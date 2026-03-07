@@ -70,14 +70,31 @@ Deno.serve(async (req) => {
 
         // 3.5 Return Text Mode (for Job Analysis)
         if (mode === 'text') {
-            // Simple cleanup
-            const text = html
-                .replace(/<script\b[^>]*>([\s\S]*?)<\/script>/gim, "")
-                .replace(/<style\b[^>]*>([\s\S]*?)<\/style>/gim, "")
-                .replace(/<[^>]+>/g, "\n") // Replace tags with newlines
+            // Robust cleanup to extract readable text while avoiding common bypasses
+            let text = html;
+
+            // 1. Remove script, style, and iframe content entirely
+            const tagsToRemove = ['script', 'style', 'iframe', 'noscript', 'canvas', 'svg'];
+            for (const tag of tagsToRemove) {
+                const regex = new RegExp(`<${tag}\\b[^>]*>([\\s\\S]*?)<\\/${tag}>`, 'gim');
+                text = text.replace(regex, "");
+            }
+
+            // 2. Convert common block tags to newlines to preserve separation
+            text = text.replace(/<(?:p|div|br|li|h[1-6]|tr)[^>]*>/gi, "\n");
+
+            // 3. Strip all remaining tags
+            text = text.replace(/<[^>]+>/g, " ");
+
+            // 4. Clean up whitespace and entities
+            text = text
+                .replace(/&nbsp;/g, " ")
+                .replace(/&amp;/g, "&")
+                .replace(/&lt;/g, "<")
+                .replace(/&gt;/g, ">")
                 .replace(/\s+/g, " ")
                 .trim()
-                .substring(0, 50000)
+                .substring(0, 50000);
 
             return new Response(JSON.stringify({ text }), {
                 headers: { ...corsHeaders, 'Content-Type': 'application/json' },
@@ -126,14 +143,20 @@ Deno.serve(async (req) => {
 
         } else {
             // For other pages, use Gemini AI parsing
-            // Clean HTML (Naive regex cleanup to save tokens)
-            const cleanHtml = html
-                .replace(/<script\b[^>]*>([\s\S]*?)<\/script>/gim, "")
-                .replace(/<style\b[^>]*>([\s\S]*?)<\/style>/gim, "")
+            // Clean HTML (Recursive cleanup to avoid simple bypasses and save tokens)
+            let cleanHtml = html;
+
+            // Remove heavy content types
+            const tagsToRemove = ['script', 'style', 'svg', 'iframe', 'noscript'];
+            for (const tag of tagsToRemove) {
+                const regex = new RegExp(`<${tag}\\b[^>]*>([\\s\\S]*?)<\\/${tag}>`, 'gim');
+                cleanHtml = cleanHtml.replace(regex, "");
+            }
+
+            cleanHtml = cleanHtml
                 .replace(/<!--([\s\S]*?)-->/gim, "")
-                .replace(/<svg\b[^>]*>([\s\S]*?)<\/svg>/gim, "")
                 .replace(/\s+/g, " ")
-                .substring(0, 30000)
+                .substring(0, 30000);
 
             const apiKey = Deno.env.get('GEMINI_API_KEY')
             if (!apiKey) throw new Error('GEMINI_API_KEY not set')

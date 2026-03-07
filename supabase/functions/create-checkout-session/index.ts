@@ -114,9 +114,8 @@ serve(async (req) => {
         const details = error.raw?.message || error.type || "unknown_error"
 
         return new Response(JSON.stringify({
-            error: message,
-            details: details,
-            stripeError: error.raw || null
+            error: "Checkout failed",
+            message: "We encountered an issue creating your checkout session. Please try again or contact support."
         }), {
             headers: { ...corsHeaders, 'Content-Type': 'application/json' },
             status: 400,
