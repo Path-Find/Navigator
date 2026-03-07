@@ -61,5 +61,9 @@
     "typescript-eslint": "^8.46.4",
     "vite": "^7.2.4",
     "vitest": "^4.0.18"
+  },
+  "overrides": {
+    "rollup": ">=4.59.0",
+    "minimatch": ">=3.1.5"
   }
 }
