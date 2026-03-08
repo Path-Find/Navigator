@@ -7,6 +7,7 @@ Navigator is an AI-powered career co-pilot that automates job monitoring, qualif
 - **[Technical](docs/ROADMAP_TECHNICAL.md)**: Supabase migrations, infrastructure scaling, and feature wishlist.
 - **[Monetization](docs/ROADMAP_MONETIZATION.md)**: Trial conversion strategy and modular pricing.
 - **[Platform](docs/ROADMAP_PLATFORM.md)**: Long-term platform intelligence and ecosystem initiatives.
+- **[Feedback](docs/ROADMAP_FEEDBACK.md)**: Closing the loop — cover letter usage tracking, outcome nudges, and user ratings.
 
 ---
 
