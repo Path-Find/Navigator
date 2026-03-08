@@ -2,27 +2,50 @@ import React, { useEffect, useState } from 'react';
 import { Shield, Activity, RefreshCw, Zap } from 'lucide-react';
 import { RdFeedbackService } from '../../../services/ai/rd/feedbackService';
 import { RdStyleService } from '../../../services/ai/rd/styleService';
+import { RdTrajectoryService } from '../../../services/ai/rd/trajectoryService';
+import { CoachStorage } from '../../../services/storage/coachStorage';
+import type { GrowthTrajectory } from '../../../services/ai/rd/types';
 import { useUser } from '../../../contexts/UserContext';
 import { Button } from '../../../components/ui/Button';
+import { TrendingUp, ArrowRight } from 'lucide-react';
 
 export const NextGenCalibration: React.FC = () => {
     const { user, isNextGenEnabled, updateProfile } = useUser();
     const [stats, setStats] = useState<{ total: number; breakdown: Record<string, number> } | null>(null);
     const [style, setStyle] = useState<string | null>(null);
+    const [trajectory, setTrajectory] = useState<GrowthTrajectory | null>(null);
+    const [targetTitle, setTargetTitle] = useState<string>('');
     const [isLoading, setIsLoading] = useState(false);
+    const [isTrajectoryLoading, setIsTrajectoryLoading] = useState(false);
 
     const loadModelData = async () => {
         if (!user) return;
         setIsLoading(true);
         try {
-            const [statsData, styleData] = await Promise.all([
+            const [statsData, styleData, targets] = await Promise.all([
                 RdFeedbackService.getSignalStats(user.id),
-                RdStyleService.getPersonalizedStyle(user.id, 'all')
+                RdStyleService.getPersonalizedStyle(user.id, 'all'),
+                CoachStorage.getTargetJobs()
             ]);
             setStats(statsData);
             setStyle(styleData);
+
+            if (targets.length > 0) {
+                setTargetTitle(targets[0].title);
+            }
         } finally {
             setIsLoading(false);
+        }
+    };
+
+    const loadTrajectory = async () => {
+        if (!user || !targetTitle) return;
+        setIsTrajectoryLoading(true);
+        try {
+            const trajectoryData = await RdTrajectoryService.getTrajectoryProjection(user.id, targetTitle);
+            setTrajectory(trajectoryData);
+        } finally {
+            setIsTrajectoryLoading(false);
         }
     };
 
@@ -112,6 +135,71 @@ export const NextGenCalibration: React.FC = () => {
                         </div>
                     </div>
                 </div>
+            </div>
+
+            {/* Trajectory Analysis (Level 2) */}
+            <div className="mt-8 pt-8 border-t border-neutral-100 dark:border-neutral-800">
+                <div className="flex items-center justify-between mb-6">
+                    <div className="flex items-center gap-2">
+                        <TrendingUp className="w-4 h-4 text-violet-500" />
+                        <span className="text-xs font-bold text-neutral-400 uppercase tracking-wider">Semantic Trajectory (Level 2)</span>
+                    </div>
+                    <div className="flex items-center gap-3">
+                        <input
+                            type="text"
+                            value={targetTitle}
+                            onChange={(e) => setTargetTitle(e.target.value)}
+                            placeholder="Target Role..."
+                            className="text-xs bg-white dark:bg-neutral-900 border border-neutral-100 dark:border-neutral-800 rounded-lg px-3 py-1.5 outline-none focus:ring-1 focus:ring-violet-500/30 w-48"
+                        />
+                        <Button
+                            variant="premium"
+                            size="sm"
+                            className="!text-[10px] !py-1.5"
+                            onClick={loadTrajectory}
+                            loading={isTrajectoryLoading}
+                            disabled={!targetTitle}
+                        >
+                            Project Path
+                        </Button>
+                    </div>
+                </div>
+
+                {trajectory ? (
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6 animate-in fade-in slide-in-from-bottom-2">
+                        <div className="md:col-span-2 bg-white dark:bg-neutral-900 rounded-2xl p-6 border border-neutral-100 dark:border-neutral-800">
+                            <h5 className="text-sm font-bold text-neutral-900 dark:text-white mb-2">{trajectory.heading}</h5>
+                            <div className="flex items-center gap-3 my-4">
+                                <span className="px-3 py-1 bg-neutral-100 dark:bg-neutral-800 rounded-lg text-[10px] font-bold text-neutral-500 capitalize">{trajectory.archetypeShift.from}</span>
+                                <ArrowRight className="w-3 h-3 text-neutral-300" />
+                                <span className="px-3 py-1 bg-violet-500/10 text-violet-500 rounded-lg text-[10px] font-bold capitalize">{trajectory.archetypeShift.to}</span>
+                            </div>
+                            <div className="mt-4 p-4 bg-violet-500/5 rounded-xl border border-violet-500/10">
+                                <p className="text-xs text-neutral-600 dark:text-neutral-400 leading-relaxed italic">
+                                    {trajectory.trajectoryGap}
+                                </p>
+                            </div>
+                        </div>
+                        <div className="bg-neutral-50 dark:bg-neutral-900/50 rounded-2xl p-6 border border-neutral-100 dark:border-neutral-800">
+                            <span className="text-[10px] font-bold text-neutral-400 uppercase tracking-widest block mb-4">Growth Signals</span>
+                            <div className="space-y-3">
+                                {trajectory.keyGrowthSignals.map((signal, i) => (
+                                    <div key={i} className="flex items-start gap-2">
+                                        <div className="w-1 h-1 rounded-full bg-violet-400 mt-1.5 shrink-0" />
+                                        <span className="text-[11px] text-neutral-600 dark:text-neutral-400 leading-tight">{signal}</span>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    </div>
+                ) : (
+                    <div className="bg-white dark:bg-neutral-900/50 rounded-2xl p-12 border border-dashed border-neutral-200 dark:border-neutral-800 flex flex-col items-center justify-center text-center">
+                        <TrendingUp className="w-8 h-8 text-neutral-200 dark:text-neutral-800 mb-4" />
+                        <p className="text-xs text-neutral-400 max-w-xs">
+                            Select or type a target role to calculate the semantic drift and growth path.
+                        </p>
+                    </div>
+                )}
             </div>
         </div>
     );
