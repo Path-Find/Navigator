@@ -1,15 +1,25 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2"
 import { fetchSafe, readTextSafe } from "./validator.ts"
 
-const corsHeaders = {
-    'Access-Control-Allow-Origin': '*',
-    'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-}
+const ALLOWED_ORIGINS = [
+    Deno.env.get('SITE_URL') ?? '',
+    'http://localhost:5173',
+    'http://localhost:4173',
+].filter(Boolean);
+
+const getCorsHeaders = (req: Request) => {
+    const origin = req.headers.get('Origin') ?? '';
+    const allowedOrigin = ALLOWED_ORIGINS.includes(origin) ? origin : '';
+    return {
+        'Access-Control-Allow-Origin': allowedOrigin,
+        'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+    };
+};
 
 Deno.serve(async (req) => {
     // 1. CORS & Auth Check
     if (req.method === 'OPTIONS') {
-        return new Response('ok', { headers: corsHeaders })
+        return new Response('ok', { headers: getCorsHeaders(req) })
     }
 
     try {
@@ -46,7 +56,7 @@ Deno.serve(async (req) => {
                 reason: limitCheck.reason,
                 message: limitCheck.message || "You have reached your limit."
             }), {
-                headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+                headers: { ...getCorsHeaders(req), 'Content-Type': 'application/json' },
                 status: 429
             });
         }
@@ -97,7 +107,7 @@ Deno.serve(async (req) => {
                 .substring(0, 50000);
 
             return new Response(JSON.stringify({ text }), {
-                headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+                headers: { ...getCorsHeaders(req), 'Content-Type': 'application/json' },
                 status: 200,
             })
         }
@@ -232,7 +242,7 @@ Deno.serve(async (req) => {
             // Validation check
             if (parsed.error === "no_jobs_found") {
                 return new Response(JSON.stringify([]), {
-                    headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+                    headers: { ...getCorsHeaders(req), 'Content-Type': 'application/json' },
                     status: 200,
                 })
             }
@@ -251,13 +261,13 @@ Deno.serve(async (req) => {
 
         // 5. Return jobs
         return new Response(JSON.stringify(jobs), {
-            headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+            headers: { ...getCorsHeaders(req), 'Content-Type': 'application/json' },
             status: 200,
         })
 
     } catch (error: any) {
         return new Response(JSON.stringify({ error: error.message }), {
-            headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+            headers: { ...getCorsHeaders(req), 'Content-Type': 'application/json' },
             status: 400,
         })
     }

@@ -155,10 +155,10 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
         // Initial Session Check
         supabase.auth.getSession().then(({ data: { session } }) => {
             const testUser = getTestUser();
+            processUser(session?.user ?? testUser);
             if (!session?.user && testUser) {
                 setActualTier((LocalStorage.get('navigator_user_tier') as UserTier) || 'free');
             }
-            processUser(session?.user ?? testUser);
         }).catch(() => processUser(null));
 
         // Auth Change Listener

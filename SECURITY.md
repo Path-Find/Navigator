@@ -35,5 +35,12 @@ Security is enforced at the database level using Row Level Security (RLS) polici
 
 ## Reporting a Vulnerability
 
-If you discover a security vulnerability in this project, please open a GitHub Issue or contact the maintainer directly. Data privacy and security are our top priorities.
+If you discover a security vulnerability in this project, **please do not open a public GitHub Issue**, as this exposes the vulnerability before it can be patched.
+
+Instead, please use one of the following private disclosure channels:
+
+- **GitHub Private Security Advisory**: [Report a vulnerability](https://github.com/ryanphanna/Navigator/security/advisories/new) (preferred)
+- **Direct contact**: Reach out to the maintainer privately via GitHub.
+
+We will acknowledge your report within 48 hours and aim to release a fix within 14 days for critical issues. Data privacy and security are our top priorities.
 

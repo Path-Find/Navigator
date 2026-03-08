@@ -8,10 +8,20 @@ const stripe = new Stripe(STRIPE_SECRET_KEY, {
     httpClient: Stripe.createFetchHttpClient(),
 })
 
-const corsHeaders = {
-    'Access-Control-Allow-Origin': '*',
-    'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-}
+const ALLOWED_ORIGINS = [
+    Deno.env.get('SITE_URL') ?? '',
+    'http://localhost:5173',
+    'http://localhost:4173',
+].filter(Boolean);
+
+const getCorsHeaders = (req: Request) => {
+    const origin = req.headers.get('Origin') ?? '';
+    const allowedOrigin = ALLOWED_ORIGINS.includes(origin) ? origin : '';
+    return {
+        'Access-Control-Allow-Origin': allowedOrigin,
+        'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+    };
+};
 
 console.log("Create Checkout Session function up and running!")
 
@@ -20,7 +30,7 @@ serve(async (req) => {
 
     // Handle CORS preflight request
     if (req.method === 'OPTIONS') {
-        return new Response('ok', { headers: corsHeaders })
+        return new Response('ok', { headers: getCorsHeaders(req) })
     }
 
     let priceId = '';
@@ -102,7 +112,7 @@ serve(async (req) => {
         return new Response(
             JSON.stringify({ url: session.url }),
             {
-                headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+                headers: { ...getCorsHeaders(req), 'Content-Type': 'application/json' },
                 status: 200,
             }
         )
@@ -117,7 +127,7 @@ serve(async (req) => {
             error: "Checkout failed",
             message: "We encountered an issue creating your checkout session. Please try again or contact support."
         }), {
-            headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+            headers: { ...getCorsHeaders(req), 'Content-Type': 'application/json' },
             status: 400,
         })
     }

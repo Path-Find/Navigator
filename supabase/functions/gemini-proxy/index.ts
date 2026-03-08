@@ -1,10 +1,20 @@
 
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2"
 
-export const corsHeaders = {
-    'Access-Control-Allow-Origin': '*',
-    'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-}
+const ALLOWED_ORIGINS = [
+    Deno.env.get('SITE_URL') ?? '',
+    'http://localhost:5173',
+    'http://localhost:4173',
+].filter(Boolean);
+
+const getCorsHeaders = (req: Request) => {
+    const origin = req.headers.get('Origin') ?? '';
+    const allowedOrigin = ALLOWED_ORIGINS.includes(origin) ? origin : '';
+    return {
+        'Access-Control-Allow-Origin': allowedOrigin,
+        'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+    };
+};
 
 const MAX_LOG_LENGTH = 200;
 const sanitizeLog = (val: unknown) => {
@@ -39,7 +49,7 @@ export const TIER_MODELS: Record<string, { extraction: string; analysis: string 
 export const handler = async (req: Request) => {
     // Handle CORS preflight request
     if (req.method === 'OPTIONS') {
-        return new Response('ok', { headers: corsHeaders })
+        return new Response('ok', { headers: getCorsHeaders(req) })
     }
 
     try {
@@ -91,7 +101,7 @@ export const handler = async (req: Request) => {
                 used: limitCheck.used,
                 limit: limitCheck.limit
             }), {
-                headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+                headers: { ...getCorsHeaders(req), 'Content-Type': 'application/json' },
                 status: 429, // Correct Rate Limit status code
             });
         }
@@ -109,7 +119,7 @@ export const handler = async (req: Request) => {
                 error: "limit_reached",
                 message: "Interviews are a premium feature available on Plus and Pro tiers."
             }), {
-                headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+                headers: { ...getCorsHeaders(req), 'Content-Type': 'application/json' },
                 status: 403,
             });
         }
@@ -136,7 +146,7 @@ export const handler = async (req: Request) => {
                         used: monthlyInterviews,
                         limit: interviewLimit
                     }), {
-                        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+                        headers: { ...getCorsHeaders(req), 'Content-Type': 'application/json' },
                         status: 429,
                     });
                 }
@@ -156,7 +166,7 @@ export const handler = async (req: Request) => {
                 error: "upgrade_required",
                 message: "This feature requires a Plus or Pro plan."
             }), {
-                headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+                headers: { ...getCorsHeaders(req), 'Content-Type': 'application/json' },
                 status: 403,
             });
         }
@@ -166,7 +176,7 @@ export const handler = async (req: Request) => {
                 error: "upgrade_required",
                 message: "This feature requires a Pro plan."
             }), {
-                headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+                headers: { ...getCorsHeaders(req), 'Content-Type': 'application/json' },
                 status: 403,
             });
         }
@@ -257,7 +267,7 @@ export const handler = async (req: Request) => {
                 error: "not_a_job",
                 message: "This content doesn't look like a valid job description."
             }), {
-                headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+                headers: { ...getCorsHeaders(req), 'Content-Type': 'application/json' },
                 status: 400,
             });
         }
@@ -285,7 +295,7 @@ export const handler = async (req: Request) => {
         }
 
         return new Response(JSON.stringify({ text, usage: data.usageMetadata }), {
-            headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+            headers: { ...getCorsHeaders(req), 'Content-Type': 'application/json' },
             status: 200,
         })
 
@@ -293,7 +303,7 @@ export const handler = async (req: Request) => {
         const message = error instanceof Error ? error.message : String(error);
         console.error("Gemini Proxy Error:", sanitizeLog(message));
         return new Response(JSON.stringify({ error: `Edge Function Error: ${message}` }), {
-            headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+            headers: { ...getCorsHeaders(req), 'Content-Type': 'application/json' },
             status: 500, // Correctly return an error status code
         })
     }
