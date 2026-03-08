@@ -4,12 +4,34 @@ import { useGlobalUI } from '../../contexts/GlobalUIContext';
 import { ROUTES, APP_VERSION } from '../../constants';
 import { useNavigate } from 'react-router-dom';
 import { type ViewId } from '../../utils/navigation';
+import { useUser } from '../../contexts/UserContext';
+import { useModal } from '../../contexts/ModalContext';
 
 export const Footer: React.FC = () => {
     const { setView } = useGlobalUI();
+    const { user } = useUser();
+    const { openModal } = useModal();
     const navigate = useNavigate();
 
     const handleNavigate = (path: string, viewId: string) => {
+        // Public paths that don't require authentication
+        const publicPaths = [
+            ROUTES.HOME,
+            ROUTES.PRIVACY,
+            ROUTES.TERMS,
+            ROUTES.CONTACT,
+            ROUTES.PLANS,
+            ROUTES.FEATURES,
+            '/terms',
+            '/contact',
+            '/about'
+        ];
+
+        if (!user && !publicPaths.includes(path as any)) {
+            openModal('AUTH');
+            return;
+        }
+
         navigate(path);
         setView(viewId as ViewId);
         window.scrollTo({ top: 0, behavior: 'smooth' });

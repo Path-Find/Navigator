@@ -2,8 +2,6 @@
 
 Navigator is an AI-powered career co-pilot that automates job monitoring, qualification mapping, and application workflows. This roadmap outlines our path from a utility tool to a comprehensive intelligence layer.
 
-## Pillars
-
 - **[Vision](docs/VISION.md)**: Product vision statement and long-term north-star goals.
 - **[Product](docs/ROADMAP_PRODUCT.md)**: Browser extension, trust & verification, design, and data features.
 - **[Technical](docs/ROADMAP_TECHNICAL.md)**: Supabase migrations, infrastructure scaling, and feature wishlist.
