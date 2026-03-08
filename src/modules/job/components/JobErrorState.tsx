@@ -26,7 +26,13 @@ export const JobErrorState: React.FC<JobErrorStateProps> = ({
     onManualRetry
 }) => {
     const isExtractionError = !job.description || (job.progressMessage && (job.progressMessage.includes("blocked") || job.progressMessage.includes("extraction") || job.progressMessage.includes("Manual Input")));
-    const isAiError = job.progressMessage && (job.progressMessage.includes("AI") || job.progressMessage.includes("quota") || job.progressMessage.includes("Too many"));
+    const isAiError = job.progressMessage && (
+        job.progressMessage.includes("AI") ||
+        job.progressMessage.includes("quota") ||
+        job.progressMessage.includes("Too many") ||
+        job.progressMessage.includes("timed out") ||
+        job.progressMessage.includes("service busy")
+    );
 
     return (
         <div className="theme-job animate-in fade-in slide-in-from-right-4 duration-300 p-6 bg-white dark:bg-neutral-900 h-full overflow-y-auto">

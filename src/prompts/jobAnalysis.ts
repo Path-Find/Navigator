@@ -40,6 +40,10 @@ export const JOB_ANALYSIS_PROMPTS = {
         "companyName": "Company name",
         "location": "City, State or Remote (Strictly geographical, exclude internal IDs)",
         "referenceCode": "Job ID or reference number (if found, otherwise null)",
+        "category": "technical" | "managerial" | "trades" | "healthcare" | "creative" | "general",
+        "canonicalTitle": "The most standard, high-level name for this role",
+        "isAiBanned": boolean,
+        "aiBanReason": "If banned, quote the prohibition policy, otherwise null",
         "keySkills": ["List of 5-8 priority skills found in the job post"],
         "requiredSkills": [
           { "name": "Skill Name", "level": "learning" | "comfortable" | "expert" }

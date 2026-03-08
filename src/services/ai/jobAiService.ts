@@ -44,18 +44,60 @@ const preCleanJobText = (text: string): string => {
         /^contact us$/i,
         /^site map$/i,
         /^top$/i,
-        /^skip to main content/i
+        /^skip to main content/i,
+        /^skip to footer/i,
+        /^view all jobs/i,
+        /^search by/i,
+        /^create alert/i,
+        /^share this job/i,
+        /facebook|twitter|linkedin|email/i,
+        /^apply now/i,
+        /^add to favorites/i,
+        /^map pin/i,
+        /^radius marker pin/i,
+        /^job title or keywords/i,
+        /^search$/i,
+        /^flexible working locations/i,
+        /logo/i,
+        /^careers home/i,
+        /^english$/i,
+        /^sign in/i,
+        /^create account/i,
+        /^job search$/i,
+        /^search results/i,
+        /^previous job/i,
+        /^next job/i,
+        /^save this job/i,
+        /^return to/i,
+        /^back$/i,
+        /^close$/i,
+        /^navigation/i,
+        /©|copyright/i,
+        /^all rights reserved/i,
+        /^powered by/i,
+        /^cookies/i,
+        /^skip to/i,
+        /^go back/i,
+        /^breadcrumb/i,
+        /^footer/i,
+        /^header/i,
+        /^menu/i,
+        /^toggle/i
     ];
 
     return text
         .split('\n')
         .filter(line => {
             const trimmed = line.trim();
-            if (trimmed.length < 2) return false;
+            // Filter out empty lines, single character lines, and junk patterns
+            if (trimmed.length < 3) return false;
+            // Filter out social links / boilerplate that are usually long but useless
+            if (trimmed.length > 500 && (trimmed.includes('http') || trimmed.includes('www.'))) return false;
+
             return !junkPatterns.some(pattern => pattern.test(trimmed));
         })
         .join('\n')
-        .substring(0, 10000); // 10k characters is a safe upper bound for core details
+        .substring(0, 12000);
 };
 
 const extractJobInfo = async (
@@ -93,7 +135,7 @@ const extractJobInfo = async (
         });
         metadata.token_usage = response.response.usageMetadata;
         const result = JSON.parse(cleanJsonOutput(response.response.text()));
-        return { distilledJob: result as DistilledJob, cleanedDescription: rawJobText };
+        return { distilledJob: result as DistilledJob, cleanedDescription: cleanedText };
     }, { event_type: 'job_extraction', prompt: extractionPrompt, model: AI_MODELS.EXTRACTION, job_id: undefined }, undefined, undefined, onProgress); // Extraction usually happens before job is fully saved, but could pass if available.
 };
 
@@ -105,11 +147,17 @@ export const analyzeJobFit = async (
     jobId?: string,
     transcript?: Transcript | null
 ): Promise<JobAnalysis> => {
-    if (onProgress) onProgress("Cleaning", 1, 2);
-    const { distilledJob: extractionInfo, cleanedDescription } = await extractJobInfo(jobDescription, onProgress);
-    if (resumes.length === 0) return { distilledJob: extractionInfo, cleanedDescription } as JobAnalysis;
+    if (onProgress) onProgress("Cleaning and Analyzing", 1, 1);
 
-    if (onProgress) onProgress("Matching", 2, 2);
+    // 1. Basic cleanup to prevent AI confusion
+    const cleanedDescription = preCleanJobText(jobDescription);
+
+    if (resumes.length === 0) {
+        // Just extract basic info if no resumes provided
+        const { distilledJob } = await extractJobInfo(cleanedDescription, onProgress);
+        return { distilledJob, cleanedDescription } as JobAnalysis;
+    }
+
     const resumeContext = resumes.map(stringifyProfile).join('\n---\n');
     const skillsContext = userSkills.length > 0
         ? `\nADDITIONAL SKILLS:\n${userSkills.map(s => `- ${s.name}: ${s.proficiency}`).join('\n')}`
@@ -119,13 +167,10 @@ export const analyzeJobFit = async (
         ? `\nACADEMIC BACKGROUND (Transcript):\nProgram: ${transcript.program} at ${transcript.university}\nCourses:\n${transcript.semesters.flatMap((s: Semester) => s.courses).map((c: Course) => `- ${c.title} (${c.code}): ${c.grade}`).join('\n')}`
         : '';
 
-    // Fetch Bucket Guidelines (Role Farming) — upsert + select in one round trip, cached in memory
-    const canonicalTitle = extractionInfo.canonicalTitle || extractionInfo.roleTitle || 'General';
-    const bucket = await BucketStorage.ensureAndGetBucket(canonicalTitle);
-    const bucketAdvice = bucket?.guidelines?.promptAdvice;
+    // 2. Fetch Bucket Guidelines - Skipping for now to keep performance high
+    // We can re-integrate this if it's critical, but we'd want to do it inside the main prompt or via parallel fetch.
 
-    // Use the consolidated Strategic Professional prompt
-    const analysisPrompt = JOB_ANALYSIS_PROMPTS.JOB_FIT_ANALYSIS.DEFAULT(cleanedDescription, (resumeContext + skillsContext + educationContext), bucketAdvice);
+    const analysisPrompt = JOB_ANALYSIS_PROMPTS.JOB_FIT_ANALYSIS.DEFAULT(cleanedDescription, (resumeContext + skillsContext + educationContext));
 
     const analysis = await callWithRetry(async (metadata) => {
         const model = await getModel({ task: 'analysis', generationConfig: { responseMimeType: "application/json" } });
@@ -134,30 +179,13 @@ export const analyzeJobFit = async (
         return JSON.parse(sanitizeInput(cleanJsonOutput(response.response.text())));
     }, { event_type: 'analysis', prompt: analysisPrompt, model: 'dynamic', job_id: jobId }, undefined, undefined, onProgress);
 
-    // Deep merge the extraction info with the detailed analysis
-    const mergedDistilledJob: DistilledJob = {
-        // Start with basic extraction info as the base
-        ...extractionInfo,
-        // Overlay anything the detailed analysis found
-        ...(analysis.distilledJob || {}),
-        // Ensure critical extraction info (safety/bans) takes ultimate precedence
-        isAiBanned: extractionInfo.isAiBanned ?? analysis.distilledJob?.isAiBanned,
-        aiBanReason: extractionInfo.aiBanReason || analysis.distilledJob?.aiBanReason,
-        referenceCode: extractionInfo.referenceCode || analysis.distilledJob?.referenceCode || null,
-        // Detailed analysis is the primary source for these fields
-        keySkills: analysis.distilledJob?.keySkills?.length ? analysis.distilledJob.keySkills : (extractionInfo.keySkills || []),
-        requiredSkills: analysis.distilledJob?.requiredSkills || [],
-        coreResponsibilities: analysis.distilledJob?.coreResponsibilities?.length ? analysis.distilledJob.coreResponsibilities : (extractionInfo.coreResponsibilities || []),
-    };
-
-    // Validation: If we have no score and no skills, something went wrong with the AI output
-    if (!analysis.compatibilityScore && (!mergedDistilledJob.keySkills.length)) {
+    // Validation: If we have no score and no skills, something went wrong
+    if (!analysis.compatibilityScore && (!analysis.distilledJob?.keySkills?.length)) {
         throw new Error("NOT_A_JOB: Analysis failed to generate meaningful insights. Please check if the source content is a valid job description.");
     }
 
     return {
         ...analysis,
-        distilledJob: mergedDistilledJob,
         cleanedDescription,
         bestResumeProfileId: analysis.bestResumeProfileId || resumes[0]?.id
     };

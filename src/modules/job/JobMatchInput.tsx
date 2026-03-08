@@ -149,6 +149,7 @@ const JobMatchInput: React.FC = () => {
             handleJobSubmission({ type: 'text', content: text });
         } catch (err: any) {
             const msg = err instanceof Error ? err.message : String(err);
+            setUrl(''); // Clear URL so user can paste JD
             if (msg.includes("403") || msg.includes("Forbidden")) {
                 setError("This site blocks automated access. Please paste the job description below:");
             } else if (msg.includes("timeout")) {
