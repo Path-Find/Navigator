@@ -237,9 +237,13 @@ describe('getUsageStats', () => {
     });
 
     it('should return default stats on error', async () => {
-        vi.mocked(supabase.from).mockImplementation(() => {
-            throw new Error('DB Error');
-        });
+        vi.mocked(supabase.from).mockReturnValue({
+            select: vi.fn().mockReturnThis(),
+            eq: vi.fn().mockReturnThis(),
+            gte: vi.fn().mockReturnThis(),
+            in: vi.fn().mockReturnThis(),
+            single: vi.fn().mockRejectedValue(new Error('DB Error'))
+        } as any);
 
         const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => { });
 

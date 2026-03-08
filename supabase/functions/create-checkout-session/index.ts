@@ -33,11 +33,9 @@ serve(async (req) => {
         return new Response('ok', { headers: getCorsHeaders(req) })
     }
 
-    let priceId = '';
     try {
         const body = await req.json()
-        priceId = body.priceId
-        const { returnUrl } = body
+        const { priceId, returnUrl } = body
 
         // 1. Authorization
         const authHeader = req.headers.get('Authorization')
@@ -82,12 +80,6 @@ serve(async (req) => {
                 }
             })
             customerId = customer.id
-
-            // Save customer ID to profile (optional, webhook will also do it but good for immediate consistency)
-            // Note: This requires the user to have permission to update this field or use service role.
-            // For now, we rely on webhook or assume user can update their own row if policies allow, 
-            // but 'stripe_customer_id' might be protected. 
-            // Safest is to let the webhook handle the syncing or use service role here if needed.
         }
 
         // 4. Create Session
@@ -120,9 +112,6 @@ serve(async (req) => {
 
     } catch (error: any) {
         console.error("Function error:", error)
-        const message = error.message || String(error)
-        const details = error.raw?.message || error.type || "unknown_error"
-
         return new Response(JSON.stringify({
             error: "Checkout failed",
             message: "We encountered an issue creating your checkout session. Please try again or contact support."
@@ -132,5 +121,3 @@ serve(async (req) => {
         })
     }
 })
-
-

@@ -805,10 +805,10 @@ export const ResumeEditor: React.FC = () => {
                                     {/* Verified Strengths Card */}
                                     <Card variant="premium" className="p-5 border-neutral-100 dark:border-neutral-800">
                                         <div className="flex items-center justify-between mb-4">
-                                            <p className="text-[10px] font-black text-emerald-500 tracking-tight flex items-center gap-1.5">
+                                            <div className="text-[10px] font-black text-emerald-500 tracking-tight flex items-center gap-1.5">
                                                 <div className="w-1 h-1 bg-emerald-500 rounded-full shadow-[0_0_8px_rgba(16,185,129,0.4)]" />
                                                 Verified Strengths
-                                            </p>
+                                            </div>
                                             <button
                                                 onClick={() => navigate(ROUTES.SKILLS)}
                                                 className="text-[9px] font-black text-indigo-500 hover:text-indigo-600 flex items-center gap-1 transition-colors"
@@ -859,10 +859,10 @@ export const ResumeEditor: React.FC = () => {
                                     {/* Discovered Keywords Card */}
                                     {uniqueDiscovered.length > 0 && (
                                         <Card variant="premium" className="p-5 border-neutral-100 dark:border-neutral-800">
-                                            <p className="text-[10px] font-black text-indigo-500 tracking-tight mb-4 flex items-center gap-1.5">
+                                            <div className="text-[10px] font-black text-indigo-500 tracking-tight mb-4 flex items-center gap-1.5">
                                                 <div className="w-1 h-1 bg-indigo-500 rounded-full shadow-[0_0_8px_rgba(99,102,241,0.4)]" />
                                                 Discovered Keywords
-                                            </p>
+                                            </div>
                                             <div className="flex flex-wrap gap-2">
                                                 {uniqueDiscovered.map(s => (
                                                     <button

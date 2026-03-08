@@ -47,6 +47,12 @@ export const ResumeProvider: React.FC<{ children: React.ReactNode }> = ({ childr
                 setResumes(loadedResumes);
                 setIsLoading(false);
             }
+        }).catch(err => {
+            console.error("Failed to load resumes:", err);
+            if (mounted) {
+                setIsLoading(false);
+                showError("Failed to load resumes. Please refresh.");
+            }
         });
         return () => { mounted = false; };
     }, [user?.id]);
@@ -55,11 +61,10 @@ export const ResumeProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         setIsParsingResume(true);
         setImportError(null);
         try {
-            const reader = new FileReader();
-            reader.readAsDataURL(file);
-
-            // Wrap FileReader in promise
+            // Wrap FileReader in promise — readAsDataURL is called INSIDE the promise
+            // so that onload/onerror handlers are guaranteed to be set first
             await new Promise<void>((resolve, reject) => {
+                const reader = new FileReader();
                 reader.onload = async () => {
                     try {
                         const result = reader.result as string;
@@ -83,6 +88,7 @@ export const ResumeProvider: React.FC<{ children: React.ReactNode }> = ({ childr
                     }
                 };
                 reader.onerror = () => reject(new Error("Failed to read file"));
+                reader.readAsDataURL(file);
             });
 
         } catch (err) {

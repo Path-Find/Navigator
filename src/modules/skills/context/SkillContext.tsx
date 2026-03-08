@@ -3,6 +3,7 @@ import type { CustomSkill } from '../../../types';
 import { TRACKING_EVENTS } from '../../../constants';
 import { Storage } from '../../../services/storageService';
 import { EventService } from '../../../services/eventService';
+import { useToast } from '../../../contexts/ToastContext';
 
 interface SkillContextType {
     skills: CustomSkill[];
@@ -29,16 +30,19 @@ export const SkillProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     const [skills, setSkills] = useState<CustomSkill[]>([]);
     const [interviewSkill, setInterviewSkill] = useState<string | null>(null);
     const [isLoading, setIsLoading] = useState(true);
+    const { showError } = useToast();
 
     // Initial Load
     useEffect(() => {
         let mounted = true;
-        // setIsLoading(true); // Initial state is true
         Storage.getSkills().then(loadedSkills => {
             if (mounted) {
                 setSkills(loadedSkills);
                 setIsLoading(false);
             }
+        }).catch(err => {
+            console.error("Failed to load skills:", err);
+            if (mounted) setIsLoading(false);
         });
         return () => { mounted = false; };
     }, []);
@@ -48,20 +52,25 @@ export const SkillProvider: React.FC<{ children: React.ReactNode }> = ({ childre
 
         if (!skillToUpdate) return;
 
-        const updatedSkill = await Storage.saveSkill({ name: skillToUpdate, proficiency, evidence });
-        EventService.trackUsage(TRACKING_EVENTS.SKILLS);
-        setSkills(prev => {
-            const exists = prev.some(s => s.name === skillToUpdate);
-            if (exists) {
-                return prev.map(s => s.name === skillToUpdate ? updatedSkill : s);
-            }
-            return [...prev, updatedSkill];
-        });
+        try {
+            const updatedSkill = await Storage.saveSkill({ name: skillToUpdate, proficiency, evidence });
+            EventService.trackUsage(TRACKING_EVENTS.SKILLS);
+            setSkills(prev => {
+                const exists = prev.some(s => s.name === skillToUpdate);
+                if (exists) {
+                    return prev.map(s => s.name === skillToUpdate ? updatedSkill : s);
+                }
+                return [...prev, updatedSkill];
+            });
 
-        if (!skillNameOverride) {
-            setInterviewSkill(null);
+            if (!skillNameOverride) {
+                setInterviewSkill(null);
+            }
+        } catch (err) {
+            console.error("Failed to save skill:", err);
+            showError("Failed to save skill. Please try again.");
         }
-    }, [interviewSkill]);
+    }, [interviewSkill, showError]);
 
     const updateSkills = useCallback((newSkills: CustomSkill[]) => {
         setSkills(newSkills);

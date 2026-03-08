@@ -8,8 +8,9 @@ let cachedUserIdPromise: Promise<string | undefined> | null = null;
 export const getUserId = async (): Promise<string | undefined> => {
     if (!cachedUserIdPromise) {
         cachedUserIdPromise = supabase.auth.getSession()
-            .then(({ data: { session } }) => session?.user?.id);
-        setTimeout(() => { cachedUserIdPromise = null; }, 30_000);
+            .then(({ data: { session } }) => session?.user?.id)
+            .catch(() => undefined);
+        setTimeout(() => { cachedUserIdPromise = null; }, 5_000);
     }
     return cachedUserIdPromise;
 };

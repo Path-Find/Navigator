@@ -33,7 +33,10 @@ export const useCoachManager = () => {
             }
         }).catch(err => {
             console.error("Failed to load coach data:", err);
-            if (mounted) setIsLoading(false);
+            if (mounted) {
+                setIsLoading(false);
+                showError("Failed to load coach data. Please refresh.");
+            }
         });
         return () => { mounted = false; };
     }, []);
@@ -51,9 +54,8 @@ export const useCoachManager = () => {
                 }
             }
 
-            const reader = new FileReader();
-            reader.readAsDataURL(file);
             await new Promise<void>((resolve, reject) => {
+                const reader = new FileReader();
                 reader.onload = async () => {
                     try {
                         const result = reader.result as string;
@@ -68,6 +70,7 @@ export const useCoachManager = () => {
                     } catch (err) { reject(err); }
                 };
                 reader.onerror = () => reject(new Error("Failed to read file"));
+                reader.readAsDataURL(file);
             });
         } catch (err) {
             console.error("Failed to add role model:", err);
@@ -76,9 +79,14 @@ export const useCoachManager = () => {
     }, []);
 
     const handleDeleteRoleModel = useCallback(async (id: string) => {
-        const updated = await Storage.deleteRoleModel(id);
-        setRoleModels(updated);
-    }, []);
+        try {
+            const updated = await Storage.deleteRoleModel(id);
+            setRoleModels(updated);
+        } catch (err) {
+            console.error("Failed to delete role model:", err);
+            showError("Failed to delete role model. Please try again.");
+        }
+    }, [showError]);
 
     const handleRunGapAnalysis = useCallback(async (targetJobId: string, { resumes, skills }: { resumes: AppState['resumes'], skills: AppState['skills'] }) => {
         const targetJob = targetJobs.find(tj => tj.id === targetJobId);
@@ -146,9 +154,14 @@ export const useCoachManager = () => {
             m.id === milestoneId ? { ...m, status: (m.status === 'completed' ? 'pending' : 'completed') as 'pending' | 'completed' } : m
         );
         const updatedTargetJob = { ...targetJob, roadmap: updatedRoadmap };
-        const updatedList = await Storage.saveTargetJob(updatedTargetJob);
-        setTargetJobs(updatedList);
-    }, [targetJobs]);
+        try {
+            const updatedList = await Storage.saveTargetJob(updatedTargetJob);
+            setTargetJobs(updatedList);
+        } catch (err) {
+            console.error("Failed to save milestone:", err);
+            showError("Failed to save milestone. Please try again.");
+        }
+    }, [targetJobs, showError]);
 
     const handleTargetJobCreated = useCallback(async (url: string) => {
         try {
@@ -185,14 +198,24 @@ export const useCoachManager = () => {
             roleModelId: roleModel.id
         };
 
-        const updated = await Storage.saveTargetJob(newTarget);
-        setTargetJobs(updated);
-    }, [roleModels]);
+        try {
+            const updated = await Storage.saveTargetJob(newTarget);
+            setTargetJobs(updated);
+        } catch (err) {
+            console.error("Failed to create emulation target:", err);
+            showError("Failed to create target. Please try again.");
+        }
+    }, [roleModels, showError]);
 
     const handleUpdateTargetJob = useCallback(async (targetJob: TargetJob) => {
-        const updatedList = await Storage.saveTargetJob(targetJob);
-        setTargetJobs(updatedList);
-    }, []);
+        try {
+            const updatedList = await Storage.saveTargetJob(targetJob);
+            setTargetJobs(updatedList);
+        } catch (err) {
+            console.error("Failed to update target job:", err);
+            showError("Failed to save changes. Please try again.");
+        }
+    }, [showError]);
 
     return {
         roleModels,

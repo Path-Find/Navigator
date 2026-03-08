@@ -133,7 +133,7 @@ export const callWithRetry = async <T>(
                     latency_ms: Date.now() - startTime,
                     job_id: context.job_id
                 });
-                throw new Error(getUserFriendlyError("DAILY_QUOTA_EXCEEDED"));
+                throw new Error(getUserFriendlyError("DAILY_QUOTA_EXCEEDED"), { cause: error });
             }
 
             const isQuotaError = (
@@ -160,8 +160,8 @@ export const callWithRetry = async <T>(
                     metadata: { attempt: i + 1 },
                     job_id: context.job_id
                 });
-                if (isQuotaError) throw new Error(getUserFriendlyError("RATE_LIMIT_EXCEEDED"));
-                throw new Error(getUserFriendlyError(err));
+                if (isQuotaError) throw new Error(getUserFriendlyError("RATE_LIMIT_EXCEEDED"), { cause: error });
+                throw new Error(getUserFriendlyError(err), { cause: error });
             }
         }
     }

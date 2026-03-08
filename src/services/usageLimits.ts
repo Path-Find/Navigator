@@ -132,14 +132,7 @@ export const getUsageStats = async (userId: string): Promise<UsageStats> => {
         firstOfMonth.setDate(1);
         firstOfMonth.setHours(0, 0, 0, 0);
 
-        const [
-            profileResult,
-            todayCountResult,
-            weekCountResult,
-            monthInterviewCountResult,
-            roleModelCountResult,
-            todayEmailCountResult,
-        ] = await Promise.allSettled([
+        const results = await Promise.allSettled([
             // Attempt to fetch all profile columns, but handle potential missing columns gracefully
             (async () => {
                 const { data, error } = await supabase
@@ -167,34 +160,50 @@ export const getUsageStats = async (userId: string): Promise<UsageStats> => {
                 }
                 return { data, error };
             })(),
-            supabase
+            (async () => supabase
                 .from('jobs')
                 .select('*', { count: 'exact', head: true })
                 .eq('user_id', userId)
-                .gte('date_added', today),
-            supabase
+                .gte('date_added', today))(),
+            (async () => supabase
                 .from('jobs')
                 .select('*', { count: 'exact', head: true })
                 .eq('user_id', userId)
-                .gte('date_added', weekAgo.toISOString()),
+                .gte('date_added', weekAgo.toISOString()))(),
             // Monthly interview count: count the START of sessions, not individual analyses
-            supabase
+            (async () => supabase
                 .from('logs')
                 .select('*', { count: 'exact', head: true })
                 .eq('user_id', userId)
                 .in('event_type', ['interview_generation', 'unified_skill_interview_generation', 'skill_interview_generation'])
-                .gte('created_at', firstOfMonth.toISOString()),
-            supabase
+                .gte('created_at', firstOfMonth.toISOString()))(),
+            (async () => supabase
                 .from('role_models')
                 .select('*', { count: 'exact', head: true })
-                .eq('user_id', userId),
-            supabase
+                .eq('user_id', userId))(),
+            (async () => supabase
                 .from('jobs')
                 .select('*', { count: 'exact', head: true })
                 .eq('user_id', userId)
                 .eq('source_type', 'email')
-                .gte('date_added', today),
+                .gte('date_added', today))(),
         ]);
+
+        const [
+            profileResult,
+            todayCountResult,
+            weekCountResult,
+            monthInterviewCountResult,
+            roleModelCountResult,
+            todayEmailCountResult,
+        ] = results as any;
+
+        // Log any rejections
+        results.forEach((r: any) => {
+            if (r.status === 'rejected') {
+                console.error('Error fetching usage stats:', r.reason);
+            }
+        });
 
         // Helper to extract data from settled promise
         const getData = (result: any) => result.status === 'fulfilled' ? result.value.data : null;

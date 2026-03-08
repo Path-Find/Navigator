@@ -34,26 +34,25 @@ export const useAcademicLogic = () => {
         setParseError(null);
 
         try {
-            const reader = new FileReader();
-            reader.readAsDataURL(file);
-            reader.onload = async () => {
-                const base64 = (reader.result as string).split(',')[1];
-                try {
-                    const parsed = await parseTranscript(base64, file.type);
-                    setTempTranscript(parsed);
-                    setShowVerification(true);
-                } catch (err: unknown) {
-                    setParseError(err instanceof Error ? err.message : 'Failed to parse transcript');
-                } finally {
-                    setIsParsing(false);
-                }
-            };
-            reader.onerror = () => {
-                setParseError('Failed to read file');
-                setIsParsing(false);
-            };
+            await new Promise<void>((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = async () => {
+                    const base64 = (reader.result as string).split(',')[1];
+                    try {
+                        const parsed = await parseTranscript(base64, file.type);
+                        setTempTranscript(parsed);
+                        setShowVerification(true);
+                        resolve();
+                    } catch (err: unknown) {
+                        reject(err);
+                    }
+                };
+                reader.onerror = () => reject(new Error('Failed to read file'));
+                reader.readAsDataURL(file);
+            });
         } catch (e: unknown) {
             setParseError(e instanceof Error ? e.message : 'An unexpected error occurred');
+        } finally {
             setIsParsing(false);
         }
     }, [setTempTranscript, setShowVerification]);
