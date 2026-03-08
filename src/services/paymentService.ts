@@ -11,7 +11,7 @@ export const paymentService = {
         }
 
         // TEMP: Kill switch for new checkouts
-        throw new Error('New subscriptions are temporarily paused while we calibrate the Professional Modeling Engine.');
+        throw new Error("Navigator is currently invite-only. Please join the waitlist in your account settings or on the plans page.");
 
         // Get fresh session with valid access token
         const { data: { session } } = await supabase.auth.getSession();

@@ -21,7 +21,8 @@ export const PlansPage: React.FC = () => {
     const [searchParams] = useSearchParams();
     const [isAnnual, setIsAnnual] = useState(false);
     const [loadingTier, setLoadingTier] = useState<string | null>(null);
-    const { showError } = useToast();
+    const [waitlistStatus, setWaitlistStatus] = useState<'idle' | 'loading' | 'success'>('idle');
+    const { showError, showInfo } = useToast();
 
     // Cycle headline on each visit
     const headline = useMemo(() => {
@@ -71,8 +72,22 @@ export const PlansPage: React.FC = () => {
                 return;
             }
 
-            // TEMP: Disable checkouts while refining NextGen
-            showError('New subscriptions are temporarily paused while we calibrate the Professional Modeling Engine. Check back soon!');
+            // TEMP: Disable checkouts while refining NextGen - Offer Waitlist
+            setWaitlistStatus('loading');
+            try {
+                const { WaitlistService } = await import('../../services/waitlistService');
+                const result = await WaitlistService.joinWaitlist(user.email!, `upgrade_${tier}`);
+                if (result.success) {
+                    setWaitlistStatus('success');
+                    showInfo("You're on the waitlist for " + tier.toUpperCase() + "! We'll notify you when it's ready.");
+                } else {
+                    showError(result.error || "Failed to join waitlist.");
+                }
+            } catch (err) {
+                showError("Something went wrong. Please try again.");
+            } finally {
+                setWaitlistStatus('idle');
+            }
             return;
 
             const { url } = await paymentService.createCheckoutSession(priceId);
@@ -112,9 +127,9 @@ export const PlansPage: React.FC = () => {
                 />
 
                 <div className="flex justify-center -mt-4 mb-12">
-                    <div className="inline-flex items-center gap-2 px-4 py-2 bg-neutral-50 dark:bg-neutral-900/40 border border-neutral-100 dark:border-neutral-800 rounded-2xl text-neutral-500 dark:text-neutral-400 text-xs font-bold">
-                        <Shield className="w-4 h-4" />
-                        We are not currently accepting new users.
+                    <div className="inline-flex items-center gap-2 px-4 py-2 bg-indigo-50 dark:bg-indigo-900/40 border border-indigo-100 dark:border-indigo-800 rounded-2xl text-indigo-600 dark:text-indigo-400 text-xs font-bold animate-in fade-in slide-in-from-top-2">
+                        <Zap className="w-4 h-4" />
+                        We're currently invite-only while calibrating NextGen.
                     </div>
                 </div>
 
@@ -213,9 +228,9 @@ export const PlansPage: React.FC = () => {
                     price={`$${plusPrice}`}
                     accentColor="indigo"
                     subText="Everything in Explorer, plus..."
-                    buttonText={userTier === USER_TIERS.PLUS ? 'Current Plan' : 'Upgrade to Plus'}
+                    buttonText={userTier === USER_TIERS.PLUS ? 'Current Plan' : 'Join Plus Waitlist'}
                     onSelect={() => handleSelectPlan(USER_TIERS.PLUS)}
-                    isLoading={loadingTier === USER_TIERS.PLUS}
+                    isLoading={loadingTier === USER_TIERS.PLUS || (loadingTier === USER_TIERS.PLUS && waitlistStatus === 'loading')}
                     features={getFeaturesForPlan('plus').map(f => ({ name: f.name, desc: f.description.plan, isComingSoon: f.stage === 'beta' }))}
                     limits={{
                         analyses: String(PLAN_LIMITS[USER_TIERS.PLUS].WEEKLY_ANALYSES),
@@ -235,9 +250,9 @@ export const PlansPage: React.FC = () => {
                     isPopular={true}
                     accentColor="emerald"
                     subText="Everything in Plus, plus..."
-                    buttonText={userTier === USER_TIERS.PRO ? 'Current Plan' : 'Upgrade to Pro'}
+                    buttonText={userTier === USER_TIERS.PRO ? 'Current Plan' : 'Join Pro Waitlist'}
                     onSelect={() => handleSelectPlan(USER_TIERS.PRO)}
-                    isLoading={loadingTier === USER_TIERS.PRO}
+                    isLoading={loadingTier === USER_TIERS.PRO || (loadingTier === USER_TIERS.PRO && waitlistStatus === 'loading')}
                     features={getFeaturesForPlan('pro').map(f => ({ name: f.name, desc: f.description.plan, isComingSoon: f.stage === 'beta' }))}
                     limits={{
                         analyses: String(PLAN_LIMITS[USER_TIERS.PRO].DAILY_ANALYSES),
