@@ -10,8 +10,7 @@ import type { FeatureDefinition } from '../../featureRegistry';
 import { useUser } from '../../contexts/UserContext';
 import { useGlobalUI } from '../../contexts/GlobalUIContext';
 import { useModal } from '../../contexts/ModalContext';
-import type { ViewId } from '../../utils/navigation';
-import type { FeatureDefinition } from '../../featureRegistry';
+import { type FeatureDefinition } from '../../featureRegistry';
 
 const HomePage: React.FC = () => {
     const { user, isAdmin, isTester, journey, userTier } = useUser();
