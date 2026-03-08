@@ -26,6 +26,12 @@ Building the foundation of the user's personal model.
 - [x] **Edit Monitoring**: Monitor manual edits for style-drift detection.
 - [x] **Outcome Correlation**: Correlate "Interview" and "Offer" status changes to successful modeling states.
 
+### Level 2: Semantic Trajectory Mapping (In Progress)
+- [x] **Trajectory Mapper Prompt**: Established `TRAJECTORY_MAPPER_PROMPT` for path analysis.
+- [x] **Growth Vector Logic**: Implemented `RdTrajectoryService` to calculate drift between past and present.
+- [ ] **Trajectory Dashboard**: UI to visualize the path from current archetype to target archetype.
+- [ ] **Gap Analysis 2.0**: Integration with the matching loop to provide trajectory-aware feedback.
+
 ### 2. Automated Style Inlining
 - [x] **Style Distillation**: Distill recent feedback into prompt-level instructions (Style Guides).
 - [x] **Prompt Injection**: Implement dynamic prompt overrides in the generation loop.

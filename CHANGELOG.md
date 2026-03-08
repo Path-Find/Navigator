@@ -6,7 +6,7 @@ All notable changes to this project will be documented in this file.
 
 ### Professional Modeling Engine (R&D)
 - **Phase 3: Personalized style Overrides**: Implemented the "Style Transformer" (`RdStyleService`) which distills user feedback into active instructions. These instructions are now "dark-wired" into the generation loop to automatically adjust AI output to the user's personal voice.
-- **Phase 2: Semantic Trajectory Mapping**: Established the `RdEmbeddingService` using `text-embedding-004` to map professional experience into a 768-dimensional latent space. Every tailored resume block is now silently vectorized to build a persistent career trajectory map.
+- **Phase 2: Semantic Trajectory Mapping**: Established the `RdEmbeddingService` using `text-embedding-004` to map professional experience into a 768-dimensional latent space. Implemented `RdTrajectoryService` to calculate the "Growth Vector" (semantic drift) between past profile versions and current target roles.
 - **Phase 1: High-Fidelity Feedback Logs**: Integrated `RdFeedbackService` into the core generation and tailoring hooks. The engine now captures explicit picks (A/B testing), implicit edits, and real-world outcomes (Interview/Offer) to calibrate user-specific models.
 - **Infrastructure**: Launched the `rd_user_embeddings` data store with `pgvector` support and implemented a secure, per-user R&D feature gating system (`isNextGenEnabled`).
 - **Roadmap Visualization**: Introduced `docs/ROADMAP_NEXTGEN.md` to track the five levels of the Modeling Engine architecture.

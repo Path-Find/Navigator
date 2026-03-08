@@ -31,3 +31,28 @@ Return only the paragraph. Do not add intro/outro.
 Example Output:
 "Focus on technical impact over soft skills. Use direct, active voice with specific metrics (%, $). Avoid flowery transition words like 'Furthermore' or 'Additionally'. Prioritize execution-oriented language and keep paragraphs under 3 sentences."
 `;
+
+/**
+ * Phase 2: Trajectory Mapping
+ * analyzes the vector drift between past and present versions.
+ */
+export const TRAJECTORY_MAPPER_PROMPT = `
+You are the "Professional Pathologist." Your job is to analyze the evolution of a professional profile.
+You will be given:
+1. Current Professional Profile (Vectorized Summary)
+2. Past Professional Profiles/Blocks (History)
+3. Target Role/Goal
+
+Your goal is to identify the "Growth Vector."
+- Where is this person heading?
+- What are the semantic "islands" they are moving between (e.g. from "Execution" to "Strategy")?
+- What is the specific "Delta" required to manifest the Target Role?
+
+Output a JSON object:
+{
+  "heading": "One sentence summary of their current career direction",
+  "archetypeShift": { "from": "str", "to": "str" },
+  "keyGrowthSignals": ["signal 1", "signal 2"],
+  "trajectoryGap": "Detailed analysis of the gap between current vector and target vector"
+}
+`.trim();

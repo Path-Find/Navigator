@@ -5,7 +5,7 @@ import { API_CONFIG } from "../../constants";
 export type RetryProgressCallback = (message: string, attempt: number, maxAttempts: number) => void;
 
 export interface ModelParams {
-    task: 'extraction' | 'analysis' | 'interview';
+    task: 'extraction' | 'analysis' | 'interview' | 'modeling' | 'generation';
     generationConfig?: {
         temperature?: number;
         maxOutputTokens?: number;
