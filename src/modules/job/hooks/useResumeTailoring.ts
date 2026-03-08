@@ -4,6 +4,10 @@ import { Storage } from '../../../services/storageService';
 import { RESUME_TAILORING } from '../../../constants';
 import type { SavedJob } from '../types';
 import type { ExperienceBlock } from '../../resume/types';
+import { useNextGen } from '../../../hooks/useNextGen';
+import { RdFeedbackService } from '../../../services/ai/rd/feedbackService';
+import { RdEmbeddingService } from '../../../services/ai/rd/embeddingService';
+import { useUser } from '../../../contexts/UserContext';
 
 export const useResumeTailoring = (
     job: SavedJob,
@@ -13,6 +17,8 @@ export const useResumeTailoring = (
 ) => {
     const [tailoringBlockId, setTailoringBlockId] = useState<string | null>(null);
     const [bulkTailoringProgress, setBulkTailoringProgress] = useState<{ current: number; total: number } | null>(null);
+    const isNextGen = useNextGen();
+    const { user } = useUser();
 
     const handleHyperTailor = useCallback(async (block: ExperienceBlock) => {
         const analysis = job.analysis;
@@ -44,6 +50,26 @@ export const useResumeTailoring = (
 
             await Storage.updateJob(updatedJob);
             onUpdateJob(updatedJob);
+
+            if (isNextGen && user) {
+                RdFeedbackService.captureSignal(user.id, {
+                    roleModelId: analysis.distilledJob?.canonicalTitle,
+                    signalType: 'explicit_approval',
+                    context: 'tailoring',
+                    outputContent: block.bullets,
+                    userCorrection: tailoredBullets,
+                    metadata: { blockId: block.id }
+                });
+
+                // Phase 2: Professional Latent Space
+                // Silently vectorize this tailored block to build the user's trajectory map
+                RdEmbeddingService.vectorizeAndStore(
+                    user.id,
+                    tailoredBullets.join('\n'),
+                    'experience_block',
+                    block.id
+                );
+            }
         } catch (err) {
             showError("Tailoring failed: " + (err as Error).message);
         } finally {

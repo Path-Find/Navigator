@@ -17,6 +17,12 @@ export interface ModelParams {
     feature?: string;
 }
 
+export interface EmbeddingParams {
+    task: 'embedding';
+    model?: string;
+    feature?: string;
+}
+
 export const getModel = async (params: ModelParams) => {
     return {
         generateContent: async (payload: { contents: { role: string; parts: ({ text: string } | { inlineData: { mimeType: string; data: string } })[] }[]; generationConfig?: Record<string, unknown> }) => {
@@ -43,6 +49,27 @@ export const getModel = async (params: ModelParams) => {
                     usageMetadata: data.usage
                 }
             };
+        }
+    };
+};
+
+export const getEmbeddingModel = async (params: EmbeddingParams) => {
+    return {
+        embedContent: async (text: string) => {
+            const { data, error } = await supabase.functions.invoke('gemini-proxy', {
+                body: {
+                    payload: { content: { parts: [{ text }] } },
+                    task: 'embedding',
+                    feature: params.feature,
+                    model: params.model || 'text-embedding-004'
+                }
+            });
+
+            if (error) throw new Error(`Proxy Error: ${error.message}`);
+            if (data?.error) throw new Error(`AI Error: ${data.error}`);
+            if (!data?.embedding) throw new Error('AI Error: no embedding returned');
+
+            return data.embedding as number[];
         }
     };
 };

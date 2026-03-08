@@ -8,10 +8,13 @@ import { checkAnalysisLimit, getUsageStats, type UsageStats, type UsageLimitResu
 import { useToast } from '../../../contexts/ToastContext';
 import { useUser } from '../../../contexts/UserContext';
 import { ROUTES, TIME_PERIODS } from '../../../constants';
+import { useNextGen } from '../../../hooks/useNextGen';
+import { RdFeedbackService } from '../../../services/ai/rd/feedbackService';
 
 export const useJobManager = () => {
     const { user, isAdmin } = useUser();
     const { showInfo, showError } = useToast();
+    const isNextGen = useNextGen();
     const navigate = useNavigate();
 
     const [jobs, setJobs] = useState<SavedJob[]>([]);
@@ -44,25 +47,35 @@ export const useJobManager = () => {
         let mounted = true;
         setIsLoading(true);
 
-        const jobsPromise = Storage.getJobs();
-        const statsPromise = user ? getUsageStats(user.id).catch(console.error) : Promise.resolve(undefined);
-        const syncPromise = user ? Storage.syncLocalToCloud().catch(err => console.error("Initial sync failed:", err)) : Promise.resolve();
+        const loadInitialData = async () => {
+            try {
+                // 1. Sync local to cloud first (if logged in) to ensure we have the latest on both ends
+                if (user) {
+                    await Storage.syncLocalToCloud().catch(err => console.error("Initial sync failed:", err));
+                }
 
-        Promise.all([jobsPromise, statsPromise, syncPromise]).then(([loadedJobs, stats]) => {
-            if (!mounted) return;
+                // 2. Fetch data in parallel
+                const [loadedJobs, stats] = await Promise.all([
+                    Storage.getJobs(),
+                    user ? getUsageStats(user.id).catch(err => {
+                        console.error("Usage stats fetch failed:", err);
+                        return undefined;
+                    }) : Promise.resolve(undefined)
+                ]);
 
-            // Re-fetch jobs if sync might have added new ones or healed them
-            if (user) {
-                Storage.getJobs().then(finalJobs => {
-                    if (mounted) setJobs(finalJobs);
-                });
-            } else {
-                setJobs(loadedJobs);
+                if (!mounted) return;
+
+                if (loadedJobs) setJobs(loadedJobs);
+                if (stats) setUsageStats(stats);
+            } catch (err) {
+                console.error("Fatal error during initial load:", err);
+                if (mounted) showError("Failed to load your data. Please check your connection.");
+            } finally {
+                if (mounted) setIsLoading(false);
             }
+        };
 
-            if (stats) setUsageStats(stats);
-            setIsLoading(false);
-        });
+        loadInitialData();
 
         return () => { mounted = false; };
     }, [user?.id]);
@@ -70,11 +83,21 @@ export const useJobManager = () => {
     const activeJob = jobs.find(j => j.id === activeJobId);
 
     const handleUpdateJob = useCallback(async (updatedJob: SavedJob) => {
+        const oldJob = jobsRef.current.find(j => j.id === updatedJob.id);
+        const statusChanged = oldJob && oldJob.status !== updatedJob.status;
+
         // Optimistic update
         setJobs(prev => prev.map(j => j.id === updatedJob.id ? updatedJob : j));
 
         try {
             await Storage.updateJob(updatedJob);
+
+            // Phase 1/2: Feedback Loop & Outcome Triangulation
+            if (isNextGen && user && statusChanged) {
+                if (['applied', 'interview', 'offer', 'rejected'].includes(updatedJob.status || '')) {
+                    RdFeedbackService.captureOutcome(user.id, updatedJob.id, updatedJob.status!);
+                }
+            }
         } catch (err) {
             console.error("FAILED TO PERSIST JOB:", err);
             showError("Critical: Failed to save changes.");

@@ -11,6 +11,10 @@ import { TRACKING_EVENTS } from '../../../constants';
 import { useToast } from '../../../contexts/ToastContext';
 import { EventService } from '../../../services/eventService';
 import { toTitleCase } from '../../../utils/stringUtils';
+import { useNextGen } from '../../../hooks/useNextGen';
+import { RdFeedbackService } from '../../../services/ai/rd/feedbackService';
+import { RdStyleService } from '../../../services/ai/rd/styleService';
+import { useUser } from '../../../contexts/UserContext';
 
 interface UseCoverLetterEditorProps {
     job: SavedJob;
@@ -36,6 +40,8 @@ export const useCoverLetterEditor = ({
     const [comparisonVersions, setComparisonVersions] = useState<{ text: string; promptVersion: string }[] | null>(null);
     const [localJob, setLocalJob] = useState(job);
     const { showError } = useToast();
+    const isNextGen = useNextGen();
+    const { user } = useUser();
 
     // Sync with parent when job prop changes
     useEffect(() => {
@@ -102,6 +108,13 @@ export const useCoverLetterEditor = ({
             const isPro = ['pro', 'admin', 'tester'].includes(userTier);
             const canonicalTitle = analysis.distilledJob?.canonicalTitle;
 
+            // Phase 3: Personalized Style Distillation
+            let personalizedStyle = undefined;
+            if (isNextGen && user) {
+                setAnalysisProgress("Distilling personal style model...");
+                personalizedStyle = await RdStyleService.getPersonalizedStyle(user.id, 'cover_letter') || undefined;
+            }
+
             const isComparisonTriggered = !critiqueContext && isPro && Math.random() < 0.1;
 
             if (isComparisonTriggered) {
@@ -109,7 +122,7 @@ export const useCoverLetterEditor = ({
                 const variants = Object.keys(COVER_LETTER_PROMPTS.COVER_LETTER.VARIANTS).slice(0, 2);
 
                 const results = await Promise.all(variants.map(v =>
-                    generateCoverLetter(textToUse, bestResume, instructions || [], finalContext, v, trajectoryContext, localJob.id, canonicalTitle)
+                    generateCoverLetter(textToUse, bestResume, instructions || [], finalContext, v, trajectoryContext, localJob.id, canonicalTitle, personalizedStyle)
                 ));
 
                 setComparisonVersions(results);
@@ -126,7 +139,8 @@ export const useCoverLetterEditor = ({
                     (msg: string) => setAnalysisProgress(msg),
                     trajectoryContext,
                     localJob.id,
-                    canonicalTitle
+                    canonicalTitle,
+                    personalizedStyle
                 );
 
                 const updated = {
@@ -147,6 +161,16 @@ export const useCoverLetterEditor = ({
                 EventService.trackUsage(TRACKING_EVENTS.COVER_LETTERS);
 
                 Logger.log(`[Pro] Cover letter generated with decision: ${result.decision} (${result.attempts} attempts)`);
+
+                if (isNextGen && user) {
+                    RdFeedbackService.captureSignal(user.id, {
+                        roleModelId: canonicalTitle,
+                        signalType: 'implicit_usage',
+                        context: 'cover_letter',
+                        inputPromptVersion: result.promptVersion,
+                        outputContent: { text: result.text, decision: result.decision }
+                    });
+                }
             } else {
                 const { text: letter, promptVersion } = await generateCoverLetter(
                     textToUse,
@@ -201,7 +225,34 @@ export const useCoverLetterEditor = ({
         }
 
         Storage.submitFeedback(localJob.id, 1, `ab_test_pick:${variant.promptVersion}_vs_${other?.promptVersion || 'none'}`);
-    }, [comparisonVersions, localJob, onJobUpdate, showError]);
+
+        if (isNextGen && user) {
+            // Log the Winner
+            RdFeedbackService.captureSignal(user.id, {
+                roleModelId: analysis.distilledJob?.canonicalTitle,
+                signalType: 'explicit_approval',
+                context: 'cover_letter',
+                inputPromptVersion: variant.promptVersion,
+                outputContent: variant.text,
+                impactScore: 3, // Choice is a stronger signal than just a save
+                metadata: { ab_test: true, comparison_variant: other?.promptVersion }
+            });
+
+            // Log the Loser (implicit distance)
+            if (other) {
+                RdFeedbackService.captureSignal(user.id, {
+                    roleModelId: analysis.distilledJob?.canonicalTitle,
+                    signalType: 'explicit_correction',
+                    context: 'cover_letter',
+                    inputPromptVersion: other.promptVersion,
+                    outputContent: other.text,
+                    userCorrection: variant.text, // The winner is effectively the "correction" of the loser
+                    impactScore: -1,
+                    metadata: { ab_test_loss: true, winner: variant.promptVersion }
+                });
+            }
+        }
+    }, [isNextGen, user, analysis, comparisonVersions, localJob, onJobUpdate, showError]);
 
     const handleRunCritique = useCallback(async () => {
         setGenerating(true);
@@ -227,6 +278,18 @@ export const useCoverLetterEditor = ({
             onJobUpdate(updated);
             try {
                 await Storage.updateJob(updated);
+
+                if (isNextGen && user && localJob.coverLetter) {
+                    RdFeedbackService.captureSignal(user.id, {
+                        roleModelId: analysis.distilledJob?.canonicalTitle,
+                        signalType: 'explicit_correction',
+                        context: 'cover_letter',
+                        inputPromptVersion: localJob.promptVersion,
+                        outputContent: localJob.initialCoverLetter || localJob.coverLetter,
+                        userCorrection: newText,
+                        impactScore: 2 // Manual edit implies the AI was close but needed refinement
+                    });
+                }
             } catch (e) {
                 showError('Failed to save cover letter edits');
             }

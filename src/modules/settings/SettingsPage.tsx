@@ -10,6 +10,7 @@ import { Button } from '../../components/ui/Button';
 import { SharedPageLayout } from '../../components/common/SharedPageLayout';
 import { PageHeader } from '../../components/ui/PageHeader';
 import { useNavigate } from 'react-router-dom';
+import { NextGenCalibration } from './components/NextGenCalibration';
 
 export const SettingsPage: React.FC = () => {
     const { user, userTier, isTester, isAdmin, simulatedTier, journey, updateProfile } = useUser();
@@ -289,7 +290,11 @@ export const SettingsPage: React.FC = () => {
                 </div>
             </div>
 
-
+            {isAdmin && (
+                <div className="mt-12">
+                    <NextGenCalibration />
+                </div>
+            )}
         </SharedPageLayout>
     );
 };

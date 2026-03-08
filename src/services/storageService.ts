@@ -18,67 +18,125 @@ export const Storage = {
         const userId = await getUserId();
         if (!userId) return;
 
-        // Fetch local data and cloud state in parallel
+        // Fetch local data and cloud ID state in parallel to identify deltas
         const [
-            { data: cloudResume },
-            { data: cloudJobs },
-            { data: cloudSkills },
-            { data: cloudModels },
-            { data: cloudTargets },
             localResumes,
             localJobs,
             localSkills,
             localRoleModels,
             localTargetJobs,
+            { data: cloudResume },
+            { data: cloudJobs },
+            { data: cloudSkills },
+            { data: cloudModels },
+            { data: cloudTargets }
         ] = await Promise.all([
-            supabase.from('resumes').select('id').eq('user_id', userId).limit(1).maybeSingle(),
-            supabase.from('jobs').select('id').eq('user_id', userId),
-            supabase.from('user_skills').select('name').eq('user_id', userId),
-            supabase.from('role_models').select('id').eq('user_id', userId),
-            supabase.from('target_jobs').select('id').eq('user_id', userId),
             Vault.getSecure(STORAGE_KEYS.RESUMES) as Promise<ResumeProfile[]>,
             Vault.getSecure(STORAGE_KEYS.JOBS_HISTORY) as Promise<SavedJob[]>,
             Vault.getSecure<any[]>(STORAGE_KEYS.SKILLS),
             Vault.getSecure<any[]>(STORAGE_KEYS.ROLE_MODELS),
             Vault.getSecure<any[]>(STORAGE_KEYS.TARGET_JOBS),
+            supabase.from('resumes').select('id').eq('user_id', userId).limit(1).maybeSingle(),
+            supabase.from('jobs').select('id').eq('user_id', userId),
+            supabase.from('user_skills').select('name').eq('user_id', userId),
+            supabase.from('role_models').select('id').eq('user_id', userId),
+            supabase.from('target_jobs').select('id').eq('user_id', userId),
         ]);
 
-        const syncTasks: Promise<unknown>[] = [];
+        const syncTasks: (Promise<any> | PromiseLike<any>)[] = [];
 
-        // 1. Sync Resumes if Cloud is Empty
-        if (!cloudResume && localResumes?.length > 0) {
+        // 1. Sync Resumes (Batched)
+        if (localResumes && localResumes.length > 0 && !cloudResume) {
             syncTasks.push(this.saveResumes(localResumes));
         }
 
-        // 2. Sync Jobs (Push missing ones)
-        if (localJobs?.length > 0) {
-            const cloudJobIds = new Set(cloudJobs?.map(j => j.id) || []);
-            for (const job of localJobs) {
-                if (!cloudJobIds.has(job.id) && !(job as any)._synced) syncTasks.push(this.addJob(job));
+        // 2. Sync Jobs (Corrected N+1 by Batching)
+        if (localJobs && localJobs.length > 0) {
+            const cloudIds = new Set(cloudJobs?.map(j => j.id) || []);
+            const missingFromCloud = localJobs.filter(j => !cloudIds.has(j.id) && !(j as any)._synced);
+
+            if (missingFromCloud.length > 0) {
+                const payload = missingFromCloud.map(job => ({
+                    user_id: userId,
+                    id: job.id,
+                    job_title: job.analysis?.distilledJob?.roleTitle || job.position || 'Untitled Role',
+                    company: job.analysis?.distilledJob?.companyName || job.company || 'Unknown Company',
+                    original_text: job.description,
+                    location: job.analysis?.distilledJob?.location || job.location,
+                    url: job.url,
+                    analysis: job.analysis,
+                    canonical_role: job.analysis?.distilledJob?.canonicalTitle,
+                    status: (job.status === 'analyzing' || !job.status) ? 'saved' : job.status,
+                    resume_id: job.resumeId,
+                    cover_letter: job.coverLetter,
+                    cover_letter_critique: job.coverLetterCritique,
+                    fit_score: job.analysis?.compatibilityScore,
+                    date_added: new Date(job.dateAdded || Date.now()).toISOString()
+                }));
+                syncTasks.push(supabase.from('jobs').insert(payload).then(({ error }) => {
+                    if (error) console.error("Cloud Sync Error (Sync Jobs):", error);
+                }));
             }
         }
 
-        // 3. Sync Skills
+        // 3. Sync Skills (Corrected N+1 by Batching)
         if (localSkills && localSkills.length > 0) {
-            const cloudSkillNames = new Set(cloudSkills?.map(s => s.name) || []);
-            for (const skill of localSkills) {
-                if (!cloudSkillNames.has(skill.name)) syncTasks.push(this.saveSkill(skill));
+            const cloudNames = new Set(cloudSkills?.map(s => s.name) || []);
+            const missingFromCloud = localSkills.filter(s => !cloudNames.has(s.name));
+
+            if (missingFromCloud.length > 0) {
+                const payload = missingFromCloud.map(skill => ({
+                    user_id: userId,
+                    name: skill.name,
+                    proficiency: skill.proficiency,
+                    evidence: skill.evidence,
+                    updated_at: new Date().toISOString()
+                }));
+                syncTasks.push(supabase.from('user_skills').upsert(payload, { onConflict: 'user_id,name' }).then(({ error }) => {
+                    if (error) console.error("Cloud Sync Error (Sync Skills):", error);
+                }));
             }
         }
 
-        // 4. Sync Role Models
+        // 4. Sync Coach Models
         if (localRoleModels && localRoleModels.length > 0) {
-            const cloudModelIds = new Set(cloudModels?.map(m => m.id) || []);
-            for (const model of localRoleModels) {
-                if (!cloudModelIds.has(model.id)) syncTasks.push(this.addRoleModel(model));
+            const cloudIds = new Set(cloudModels?.map(m => m.id) || []);
+            const missingFromCloud = localRoleModels.filter(m => !cloudIds.has(m.id));
+
+            if (missingFromCloud.length > 0) {
+                const payload = missingFromCloud.map(model => ({
+                    id: model.id,
+                    user_id: userId,
+                    name: model.name,
+                    content: model
+                }));
+                syncTasks.push(supabase.from('role_models').insert(payload).then(({ error }) => {
+                    if (error) console.error("Cloud Sync Error (Sync Role Models):", error);
+                }));
             }
         }
 
         // 5. Sync Target Jobs
         if (localTargetJobs && localTargetJobs.length > 0) {
-            const cloudTargetIds = new Set(cloudTargets?.map(t => t.id) || []);
-            for (const target of localTargetJobs) {
-                if (!cloudTargetIds.has(target.id)) syncTasks.push(this.saveTargetJob(target));
+            const cloudIds = new Set(cloudTargets?.map(t => t.id) || []);
+            const missingFromCloud = localTargetJobs.filter(t => !cloudIds.has(t.id));
+
+            if (missingFromCloud.length > 0) {
+                const payload = missingFromCloud.map(target => ({
+                    id: target.id,
+                    user_id: userId,
+                    title: target.title,
+                    description: target.description,
+                    role_model_id: target.roleModelId,
+                    gap_analysis: target.gapAnalysis,
+                    roadmap: target.roadmap,
+                    type: target.type || 'goal',
+                    strict_mode: target.strictMode ?? true,
+                    date_added: new Date(target.dateAdded || Date.now()).toISOString()
+                }));
+                syncTasks.push(supabase.from('target_jobs').upsert(payload).then(({ error }) => {
+                    if (error) console.error("Cloud Sync Error (Sync Target Jobs):", error);
+                }));
             }
         }
 

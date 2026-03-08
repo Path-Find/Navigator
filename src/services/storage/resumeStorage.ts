@@ -2,6 +2,7 @@ import { supabase } from '../supabase';
 import { Vault, getUserId, areBlocksEqual } from './storageCore';
 import { STORAGE_KEYS } from '../../constants';
 import { Logger } from '../../utils/logger';
+import { withTimeout } from '../../utils/promiseUtils';
 import type { ResumeProfile } from '../../types';
 
 export const ResumeStorage = {
@@ -55,28 +56,31 @@ export const ResumeStorage = {
     },
 
     async saveResumes(resumes: ResumeProfile[]) {
+        const userId = await getUserId();
+
         await Promise.all([
             Vault.setSecure(STORAGE_KEYS.RESUMES, resumes),
-            getUserId().then(async userId => {
+            (async () => {
                 if (!userId) return;
-                const { data, error: selectError } = await supabase
-                    .from('resumes')
-                    .select('id')
-                    .eq('user_id', userId)
-                    .order('created_at', { ascending: false })
-                    .limit(1)
-                    .maybeSingle();
-                if (selectError && selectError.code !== 'PGRST116') {
-                    console.error("Supabase select error in saveResumes:", selectError);
-                }
+
+                const { data, error: selectError } = await withTimeout(
+                    supabase.from('resumes').select('id').eq('user_id', userId).limit(1).maybeSingle()
+                );
+
+                if (selectError) throw selectError;
+
                 if (data) {
-                    const { error: updateError } = await supabase.from('resumes').update({ content: resumes, name: 'Default Profile' }).eq('id', data.id);
-                    if (updateError) console.error("Supabase update error:", updateError);
+                    const { error: updateError } = await withTimeout(
+                        supabase.from('resumes').update({ content: resumes, name: 'Default Profile' }).eq('id', data.id)
+                    );
+                    if (updateError) throw updateError;
                 } else {
-                    const { error: insertError } = await supabase.from('resumes').insert({ user_id: userId, name: 'Default Profile', content: resumes });
-                    if (insertError) console.error("Supabase insert error:", insertError);
+                    const { error: insertError } = await withTimeout(
+                        supabase.from('resumes').insert({ user_id: userId, name: 'Default Profile', content: resumes })
+                    );
+                    if (insertError) throw insertError;
                 }
-            })
+            })()
         ]);
     },
 

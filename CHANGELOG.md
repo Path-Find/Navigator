@@ -2,6 +2,22 @@
 
 All notable changes to this project will be documented in this file.
 
+## [Unreleased]
+
+### Professional Modeling Engine (R&D)
+- **Phase 3: Personalized style Overrides**: Implemented the "Style Transformer" (`RdStyleService`) which distills user feedback into active instructions. These instructions are now "dark-wired" into the generation loop to automatically adjust AI output to the user's personal voice.
+- **Phase 2: Semantic Trajectory Mapping**: Established the `RdEmbeddingService` using `text-embedding-004` to map professional experience into a 768-dimensional latent space. Every tailored resume block is now silently vectorized to build a persistent career trajectory map.
+- **Phase 1: High-Fidelity Feedback Logs**: Integrated `RdFeedbackService` into the core generation and tailoring hooks. The engine now captures explicit picks (A/B testing), implicit edits, and real-world outcomes (Interview/Offer) to calibrate user-specific models.
+- **Infrastructure**: Launched the `rd_user_embeddings` data store with `pgvector` support and implemented a secure, per-user R&D feature gating system (`isNextGenEnabled`).
+- **Roadmap Visualization**: Introduced `docs/ROADMAP_NEXTGEN.md` to track the five levels of the Modeling Engine architecture.
+- **The Distiller (Style Transformer)**: Successfully implemented the LLM-powered style distillation logic. The engine now dynamically fetches the 25 most recent "Sensory Signals" (A/B picks, manual edits) and routes them through a low-temperature `MODELING_DISTILLER` pass to generate a personalized 60-word "Style Guide" for AI generations.
+- **R&D Calibration Dashboard**: Launched a hidden admin-only calibration interface in Settings to visualize and trigger the Style Distiller, allowing manual model recalibration and visibility into active style overrides.
+- **Signup & Growth Lockdown**: Temporarily paused new user registrations and plan upgrades ("Waitlist Mode") to preserve compute for R&D testing. Implemented multi-layer blocks across AuthModal, PlansPage, and Stripe Checkout services.
+- **Stability Pass — N+1 Batch Sync**: Refactored the `Storage.syncLocalToCloud` engine to use batched insertions and upserts. Syncing local history to the cloud now takes a single round trip instead of 50+, significantly reducing write failures on flaky networks.
+- **Stability Pass — Cloud Rollbacks**: Implemented an optimistic rollback mechanism in `UserContext`. Profile updates (Journey, TOS, NextGen toggle) now immediately reflect in the UI but automatically revert if the Supabase write fails, ensuring the UI never desyncs from the database.
+- **Stability Pass — Request Timeouts**: Introduced a global `withTimeout` utility in `promiseUtils.ts` and wrapped all critical storage operations (Jobs, Resumes, Skills, Coach). The app now accurately identifies and recovers from "Cloud Hanging" scenarios instead of staying in a permanent loading state.
+- **Improved Initial Hydration**: Consolidated the job manager's initial load to fire *after* the primary sync, eliminating the "Double Fetch" pattern and ensuring the dashboard correctly reflects cloud items on the first render.
+
 ## [2.31.6] - 2026-03-08
 
 ### Optimization

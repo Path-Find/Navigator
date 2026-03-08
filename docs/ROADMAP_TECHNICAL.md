@@ -14,12 +14,12 @@ Technical foundation and scaling initiatives to support growth and long-term sta
 ## Maintenance
 
 ### High Priority
-- [ ] **Cloud sync silent failures** (`resumeStorage.ts`, `jobStorage.ts`, `coachStorage.ts`): `Promise.all()` cloud branches swallow errors — users don't know when sync fails.
-- [ ] **Optimistic state before DB confirmation** (`UserContext.tsx:202`): `updateProfile()` applies local state before checking if Supabase write succeeded. Roll back on failure.
-- [ ] **Double-fetch on load** (`useJobManager.ts:43`): Initial fetch + refetch after sync with no error handling on the first fetch. Consolidate to a single fetch-after-sync.
-- [ ] **N+1 cloud sync** (`storageService.ts`): Sync iterates and awaits a separate Supabase call per item. Batch insertions to reduce round trips. *(Work started on `perf/fix-n-plus-1-sync` branch — conflicts with main need manual resolution before merging.)*
+- [x] **Cloud sync silent failures** (`resumeStorage.ts`, `jobStorage.ts`, `coachStorage.ts`): Implemented timeouts and error propagation (Mar 2026).
+- [x] **Optimistic state before DB confirmation** (`UserContext.tsx:202`): Rollback mechanism implemented (Mar 2026).
+- [x] **Double-fetch on load** (`useJobManager.ts:43`): Consolidated to single fetch-after-sync (Mar 2026).
+- [x] **N+1 cloud sync** (`storageService.ts`): Batched insertions/upserts implemented (Mar 2026).
 - [ ] **Missing error boundaries** (context providers): No error boundaries wrap async providers — unhandled rejections can crash the entire app silently.
-- [ ] **No timeout on cloud operations** (all storage files): Supabase queries have no timeout. Slow network hangs the app indefinitely with no feedback.
+- [x] **No timeout on cloud operations** (all storage files): `withTimeout` utility applied to core operations (Mar 2026).
 - [ ] **Usage stats silent downgrade** (`usageLimits.ts:135`): If multiple stats queries fail, fallback silently downgrades a pro user to free-tier limits. Add explicit notification on fallback.
 
 ### Medium Priority

@@ -71,6 +71,10 @@ export const PlansPage: React.FC = () => {
                 return;
             }
 
+            // TEMP: Disable checkouts while refining NextGen
+            showError('New subscriptions are temporarily paused while we calibrate the Professional Modeling Engine. Check back soon!');
+            return;
+
             const { url } = await paymentService.createCheckoutSession(priceId);
             window.location.href = url;
 
@@ -106,6 +110,13 @@ export const PlansPage: React.FC = () => {
                     highlight={headline.highlight}
                     subtitle="Choose the plan that fits your pace — from exploring to all-in."
                 />
+
+                <div className="flex justify-center -mt-4 mb-12">
+                    <div className="inline-flex items-center gap-2 px-4 py-2 bg-neutral-50 dark:bg-neutral-900/40 border border-neutral-100 dark:border-neutral-800 rounded-2xl text-neutral-500 dark:text-neutral-400 text-xs font-bold">
+                        <Shield className="w-4 h-4" />
+                        We are not currently accepting new users.
+                    </div>
+                </div>
 
                 <div className="text-center mb-16 flex flex-col items-center -mt-8">
                     {/* Monthly / Annual Toggle */}

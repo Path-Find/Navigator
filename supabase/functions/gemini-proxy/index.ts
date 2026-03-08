@@ -107,11 +107,10 @@ export const handler = async (req: Request) => {
         }
 
         // 2. PARSE REQUEST & RESOLVE MODEL
-        // We no longer trust the client to provide modelName
-        const { payload, task = "analysis", generationConfig, feature } = await req.json()
+        const { payload, task = "analysis", generationConfig, feature, model } = await req.json()
 
         // Validate task
-        const validTasks = ['extraction', 'analysis', 'interview'];
+        const validTasks = ['extraction', 'analysis', 'interview', 'embedding'];
         const safeTask = validTasks.includes(task) ? task : 'analysis';
 
         if (safeTask === 'interview' && userTier === 'free') {
@@ -182,7 +181,12 @@ export const handler = async (req: Request) => {
         }
 
         const tierConfig = TIER_MODELS[userTier] || TIER_MODELS.free;
-        const modelName = safeTask === 'extraction' ? tierConfig.extraction : tierConfig.analysis;
+        let modelName = safeTask === 'extraction' ? tierConfig.extraction : tierConfig.analysis;
+
+        // Overwrite if it's an embedding task or if a specific model was requested (R&D only)
+        if (safeTask === 'embedding') {
+            modelName = model || 'text-embedding-004';
+        }
 
         console.log("User action:", { userId: sanitizeLog(user.id), tier: sanitizeLog(userTier), task: sanitizeLog(safeTask), model: sanitizeLog(modelName) });
 
@@ -207,7 +211,8 @@ export const handler = async (req: Request) => {
         }
 
         // 5. CALL GEMINI API VIA FETCH
-        const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${apiKey}`;
+        const method = safeTask === 'embedding' ? 'embedContent' : 'generateContent';
+        const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:${method}?key=${apiKey}`;
 
         let response;
         try {
@@ -246,7 +251,16 @@ export const handler = async (req: Request) => {
 
         const data = await response.json();
 
-        // Extract text from standard Gemini response structure
+        // Handle Embedding Response
+        if (safeTask === 'embedding') {
+            const embedding = data.embedding?.values || [];
+            return new Response(JSON.stringify({ embedding }), {
+                headers: { ...getCorsHeaders(req), 'Content-Type': 'application/json' },
+                status: 200,
+            });
+        }
+
+        // Handle Generation Response
         let text = "";
         if (data.candidates && data.candidates[0] && data.candidates[0].content && data.candidates[0].content.parts) {
             text = data.candidates[0].content.parts.map((p: { text: string }) => p.text).join('');

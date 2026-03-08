@@ -22,11 +22,12 @@ interface UserContextType {
     actualTier: UserTier; // Real tier from DB
     isTester: boolean;
     isAdmin: boolean;
+    isNextGenEnabled: boolean;
     isLoading: boolean;
     signOut: () => Promise<void>;
     setSimulatedTier: (tier: UserTier | null) => void; // Admin-only: simulate viewing as different tier
     simulatedTier: UserTier | null;
-    updateProfile: (updates: Partial<{ first_name: string; last_name: string; device_id: string; journey: string; last_archetype_update: number; accepted_tos_version: number }>) => Promise<void>;
+    updateProfile: (updates: Partial<{ first_name: string; last_name: string; device_id: string; journey: string; last_archetype_update: number; accepted_tos_version: number; next_gen_enabled: boolean }>) => Promise<void>;
     journey: string; // User's onboarding journey stage (student, job-hunter, etc.)
     lastArchetypeUpdate: number;
     acceptedTosVersion: number;
@@ -45,6 +46,7 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const [simulatedTier, setSimulatedTier] = useState<UserTier | null>(null);
     const [isTester, setIsTester] = useState(false);
     const [isAdmin, setIsAdmin] = useState(false);
+    const [isNextGenEnabled, setIsNextGenEnabled] = useState(false);
     const [journey, setJourney] = useState<string>(() => {
         if (typeof window !== 'undefined') {
             return LocalStorage.get(STORAGE_KEYS.USER_JOURNEY) || 'job-hunter';
@@ -87,7 +89,7 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
                 // Fetch profile with resiliency. If one column fails, try fetching basic info.
                 const { data, error } = await supabase
                     .from('profiles')
-                    .select('subscription_tier, is_admin, is_tester, journey, device_id, last_archetype_update, accepted_tos_version')
+                    .select('subscription_tier, is_admin, is_tester, next_gen_enabled, journey, device_id, last_archetype_update, accepted_tos_version')
                     .eq('id', currentUser.id)
                     .single();
 
@@ -108,6 +110,7 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
                     setActualTier(profileData.is_admin ? 'admin' : tier);
                     setIsAdmin(profileData.is_admin || false);
                     setIsTester(profileData.is_tester || false);
+                    setIsNextGenEnabled(profileData.next_gen_enabled || false);
 
                     // If they have an account, they've implicitly accepted privacy/terms
                     LocalStorage.set(STORAGE_KEYS.PRIVACY_ACCEPTED, 'true');
@@ -146,6 +149,7 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
             setActualTier('free');
             setIsTester(false);
             setIsAdmin(false);
+            setIsNextGenEnabled(false);
             setSimulatedTier(null);
         }
         setIsLoading(false);
@@ -181,7 +185,7 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
         window.location.href = '/';
     };
 
-    const updateProfile = async (updates: Partial<{ first_name: string; last_name: string; device_id: string; journey: string; last_archetype_update: number; accepted_tos_version: number }>) => {
+    const updateProfile = async (updates: Partial<{ first_name: string; last_name: string; device_id: string; journey: string; last_archetype_update: number; accepted_tos_version: number; next_gen_enabled: boolean }>) => {
         if (!user) {
             // If not logged in, just update local state/storage
             if (updates.journey) {
@@ -199,10 +203,13 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
             return;
         }
 
-        const { error } = await supabase.from('profiles').update(updates).eq('id', user.id);
+        // Store current state for rollback
+        const oldJourney = journey;
+        const oldLastArchetypeUpdate = lastArchetypeUpdate;
+        const oldAcceptedTosVersion = acceptedTosVersion;
+        const oldNextGenEnabled = isNextGenEnabled;
 
-        // Optimistically update local state for better UX, even if DB update fails
-        // (common if schema is out of sync in local dev)
+        // Optimistically update local state for better UX
         if (updates.journey) {
             setJourney(updates.journey);
             LocalStorage.set(STORAGE_KEYS.USER_JOURNEY, updates.journey);
@@ -223,12 +230,33 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
             LocalStorage.set(STORAGE_KEYS.ACCEPTED_TOS_VERSION, updates.accepted_tos_version.toString());
         }
 
+        if (updates.next_gen_enabled !== undefined) {
+            setIsNextGenEnabled(updates.next_gen_enabled);
+        }
+
+        const { error } = await supabase.from('profiles').update(updates).eq('id', user.id);
+
         if (error) {
-            // Handle missing column gracefully in manual updates too
-            if (error.code === 'PGRST204' || error.message?.includes('device_id') || error.message?.includes('journey') || error.message?.includes('last_archetype_update') || error.message?.includes('accepted_tos_version')) {
+            // Handle missing column gracefully
+            const isGraceful = error.code === 'PGRST204' || error.message?.includes('device_id') || error.message?.includes('journey') || error.message?.includes('last_archetype_update') || error.message?.includes('accepted_tos_version');
+
+            if (isGraceful) {
                 console.warn("Profile update partially skipped: some columns might be missing in DB.");
             } else {
-                console.error("Failed to update profile context", error);
+                console.error("Failed to update profile context. Rolling back.", error);
+
+                // Rollback local state
+                setJourney(oldJourney);
+                setLastArchetypeUpdate(oldLastArchetypeUpdate);
+                setAcceptedTosVersion(oldAcceptedTosVersion);
+                setIsNextGenEnabled(oldNextGenEnabled);
+
+                // Rollback storage
+                LocalStorage.set(STORAGE_KEYS.USER_JOURNEY, oldJourney);
+                LocalStorage.set(STORAGE_KEYS.LAST_ARCHETYPE_UPDATE, oldLastArchetypeUpdate.toString());
+                LocalStorage.set(STORAGE_KEYS.ACCEPTED_TOS_VERSION, oldAcceptedTosVersion.toString());
+
+                throw error; // Re-throw so UI can show error toast
             }
         }
     };
@@ -263,6 +291,7 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
             actualTier,
             isTester,
             isAdmin,
+            isNextGenEnabled,
             isLoading,
             signOut,
             simulatedTier,

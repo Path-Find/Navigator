@@ -77,7 +77,12 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, featureCo
             });
 
             if (!checkError) {
-                setIsSignUp(!exists);
+                if (!exists) {
+                    setError('We are not currently accepting new users.');
+                    setLoading(false);
+                    return;
+                }
+                setIsSignUp(false);
             } else {
                 // Background fallback: If RPC fails, we'll default to login
                 // but keep a way to switch if needed.

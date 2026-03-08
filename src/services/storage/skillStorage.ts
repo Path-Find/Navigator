@@ -1,6 +1,7 @@
 import { supabase } from '../supabase';
 import { Vault, getUserId } from './storageCore';
 import { STORAGE_KEYS } from '../../constants';
+import { withTimeout } from '../../utils/promiseUtils';
 import type { CustomSkill } from '../../types';
 
 export const SkillStorage = {
@@ -9,29 +10,36 @@ export const SkillStorage = {
 
         const userId = await getUserId();
         if (userId) {
-            const { data, error } = await supabase
-                .from('user_skills')
-                .select('*')
-                .eq('user_id', userId)
-                .order('name');
+            try {
+                const { data, error } = await withTimeout(
+                    supabase
+                        .from('user_skills')
+                        .select('*')
+                        .eq('user_id', userId)
+                        .order('name')
+                );
 
-            if (!error && data) {
-                const cloudSkills: CustomSkill[] = data.map(row => ({
-                    id: row.id,
-                    user_id: row.user_id,
-                    name: row.name,
-                    proficiency: row.proficiency,
-                    evidence: row.evidence,
-                    created_at: row.created_at,
-                    updated_at: row.updated_at
-                }));
+                if (error) {
+                    console.error("Cloud Sync Error (Get Skills):", error);
+                } else if (data) {
+                    const cloudSkills: CustomSkill[] = data.map(row => ({
+                        id: row.id,
+                        user_id: row.user_id,
+                        name: row.name,
+                        proficiency: row.proficiency,
+                        evidence: row.evidence,
+                        created_at: row.created_at,
+                        updated_at: row.updated_at
+                    }));
 
-                // Non-destructive merge: cloud always wins for existing names, but keep local-only skills that haven't synced yet
-                const cloudNames = new Set(cloudSkills.map((s: CustomSkill) => s.name));
-                const unsyncedSkills = skills.filter((s: CustomSkill) => !cloudNames.has(s.name));
+                    const cloudNames = new Set(cloudSkills.map((s: CustomSkill) => s.name));
+                    const unsyncedSkills = skills.filter((s: CustomSkill) => !cloudNames.has(s.name));
 
-                skills = [...cloudSkills, ...unsyncedSkills].sort((a, b) => a.name.localeCompare(b.name));
-                await Vault.setSecure(STORAGE_KEYS.SKILLS, skills);
+                    skills = [...cloudSkills, ...unsyncedSkills].sort((a, b) => a.name.localeCompare(b.name));
+                    await Vault.setSecure(STORAGE_KEYS.SKILLS, skills);
+                }
+            } catch (err) {
+                console.warn("Exception during cloud skills fetch:", err);
             }
         }
         return skills;
@@ -57,17 +65,19 @@ export const SkillStorage = {
             return newSkill;
         }
 
-        const { data, error } = await supabase
-            .from('user_skills')
-            .upsert({
-                user_id: userId,
-                name: skill.name,
-                proficiency: skill.proficiency,
-                evidence: skill.evidence,
-                updated_at: new Date().toISOString()
-            }, { onConflict: 'user_id,name' })
-            .select()
-            .single();
+        const { data, error } = await withTimeout(
+            supabase
+                .from('user_skills')
+                .upsert({
+                    user_id: userId,
+                    name: skill.name,
+                    proficiency: skill.proficiency,
+                    evidence: skill.evidence,
+                    updated_at: new Date().toISOString()
+                }, { onConflict: 'user_id,name' })
+                .select()
+                .single()
+        );
 
         if (error) throw error;
 
@@ -86,7 +96,10 @@ export const SkillStorage = {
 
         const userId = await getUserId();
         if (userId) {
-            await supabase.from('user_skills').delete().eq('user_id', userId).eq('name', name);
+            const { error } = await withTimeout(
+                supabase.from('user_skills').delete().eq('user_id', userId).eq('name', name)
+            );
+            if (error) throw error;
         }
     }
 };
