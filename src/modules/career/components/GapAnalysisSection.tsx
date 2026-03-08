@@ -39,6 +39,7 @@ export const GapAnalysisSection: React.FC<GapAnalysisSectionProps> = ({
     onRunGapAnalysis,
     onGenerateRoadmap,
     onToggleMilestone,
+    onViewChange,
     onCompare,
     activeAnalysisIds = new Set()
 }) => {
