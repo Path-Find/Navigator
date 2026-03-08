@@ -2,11 +2,15 @@ import { CONTENT_VALIDATION } from '../constants';
 
 export const JOB_ANALYSIS_PROMPTS = {
   JOB_FIT_ANALYSIS: {
-    DEFAULT: (jobDescription: string, resumeContext: string, bucketAdvice?: string[]) => `
+    DEFAULT: (jobDescription: string, resumeContext: string, bucketAdvice?: string[], trajectoryContext?: string) => `
     You are a Strategic Career Architect and Hiring Expert. Your job is to analyze this candidate's fit for the role with absolute professional objectivity.
     
     ${bucketAdvice ? `ROLE-SPECIFIC FOCUS (Follow these guidelines):
     ${bucketAdvice.map(a => `- ${a}`).join('\n')}
+    ` : ''}
+
+    ${trajectoryContext ? `SEMANTIC TRAJECTORY (The user's career path):
+    ${trajectoryContext}
     ` : ''}
 
     INPUT DATA:

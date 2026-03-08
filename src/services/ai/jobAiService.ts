@@ -145,7 +145,8 @@ export const analyzeJobFit = async (
     userSkills: CustomSkill[] = [],
     onProgress?: RetryProgressCallback,
     jobId?: string,
-    transcript?: Transcript | null
+    transcript?: Transcript | null,
+    trajectoryContext?: string
 ): Promise<JobAnalysis> => {
     if (onProgress) onProgress("Cleaning and Analyzing", 1, 1);
 
@@ -170,7 +171,7 @@ export const analyzeJobFit = async (
     // 2. Fetch Bucket Guidelines - Skipping for now to keep performance high
     // We can re-integrate this if it's critical, but we'd want to do it inside the main prompt or via parallel fetch.
 
-    const analysisPrompt = JOB_ANALYSIS_PROMPTS.JOB_FIT_ANALYSIS.DEFAULT(cleanedDescription, (resumeContext + skillsContext + educationContext));
+    const analysisPrompt = JOB_ANALYSIS_PROMPTS.JOB_FIT_ANALYSIS.DEFAULT(cleanedDescription, (resumeContext + skillsContext + educationContext), undefined, trajectoryContext);
 
     const analysis = await callWithRetry(async (metadata) => {
         const model = await getModel({ task: 'analysis', generationConfig: { responseMimeType: "application/json" } });

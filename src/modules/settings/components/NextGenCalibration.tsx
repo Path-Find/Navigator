@@ -3,11 +3,13 @@ import { Shield, Activity, RefreshCw, Zap } from 'lucide-react';
 import { RdFeedbackService } from '../../../services/ai/rd/feedbackService';
 import { RdStyleService } from '../../../services/ai/rd/styleService';
 import { RdTrajectoryService } from '../../../services/ai/rd/trajectoryService';
+import { RdEmbeddingService } from '../../../services/ai/rd/embeddingService';
+import { ResumeStorage } from '../../../services/storage/resumeStorage';
 import { CoachStorage } from '../../../services/storage/coachStorage';
 import type { GrowthTrajectory } from '../../../services/ai/rd/types';
 import { useUser } from '../../../contexts/UserContext';
 import { Button } from '../../../components/ui/Button';
-import { TrendingUp, ArrowRight } from 'lucide-react';
+import { TrendingUp, ArrowRight, Share2 } from 'lucide-react';
 
 export const NextGenCalibration: React.FC = () => {
     const { user, isNextGenEnabled, updateProfile } = useUser();
@@ -17,6 +19,32 @@ export const NextGenCalibration: React.FC = () => {
     const [targetTitle, setTargetTitle] = useState<string>('');
     const [isLoading, setIsLoading] = useState(false);
     const [isTrajectoryLoading, setIsTrajectoryLoading] = useState(false);
+    const [isVectorizing, setIsVectorizing] = useState(false);
+
+    const handleSyncLatentSpace = async () => {
+        if (!user) return;
+        setIsVectorizing(true);
+        try {
+            const resumes = await ResumeStorage.getResumes();
+            const master = resumes.find(r => r.id === 'master') || resumes[0];
+            if (!master) return;
+
+            // Vectorize each visible block
+            const promises = master.blocks
+                .filter(b => b.isVisible && b.bullets.length > 0)
+                .map(b => RdEmbeddingService.vectorizeAndStore(
+                    user.id,
+                    `[${b.type}] ${b.title} at ${b.organization}: ${b.bullets.join(' ')}`,
+                    'experience_block',
+                    b.id
+                ));
+
+            await Promise.all(promises);
+            await loadModelData(); // Refresh signal stats
+        } finally {
+            setIsVectorizing(false);
+        }
+    };
 
     const loadModelData = async () => {
         if (!user) return;
@@ -112,9 +140,21 @@ export const NextGenCalibration: React.FC = () => {
 
                 {/* Signal Stats */}
                 <div className="space-y-4">
-                    <div className="flex items-center gap-2">
-                        <Activity className="w-3.5 h-3.5 text-emerald-400" />
-                        <span className="text-xs font-bold text-neutral-400 uppercase tracking-wider">Signal Density</span>
+                    <div className="flex items-center justify-between">
+                        <div className="flex items-center gap-2">
+                            <Activity className="w-3.5 h-3.5 text-emerald-400" />
+                            <span className="text-xs font-bold text-neutral-400 uppercase tracking-wider">Signal Density</span>
+                        </div>
+                        <Button
+                            variant="ghost"
+                            size="sm"
+                            className="!text-[9px] !h-6 !px-2"
+                            onClick={handleSyncLatentSpace}
+                            loading={isVectorizing}
+                            icon={<Share2 className="w-2.5 h-2.5" />}
+                        >
+                            Map Latent Space
+                        </Button>
                     </div>
                     <div className="space-y-3">
                         {stats ? (

@@ -29,8 +29,8 @@ Building the foundation of the user's personal model.
 ### Level 2: Semantic Trajectory Mapping (In Progress)
 - [x] **Trajectory Mapper Prompt**: Established `TRAJECTORY_MAPPER_PROMPT` for path analysis.
 - [x] **Growth Vector Logic**: Implemented `RdTrajectoryService` to calculate drift between past and present.
-- [ ] **Trajectory Dashboard**: UI to visualize the path from current archetype to target archetype.
-- [ ] **Gap Analysis 2.0**: Integration with the matching loop to provide trajectory-aware feedback.
+- [x] **Trajectory Dashboard**: UI to visualize the path from current archetype to target archetype.
+- [x] **Gap Analysis 2.0**: Integration with the matching loop to provide trajectory-aware feedback.
 
 ### 2. Automated Style Inlining
 - [x] **Style Distillation**: Distill recent feedback into prompt-level instructions (Style Guides).
@@ -46,7 +46,7 @@ Transforming text-based profiles into a mathematical career space.
 ### 1. Experience Vectorization
 - [x] **Data Store**: Establish isolated `rd_user_embeddings` data store with `pgvector`.
 - [x] **Trajectory Wiring**: Silently vectorize tailored resume blocks to track professional trajectory.
-- [ ] **Master Profile**: Implement vectorization for "Master Profile" updates to establish a semantic "Zero Point."
+- [x] **Master Profile**: Implement vectorization for "Master Profile" updates to establish a semantic "Zero Point."
 
 ### 2. Similarity Infrastructure
 - [ ] **Role Model Matching**: Implement vector-based matching logic to find Role Models (Buckets) with high semantic overlap.

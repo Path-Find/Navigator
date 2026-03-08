@@ -7,6 +7,9 @@ import type { SavedJob } from '../types';
 import type { ResumeProfile } from '../../resume/types';
 import type { CustomSkill } from '../../skills/types';
 import type { Transcript } from '../../grad/types';
+import { useNextGen } from '../../../hooks/useNextGen';
+import { RdTrajectoryService } from '../../../services/ai/rd/trajectoryService';
+import { useUser } from '../../../contexts/UserContext';
 
 export const useJobAnalysis = (
     job: SavedJob | undefined,
@@ -16,6 +19,8 @@ export const useJobAnalysis = (
     showError: (msg: string) => void,
     onAnalyzeJob?: (job: SavedJob) => Promise<SavedJob>
 ) => {
+    const isNextGen = useNextGen();
+    const { user } = useUser();
     const [analysisProgress, setAnalysisProgress] = useState<string | null>(null);
     const hasStartedAnalysis = useRef(false);
 
@@ -32,13 +37,24 @@ export const useJobAnalysis = (
                     try { transcript = JSON.parse(savedTranscript); } catch (e) { console.error(e); }
                 }
 
+                // Phase 2 Integration: Trajectory Context
+                let trajectoryContext = '';
+                if (isNextGen && user) {
+                    setAnalysisProgress("Mapping Trajectory");
+                    const trajectory = await RdTrajectoryService.getTrajectoryProjection(user.id, job.position);
+                    if (trajectory) {
+                        trajectoryContext = `DIRECTION: ${trajectory.heading}\nPATH: ${trajectory.archetypeShift.from} -> ${trajectory.archetypeShift.to}\nGAPS: ${trajectory.trajectoryGap}`;
+                    }
+                }
+
                 const result = await analyzeJobFit(
                     job.description || '',
                     resumes,
                     userSkills,
                     (msg) => setAnalysisProgress(msg),
                     job.id,
-                    transcript
+                    transcript,
+                    trajectoryContext
                 );
                 const finalJob: SavedJob = { ...job, analysis: result, status: 'saved' as const };
                 await Storage.updateJob(finalJob);
