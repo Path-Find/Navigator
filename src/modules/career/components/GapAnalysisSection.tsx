@@ -14,7 +14,6 @@ import {
 } from 'lucide-react';
 import type { RoleModelProfile, TargetJob, Transcript } from '../../../types';
 import { useToast } from '../../../contexts/ToastContext';
-import type { CoachViewType } from '../types';
 
 interface GapAnalysisSectionProps {
     targetJobs: TargetJob[];
@@ -25,7 +24,6 @@ interface GapAnalysisSectionProps {
     onRunGapAnalysis: (targetJobId: string) => Promise<void>;
     onGenerateRoadmap: (targetJobId: string) => Promise<void>;
     onToggleMilestone: (targetJobId: string, milestoneId: string) => Promise<void>;
-    onViewChange: (view: CoachViewType) => void;
     onCompare?: (roleModelId: string) => void;
     activeAnalysisIds?: Set<string>;
 }
@@ -39,7 +37,6 @@ export const GapAnalysisSection: React.FC<GapAnalysisSectionProps> = ({
     onRunGapAnalysis,
     onGenerateRoadmap,
     onToggleMilestone,
-    onViewChange,
     onCompare,
     activeAnalysisIds = new Set()
 }) => {

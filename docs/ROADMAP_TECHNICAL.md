@@ -15,8 +15,6 @@ Technical foundation and scaling initiatives to support growth and long-term sta
 ## Future Initiatives
 
 - [ ] **Job Alert Inbox**: Standalone service for high-scale email parsing.
-- [ ] **Outreach Auto-Pilot**: Personalized recruitment messaging automation.
-- [ ] **Auto-Fill Assistant**: Browser helper to populate application forms.
 
 ---
 
