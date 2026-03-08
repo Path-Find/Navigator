@@ -301,9 +301,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, featureCo
                                 <Clock className="w-5 h-5 text-indigo-600 dark:text-indigo-400 shrink-0 mt-0.5" />
                                 <div>
                                     <h5 className="text-sm font-bold text-indigo-900 dark:text-indigo-100 mb-1">Invite Required</h5>
-                                    <p className="text-xs text-indigo-700 dark:text-indigo-300 leading-relaxed font-medium">
-                                        Navigator is currently invite-only while we calibrate our Professional Modeling Engine.
-                                    </p>
+                                    Navigator is currently invite-only
                                 </div>
                             </div>
 

@@ -129,7 +129,7 @@ export const PlansPage: React.FC = () => {
                 <div className="flex justify-center -mt-4 mb-12">
                     <div className="inline-flex items-center gap-2 px-4 py-2 bg-indigo-50 dark:bg-indigo-900/40 border border-indigo-100 dark:border-indigo-800 rounded-2xl text-indigo-600 dark:text-indigo-400 text-xs font-bold animate-in fade-in slide-in-from-top-2">
                         <Zap className="w-4 h-4" />
-                        We're currently invite-only while calibrating NextGen.
+                        Navigator is currently invite-only
                     </div>
                 </div>
 
