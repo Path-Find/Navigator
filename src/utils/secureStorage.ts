@@ -151,7 +151,7 @@ async function encrypt(plaintext: string, key?: CryptoKey): Promise<string> {
     return btoa(String.fromCharCode(...combined));
   } catch (error) {
     console.error('Encryption failed:', error);
-    throw new Error('Failed to encrypt data');
+    throw new Error('Failed to encrypt data', { cause: error });
   }
 }
 
@@ -177,8 +177,8 @@ async function decrypt(encryptedData: string, key?: CryptoKey): Promise<string> 
 
     const decoder = new TextDecoder();
     return decoder.decode(decryptedBuffer);
-  } catch {
-    throw new Error('Failed to decrypt data');
+  } catch (error) {
+    throw new Error('Failed to decrypt data', { cause: error });
   }
 }
 

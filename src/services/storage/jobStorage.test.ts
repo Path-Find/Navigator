@@ -12,19 +12,25 @@ vi.mock('./storageCore', () => ({
     getUserId: vi.fn()
 }));
 
-vi.mock('../supabase', () => ({
-    supabase: {
-        from: vi.fn(() => ({
-            insert: vi.fn(() => Promise.resolve({ error: null })),
-            update: vi.fn(() => ({ eq: vi.fn(() => Promise.resolve({ error: null })) })),
-            delete: vi.fn(() => ({ eq: vi.fn(() => Promise.resolve({ error: null })) })),
-            select: vi.fn(() => ({ order: vi.fn(() => ({ eq: vi.fn(() => Promise.resolve({ data: [], error: null })) })) }))
-        })),
-        auth: {
-            getUser: vi.fn(() => Promise.resolve({ data: { user: { id: 'test-user' } }, error: null }))
+vi.mock('../supabase', () => {
+    const mockQueryBuilder = {
+        insert: vi.fn().mockReturnThis(),
+        update: vi.fn().mockReturnThis(),
+        delete: vi.fn().mockReturnThis(),
+        select: vi.fn().mockReturnThis(),
+        eq: vi.fn().mockReturnThis(),
+        order: vi.fn().mockReturnThis(),
+        then: vi.fn((callback) => callback({ data: [], error: null }))
+    };
+    return {
+        supabase: {
+            from: vi.fn(() => mockQueryBuilder),
+            auth: {
+                getUser: vi.fn(() => Promise.resolve({ data: { user: { id: 'test-user' } }, error: null }))
+            }
         }
-    }
-}));
+    };
+});
 
 const VALID_UUID = '123e4567-e89b-12d3-a456-426614174000';
 

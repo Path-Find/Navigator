@@ -88,6 +88,77 @@ export const InterviewAdvisor: React.FC = () => {
             }));
     };
 
+
+
+    const handleStartTailored = async () => {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) return;
+
+        const limit = await checkInterviewLimit(user.id);
+        if (!limit.allowed) {
+            setLimitError(`Monthly interview limit reached (${limit.used}/${limit.limit})`);
+            return;
+        }
+
+        const job = jobs.find(j => j.id === selectedJobId);
+        if (job) {
+            setResumeSnippets(computeSnippets());
+            loadTailoredQuestions(job, resumes);
+            setMode('session');
+        } else {
+            showError("Please select a target job first");
+        }
+    };
+
+    const handleStartGeneral = async () => {
+        const { data: { user } } = await supabase.auth.getUser();
+        if (!user) return;
+
+        const limit = await checkInterviewLimit(user.id);
+        if (!limit.allowed) {
+            setLimitError(`Monthly interview limit reached (${limit.used}/${limit.limit})`);
+            return;
+        }
+
+        setResumeSnippets(computeSnippets());
+        loadGeneralQuestions(resumes);
+        setMode('session');
+    };
+
+    const handleSubmit = async () => {
+        if (!userResponse.trim()) return;
+        const job = jobs.find(j => j.id === selectedJobId);
+        await submitResponse(currentQuestion.id, userResponse, job);
+        setUserResponse('');
+    };
+
+    const handleBankSuggestion = React.useCallback(async (suggestion: { type: string; suggestion: string; impact: string }) => {
+        if (resumes.length === 0) return;
+
+        // Apply to the first (primary) resume for now
+        const primaryResume = resumes[0];
+        const newSuggestion = {
+            id: crypto.randomUUID(),
+            type: suggestion.type as 'add' | 'update' | 'remove',
+            suggestion: suggestion.suggestion,
+            impact: suggestion.impact,
+            source: 'Interview Advisor',
+            dateAdded: Date.now()
+        };
+
+        const updatedResume = {
+            ...primaryResume,
+            suggestedUpdates: [
+                ...(primaryResume.suggestedUpdates || []),
+                newSuggestion
+            ]
+        };
+
+        await handleUpdateResume(updatedResume);
+    }, [resumes, handleUpdateResume]);
+
+    const isSessionLoading = mode === 'session' && questions.length === 0 && isLoading;
+
     // Build flat ChatMessage[] from questions + responses for InterviewChat
     const chatMessages = React.useMemo((): ChatMessage[] => {
         if (mode !== 'session' || !questions || questions.length === 0) return [];
@@ -224,76 +295,9 @@ export const InterviewAdvisor: React.FC = () => {
         });
 
         return msgs;
-    }, [questions, currentQuestionIndex, responses, mode, resumes, copiedText]);
+    }, [questions, currentQuestionIndex, responses, mode, resumes, copiedText, resumeSnippets, handleBankSuggestion]);
 
-    const handleStartTailored = async () => {
-        const { data: { user } } = await supabase.auth.getUser();
-        if (!user) return;
 
-        const limit = await checkInterviewLimit(user.id);
-        if (!limit.allowed) {
-            setLimitError(`Monthly interview limit reached (${limit.used}/${limit.limit})`);
-            return;
-        }
-
-        const job = jobs.find(j => j.id === selectedJobId);
-        if (job) {
-            setResumeSnippets(computeSnippets());
-            loadTailoredQuestions(job, resumes);
-            setMode('session');
-        } else {
-            showError("Please select a target job first");
-        }
-    };
-
-    const handleStartGeneral = async () => {
-        const { data: { user } } = await supabase.auth.getUser();
-        if (!user) return;
-
-        const limit = await checkInterviewLimit(user.id);
-        if (!limit.allowed) {
-            setLimitError(`Monthly interview limit reached (${limit.used}/${limit.limit})`);
-            return;
-        }
-
-        setResumeSnippets(computeSnippets());
-        loadGeneralQuestions(resumes);
-        setMode('session');
-    };
-
-    const handleSubmit = async () => {
-        if (!userResponse.trim()) return;
-        const job = jobs.find(j => j.id === selectedJobId);
-        await submitResponse(currentQuestion.id, userResponse, job);
-        setUserResponse('');
-    };
-
-    const handleBankSuggestion = async (suggestion: { type: string; suggestion: string; impact: string }) => {
-        if (resumes.length === 0) return;
-
-        // Apply to the first (primary) resume for now
-        const primaryResume = resumes[0];
-        const newSuggestion = {
-            id: crypto.randomUUID(),
-            type: suggestion.type as 'add' | 'update' | 'remove',
-            suggestion: suggestion.suggestion,
-            impact: suggestion.impact,
-            source: 'Interview Advisor',
-            dateAdded: Date.now()
-        };
-
-        const updatedResume = {
-            ...primaryResume,
-            suggestedUpdates: [
-                ...(primaryResume.suggestedUpdates || []),
-                newSuggestion
-            ]
-        };
-
-        await handleUpdateResume(updatedResume);
-    };
-
-    const isSessionLoading = mode === 'session' && questions.length === 0 && isLoading;
 
     if (isSessionLoading) {
         return (

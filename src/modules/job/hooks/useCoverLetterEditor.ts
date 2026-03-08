@@ -48,12 +48,16 @@ export const useCoverLetterEditor = ({
         setTimeout(() => setCopiedState(null), 2000);
     }, []);
 
-    const handleUpdateContext = useCallback((value: string) => {
+    const handleUpdateContext = useCallback(async (value: string) => {
         const updated = { ...localJob, contextNotes: value };
         setLocalJob(updated);
-        Storage.updateJob(updated);
         onJobUpdate(updated);
-    }, [localJob, onJobUpdate]);
+        try {
+            await Storage.updateJob(updated);
+        } catch (e) {
+            showError('Failed to save context notes');
+        }
+    }, [localJob, onJobUpdate, showError]);
 
     const handleGenerateCoverLetter = useCallback(async (critiqueContext?: string) => {
         if (!bestResume) {
@@ -137,7 +141,7 @@ export const useCoverLetterEditor = ({
                     },
                 };
 
-                Storage.updateJob(updated);
+                await Storage.updateJob(updated);
                 setLocalJob(updated);
                 onJobUpdate(updated);
                 EventService.trackUsage(TRACKING_EVENTS.COVER_LETTERS);
@@ -163,7 +167,7 @@ export const useCoverLetterEditor = ({
                     coverLetterCritique: undefined
                 };
 
-                Storage.updateJob(updated);
+                await Storage.updateJob(updated);
                 setLocalJob(updated);
                 onJobUpdate(updated);
                 EventService.trackUsage(TRACKING_EVENTS.COVER_LETTERS);
@@ -177,7 +181,7 @@ export const useCoverLetterEditor = ({
         }
     }, [bestResume, analysis, localJob, targetJobs, userTier, onJobUpdate, showError]);
 
-    const handleSelectVariant = useCallback((variant: { text: string; promptVersion: string }) => {
+    const handleSelectVariant = useCallback(async (variant: { text: string; promptVersion: string }) => {
         const other = comparisonVersions?.find(v => v.promptVersion !== variant.promptVersion);
 
         const updated = {
@@ -187,13 +191,17 @@ export const useCoverLetterEditor = ({
             promptVersion: variant.promptVersion
         };
 
-        Storage.updateJob(updated);
         setLocalJob(updated);
         onJobUpdate(updated);
         setComparisonVersions(null);
+        try {
+            await Storage.updateJob(updated);
+        } catch (e) {
+            showError('Failed to save selected variant');
+        }
 
         Storage.submitFeedback(localJob.id, 1, `ab_test_pick:${variant.promptVersion}_vs_${other?.promptVersion || 'none'}`);
-    }, [comparisonVersions, localJob, onJobUpdate]);
+    }, [comparisonVersions, localJob, onJobUpdate, showError]);
 
     const handleRunCritique = useCallback(async () => {
         setGenerating(true);
@@ -202,7 +210,7 @@ export const useCoverLetterEditor = ({
             const critique = await critiqueCoverLetter(textToUse, localJob.coverLetter!, localJob.id);
 
             const updated = { ...localJob, coverLetterCritique: critique };
-            Storage.updateJob(updated);
+            await Storage.updateJob(updated);
             setLocalJob(updated);
             onJobUpdate(updated);
         } catch (e) {
@@ -212,14 +220,18 @@ export const useCoverLetterEditor = ({
         }
     }, [analysis, localJob, onJobUpdate, showError]);
 
-    const handleEditCoverLetter = useCallback((newText: string) => {
+    const handleEditCoverLetter = useCallback(async (newText: string) => {
         if (newText !== localJob.coverLetter) {
             const updated = { ...localJob, coverLetter: newText };
             setLocalJob(updated);
-            Storage.updateJob(updated);
             onJobUpdate(updated);
+            try {
+                await Storage.updateJob(updated);
+            } catch (e) {
+                showError('Failed to save cover letter edits');
+            }
         }
-    }, [localJob, onJobUpdate]);
+    }, [localJob, onJobUpdate, showError]);
 
     // Auto-Generate on Mount if no letter exists
     useEffect(() => {

@@ -143,10 +143,14 @@ export const JobDetail: React.FC = () => {
         <div className="flex items-center gap-3">
             <select
                 value={job.status}
-                onChange={(e) => {
+                onChange={async (e) => {
                     const updated = { ...job, status: e.target.value as SavedJob['status'] };
-                    Storage.updateJob(updated);
                     onUpdateJob(updated);
+                    try {
+                        await Storage.updateJob(updated);
+                    } catch {
+                        showError('Failed to save status change');
+                    }
                 }}
                 className="text-xs bg-neutral-50 dark:bg-neutral-800 rounded-xl px-4 py-2 font-black text-neutral-600 dark:text-neutral-400 border-none focus:ring-4 focus:ring-accent-primary/10 transition-all cursor-pointer hover:bg-neutral-100 dark:hover:bg-neutral-700"
             >

@@ -6,7 +6,7 @@ import {
 import { ScraperService } from '../../services/scraperService';
 import { supabase } from '../../services/supabase';
 import { analyzeJobFit } from '../../services/geminiService';
-import type { JobFeedItem, ResumeRow } from '../../types';
+import type { JobFeedItem } from '../../types';
 import { SharedPageLayout } from '../../components/common/SharedPageLayout';
 import { PageHeader } from '../../components/ui/PageHeader';
 import { STORAGE_KEYS } from '../../constants';
@@ -108,49 +108,53 @@ export const NavigatorPro: React.FC = () => {
     };
 
     const analyzeJobsInBackground = async (jobs: JobFeedItem[]) => {
-        // Get user's resume and tier
-        const { data: resumes } = await supabase
-            .from('resumes')
-            .select('*')
-            .order('created_at', { ascending: false })
-            .limit(1);
+        try {
+            // Get user's resume and tier
+            const { data: resumes } = await supabase
+                .from('resumes')
+                .select('*')
+                .order('created_at', { ascending: false })
+                .limit(1);
 
-        if (!resumes || resumes.length === 0) {
-            return;
-        }
-
-        const resume = resumes[0];
-
-        // Check which jobs already have analysis in Supabase
-        const jobUrls = jobs.map(j => j.url);
-        const { data: existingJobs } = await supabase
-            .from('jobs')
-            .select('url, analysis')
-            .in('url', jobUrls);
-
-        // Separate cached vs uncached jobs
-        const jobsToAnalyze: JobFeedItem[] = [];
-        for (const job of jobs) {
-            const existing = existingJobs?.find(j => j.url === job.url);
-            if (existing?.analysis?.matchScore) {
-                // Use cached match score immediately
-                setFeed(prevFeed => prevFeed.map(f =>
-                    f.id === job.id ? { ...f, matchScore: existing.analysis.matchScore } : f
-                ));
-            } else {
-                jobsToAnalyze.push(job);
+            if (!resumes || resumes.length === 0) {
+                return;
             }
-        }
 
-        // Analyze uncached jobs in parallel batches (3 at a time to avoid rate limits)
-        const CONCURRENCY = 3;
-        for (let i = 0; i < jobsToAnalyze.length; i += CONCURRENCY) {
-            const batch = jobsToAnalyze.slice(i, i + CONCURRENCY);
-            await Promise.all(batch.map(job => analyzeAndCacheJob(job, resume)));
+            const resume = resumes[0] as any;
+
+            // Check which jobs already have analysis in Supabase
+            const jobUrls = jobs.map(j => j.url);
+            const { data: existingJobs } = await supabase
+                .from('jobs')
+                .select('url, analysis')
+                .in('url', jobUrls);
+
+            // Separate cached vs uncached jobs
+            const jobsToAnalyze: JobFeedItem[] = [];
+            for (const job of jobs) {
+                const existing = existingJobs?.find(j => j.url === job.url);
+                if (existing?.analysis?.compatibilityScore) {
+                    // Use cached match score immediately
+                    setFeed(prevFeed => prevFeed.map(f =>
+                        f.id === job.id ? { ...f, matchScore: existing.analysis.compatibilityScore } : f
+                    ));
+                } else {
+                    jobsToAnalyze.push(job);
+                }
+            }
+
+            // Analyze uncached jobs in parallel batches (3 at a time to avoid rate limits)
+            const CONCURRENCY = 3;
+            for (let i = 0; i < jobsToAnalyze.length; i += CONCURRENCY) {
+                const batch = jobsToAnalyze.slice(i, i + CONCURRENCY);
+                await Promise.all(batch.map(job => analyzeAndCacheJob(job, resume)));
+            }
+        } catch (error) {
+            console.error("Background analysis failed:", error);
         }
     };
 
-    const analyzeAndCacheJob = async (job: JobFeedItem, resume: ResumeRow) => {
+    const analyzeAndCacheJob = async (job: JobFeedItem, resume: any) => {
         try {
             // 1. Scrape Job Text
             let jobText = "";
@@ -176,13 +180,14 @@ export const NavigatorPro: React.FC = () => {
             ));
 
             // 4. Cache in Supabase
+            // Important: Keep status as 'feed' so it remains in the feed and doesn't clutter history until user takes action
             await supabase.from('jobs').upsert({
                 user_id: resume.user_id,
                 job_title: job.title,
                 company: job.company,
                 url: job.url,
                 analysis: analysis, // Store full analysis JSON
-                status: 'saved'
+                status: 'feed'
             }, { onConflict: 'url' });
 
         } catch (error) {

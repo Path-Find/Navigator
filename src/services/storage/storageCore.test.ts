@@ -40,6 +40,7 @@ describe('Vault - PBKDF2 iteration migration', () => {
     beforeEach(() => {
         vi.clearAllMocks();
         Vault.initialized = false;
+        Vault.initPromise = null;
         localStorage.clear();
         localStorage.setItem('jobfit_vault_seed', 'test-seed-123');
     });

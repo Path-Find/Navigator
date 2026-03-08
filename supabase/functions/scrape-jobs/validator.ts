@@ -186,7 +186,7 @@ export async function validateUrl(url: string, resolver: DnsResolver = defaultDn
     }
 
     // Resolve hostname
-    let ips: string[] = [];
+    let ips: string[];
     try {
         ips = await resolver(hostname);
     } catch {
@@ -208,7 +208,7 @@ export async function validateUrl(url: string, resolver: DnsResolver = defaultDn
 
 export async function fetchSafe(inputUrl: string, options: RequestInit = {}): Promise<Response> {
     let currentUrl = inputUrl;
-    let response: Response | null = null;
+    let response: Response;
     const maxRedirects = 5;
     const timeout = 15000; // 15 second timeout for scraping
 
@@ -272,7 +272,9 @@ export async function fetchSafe(inputUrl: string, options: RequestInit = {}): Pr
             // Consume/Cancel the response body to free resources before next fetch
             try {
                 await response.body?.cancel();
-            } catch { }
+            } catch {
+                // Ignore cancellation errors
+            }
 
             continue;
         }
@@ -296,22 +298,17 @@ export async function readTextSafe(response: Response, maxLength: number = 5 * 1
     let receivedLength = 0;
     const chunks: Uint8Array[] = [];
 
-    try {
-        while (true) {
-            const { done, value } = await reader.read();
-            if (done) break;
+    while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
 
-            receivedLength += value.length;
-            if (receivedLength > maxLength) {
-                // Cancel the rest of the stream
-                await reader.cancel();
-                throw new Error(`Response too large (max ${maxLength} bytes)`);
-            }
-            chunks.push(value);
+        receivedLength += value.length;
+        if (receivedLength > maxLength) {
+            // Cancel the rest of the stream
+            await reader.cancel();
+            throw new Error(`Response too large (max ${maxLength} bytes)`);
         }
-    } catch (e) {
-        // Propagate error
-        throw e;
+        chunks.push(value);
     }
 
     // Concatenate chunks

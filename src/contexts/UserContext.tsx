@@ -104,7 +104,7 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
                 }
 
                 if (profileData) {
-                    const tier = profileData.subscription_tier as UserTier;
+                    const tier = (profileData.subscription_tier as UserTier) || 'free';
                     setActualTier(profileData.is_admin ? 'admin' : tier);
                     setIsAdmin(profileData.is_admin || false);
                     setIsTester(profileData.is_tester || false);
