@@ -25,7 +25,7 @@ export const EmailVerificationScreen: React.FC = () => {
             refreshUser();
         }, 5000); // Check every 5 seconds
         return () => clearInterval(interval);
-    }, [refreshUser, isEmailVerified]);
+    }, [refreshUser, isEmailVerified, user]);
 
     const handleResend = async () => {
         if (cooldown > 0) return;

@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file.
 
+## [Unreleased]
+
+### Changed
+- **Code Health Sweep**: Resolved major linting warnings across the project. Replaced generic `any` types with disciplined interfaces (`ProcessedJob`, specific `PromiseSettledResult`s) in `jobStorage.ts` and `usageLimits.ts`.
+- **Hook Optimization**: Added missing dependencies to `useEffect`, `useMemo`, and `useCallback` hooks in `useCoachManager` and `EmailVerificationScreen` to prevent stale closure bugs.
+
+### Fixed
+- **Storage Core Migration**: Increased the migration timeout budget from 3s to 5s and refined the Base64 regex detection in `Vault` to prevent silently skipping the PBKDF2 iteration migration.
+- **Supabase Mock Fragility**: Restructured the Supabase test mocks in `jobStorage.test.ts` to fully support chained operations (`.from().update().eq().eq()`), stopping `TypeError` false positives during unit tests.
+- **Unhandled Database Exceptions**: Fixed a bug in `usageLimits.ts` where failed or aborted Supabase queries caused unhandled promise rejections. Returns from `Promise.allSettled` are now safely extracted with fallback defaults.
+- **Profile Data Sync**: Restored missing columns (`total_ai_calls`, `job_analyses_count`, `inbound_email_token`) to the `profiles` fetch query that previously broke tier limitations.
+
 ## [2.31.8] - 2026-03-08
 
 ### Fixed

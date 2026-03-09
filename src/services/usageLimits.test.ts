@@ -160,7 +160,8 @@ describe('getUsageStats', () => {
             emailLimit: 25,
             roleModelLimit: 25,
             interviewLimit: 5,
-            inboundEmailToken: 'token-123'
+            inboundEmailToken: 'token-123',
+            isFallback: false
         });
     });
 
@@ -245,7 +246,7 @@ describe('getUsageStats', () => {
             single: vi.fn().mockRejectedValue(new Error('DB Error'))
         } as any);
 
-        const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => { });
+        const consoleSpy = vi.spyOn(console, 'warn').mockImplementation(() => { });
 
         const result = await getUsageStats(userId);
 
@@ -263,9 +264,10 @@ describe('getUsageStats', () => {
             emailLimit: 0,
             roleModelLimit: 0,
             interviewLimit: 0,
-            inboundEmailToken: undefined
+            inboundEmailToken: undefined,
+            isFallback: true
         });
-        expect(consoleSpy).toHaveBeenCalledWith('Error fetching usage stats:', expect.any(Error));
+        expect(consoleSpy).toHaveBeenCalledWith('Profile fetch failed, using fallback usage stats');
 
         consoleSpy.mockRestore();
     });

@@ -39,7 +39,7 @@ export const useCoachManager = () => {
             }
         });
         return () => { mounted = false; };
-    }, []);
+    }, [showError]);
 
     const handleAddRoleModel = useCallback(async (file: File) => {
         try {
@@ -120,7 +120,7 @@ export const useCoachManager = () => {
                 return next;
             });
         }
-    }, [targetJobs, roleModels, transcript, showInfo]);
+    }, [targetJobs, roleModels, transcript, showInfo, showError]);
 
     const handleGenerateRoadmap = useCallback(async (targetJobId: string) => {
         const targetJob = targetJobs.find(tj => tj.id === targetJobId);
@@ -144,7 +144,7 @@ export const useCoachManager = () => {
                 return next;
             });
         }
-    }, [targetJobs, showInfo]);
+    }, [targetJobs, showInfo, showError]);
 
     const handleToggleMilestone = useCallback(async (targetJobId: string, milestoneId: string) => {
         const targetJob = targetJobs.find(tj => tj.id === targetJobId);

@@ -80,12 +80,13 @@ export const JobStorage = {
                             }
                         }
 
-                        (finalJob as any)._synced = true;
+                        type ProcessedJob = SavedJob & { _synced?: boolean };
+                        (finalJob as ProcessedJob)._synced = true;
                         return finalJob;
                     });
 
                     const cloudIds = new Set(cloudJobs.map(j => j.id));
-                    const unsyncedLocalJobs = localJobs.filter(l => !cloudIds.has(l.id) && !(l as any)._synced);
+                    const unsyncedLocalJobs = localJobs.filter(l => !cloudIds.has(l.id) && !(l as SavedJob & { _synced?: boolean })._synced);
 
                     jobs = [...processedCloudJobs, ...unsyncedLocalJobs].sort((a, b) => b.dateAdded - a.dateAdded);
                     await Vault.setSecure(STORAGE_KEYS.JOBS_HISTORY, jobs);

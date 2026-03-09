@@ -13,15 +13,27 @@ vi.mock('./storageCore', () => ({
 }));
 
 vi.mock('../supabase', () => {
-    const mockQueryBuilder = {
-        insert: vi.fn().mockReturnThis(),
-        update: vi.fn().mockReturnThis(),
-        delete: vi.fn().mockReturnThis(),
-        select: vi.fn().mockReturnThis(),
-        eq: vi.fn().mockReturnThis(),
-        order: vi.fn().mockReturnThis(),
-        then: vi.fn((callback) => callback({ data: [], error: null }))
+    const mockQueryBuilder: any = {
+        insert: vi.fn(),
+        update: vi.fn(),
+        delete: vi.fn(),
+        select: vi.fn(),
+        eq: vi.fn(),
+        order: vi.fn(),
+        then: vi.fn()
     };
+
+    // Make mockQueryBuilder methods chainable by default
+    mockQueryBuilder.insert.mockReturnValue(mockQueryBuilder);
+    mockQueryBuilder.update.mockReturnValue(mockQueryBuilder);
+    mockQueryBuilder.delete.mockReturnValue(mockQueryBuilder);
+    mockQueryBuilder.select.mockReturnValue(mockQueryBuilder);
+    mockQueryBuilder.eq.mockReturnValue(mockQueryBuilder);
+    mockQueryBuilder.order.mockReturnValue(mockQueryBuilder);
+    mockQueryBuilder.then.mockImplementation((callback: any) =>
+        Promise.resolve(callback({ data: [], error: null }))
+    );
+
     return {
         supabase: {
             from: vi.fn(() => mockQueryBuilder),

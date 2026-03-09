@@ -45,12 +45,12 @@ async function migrateVaultData(): Promise<void> {
     }
 
     const startTime = Date.now();
-    const MIGRATION_TIMEOUT_MS = 3000; // 3s budget for migration
+    const MIGRATION_TIMEOUT_MS = 5000; // 5s budget for migration (increased for safety)
 
     for (const key of keysToCheck) {
         // Break if we exceed the budget to prevent long UI blocks
         if (Date.now() - startTime > MIGRATION_TIMEOUT_MS) {
-            console.warn(`[Vault] Migration budget exceeded after ${keysToCheck.indexOf(key)}/${keysToCheck.length} items. Remainder will be lazy-migrated.`);
+            console.warn(`[Vault] Migration budget exceeded after processing ${keysToCheck.indexOf(key)}/${keysToCheck.length} items. Remainder will be lazy-migrated.`);
             break;
         }
 
@@ -59,10 +59,9 @@ async function migrateVaultData(): Promise<void> {
 
         // Vault entries have the form ivBase64:ciphertextBase64.
         // Base64 characters are A-Z, a-z, 0-9, +, / and = (padding).
-        // Characters like '{', '[', spaces, or hyphens are never valid base64,
-        // so this regex efficiently rejects JSON, plain strings, and UUIDs
-        // while matching potential vault ciphertext.
-        if (!/^[A-Za-z0-9+/].*:[A-Za-z0-9+/]/.test(raw)) continue;
+        // We use a robust regex that allows for padding and checks for the colon.
+        // IV part is required but length can vary depending on implementation details.
+        if (!/^[A-Za-z0-9+/=]+:[A-Za-z0-9+/=]+$/.test(raw)) continue;
 
         try {
             const decrypted = await encryptionService.decryptLegacy(raw);

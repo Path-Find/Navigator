@@ -11,16 +11,18 @@ vi.mock('../supabase', () => ({
     }
 }));
 
-vi.mock('../encryptionService', () => ({
-    encryptionService: {
-        init: vi.fn(),
-        needsMigration: vi.fn(),
-        decryptLegacy: vi.fn(),
-        encrypt: vi.fn(),
-        decrypt: vi.fn(),
-        markMigrationComplete: vi.fn(),
-    }
-}));
+vi.mock('../encryptionService', () => {
+    return {
+        encryptionService: {
+            init: vi.fn(() => Promise.resolve()),
+            needsMigration: vi.fn(() => false),
+            decryptLegacy: vi.fn(() => Promise.resolve('')),
+            encrypt: vi.fn(() => Promise.resolve('')),
+            decrypt: vi.fn(() => Promise.resolve('')),
+            markMigrationComplete: vi.fn(),
+        }
+    };
+});
 
 describe('areBlocksEqual (exported from storageCore)', () => {
     it('should correctly compare two equal blocks', () => {

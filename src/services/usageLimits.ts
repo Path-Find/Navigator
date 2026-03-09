@@ -147,7 +147,7 @@ export const getUsageStats = async (userId: string): Promise<UsageStats> => {
                     // Fallback to a more basic query if the initial one fails, e.g., due to missing columns
                     const { data: basicData, error: basicError } = await supabase
                         .from('profiles')
-                        .select('subscription_tier, is_admin, is_tester')
+                        .select('subscription_tier,is_admin,is_tester,total_ai_calls,job_analyses_count,inbound_email_token')
                         .eq('id', userId)
                         .single();
                     if (basicError) {
@@ -190,25 +190,49 @@ export const getUsageStats = async (userId: string): Promise<UsageStats> => {
                 .gte('date_added', today))(),
         ]);
 
-        const [
-            profileResult,
-            todayCountResult,
-            weekCountResult,
-            monthInterviewCountResult,
-            roleModelCountResult,
-            todayEmailCountResult,
-        ] = results as any;
+        const getData = <T>(result: PromiseSettledResult<{ data: T }>) =>
+            result.status === 'fulfilled' ? result.value.data : null;
 
-        // Log any rejections
-        results.forEach((r: any) => {
-            if (r.status === 'rejected') {
-                console.error('Error fetching usage stats:', r.reason);
+        const getCount = (result: PromiseSettledResult<{ count: number | null }>) =>
+            result.status === 'fulfilled' ? result.value.count : 0;
+
+        const profileResult = results[0] as PromiseSettledResult<{
+            data: {
+                subscription_tier?: string;
+                is_admin?: boolean;
+                is_tester?: boolean;
+                job_analyses_count?: number;
+                total_ai_calls?: number;
+                inbound_email_token?: string;
             }
-        });
+        }>;
+        const todayCountResult = results[1] as PromiseSettledResult<{ count: number | null }>;
+        const weekCountResult = results[2] as PromiseSettledResult<{ count: number | null }>;
+        const monthInterviewCountResult = results[3] as PromiseSettledResult<{ count: number | null }>;
+        const roleModelCountResult = results[4] as PromiseSettledResult<{ count: number | null }>;
+        const todayEmailCountResult = results[5] as PromiseSettledResult<{ count: number | null }>;
 
-        // Helper to extract data from settled promise
-        const getData = (result: any) => result.status === 'fulfilled' ? result.value.data : null;
-        const getCount = (result: any) => result.status === 'fulfilled' ? result.value.count : 0;
+        // If even the profile fetch failed or was rejected, we should treat this as a fallback scenario
+        if (profileResult.status === 'rejected' || !getData(profileResult)) {
+            console.warn('Profile fetch failed, using fallback usage stats');
+            return {
+                tier: 'free' as UserTier,
+                todayAnalyses: 0,
+                weekAnalyses: 0,
+                todayEmails: 0,
+                monthInterviews: 0,
+                roleModelCount: 0,
+                totalAICalls: 0,
+                lifetimeAnalyses: 0,
+                analysisLimit: 3,
+                analysisPeriod: 'lifetime',
+                emailLimit: 0,
+                roleModelLimit: 0,
+                interviewLimit: 0,
+                inboundEmailToken: undefined,
+                isFallback: true
+            };
+        }
 
         const profile = getData(profileResult);
         const todayCount = getCount(todayCountResult);
