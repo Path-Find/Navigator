@@ -36,6 +36,36 @@ describe('areBlocksEqual (exported from storageCore)', () => {
         const b = { type: 'work', title: 'Manager', organization: 'Company A' };
         expect(areBlocksEqual(a, b)).toBe(false);
     });
+
+    it('should correctly compare with case and whitespace differences', () => {
+        const a = { type: 'work', title: ' Developer ', organization: 'company a' };
+        const b = { type: 'work', title: 'developer', organization: 'Company A ' };
+        expect(areBlocksEqual(a, b)).toBe(true);
+    });
+
+    it('should correctly compare skill types relying only on title', () => {
+        const a = { type: 'skill', title: 'React', organization: 'Different Org' };
+        const b = { type: 'skill', title: 'React', organization: 'Another Org' };
+        expect(areBlocksEqual(a, b)).toBe(true);
+    });
+
+    it('should always return true for matching summary types', () => {
+        const a = { type: 'summary', title: 'A long summary' };
+        const b = { type: 'summary', title: 'A completely different summary' };
+        expect(areBlocksEqual(a, b)).toBe(true);
+    });
+
+    it('should gracefully handle undefined properties in equality check', () => {
+        const a = { type: 'education', title: undefined, organization: 'Uni' };
+        const b = { type: 'education', title: '', organization: 'Uni' };
+        expect(areBlocksEqual(a, b)).toBe(true);
+    });
+
+    it('should return false if types do not match regardless of title', () => {
+        const a = { type: 'work', title: 'Software Engineer', organization: 'Google' };
+        const b = { type: 'education', title: 'Software Engineer', organization: 'Google' };
+        expect(areBlocksEqual(a, b)).toBe(false);
+    });
 });
 
 describe('Vault - PBKDF2 iteration migration', () => {
