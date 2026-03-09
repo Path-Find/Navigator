@@ -6,7 +6,7 @@ import {
 import { ScraperService } from '../../services/scraperService';
 import { supabase } from '../../services/supabase';
 import { analyzeJobFit } from '../../services/geminiService';
-import type { JobFeedItem } from '../../types';
+import type { JobFeedItem, ResumeRow } from '../../types';
 import { SharedPageLayout } from '../../components/common/SharedPageLayout';
 import { PageHeader } from '../../components/ui/PageHeader';
 import { STORAGE_KEYS } from '../../constants';
@@ -120,7 +120,7 @@ export const NavigatorPro: React.FC = () => {
                 return;
             }
 
-            const resume = resumes[0] as any;
+            const resume = resumes[0] as ResumeRow;
 
             // Check which jobs already have analysis in Supabase
             const jobUrls = jobs.map(j => j.url);
@@ -154,7 +154,7 @@ export const NavigatorPro: React.FC = () => {
         }
     };
 
-    const analyzeAndCacheJob = async (job: JobFeedItem, resume: any) => {
+    const analyzeAndCacheJob = async (job: JobFeedItem, resume: ResumeRow) => {
         try {
             // 1. Scrape Job Text
             let jobText = "";
