@@ -1,39 +1,29 @@
 # Security Model
 
-This document outlines the security architecture and data protections for Navigator.
+Navigator is built with privacy and security as its foundation.
 
-## Authentication & Authorization
-
-Navigator uses a multi-tier security model to protect user data and ensure authorized access.
-
-### 1. Account Security
-Access to the application is managed via Supabase Auth. We support secure login methods and enforce email verification to prevent account takeover and ensure high-quality usage.
-
-### 2. Role-Based Access Control (RBAC)
-Permissions are enforced at the database level via Supabase profiles:
-- **Free Users**: Access to foundational analysis and resume management.
-- **Plus/Pro Users**: High-volume analysis, strategic career coaching, and priority support.
-- **Admins**: Access to system health metrics and platform management.
-
-### 3. Abuse Prevention
-To maintain the quality of our free tier and prevent automated abuse, we implement several layers of defense:
-- **Device Fingerprinting**: We use browser fingerprinting to detect and block multi-account abuse on the same device.
-- **Email Normalization**: We programmatically handle Gmail/Outlook alias abuse (e.g., `user+1@gmail.com` -> `user@gmail.com`) to ensure fair distribution of free credits.
-
-## Data Protections
-
-### AI Privacy (Enterprise-Grade)
-Navigator uses the paid Enterprise tier of Google's Gemini API. 
-- **No Training**: Under our enterprise agreement, your resumes, job descriptions, and chats are **never** used to train Google's foundational models.
-- **Isolation**: Your data is processed in isolated sessions and is not shared with other users.
-
-### Database Security (Supabase RLS)
-Security is enforced at the database level using Row Level Security (RLS) policies:
-- **Data Isolation**: Users can only read and write their own profile data, resumes, and analysis history.
-- **Encrypted Sync**: Sensitive profile data is encrypted at rest using industry-standard AES-256.
-- **Secure Edge Functions**: Operations like job scraping and payment processing are handled in isolated server-side environments (Supabase Edge Functions).
+- **Authentication & Authorization**: A multi-tier model using Supabase Auth with secure login methods and email verification.
+- **Data Ownership**: Row Level Security (RLS) ensures users only access their own resumes and analysis history.
+- **AI Privacy**: Navigator uses Gemini to analyze resumes and job descriptions.
+    - **Privacy Commitment**: Covered by [Google's Enterprise Privacy protections](https://cloud.google.com/vertex-ai/docs/generative-ai/learn/privacy).
+    - **No Training**: Your resumes, job descriptions, and chats are never used to train global AI models.
+    - **Isolation**: Data is processed in isolated sessions and is not shared with other users.
+- **Secure Integration**: Operations like job scraping are handled in isolated server-side environments (Supabase Edge Functions).
+- **Abuse Prevention**: Implements device fingerprinting and email normalization to protect platform integrity.
 
 ## Reporting a Vulnerability
 
-If you discover a security vulnerability in this project, please open a GitHub Issue or contact the maintainer directly. Data privacy and security are our top priorities.
+If you discover a security vulnerability in this project, please report it via the **[GitHub Private Vulnerability Reporting](https://github.com/ryanphanna/Navigator/security/advisories/new)** tool. Private reports allow for a secure disclosure process before a formal patch is released.
 
+### What to Include
+
+- Description of the vulnerability
+- Steps to reproduce
+- Potential impact
+- Suggested fix (if any)
+
+### Response Timeline
+
+- **Initial response**: Within 48 hours
+- **Status update**: Within 7 days
+- **Resolution**: Depends on severity and complexity

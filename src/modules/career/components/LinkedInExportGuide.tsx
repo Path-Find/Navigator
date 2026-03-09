@@ -14,13 +14,9 @@ export const LinkedInExportGuide: React.FC<LinkedInExportGuideProps> = ({
     isUploading
 }) => {
     return (
-        <div className="animate-in zoom-in-95 duration-500 relative -mt-8 -mx-4 sm:-mx-6 px-4 sm:px-6 py-12 min-h-[calc(100vh-12rem)]">
-            {/* Ambient Background Glows */}
-            <div className="absolute top-1/4 -left-24 w-96 h-96 bg-emerald-500/10 blur-[150px] rounded-full" />
-            <div className="absolute bottom-1/4 -right-24 w-96 h-96 bg-teal-500/10 blur-[150px] rounded-full" />
-
-            <div className="relative z-10 max-w-7xl mx-auto">
-                <div className="max-w-7xl mx-auto text-center mb-12">
+        <div className="animate-in zoom-in-95 duration-500 relative py-8">
+            <div className="max-w-5xl mx-auto">
+                <div className="text-center mb-12">
                     <h1 className="text-3xl md:text-4xl font-black text-neutral-900 dark:text-white tracking-tight mb-2">
                         Career Models
                     </h1>

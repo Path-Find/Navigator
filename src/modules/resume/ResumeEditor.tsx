@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import type { ExperienceBlock } from './types';
 import { Upload, Loader2, Plus, Trash2, Briefcase, GraduationCap, Code, Layers, Calendar, UserCircle, FileText, Zap, Sparkles, Heart, Download, ArrowRightLeft, ChevronUp, ChevronDown, X, Check } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { TRACKING_EVENTS, ROUTES } from '../../constants';
+import { ROUTES } from '../../constants';
 import { isRecognizedSkill } from '../../data/skillDatabase';
 import { SharedPageLayout } from '../../components/common/SharedPageLayout';
 import { PageHeader } from '../../components/ui/PageHeader';
@@ -11,7 +11,7 @@ import { Card } from '../../components/ui/Card';
 import { Button } from '../../components/ui/Button';
 import { Alert } from '../../components/ui/Alert';
 import { useResumeContext } from './context/ResumeContext';
-import { EventService } from '../../services/eventService';
+import { useResumeEditor } from './hooks/useResumeEditor';
 import { UnifiedUploadHero } from '../../components/common/UnifiedUploadHero';
 import { GlobalDragOverlay } from '../../components/common/GlobalDragOverlay';
 import { ResumePreview } from './components/ResumePreview';
@@ -64,8 +64,21 @@ export const ResumeEditor: React.FC = () => {
 
     const initialResume = resumes.length > 0 ? resumes[0] : { id: 'primary', name: 'Primary Experience', blocks: [] };
 
-    const [blocks, setBlocks] = useState<ExperienceBlock[]>(initialResume.blocks || []);
-    const [movingBlockId, setMovingBlockId] = useState<string | null>(null);
+    const {
+        blocks,
+        movingBlockId,
+        setMovingBlockId,
+        addBlock,
+        removeBlock,
+        updateBlock,
+        updateBullet,
+        addBullet,
+        removeBullet,
+        moveBullet,
+        handleApplySuggestion,
+        handleDismissSuggestion
+    } = useResumeEditor(initialResume, resumes, onSave);
+
     const [hasStartedManually, setHasStartedManually] = useState(false);
     const [parsingMessageIndex, setParsingMessageIndex] = useState(0);
     const [isPreviewOpen, setIsPreviewOpen] = useState(false);
@@ -81,7 +94,7 @@ export const ResumeEditor: React.FC = () => {
     ];
 
     useEffect(() => {
-        let interval: any;
+        let interval: ReturnType<typeof setInterval> | undefined;
         if (isParsing) {
             interval = setInterval(() => {
                 setParsingMessageIndex((prev) => (prev + 1) % PARSING_MESSAGES.length);
@@ -90,14 +103,6 @@ export const ResumeEditor: React.FC = () => {
         return () => clearInterval(interval);
     }, [isParsing, PARSING_MESSAGES.length]);
 
-
-
-    useEffect(() => {
-        if (resumes.length > 0) {
-            setBlocks(resumes[0].blocks);
-        }
-    }, [resumes]);
-
     // Clear error on unmount
     useEffect(() => {
         return () => {
@@ -105,118 +110,11 @@ export const ResumeEditor: React.FC = () => {
         };
     }, [clearImportError]);
 
-
-
-    useEffect(() => {
-        const handler = setTimeout(() => {
-            const updatedProfile = { ...initialResume, blocks };
-            onSave([updatedProfile]);
-            // Track usage of resume builder
-            EventService.trackUsage(TRACKING_EVENTS.RESUMES);
-        }, 800);
-        return () => clearTimeout(handler);
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [blocks, initialResume.id]);
-
     const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
         if (!file) return;
         onImport(file);
         if (fileInputRef.current) fileInputRef.current.value = '';
-    };
-
-    const addBlock = (type: SectionType) => {
-        if (type === 'summary' && blocks.some(b => b.type === 'summary')) return;
-        const newBlock: ExperienceBlock = {
-            id: crypto.randomUUID(),
-            type: type,
-            title: type === 'summary' ? 'Professional Summary' : '',
-            organization: '',
-            dateRange: '',
-            bullets: [''],
-            isVisible: true
-        };
-        setBlocks([...blocks, newBlock]);
-    };
-
-    const removeBlock = (id: string) => {
-        setBlocks(blocks.filter(b => b.id !== id));
-    };
-
-    const updateBlock = (id: string, field: keyof ExperienceBlock, value: string | string[] | boolean) => {
-        setBlocks(blocks.map(b => b.id === id ? { ...b, [field]: value } : b));
-    };
-
-    const updateBullet = (blockId: string, index: number, value: string) => {
-        setBlocks(blocks.map(b => {
-            if (b.id !== blockId) return b;
-            const newBullets = [...b.bullets];
-            newBullets[index] = value;
-            return { ...b, bullets: newBullets };
-        }));
-    };
-
-    const addBullet = (blockId: string, text: string = '') => {
-        setBlocks(prev => prev.map(b => {
-            if (b.id !== blockId) return b;
-            // If the last bullet is empty and we're inserting non-empty text, fill that slot
-            const newBullets = [...b.bullets];
-            if (text !== '' && newBullets.length > 0 && newBullets[newBullets.length - 1] === '') {
-                newBullets[newBullets.length - 1] = text;
-            } else {
-                newBullets.push(text);
-            }
-            return { ...b, bullets: newBullets };
-        }));
-    };
-
-    const removeBullet = (blockId: string, index: number) => {
-        setBlocks(blocks.map(b => {
-            if (b.id !== blockId) return b;
-            return { ...b, bullets: b.bullets.filter((_: string, i: number) => i !== index) };
-        }));
-    };
-
-    const moveBullet = (blockId: string, index: number, direction: 'up' | 'down') => {
-        setBlocks(blocks.map(b => {
-            if (b.id !== blockId) return b;
-            const newBullets = [...b.bullets];
-            const targetIndex = direction === 'up' ? index - 1 : index + 1;
-            if (targetIndex >= 0 && targetIndex < newBullets.length) {
-                [newBullets[index], newBullets[targetIndex]] = [newBullets[targetIndex], newBullets[index]];
-            }
-            return { ...b, bullets: newBullets };
-        }));
-    };
-
-    const handleApplySuggestion = (suggestion: any) => {
-        if (suggestion.type === 'add' || suggestion.type === 'update') {
-            // Find summary block or add one
-            const summaryBlock = blocks.find(b => b.type === 'summary');
-            if (summaryBlock) {
-                addBullet(summaryBlock.id, suggestion.suggestion);
-            } else {
-                const newBlock: ExperienceBlock = {
-                    id: crypto.randomUUID(),
-                    type: 'summary',
-                    title: 'Professional Summary',
-                    organization: '',
-                    dateRange: '',
-                    bullets: [suggestion.suggestion],
-                    isVisible: true
-                };
-                setBlocks([newBlock, ...blocks]);
-            }
-        }
-        handleDismissSuggestion(suggestion.id);
-    };
-
-    const handleDismissSuggestion = (suggestionId: string) => {
-        const updatedProfile = {
-            ...initialResume,
-            suggestedUpdates: (initialResume.suggestedUpdates || []).filter(s => s.id !== suggestionId)
-        };
-        onSave([updatedProfile]);
     };
 
     const handlePrint = () => {
@@ -626,21 +524,21 @@ export const ResumeEditor: React.FC = () => {
                                                                 </div>
 
                                                                 {block.type !== 'summary' && (
-                                                                    <div className="mt-4 flex items-center gap-1 no-print">
+                                                                    <div className="mt-6 flex items-center gap-3 no-print h-9">
                                                                         <button
                                                                             onClick={() => addBullet(block.id)}
-                                                                            className="px-2.5 py-1.5 rounded-lg transition-all flex items-center gap-1.5 border border-transparent text-neutral-400 hover:text-indigo-600 hover:bg-indigo-50 dark:hover:bg-indigo-900/10"
+                                                                            className="px-3 py-1.5 bg-white dark:bg-neutral-900 border border-neutral-100 dark:border-neutral-800 hover:border-indigo-200 dark:hover:border-indigo-900/50 text-neutral-500 hover:text-indigo-600 rounded-xl transition-all shadow-sm hover:shadow-md active:scale-95 group/add flex items-center gap-1.5"
                                                                         >
-                                                                            <Plus className="w-3.5 h-3.5" />
-                                                                            <span className="text-[10px] font-black tracking-tight">Add</span>
+                                                                            <Plus className="w-3.5 h-3.5 group-hover/add:rotate-90 transition-transform duration-300" />
+                                                                            <span className="text-[10px] font-black tracking-tight">Add Line</span>
                                                                         </button>
 
-                                                                        <div className="flex items-center gap-1 group/move relative">
+                                                                        <div className="flex items-center gap-1 group/move relative h-full">
                                                                             <button
                                                                                 onClick={() => setMovingBlockId(movingBlockId === block.id ? null : block.id)}
-                                                                                className={`px-2.5 py-1.5 rounded-lg transition-all flex items-center gap-1.5 border border-transparent relative z-20 ${movingBlockId === block.id
-                                                                                    ? 'bg-neutral-900 dark:bg-white text-white dark:text-neutral-900 shadow-lg'
-                                                                                    : 'text-neutral-400 hover:text-indigo-600 hover:bg-indigo-50 dark:hover:bg-indigo-900/10'}`}
+                                                                                className={`px-3 py-1.5 rounded-xl transition-all flex items-center gap-2 border shadow-lg relative z-20 active:scale-95 ${movingBlockId === block.id
+                                                                                    ? 'bg-neutral-900 border-neutral-900 dark:bg-white dark:border-white text-white dark:text-neutral-900'
+                                                                                    : 'bg-white dark:bg-neutral-900 border-neutral-100 dark:border-neutral-800 text-neutral-500 hover:text-indigo-600 hover:border-indigo-100 dark:hover:border-indigo-900/50'}`}
                                                                                 title="Move to Section"
                                                                             >
                                                                                 <ArrowRightLeft className="w-3.5 h-3.5" />
@@ -650,14 +548,17 @@ export const ResumeEditor: React.FC = () => {
                                                                             <AnimatePresence>
                                                                                 {movingBlockId === block.id && (
                                                                                     <motion.div
-                                                                                        initial={{ opacity: 0, x: -20, width: 0 }}
-                                                                                        animate={{ opacity: 1, x: 0, width: 'auto' }}
-                                                                                        exit={{ opacity: 0, x: -20, width: 0 }}
-                                                                                        className="flex items-center gap-1 ml-0 p-1 pl-4 -ml-2 bg-white dark:bg-neutral-900 rounded-r-xl border border-l-0 border-neutral-200 dark:border-neutral-800 shadow-xl overflow-hidden z-10"
+                                                                                        initial={{ opacity: 0, x: -10, scale: 0.95 }}
+                                                                                        animate={{ opacity: 1, x: 0, scale: 1 }}
+                                                                                        exit={{ opacity: 0, x: -10, scale: 0.95 }}
+                                                                                        className="flex items-center gap-1 ml-2 p-1 px-1 bg-white/80 dark:bg-neutral-900/80 rounded-full border border-white/30 dark:border-neutral-800/50 backdrop-blur-2xl shadow-[0_4px_24px_rgba(0,0,0,0.06)] dark:shadow-[0_8px_32px_rgba(0,0,0,0.4)] z-10 h-full"
                                                                                     >
                                                                                         {SECTIONS.filter(s => s.type !== 'summary').map(s => {
                                                                                             const isSelected = block.type === s.type;
-                                                                                            const typeColor = getTypeColor(s.type);
+                                                                                            const typeColorClasses = getTypeColor(s.type);
+                                                                                            // Extract just the text color for the button
+                                                                                            const textColor = typeColorClasses.split(' ').find(c => c.startsWith('text-')) || 'text-neutral-400';
+
                                                                                             return (
                                                                                                 <button
                                                                                                     key={s.type}
@@ -665,12 +566,19 @@ export const ResumeEditor: React.FC = () => {
                                                                                                         updateBlock(block.id, 'type', s.type);
                                                                                                         setMovingBlockId(null);
                                                                                                     }}
-                                                                                                    className={`px-3 py-1.5 rounded-lg text-[10px] font-black tracking-tight transition-all flex items-center gap-2 justify-center active:scale-95 whitespace-nowrap ${isSelected
-                                                                                                        ? `${typeColor} shadow-sm bg-neutral-50 dark:bg-neutral-800`
-                                                                                                        : 'text-neutral-400 hover:text-neutral-900 dark:hover:text-white hover:bg-neutral-100 dark:hover:bg-neutral-800'
+                                                                                                    className={`relative px-3 py-1 rounded-full text-[10px] font-black tracking-tight transition-all flex items-center gap-2 justify-center active:scale-95 whitespace-nowrap z-10 ${isSelected
+                                                                                                        ? textColor
+                                                                                                        : 'text-neutral-400 hover:text-neutral-700 dark:hover:text-white hover:bg-neutral-50 dark:hover:bg-neutral-800/50'
                                                                                                         }`}
                                                                                                 >
-                                                                                                    {s.icon && <span className="w-3.5 h-3.5 flex items-center justify-center opacity-70 group-hover:opacity-100">{s.icon}</span>}
+                                                                                                    {isSelected && (
+                                                                                                        <motion.div
+                                                                                                            layoutId={`active-pill-${block.id}`}
+                                                                                                            className="absolute inset-0 bg-white shadow-sm border border-neutral-100 dark:bg-neutral-800 dark:border-neutral-700 rounded-full -z-10"
+                                                                                                            transition={{ type: "spring", bounce: 0, duration: 0.5 }}
+                                                                                                        />
+                                                                                                    )}
+                                                                                                    {s.icon && <span className={`w-3.5 h-3.5 flex items-center justify-center ${isSelected ? 'opacity-100' : 'opacity-70'}`}>{s.icon}</span>}
                                                                                                     {s.label}
                                                                                                 </button>
                                                                                             );
@@ -682,10 +590,10 @@ export const ResumeEditor: React.FC = () => {
 
                                                                         <button
                                                                             onClick={() => removeBlock(block.id)}
-                                                                            className="p-1.5 text-neutral-300 hover:text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-900/20 rounded-lg transition-all no-print"
+                                                                            className="p-2 bg-white dark:bg-neutral-900 border border-neutral-100 dark:border-neutral-800 hover:border-rose-200 dark:hover:border-rose-900/50 text-neutral-300 hover:text-rose-500 rounded-xl transition-all shadow-sm hover:shadow-md ml-auto active:scale-95"
                                                                             title="Delete Block"
                                                                         >
-                                                                            <Trash2 className="w-3.5 h-3.5" />
+                                                                            <Trash2 className="w-4 h-4" />
                                                                         </button>
                                                                     </div>
                                                                 )}
@@ -795,10 +703,10 @@ export const ResumeEditor: React.FC = () => {
                                     {/* Verified Strengths Card */}
                                     <Card variant="premium" className="p-5 border-neutral-100 dark:border-neutral-800">
                                         <div className="flex items-center justify-between mb-4">
-                                            <p className="text-[10px] font-black text-emerald-500 tracking-tight flex items-center gap-1.5">
+                                            <div className="text-[10px] font-black text-emerald-500 tracking-tight flex items-center gap-1.5">
                                                 <div className="w-1 h-1 bg-emerald-500 rounded-full shadow-[0_0_8px_rgba(16,185,129,0.4)]" />
                                                 Verified Strengths
-                                            </p>
+                                            </div>
                                             <button
                                                 onClick={() => navigate(ROUTES.SKILLS)}
                                                 className="text-[9px] font-black text-indigo-500 hover:text-indigo-600 flex items-center gap-1 transition-colors"
@@ -849,10 +757,10 @@ export const ResumeEditor: React.FC = () => {
                                     {/* Discovered Keywords Card */}
                                     {uniqueDiscovered.length > 0 && (
                                         <Card variant="premium" className="p-5 border-neutral-100 dark:border-neutral-800">
-                                            <p className="text-[10px] font-black text-indigo-500 tracking-tight mb-4 flex items-center gap-1.5">
+                                            <div className="text-[10px] font-black text-indigo-500 tracking-tight mb-4 flex items-center gap-1.5">
                                                 <div className="w-1 h-1 bg-indigo-500 rounded-full shadow-[0_0_8px_rgba(99,102,241,0.4)]" />
                                                 Discovered Keywords
-                                            </p>
+                                            </div>
                                             <div className="flex flex-wrap gap-2">
                                                 {uniqueDiscovered.map(s => (
                                                     <button

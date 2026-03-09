@@ -2,8 +2,9 @@ import React, { useEffect, useState, useMemo } from 'react';
 import { getUsageOutliers, type UsageOutlier } from '../../services/adminService';
 import { AlertTriangle, ShieldAlert, Activity, RefreshCw, TrendingUp, Users, Laptop } from 'lucide-react';
 import { useUser } from '../../contexts/UserContext';
+import type { UserTier } from '../../types/app';
 
-const StatsCard = ({ title, value, subtext, icon: Icon, color }: { title: string, value: string, subtext?: string, icon: any, color: string }) => (
+const StatsCard = ({ title, value, subtext, icon: Icon, color }: { title: string, value: string, subtext?: string, icon: React.ElementType, color: string }) => (
     <div className="bg-white dark:bg-neutral-800 p-6 rounded-2xl border border-neutral-200 dark:border-neutral-700 shadow-sm flex items-start justify-between group hover:border-indigo-500/30 transition-all duration-300">
         <div>
             <p className="text-[11px] font-bold text-neutral-400 tracking-wider mb-1.5">{title}</p>
@@ -127,10 +128,10 @@ export const AdminDashboard: React.FC = () => {
                                 <span className="text-[10px] font-bold text-neutral-400 tracking-wide">Simulation</span>
                             </div>
                             {[
-                                { id: null, label: 'Standard' },
-                                { id: 'pro', label: 'Pro' },
-                                { id: 'free', label: 'Free' }
-                            ].map((tier: any) => (
+                                { id: null as UserTier | null, label: 'Standard' },
+                                { id: 'pro' as UserTier, label: 'Pro' },
+                                { id: 'free' as UserTier, label: 'Free' }
+                            ].map((tier) => (
                                 <button
                                     key={tier.label}
                                     onClick={() => setSimulatedTier(tier.id)}

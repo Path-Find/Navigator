@@ -94,7 +94,7 @@ export const Header: React.FC = () => {
             : 'bg-transparent border-transparent'
             }`}>
             {/* Background Background blur/border (Conditional on scroll if needed, but keeping it elegant) */}
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 h-full flex items-center justify-between relative pointer-events-auto">
+            <div className="max-w-6xl mx-auto px-4 sm:px-6 h-full flex items-center justify-between relative pointer-events-auto">
                 <div className="flex items-center gap-4">
                     <div
                         className="group flex items-center gap-2.5 cursor-pointer"
@@ -119,10 +119,10 @@ export const Header: React.FC = () => {
                     <motion.nav
                         layout
                         transition={{ layout: { duration: 0.3, type: "spring", bounce: 0 } }}
-                        className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 flex items-center bg-white/80 dark:bg-neutral-900/80 p-1.5 rounded-[2.5rem] border border-white/30 dark:border-neutral-800/50 backdrop-blur-2xl shadow-[0_4px_24px_rgba(0,0,0,0.06)] dark:shadow-[0_8px_32px_rgba(0,0,0,0.4)]"
+                        className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 flex items-center bg-white/80 dark:bg-neutral-900/80 p-1 rounded-[2.5rem] border border-white/30 dark:border-neutral-800/50 backdrop-blur-2xl shadow-[0_4px_24px_rgba(0,0,0,0.06)] dark:shadow-[0_8px_32px_rgba(0,0,0,0.4)]"
                     >
                         {isFocusedMode ? (
-                            <div className="px-5 py-1.5 flex items-center gap-3">
+                            <div className="px-4 py-1 flex items-center gap-2">
                                 <div className={`p-1.5 rounded-xl ${currentView === 'skills-interview' ? 'bg-emerald-500/10 text-emerald-600' : 'bg-indigo-500/10 text-indigo-600'}`}>
                                     {currentView === 'skills-interview' ? <Target className="w-3.5 h-3.5" /> : <MessageSquare className="w-3.5 h-3.5" />}
                                 </div>
@@ -135,7 +135,7 @@ export const Header: React.FC = () => {
                                 {navGroups.map((group) => (
                                     <div
                                         key={group.id}
-                                        className="relative flex items-center px-1"
+                                        className="relative flex items-center px-0.5"
                                     >
                                         <AnimatePresence>
                                             {group.isActive && (
@@ -151,10 +151,10 @@ export const Header: React.FC = () => {
                                         <div className="relative z-10 flex items-center gap-1">
                                             <button
                                                 onClick={() => onViewChange((group as any).defaultView || group.items[0].id as any)}
-                                                className={`px-2.5 py-2 rounded-2xl text-[11px] font-bold transition-all duration-300 flex items-center gap-2 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500/50 cursor-pointer ${group.isActive
+                                                className={`px-2 py-1.5 rounded-2xl text-[11px] font-bold transition-all duration-300 flex items-center gap-1.5 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500/50 cursor-pointer ${group.isActive
                                                     ? (group.id === 'career' ? 'text-emerald-600' : group.id === 'edu' ? 'text-amber-600' : group.id === 'plans' ? 'text-amber-500' : 'text-indigo-600')
                                                     : (group.id === 'plans' ? 'text-amber-500/80 hover:text-amber-600' : 'text-neutral-500 hover:text-neutral-800 dark:text-neutral-400 dark:hover:text-neutral-200')
-                                                    } ${group.id === 'plans' ? '!py-1.5 !px-3' : ''}`}
+                                                    } ${group.id === 'plans' ? '!py-1.5 !px-2.5' : ''}`}
                                             >
                                                 <group.icon className={`w-3.5 h-3.5 transition-transform duration-300 ${group.isActive ? 'scale-110' : 'opacity-70 group-hover:opacity-100'}`} />
                                                 <span className="hidden leading-none md:block tracking-wider">{group.label}</span>
@@ -173,7 +173,7 @@ export const Header: React.FC = () => {
                                                                 key={item.id}
                                                                 onClick={() => onViewChange(item.id as any)}
                                                                 className={`relative px-2 py-1.5 rounded-xl text-[10px] font-black transition-all whitespace-nowrap tracking-wide overflow-hidden focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500/50 cursor-pointer ${currentView === item.id
-                                                                    ? (group.id === 'career' ? 'text-emerald-600' : group.id === 'edu' ? 'text-amber-600' : group.id === 'indigo-600')
+                                                                    ? (group.id === 'career' ? 'text-emerald-600' : group.id === 'edu' ? 'text-amber-600' : 'text-indigo-600')
                                                                     : 'text-neutral-400 hover:text-neutral-700 dark:text-neutral-500 dark:hover:text-neutral-300 hover:bg-neutral-50 dark:hover:bg-neutral-800/50'
                                                                     }`}
                                                             >
@@ -192,28 +192,28 @@ export const Header: React.FC = () => {
                 )}
 
                 {/* Right Actions */}
-                <div className="flex items-center gap-1.5">
+                <div className="flex items-center gap-1">
                     {!isLoading && !user ? (
                         <div className="flex items-center gap-2">
                             <button
-                                onClick={() => openModal('AUTH')}
+                                onClick={() => openModal('AUTH', { authMode: 'sign-in' })}
                                 className="px-4 py-2 text-xs font-bold text-neutral-500 hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-neutral-100 transition-all active:scale-95 cursor-pointer"
                             >
                                 Sign In
                             </button>
                             <button
-                                onClick={() => openModal('AUTH')}
+                                onClick={() => openModal('AUTH', { authMode: 'sign-up' })}
                                 className="px-4 py-2 text-xs font-black text-white bg-indigo-600 hover:bg-indigo-700 rounded-xl transition-all shadow-lg shadow-indigo-500/20 active:scale-95 cursor-pointer"
                             >
                                 Sign Up
                             </button>
                         </div>
                     ) : (
-                        <div className="flex items-center gap-1.5">
+                        <div className="flex items-center gap-1">
                             {isFocusedMode ? (
                                 <button
                                     onClick={handleExit}
-                                    className="group flex items-center gap-2 px-3 py-2 text-xs font-bold rounded-xl hover:bg-neutral-100 dark:hover:bg-neutral-800/80 transition-all text-neutral-500 dark:text-neutral-400 active:scale-95 cursor-pointer"
+                                    className="group flex items-center gap-1.5 px-2 py-1.5 text-xs font-bold rounded-xl hover:bg-neutral-100 dark:hover:bg-neutral-800/80 transition-all text-neutral-500 dark:text-neutral-400 active:scale-95 cursor-pointer"
                                 >
                                     <LogOut className="w-4 h-4 transition-transform group-hover:rotate-180" />
                                     <span className="tracking-wider">Exit</span>
@@ -221,7 +221,7 @@ export const Header: React.FC = () => {
                             ) : (
                                 <button
                                     onClick={signOut}
-                                    className="group flex items-center gap-2 px-3 py-2 text-xs font-bold rounded-xl hover:bg-neutral-100 dark:hover:bg-neutral-800/80 transition-all text-neutral-500 dark:text-neutral-400 cursor-pointer active:scale-95"
+                                    className="group flex items-center gap-1.5 px-2 py-1.5 text-xs font-bold rounded-xl hover:bg-neutral-100 dark:hover:bg-neutral-800/80 transition-all text-neutral-500 dark:text-neutral-400 cursor-pointer active:scale-95"
                                 >
                                     <LogOut className="w-4 h-4 transition-transform group-hover:-translate-x-0.5" />
                                     <span className="hidden md:inline tracking-wider">Sign Out</span>
@@ -233,24 +233,24 @@ export const Header: React.FC = () => {
                                     {isAdmin && (
                                         <button
                                             onClick={() => onViewChange('admin')}
-                                            className="p-2.5 text-neutral-400 hover:text-indigo-600 dark:text-neutral-500 dark:hover:text-indigo-400 transition-all active:scale-90 cursor-pointer"
+                                            className="p-1.5 text-neutral-400 hover:text-indigo-600 dark:text-neutral-500 dark:hover:text-indigo-400 transition-all active:scale-90 cursor-pointer"
                                             title="Admin Console"
                                         >
-                                            <ShieldCheck className="w-4.5 h-4.5" />
+                                            <ShieldCheck className="w-4 h-4" />
                                         </button>
                                     )}
                                     <button
                                         onClick={toggleDarkMode}
-                                        className="p-2.5 text-neutral-400 hover:text-neutral-900 dark:text-neutral-500 dark:hover:text-neutral-100 transition-all active:scale-90 cursor-pointer"
+                                        className="p-1.5 text-neutral-400 hover:text-neutral-900 dark:text-neutral-500 dark:hover:text-neutral-100 transition-all active:scale-90 cursor-pointer"
                                         title={isDark ? "Switch to Light Mode" : "Switch to Dark Mode"}
                                     >
-                                        {isDark ? <Sun className="w-4.5 h-4.5" /> : <Moon className="w-4.5 h-4.5" />}
+                                        {isDark ? <Sun className="w-4 h-4" /> : <Moon className="w-4 h-4" />}
                                     </button>
                                     <button
                                         onClick={() => onViewChange('settings')}
-                                        className="p-2.5 text-neutral-400 hover:text-neutral-900 dark:text-neutral-500 dark:hover:text-neutral-100 transition-all active:scale-90 cursor-pointer"
+                                        className="p-1.5 text-neutral-400 hover:text-neutral-900 dark:text-neutral-500 dark:hover:text-neutral-100 transition-all active:scale-90 cursor-pointer"
                                     >
-                                        <Settings className="w-4.5 h-4.5" />
+                                        <Settings className="w-4 h-4" />
                                     </button>
                                 </div>
                             )}

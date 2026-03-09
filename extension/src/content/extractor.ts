@@ -3,9 +3,15 @@ import type { ExtractedJob } from '../types';
 // ─── Helpers ────────────────────────────────────────────────────────────
 
 function stripHtml(html: string): string {
-    const div = document.createElement('div');
-    div.innerHTML = html;
-    return (div.textContent || div.innerText || '').trim();
+    if (!html) return '';
+    try {
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(html, 'text/html');
+        return (doc.body.textContent || '').trim();
+    } catch {
+        // Fallback for environments where DOMParser is unavailable or fails
+        return html.replace(/<[^>]*>?/gm, '').trim();
+    }
 }
 
 function cleanText(text: string): string {

@@ -25,7 +25,7 @@ export const EmailVerificationScreen: React.FC = () => {
             refreshUser();
         }, 5000); // Check every 5 seconds
         return () => clearInterval(interval);
-    }, [refreshUser, isEmailVerified]);
+    }, [refreshUser, isEmailVerified, user]);
 
     const handleResend = async () => {
         if (cooldown > 0) return;
@@ -39,7 +39,8 @@ export const EmailVerificationScreen: React.FC = () => {
             setMessage({ type: 'success', text: 'Verification email sent! Check your inbox.' });
             setCooldown(60); // 1 minute cooldown
         } else {
-            setMessage({ type: 'error', text: error?.message || 'Failed to send email. Please try again.' });
+            const errorMsg = error instanceof Error ? error.message : (typeof error === 'string' ? error : 'Failed to send email. Please try again.');
+            setMessage({ type: 'error', text: errorMsg });
         }
         setResending(false);
     };

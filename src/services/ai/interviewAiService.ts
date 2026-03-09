@@ -25,21 +25,6 @@ export const generateTailoredInterviewQuestions = async (
     }, { event_type: 'interview_generation', prompt, model: 'dynamic', job_id: jobId });
 };
 
-export const generateSkillQuestions = async (
-    skillName: string,
-    level: string
-): Promise<string[]> => {
-    const prompt = INTERVIEW_PROMPTS.SKILL_INTERVIEW(skillName, level);
-
-    return callWithRetry(async (metadata) => {
-        const model = await getModel({ task: 'interview', generationConfig: { responseMimeType: "application/json" } });
-        const response = await model.generateContent({ contents: [{ role: "user", parts: [{ text: prompt }] }] });
-        metadata.token_usage = response.response.usageMetadata;
-        const questions = JSON.parse(cleanJsonOutput(response.response.text()));
-        return questions as string[];
-    }, { event_type: 'skill_interview_generation', prompt, model: 'dynamic' });
-};
-
 export const generateUnifiedQuestions = async (
     skills: { name: string; proficiency: string }[]
 ): Promise<{ question: string; targetSkills: string[] }[]> => {
@@ -72,8 +57,8 @@ export const analyzeUnifiedResponse = async (
     }, { event_type: 'unified_skill_interview_analysis', prompt, model: 'dynamic' });
 };
 
-export const generateGeneralBehavioralQuestions = async (): Promise<InterviewQuestion[]> => {
-    const prompt = INTERVIEW_PROMPTS.GENERAL_BEHAVIORAL;
+export const generateGeneralBehavioralQuestions = async (resumeContext: string): Promise<InterviewQuestion[]> => {
+    const prompt = INTERVIEW_PROMPTS.GENERAL_BEHAVIORAL(resumeContext);
 
     return callWithRetry(async (metadata) => {
         const model = await getModel({ task: 'interview', generationConfig: { responseMimeType: "application/json" } });
@@ -98,6 +83,22 @@ export const analyzeInterviewResponse = async (
         metadata.token_usage = response.response.usageMetadata;
         return JSON.parse(cleanJsonOutput(response.response.text()));
     }, { event_type: 'interview_analysis', prompt, model: 'dynamic', job_id: jobId });
+};
+
+export const analyzeAndFollowUp = async (
+    question: string,
+    userResponse: string,
+    jobDescription?: string,
+    jobId?: string
+): Promise<InterviewResponseAnalysis & { followUp: { shouldFollowUp: boolean; question: string | null; rationale?: string } }> => {
+    const prompt = INTERVIEW_PROMPTS.ANALYZE_AND_FOLLOW_UP(question, userResponse, jobDescription);
+
+    return callWithRetry(async (metadata) => {
+        const model = await getModel({ task: 'interview', generationConfig: { responseMimeType: "application/json" } });
+        const response = await model.generateContent({ contents: [{ role: "user", parts: [{ text: prompt }] }] });
+        metadata.token_usage = response.response.usageMetadata;
+        return JSON.parse(cleanJsonOutput(response.response.text()));
+    }, { event_type: 'interview_analysis_with_followup', prompt, model: 'dynamic', job_id: jobId });
 };
 
 export const generateFollowUp = async (

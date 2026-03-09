@@ -1,15 +1,25 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2"
 import { fetchSafe, readTextSafe } from "./validator.ts"
 
-const corsHeaders = {
-    'Access-Control-Allow-Origin': '*',
-    'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-}
+const ALLOWED_ORIGINS = [
+    Deno.env.get('SITE_URL') ?? '',
+    'http://localhost:5173',
+    'http://localhost:4173',
+].filter(Boolean);
+
+const getCorsHeaders = (req: Request) => {
+    const origin = req.headers.get('Origin') ?? '';
+    const allowedOrigin = ALLOWED_ORIGINS.includes(origin) ? origin : '';
+    return {
+        'Access-Control-Allow-Origin': allowedOrigin,
+        'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+    };
+};
 
 Deno.serve(async (req) => {
     // 1. CORS & Auth Check
     if (req.method === 'OPTIONS') {
-        return new Response('ok', { headers: corsHeaders })
+        return new Response('ok', { headers: getCorsHeaders(req) })
     }
 
     try {
@@ -46,7 +56,7 @@ Deno.serve(async (req) => {
                 reason: limitCheck.reason,
                 message: limitCheck.message || "You have reached your limit."
             }), {
-                headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+                headers: { ...getCorsHeaders(req), 'Content-Type': 'application/json' },
                 status: 429
             });
         }
@@ -70,17 +80,34 @@ Deno.serve(async (req) => {
 
         // 3.5 Return Text Mode (for Job Analysis)
         if (mode === 'text') {
-            // Simple cleanup
-            const text = html
-                .replace(/<script\b[^>]*>([\s\S]*?)<\/script>/gim, "")
-                .replace(/<style\b[^>]*>([\s\S]*?)<\/style>/gim, "")
-                .replace(/<[^>]+>/g, "\n") // Replace tags with newlines
+            // Robust cleanup to extract readable text while avoiding common bypasses
+            let text = html;
+
+            // 1. Remove script, style, and iframe content entirely
+            const tagsToRemove = ['script', 'style', 'iframe', 'noscript', 'canvas', 'svg'];
+            for (const tag of tagsToRemove) {
+                const regex = new RegExp(`<${tag}\\b[^>]*>([\\s\\S]*?)<\\/${tag}>`, 'gim');
+                text = text.replace(regex, "");
+            }
+
+            // 2. Convert common block tags to newlines to preserve separation
+            text = text.replace(/<(?:p|div|br|li|h[1-6]|tr)[^>]*>/gi, "\n");
+
+            // 3. Strip all remaining tags
+            text = text.replace(/<[^>]+>/g, " ");
+
+            // 4. Clean up whitespace and entities
+            text = text
+                .replace(/&nbsp;/g, " ")
+                .replace(/&amp;/g, "&")
+                .replace(/&lt;/g, "<")
+                .replace(/&gt;/g, ">")
                 .replace(/\s+/g, " ")
                 .trim()
-                .substring(0, 50000)
+                .substring(0, 50000);
 
             return new Response(JSON.stringify({ text }), {
-                headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+                headers: { ...getCorsHeaders(req), 'Content-Type': 'application/json' },
                 status: 200,
             })
         }
@@ -126,14 +153,20 @@ Deno.serve(async (req) => {
 
         } else {
             // For other pages, use Gemini AI parsing
-            // Clean HTML (Naive regex cleanup to save tokens)
-            const cleanHtml = html
-                .replace(/<script\b[^>]*>([\s\S]*?)<\/script>/gim, "")
-                .replace(/<style\b[^>]*>([\s\S]*?)<\/style>/gim, "")
+            // Clean HTML (Recursive cleanup to avoid simple bypasses and save tokens)
+            let cleanHtml = html;
+
+            // Remove heavy content types
+            const tagsToRemove = ['script', 'style', 'svg', 'iframe', 'noscript'];
+            for (const tag of tagsToRemove) {
+                const regex = new RegExp(`<${tag}\\b[^>]*>([\\s\\S]*?)<\\/${tag}>`, 'gim');
+                cleanHtml = cleanHtml.replace(regex, "");
+            }
+
+            cleanHtml = cleanHtml
                 .replace(/<!--([\s\S]*?)-->/gim, "")
-                .replace(/<svg\b[^>]*>([\s\S]*?)<\/svg>/gim, "")
                 .replace(/\s+/g, " ")
-                .substring(0, 30000)
+                .substring(0, 30000);
 
             const apiKey = Deno.env.get('GEMINI_API_KEY')
             if (!apiKey) throw new Error('GEMINI_API_KEY not set')
@@ -209,7 +242,7 @@ Deno.serve(async (req) => {
             // Validation check
             if (parsed.error === "no_jobs_found") {
                 return new Response(JSON.stringify([]), {
-                    headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+                    headers: { ...getCorsHeaders(req), 'Content-Type': 'application/json' },
                     status: 200,
                 })
             }
@@ -228,13 +261,13 @@ Deno.serve(async (req) => {
 
         // 5. Return jobs
         return new Response(JSON.stringify(jobs), {
-            headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+            headers: { ...getCorsHeaders(req), 'Content-Type': 'application/json' },
             status: 200,
         })
 
     } catch (error: any) {
         return new Response(JSON.stringify({ error: error.message }), {
-            headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+            headers: { ...getCorsHeaders(req), 'Content-Type': 'application/json' },
             status: 400,
         })
     }

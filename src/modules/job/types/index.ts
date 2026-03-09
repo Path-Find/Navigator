@@ -45,7 +45,9 @@ export interface SavedJob {
     position: string;
     description: string;
     url?: string;
+    location?: string;
     dateAdded: number;
+    updatedAt?: number;
 
     // Legacy / Full Analysis
     analysis?: JobAnalysis;
@@ -88,7 +90,7 @@ export interface JobFeedItem {
     url: string;
     postedDate: string; // ISO string
     matchScore?: number;
-    source: 'ttc' | 'toronto' | 'other' | 'email';
+    source: 'scraped' | 'other' | 'email';
     sourceType?: 'scraper' | 'email';
     triageReasoning?: string;
     isNew?: boolean;

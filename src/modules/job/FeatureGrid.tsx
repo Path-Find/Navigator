@@ -1,7 +1,8 @@
 import React, { useMemo } from 'react';
 import { FEATURE_REGISTRY, FEATURE_RANKINGS, getFeatureColor, shouldShowNewBadge, type FeatureDefinition } from '../../featureRegistry';
 import { getPreviewComponent } from '../../components/common/FeaturePreviews';
-import { Mail, TrendingUp, PenTool, Sparkles, FileText, GraduationCap, Bookmark, Zap, RefreshCw, Shield, Users, Globe, Search, Calculator, MessageSquare, Rss, Activity, type LucideIcon } from 'lucide-react';
+import type { ViewId } from '../../utils/navigation';
+import { Mail, TrendingUp, PenTool, Sparkles, FileText, GraduationCap, Bookmark, Zap, RefreshCw, Shield, Users, Globe, Search, Calculator, MessageSquare, Rss, Activity, Building2, School, type LucideIcon } from 'lucide-react';
 import { BentoCard } from '../../components/ui/BentoCard';
 import { EventService } from '../../services/eventService';
 import type { User as SupabaseUser } from '@supabase/supabase-js';
@@ -27,11 +28,13 @@ const ICON_MAP: Record<string, LucideIcon> = {
     MessageSquare,
     Rss,
     Activity,
+    Building2,
+    School,
 } as const;
 
 interface FeatureGridProps {
     user: SupabaseUser | null;
-    onNavigate?: (view: string) => void;
+    onNavigate?: (view: ViewId) => void;
     onShowAuth?: (feature?: FeatureDefinition) => void;
     isAdmin?: boolean;
     isTester?: boolean;
@@ -69,8 +72,8 @@ export const FeatureGrid: React.FC<FeatureGridProps> = ({
             const config = FEATURE_REGISTRY[key];
             if (!config || !config.showOnHomepage) return false;
 
-            // Education requires Admin/Tester
-            if (config.category === 'EDUCATION') return isAdmin || isTester;
+            // Education requires Admin/Tester/Student
+            if (config.category === 'EDUCATION') return isAdmin || isTester || journey === 'student';
 
             return true;
         });
@@ -132,16 +135,16 @@ export const FeatureGrid: React.FC<FeatureGridProps> = ({
         return finalKeys;
     }, [isAdmin, isTester, journey, userTier, user, lastArchetypeUpdate, acceptedTosVersion, dismissedNotices]);
 
-    const handleAction = (feature: FeatureDefinition) => {
+    const handleAction = (config: FeatureDefinition) => {
         // Track curiosity (Interest)
-        EventService.trackInterest(feature.id);
+        EventService.trackInterest(config.id);
 
         if (user) {
-            onNavigate?.(feature.targetView);
+            onNavigate?.(config.targetView);
         } else {
             // Logged out behavior
             if (onShowAuth) {
-                onShowAuth(feature);
+                onShowAuth(config);
             } else {
                 window.scrollTo({ top: 0, behavior: 'smooth' });
                 setTimeout(() => document.querySelector('input')?.focus(), 500);
@@ -170,7 +173,7 @@ export const FeatureGrid: React.FC<FeatureGridProps> = ({
                             color={color}
                             actionLabel={config.action[actionKey]}
                             badge={config.badge || (shouldShowNewBadge(config) ? 'New' : undefined)}
-                            isComingSoon={config.isComingSoon}
+                            isComingSoon={config.stage === 'beta'}
                             previewContent={getPreviewComponent(config.id, color)}
                             onAction={() => handleAction(config)}
                             onDismiss={isSystemNotice ? () => {

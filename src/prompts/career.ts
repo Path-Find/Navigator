@@ -138,24 +138,6 @@ export const CAREER_PROMPTS = {
     }
   `,
 
-    FILTER_HARD_SKILLS: (gapAnalysisData: string) => `
-    You are a Skill Filter AI. Your job is to take a Gap Analysis and filter out any "Soft Skills" while RETAINING the "Strategic Path Patterns".
-
-    GAP ANALYSIS DATA:
-    ${gapAnalysisData}
-
-    CRITICAL RULES:
-    1. CATEGORIZE skills in 'topSkillGaps' by adding a 'category' field:
-       - 'technical': Hard skills, languages, frameworks.
-       - 'soft': Interpersonal, leadership, communication.
-       - 'methodology': Agile, Scrum, specific processes.
-    2. RETAIN ALL 'strategicPathPatterns' and 'careerTrajectoryGap' content.
-    3. Do NOT delete skills. Categorize them so the UI can filter them.
-    4. REWRITE tasks to be specific if they are too vague.
-
-    Return the same JSON schema, but add "category" to each item in "topSkillGaps".
-  `,
-
     GENERATE_ROADMAP: (gapAnalysis: string) => `
     You are a Strategic Career Architect. Your task is to transform a Gap Analysis into a structured 12-month Roadmap.
 

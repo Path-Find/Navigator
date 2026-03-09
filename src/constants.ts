@@ -29,6 +29,8 @@ export const CONTENT_VALIDATION = {
   MIN_PDF_TEXT_LENGTH: 50,
   MIN_SCRAPED_TEXT_LENGTH: 50,
   MAX_JOB_DESCRIPTION_LENGTH: 15000,
+  SCRAPE_FAILURE_THRESHOLD: 0.8, // 80% failure rate triggers a block
+  SCRAPE_MIN_ATTEMPTS: 5,         // Minimum attempts before blocking a domain
 } as const;
 
 // Job Analysis Thresholds
@@ -42,6 +44,7 @@ export const JOB_ANALYSIS = {
 // Time Periods
 export const TIME_PERIODS = {
   NUDGE_THRESHOLD_MS: 21 * 24 * 60 * 60 * 1000, // 3 weeks in milliseconds
+  APPLIED_NUDGE_THRESHOLD_MS: 7 * 24 * 60 * 60 * 1000, // 1 week — stale "applied" jobs
   FEED_CACHE_HOURS: 24,
   SUCCESS_MESSAGE_DURATION_MS: 3000,
   NUDGE_DELAY_MS: 1500,
@@ -92,6 +95,14 @@ export const STORAGE_KEYS = {
   TRANSCRIPT_CACHE: 'NAVIGATOR_TRANSCRIPT_CACHE',
   FEED_CACHE: 'navigator_feed_cache',
   FEED_CACHE_TIMESTAMP: 'navigator_feed_timestamp',
+  ORGS: 'navigator_professional_orgs',
+  USER_JOURNEY: 'navigator_user_journey',
+  LAST_ARCHETYPE_UPDATE: 'navigator_last_archetype_update',
+  ACCEPTED_TOS_VERSION: 'navigator_accepted_tos_version',
+  DISMISSED_NOTICES: 'navigator_dismissed_notices',
+  DEVICE_ID: 'nav_device_id',
+  ONBOARDING_STATE: 'onboarding_state',
+  DOMAIN_RELIABILITY: 'navigator_domain_reliability',
 } as const;
 
 // Feature Tracking Events
@@ -103,14 +114,6 @@ export const TRACKING_EVENTS = {
   COVER_LETTERS: 'cover_letters',
 } as const;
 
-// Feature Registry (re-exports for backward compatibility)
-// The canonical source is featureRegistry.ts
-export {
-  BENTO_CARDS_COMPAT as BENTO_CARDS,
-  BENTO_CATEGORIES_COMPAT as BENTO_CATEGORIES,
-  BENTO_RANKINGS_COMPAT as BENTO_RANKINGS,
-} from './featureRegistry';
-export type { FeatureDefinition as BentoCardConfig } from './featureRegistry';
 
 // Date Display Formats
 export const DATE_FORMATS = {
@@ -157,6 +160,7 @@ export const ROUTES = {
   CAREER_MODELS: '/career/models',
   COACH_ROLE_MODELS: '/career/models',
   COACH_GAP: '/career/gap',
+  CAREER_ORGS: '/career/orgs',
 
   // Education Section
   EDUCATION_HOME: '/education',

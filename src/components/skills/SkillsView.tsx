@@ -122,7 +122,7 @@ export const SkillsView: React.FC = () => {
     };
 
     return (
-        <SharedPageLayout className="theme-coach" spacing="compact" maxWidth="7xl">
+        <SharedPageLayout className="theme-coach" spacing="compact" maxWidth="6xl">
             {/* Quick Stats */}
             <SkillsStats
                 skills={skills}

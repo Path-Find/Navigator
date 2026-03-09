@@ -10,6 +10,7 @@ import { useModal } from '../../contexts/ModalContext';
 import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { paymentService } from '../../services/paymentService';
 import { PlanCard } from '../../components/ui/PlanCard';
+import { useToast } from '../../contexts/ToastContext';
 
 export const PlansPage: React.FC = () => {
 
@@ -20,6 +21,8 @@ export const PlansPage: React.FC = () => {
     const [searchParams] = useSearchParams();
     const [isAnnual, setIsAnnual] = useState(false);
     const [loadingTier, setLoadingTier] = useState<string | null>(null);
+    const [waitlistStatus, setWaitlistStatus] = useState<'idle' | 'loading' | 'success'>('idle');
+    const { showError, showInfo } = useToast();
 
     // Cycle headline on each visit
     const headline = useMemo(() => {
@@ -65,21 +68,39 @@ export const PlansPage: React.FC = () => {
             }
 
             if (!priceId || priceId.includes('placeholder')) {
-                alert('Stripe configuration missing. Please check .env or constants.');
+                showError('Payment setup is not complete. Please contact support.');
                 return;
             }
+
+            // TEMP: Disable checkouts while refining NextGen - Offer Waitlist
+            setWaitlistStatus('loading');
+            try {
+                const { WaitlistService } = await import('../../services/waitlistService');
+                const result = await WaitlistService.joinWaitlist(user.email!, `upgrade_${tier}`);
+                if (result.success) {
+                    setWaitlistStatus('success');
+                    showInfo("You're on the waitlist for " + tier.toUpperCase() + "! We'll notify you when it's ready.");
+                } else {
+                    showError(result.error || "Failed to join waitlist.");
+                }
+            } catch (err) {
+                showError("Something went wrong. Please try again.");
+            } finally {
+                setWaitlistStatus('idle');
+            }
+            return;
 
             const { url } = await paymentService.createCheckoutSession(priceId);
             window.location.href = url;
 
-        } catch (error: any) {
+        } catch (error: unknown) {
             console.error('Error creating checkout session:', error);
-            const errorMsg = error.message || 'Unknown error';
+            const errorMsg = error instanceof Error ? error.message : 'Unknown error';
 
             if (errorMsg === 'User not authenticated') {
                 openModal('AUTH');
             } else {
-                alert(`Checkout Error: ${errorMsg}`);
+                showError('Something went wrong during checkout. Please try again.');
             }
         } finally {
             setLoadingTier(null);
@@ -97,13 +118,20 @@ export const PlansPage: React.FC = () => {
             <div className="absolute top-0 left-1/4 w-[500px] h-[500px] bg-indigo-500/10 rounded-full blur-[120px] -z-10 animate-pulse" />
             <div className="absolute bottom-0 right-1/4 w-[500px] h-[500px] bg-emerald-500/10 rounded-full blur-[120px] -z-10 animate-pulse-slow" />
 
-            <div className="max-w-7xl mx-auto relative z-10 px-4 sm:px-6">
+            <div className="max-w-6xl mx-auto relative z-10 px-4 sm:px-6">
                 <PageHeader
                     variant="hero"
                     title={headline.text}
                     highlight={headline.highlight}
                     subtitle="Choose the plan that fits your pace — from exploring to all-in."
                 />
+
+                <div className="flex justify-center -mt-4 mb-12">
+                    <div className="inline-flex items-center gap-2 px-4 py-2 bg-indigo-50 dark:bg-indigo-900/40 border border-indigo-100 dark:border-indigo-800 rounded-2xl text-indigo-600 dark:text-indigo-400 text-xs font-bold animate-in fade-in slide-in-from-top-2">
+                        <Zap className="w-4 h-4" />
+                        Navigator is currently invite-only
+                    </div>
+                </div>
 
                 <div className="text-center mb-16 flex flex-col items-center -mt-8">
                     {/* Monthly / Annual Toggle */}
@@ -169,7 +197,7 @@ export const PlansPage: React.FC = () => {
                 </div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-24 max-w-7xl mx-auto px-4 sm:px-6 items-stretch">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-24 max-w-6xl mx-auto px-4 sm:px-6 items-stretch">
                 {/* Explorer Plan */}
                 <PlanCard
                     title="Explorer"
@@ -182,7 +210,7 @@ export const PlansPage: React.FC = () => {
                                     'Trial Plan'
                     }
                     onSelect={() => handleSelectPlan(USER_TIERS.FREE)}
-                    features={getFeaturesForPlan('explorer').map(f => ({ name: f.name, desc: f.description.plan, isComingSoon: f.isComingSoon }))}
+                    features={getFeaturesForPlan('explorer').map(f => ({ name: f.name, desc: f.description.plan, isComingSoon: f.stage === 'beta' }))}
                     limits={{
                         analyses: String(PLAN_LIMITS[USER_TIERS.FREE].TOTAL_ANALYSES),
                         analysesPeriod: 'lifetime',
@@ -200,10 +228,10 @@ export const PlansPage: React.FC = () => {
                     price={`$${plusPrice}`}
                     accentColor="indigo"
                     subText="Everything in Explorer, plus..."
-                    buttonText={userTier === USER_TIERS.PLUS ? 'Current Plan' : 'Upgrade to Plus'}
+                    buttonText={userTier === USER_TIERS.PLUS ? 'Current Plan' : 'Join Plus Waitlist'}
                     onSelect={() => handleSelectPlan(USER_TIERS.PLUS)}
-                    isLoading={loadingTier === USER_TIERS.PLUS}
-                    features={getFeaturesForPlan('plus').map(f => ({ name: f.name, desc: f.description.plan, isComingSoon: f.isComingSoon }))}
+                    isLoading={loadingTier === USER_TIERS.PLUS || (loadingTier === USER_TIERS.PLUS && waitlistStatus === 'loading')}
+                    features={getFeaturesForPlan('plus').map(f => ({ name: f.name, desc: f.description.plan, isComingSoon: f.stage === 'beta' }))}
                     limits={{
                         analyses: String(PLAN_LIMITS[USER_TIERS.PLUS].WEEKLY_ANALYSES),
                         analysesPeriod: 'week',
@@ -222,10 +250,10 @@ export const PlansPage: React.FC = () => {
                     isPopular={true}
                     accentColor="emerald"
                     subText="Everything in Plus, plus..."
-                    buttonText={userTier === USER_TIERS.PRO ? 'Current Plan' : 'Upgrade to Pro'}
+                    buttonText={userTier === USER_TIERS.PRO ? 'Current Plan' : 'Join Pro Waitlist'}
                     onSelect={() => handleSelectPlan(USER_TIERS.PRO)}
-                    isLoading={loadingTier === USER_TIERS.PRO}
-                    features={getFeaturesForPlan('pro').map(f => ({ name: f.name, desc: f.description.plan, isComingSoon: f.isComingSoon }))}
+                    isLoading={loadingTier === USER_TIERS.PRO || (loadingTier === USER_TIERS.PRO && waitlistStatus === 'loading')}
+                    features={getFeaturesForPlan('pro').map(f => ({ name: f.name, desc: f.description.plan, isComingSoon: f.stage === 'beta' }))}
                     limits={{
                         analyses: String(PLAN_LIMITS[USER_TIERS.PRO].DAILY_ANALYSES),
                         analysesPeriod: 'day',
@@ -255,7 +283,7 @@ export const PlansPage: React.FC = () => {
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.5 }}
-                className="mt-24 pt-12 border-t border-neutral-100 dark:border-neutral-800 grid grid-cols-1 md:grid-cols-3 gap-12 max-w-7xl mx-auto px-4 sm:px-6"
+                className="mt-24 pt-12 border-t border-neutral-100 dark:border-neutral-800 grid grid-cols-1 md:grid-cols-3 gap-12 max-w-6xl mx-auto px-4 sm:px-6"
             >
                 <div className="flex gap-4 items-start text-left">
                     <div className="w-10 h-10 rounded-xl bg-indigo-500/10 flex items-center justify-center shrink-0">

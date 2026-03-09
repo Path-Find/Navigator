@@ -28,7 +28,9 @@ export type ViewId =
     | 'features'
     | 'welcome'
     | 'settings'
-    | 'skills-interview';
+    | 'skills-interview'
+    | 'career-orgs'
+    | 'career-salary';
 
 const PATH_TO_VIEW: Record<string, ViewId> = {
     [ROUTES.HOME]: 'home',
@@ -44,6 +46,7 @@ const PATH_TO_VIEW: Record<string, ViewId> = {
     [ROUTES.CAREER_MODELS]: 'coach-role-models',
     [ROUTES.CAREER_GROWTH]: 'career-growth',
     [ROUTES.COACH_GAP]: 'coach-gap-analysis',
+    [ROUTES.CAREER_ORGS]: 'career-orgs',
     [ROUTES.EDUCATION_HOME]: 'edu-home',
     [ROUTES.TRANSCRIPT]: 'edu-transcript',
     [ROUTES.GPA_CALCULATOR]: 'edu-gpa',
@@ -89,6 +92,8 @@ const VIEW_TO_PATH: Record<ViewId, string> = {
     'welcome': ROUTES.WELCOME,
     'settings': ROUTES.SETTINGS,
     'skills-interview': '/career/skills/interview',
+    'career-orgs': ROUTES.CAREER_ORGS,
+    'career-salary': ROUTES.CAREER_HOME,
 };
 
 export const getViewIdFromPath = (path: string): ViewId => {

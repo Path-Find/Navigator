@@ -1,0 +1,196 @@
+
+> navigator@2.31.0 test:run
+> vitest run
+
+
+[1m[46m RUN [49m[22m [36mv4.0.18 [39m[90m/Users/ryan/Desktop/Production/Navigator[39m
+
+ [31m❯[39m src/services/storage/jobStorage.test.ts [2m([22m[2m3 tests[22m[2m | [22m[31m1 failed[39m[2m)[22m[32m 13[2mms[22m[39m
+     [32m✓[39m should add a job to local storage[32m 4[2mms[22m[39m
+[31m     [31m×[31m should update a job in local storage[39m[32m 6[2mms[22m[39m
+     [32m✓[39m should delete a job from local storage[32m 1[2mms[22m[39m
+ [32m✓[39m src/modules/job/FeatureGrid.test.tsx [2m([22m[2m3 tests[22m[2m)[22m[32m 65[2mms[22m[39m
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+ [32m✓[39m src/modules/career/components/GapAnalysisSection.test.tsx [2m([22m[2m6 tests[22m[2m)[22m[32m 221[2mms[22m[39m
+ [32m✓[39m src/contexts/UserContext.test.tsx [2m([22m[2m1 test[22m[2m)[22m[32m 82[2mms[22m[39m
+ [32m✓[39m src/modules/grad/hooks/useAcademicLogic.test.ts [2m([22m[2m5 tests[22m[2m)[22m[32m 47[2mms[22m[39m
+[90mstderr[2m | src/modules/resume/ResumeEditor.test.tsx[2m > [22m[2mResumeEditor[2m > [22m[2mswitches to manual entry when "Start Fresh" is clicked
+[22m[39mIn HTML, <div> cannot be a descendant of <p>.
+This will cause a hydration error.
+
+  <ResumeEditor>
+    <SharedPageLayout className="theme-resume" spacing="compact" maxWidth="6xl">
+      <div data-testid="shared-pag...">
+        <style>
+        <div>
+        <GlobalDragOverlay>
+        <div>
+        <input>
+        <PageHeader>
+        <div className="flex flex-...">
+          <div>
+          <aside className="hidden lg:...">
+            <Card variant="premium" className="p-5 border...">
+              <div className="relative r..." onClick={undefined}>
+                <div className="relative z...">
+                  <div className="flex items...">
+>                   <p className="text-[10px] font-black text-emerald-500 tracking-tight flex items-center gap-1.5">
+>                     <div className="w-1 h-1 bg-emerald-500 rounded-full shadow-[0_0_8px_rgba(16,185,129,0.4)]">
+                      ...
+                    ...
+                  ...
+            ...
+
+
+ [32m✓[39m src/modules/job/History.test.tsx [2m([22m[2m11 tests[22m[2m)[22m[33m 577[2mms[22m[39m
+ [32m✓[39m src/modules/resume/ResumeEditor.test.tsx [2m([22m[2m8 tests[22m[2m)[22m[33m 776[2mms[22m[39m
+     [33m[2m✓[22m[39m renders the 3-card empty state when no resumes exist [33m 325[2mms[22m[39m
+ [32m✓[39m src/utils/secureStorage.test.ts [2m([22m[2m5 tests[22m[2m)[22m[32m 46[2mms[22m[39m
+ [32m✓[39m src/services/encryptionService.test.ts [2m([22m[2m7 tests[22m[2m)[22m[32m 6[2mms[22m[39m
+ [32m✓[39m src/hooks/useLocalStorage.test.ts [2m([22m[2m4 tests[22m[2m)[22m[32m 39[2mms[22m[39m
+ [32m✓[39m src/components/common/UnifiedUploadHero.test.tsx [2m([22m[2m4 tests[22m[2m)[22m[33m 428[2mms[22m[39m
+     [33m[2m✓[22m[39m renders the default 3-card layout [33m 331[2mms[22m[39m
+ [32m✓[39m src/services/scraperService.test.ts [2m([22m[2m1 test[22m[2m)[22m[32m 8[2mms[22m[39m
+ [32m✓[39m src/utils/lazyWithRetry.test.ts [2m([22m[2m2 tests[22m[2m)[22m[32m 8[2mms[22m[39m
+ [32m✓[39m src/components/layout/Header.test.tsx [2m([22m[2m4 tests[22m[2m)[22m[33m 600[2mms[22m[39m
+     [33m[2m✓[22m[39m should have the navigation pill correctly centered vertically [33m 519[2mms[22m[39m
+ [32m✓[39m src/services/usageLimits.test.ts [2m([22m[2m11 tests[22m[2m)[22m[32m 53[2mms[22m[39m
+ [32m✓[39m src/modules/grad/utils/gpaUtils.test.ts [2m([22m[2m7 tests[22m[2m)[22m[32m 7[2mms[22m[39m
+ [32m✓[39m src/constants.test.ts [2m([22m[2m19 tests[22m[2m)[22m[32m 12[2mms[22m[39m
+ [32m✓[39m src/services/storage/blockUtils.test.ts [2m([22m[2m33 tests[22m[2m)[22m[32m 15[2mms[22m[39m
+ [32m✓[39m src/utils/archetypeUtils.test.ts [2m([22m[2m5 tests[22m[2m)[22m[32m 8[2mms[22m[39m
+ [31m❯[39m src/services/storage/storageCore.test.ts [2m([22m[2m8 tests[22m[2m | [22m[31m5 failed[39m[2m)[22m[32m 29[2mms[22m[39m
+     [32m✓[39m should correctly compare two equal blocks[32m 7[2mms[22m[39m
+     [32m✓[39m should correctly compare two different blocks[32m 1[2mms[22m[39m
+     [32m✓[39m skips migration when encryptionService reports none needed[32m 4[2mms[22m[39m
+[31m     [31m×[31m re-encrypts vault items and marks migration complete when migration is needed[39m[32m 6[2mms[22m[39m
+[31m     [31m×[31m silently skips plain-JSON items during migration[39m[32m 1[2mms[22m[39m
+[31m     [31m×[31m silently skips non-vault items (no colon) during migration[39m[32m 1[2mms[22m[39m
+[31m     [31m×[31m skips items that fail legacy decryption without aborting the migration[39m[32m 5[2mms[22m[39m
+[31m     [31m×[31m sets initialized=true after migration[39m[32m 2[2mms[22m[39m
+ [32m✓[39m src/services/ai/resumeAiService.test.ts [2m([22m[2m1 test[22m[2m)[22m[32m 6[2mms[22m[39m
+ [32m✓[39m src/services/ai/aiCore.test.ts [2m([22m[2m9 tests[22m[2m)[22m[32m 4[2mms[22m[39m
+
+[31m⎯⎯⎯⎯⎯⎯⎯[39m[1m[41m Failed Tests 6 [49m[22m[31m⎯⎯⎯⎯⎯⎯⎯[39m
+
+[41m[1m FAIL [22m[49m src/services/storage/jobStorage.test.ts[2m > [22mJobStorage[2m > [22mshould update a job in local storage
+[31m[1mTypeError[22m: __vite_ssr_import_0__.supabase.from(...).update(...).eq(...).eq is not a function[39m
+[36m [2m❯[22m src/services/storage/jobStorage.ts:[2m146:22[22m[39m
+    [90m144| [39m                    fit_score[33m:[39m updatedJob[33m.[39manalysis[33m?.[39mcompatibilityScore
+    [90m145| [39m                })[33m.[39m[34meq[39m([32m'id'[39m[33m,[39m updatedJob[33m.[39mid)
+    [90m146| [39m                    [33m.[39m[34meq[39m([32m'user_id'[39m[33m,[39m userId)
+    [90m   | [39m                     [31m^[39m
+    [90m147| [39m                    [33m.[39m[34mthen[39m(({ error }) [33m=>[39m {
+    [90m148| [39m                        if (error) console.error("Cloud Sync Error (Up…
+[90m [2m❯[22m Object.updateJob src/services/storage/jobStorage.ts:[2m128:9[22m[39m
+[90m [2m❯[22m src/services/storage/jobStorage.test.ts:[2m62:9[22m[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/6]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m src/services/storage/storageCore.test.ts[2m > [22mVault - PBKDF2 iteration migration[2m > [22mre-encrypts vault items and marks migration complete when migration is needed
+[31m[1mAssertionError[22m: expected "vi.fn()" to be called with arguments: [ 'oldIv:oldCiphertext' ][90m
+
+Number of calls: [1m0[22m
+[31m[39m
+[36m [2m❯[22m src/services/storage/storageCore.test.ts:[2m65:49[22m[39m
+    [90m 63| [39m        [35mawait[39m [33mVault[39m[33m.[39m[34mensureInit[39m()[33m;[39m
+    [90m 64| [39m
+    [90m 65| [39m        expect(encryptionService.decryptLegacy).toHaveBeenCalledWith('…
+    [90m   | [39m                                                [31m^[39m
+    [90m 66| [39m        expect(encryptionService.encrypt).toHaveBeenCalledWith('{"resu…
+    [90m 67| [39m        expect(localStorage.getItem('navigator_resumes_v2')).toBe('new…
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/6]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m src/services/storage/storageCore.test.ts[2m > [22mVault - PBKDF2 iteration migration[2m > [22msilently skips plain-JSON items during migration
+[31m[1mAssertionError[22m: expected "vi.fn()" to be called at least once[39m
+[36m [2m❯[22m src/services/storage/storageCore.test.ts:[2m80:57[22m[39m
+    [90m 78| [39m        // JSON items are excluded from migration without attempting d…
+    [90m 79| [39m        expect(encryptionService.decryptLegacy).not.toHaveBeenCalledWi…
+    [90m 80| [39m        expect(encryptionService.markMigrationComplete).toHaveBeenCall…
+    [90m   | [39m                                                        [31m^[39m
+    [90m 81| [39m    })[33m;[39m
+    [90m 82| [39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/6]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m src/services/storage/storageCore.test.ts[2m > [22mVault - PBKDF2 iteration migration[2m > [22msilently skips non-vault items (no colon) during migration
+[31m[1mAssertionError[22m: expected "vi.fn()" to be called at least once[39m
+[36m [2m❯[22m src/services/storage/storageCore.test.ts:[2m91:57[22m[39m
+    [90m 89| [39m
+    [90m 90| [39m        expect(encryptionService.decryptLegacy).not.toHaveBeenCalledWi…
+    [90m 91| [39m        expect(encryptionService.markMigrationComplete).toHaveBeenCall…
+    [90m   | [39m                                                        [31m^[39m
+    [90m 92| [39m    })[33m;[39m
+    [90m 93| [39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/6]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m src/services/storage/storageCore.test.ts[2m > [22mVault - PBKDF2 iteration migration[2m > [22mskips items that fail legacy decryption without aborting the migration
+[31m[1mAssertionError[22m: expected 'validIv:validCiphertext' to be 'newIv:newCiphertext' // Object.is equality[39m
+
+Expected: [32m"[7mnewIv:new[27mCiphertext"[39m
+Received: [31m"[7mvalidIv:valid[27mCiphertext"[39m
+
+[36m [2m❯[22m src/services/storage/storageCore.test.ts:[2m106:62[22m[39m
+    [90m104| [39m
+    [90m105| [39m        [90m// Valid item was migrated[39m
+    [90m106| [39m        expect(localStorage.getItem('navigator_resumes_v2')).toBe('new…
+    [90m   | [39m                                                             [31m^[39m
+    [90m107| [39m        // Migration still completed despite the error on the second i…
+    [90m108| [39m        expect(encryptionService.markMigrationComplete).toHaveBeenCall…
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/6]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m src/services/storage/storageCore.test.ts[2m > [22mVault - PBKDF2 iteration migration[2m > [22msets initialized=true after migration
+[31m[1mAssertionError[22m: expected false to be true // Object.is equality[39m
+
+[32m- Expected[39m
+[31m+ Received[39m
+
+[32m- true[39m
+[31m+ false[39m
+
+[36m [2m❯[22m src/services/storage/storageCore.test.ts:[2m116:35[22m[39m
+    [90m114| [39m        [35mawait[39m [33mVault[39m[33m.[39m[34mensureInit[39m()[33m;[39m
+    [90m115| [39m
+    [90m116| [39m        [34mexpect[39m([33mVault[39m[33m.[39minitialized)[33m.[39m[34mtoBe[39m([35mtrue[39m)[33m;[39m
+    [90m   | [39m                                  [31m^[39m
+    [90m117| [39m    })[33m;[39m
+    [90m118| [39m})[33m;[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[6/6]⎯[22m[39m
+
+[31m⎯⎯⎯⎯⎯⎯[39m[1m[41m Unhandled Errors [49m[22m[31m⎯⎯⎯⎯⎯⎯[39m
+[31m[1m
+Vitest caught 1 unhandled error during the test run.
+This might cause false positive tests. Resolve unhandled errors to make sure your tests are not affected.[22m[39m
+
+[31m⎯⎯⎯⎯[39m[1m[41m Unhandled Rejection [49m[22m[31m⎯⎯⎯⎯⎯[39m
+[31m[1mError[22m: DB Error[39m
+[36m [2m❯[22m Object.<anonymous> src/services/usageLimits.test.ts:[2m241:19[22m[39m
+    [90m239| [39m    [34mit[39m([32m'should return default stats on error'[39m[33m,[39m [35masync[39m () [33m=>[39m {
+    [90m240| [39m        vi[33m.[39m[34mmocked[39m(supabase[33m.[39m[35mfrom[39m)[33m.[39m[34mmockImplementation[39m(() [33m=>[39m {
+    [90m241| [39m            [35mthrow[39m [35mnew[39m [33mError[39m([32m'DB Error'[39m)[33m;[39m
+    [90m   | [39m                  [31m^[39m
+    [90m242| [39m        })[33m;[39m
+    [90m243| [39m
+[90m [2m❯[22m Object.Mock node_modules/@vitest/spy/dist/index.js:[2m285:34[22m[39m
+[90m [2m❯[22m src/services/usageLimits.ts:[2m146:22[22m[39m
+[90m [2m❯[22m Module.getUsageStats src/services/usageLimits.ts:[2m169:13[22m[39m
+[90m [2m❯[22m src/services/usageLimits.test.ts:[2m246:30[22m[39m
+[90m [2m❯[22m node_modules/@vitest/runner/dist/index.js:[2m145:11[22m[39m
+[90m [2m❯[22m node_modules/@vitest/runner/dist/index.js:[2m915:26[22m[39m
+[90m [2m❯[22m node_modules/@vitest/runner/dist/index.js:[2m1243:20[22m[39m
+[90m [2m❯[22m runWithTimeout node_modules/@vitest/runner/dist/index.js:[2m1209:10[22m[39m
+
+[31mThis error originated in "[1msrc/services/usageLimits.test.ts[22m" test file. It doesn't mean the error was thrown inside the file itself, but while it was running.[39m
+[31m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[39m
+
+
+[2m Test Files [22m [1m[31m2 failed[39m[22m[2m | [22m[1m[32m20 passed[39m[22m[90m (22)[39m
+[2m      Tests [22m [1m[31m6 failed[39m[22m[2m | [22m[1m[32m151 passed[39m[22m[90m (157)[39m
+[2m     Errors [22m [1m[31m1 error[39m[22m
+[2m   Start at [22m 12:05:26
+[2m   Duration [22m 7.79s[2m (transform 2.98s, setup 6.74s, import 5.46s, tests 3.05s, environment 27.90s)[22m
+

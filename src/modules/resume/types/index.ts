@@ -22,6 +22,7 @@ export interface ResumeProfile {
     name: string;
     blocks: ExperienceBlock[];
     suggestedUpdates?: ResumeSuggestion[]; // New: Persistent bank of AI suggestions
+    updatedAt?: number;
 }
 
 export interface RoleModelProfile {

@@ -5,23 +5,27 @@ import { API_CONFIG } from "../../constants";
 export type RetryProgressCallback = (message: string, attempt: number, maxAttempts: number) => void;
 
 export interface ModelParams {
-    task: 'extraction' | 'analysis' | 'interview';
+    task: 'extraction' | 'analysis' | 'interview' | 'modeling' | 'generation';
     generationConfig?: {
         temperature?: number;
         maxOutputTokens?: number;
         responseMimeType?: string;
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        responseSchema?: any;
+        responseSchema?: Record<string, unknown>;
     };
     model?: string;
     /** Feature tag for server-side tier gating (e.g. 'cover_letter', 'resume_tailor', 'gap_analysis', 'roadmap', 'role_model') */
     feature?: string;
 }
 
-export const getModel = async (params: ModelParams) => {
+export interface EmbeddingParams {
+    task: 'embedding';
+    model?: string;
+    feature?: string;
+}
+
+export const getModel = async (params: ModelParams & { signal?: AbortSignal }) => {
     return {
         generateContent: async (payload: { contents: { role: string; parts: ({ text: string } | { inlineData: { mimeType: string; data: string } })[] }[]; generationConfig?: Record<string, unknown> }) => {
-            console.log(`Using Gemini Proxy (Edge Function) for ${params.task}...`);
             const { generationConfig: payloadGenerationConfig, ...contentsOnly } = payload;
             const { data, error } = await supabase.functions.invoke('gemini-proxy', {
                 body: {
@@ -29,7 +33,8 @@ export const getModel = async (params: ModelParams) => {
                     task: params.task,
                     generationConfig: payloadGenerationConfig ?? params.generationConfig,
                     feature: params.feature
-                }
+                },
+                signal: params.signal
             });
 
             if (error) throw new Error(`Proxy Error: ${error.message}`);
@@ -45,6 +50,27 @@ export const getModel = async (params: ModelParams) => {
                     usageMetadata: data.usage
                 }
             };
+        }
+    };
+};
+
+export const getEmbeddingModel = async (params: EmbeddingParams) => {
+    return {
+        embedContent: async (text: string) => {
+            const { data, error } = await supabase.functions.invoke('gemini-proxy', {
+                body: {
+                    payload: { content: { parts: [{ text }] } },
+                    task: 'embedding',
+                    feature: params.feature,
+                    model: params.model || 'text-embedding-004'
+                }
+            });
+
+            if (error) throw new Error(`Proxy Error: ${error.message}`);
+            if (data?.error) throw new Error(`AI Error: ${data.error}`);
+            if (!data?.embedding) throw new Error('AI Error: no embedding returned');
+
+            return data.embedding as number[];
         }
     };
 };
@@ -97,12 +123,15 @@ export const callWithRetry = async <T>(
     context: { event_type: string; prompt: string; model: string; metadata?: Record<string, unknown>; job_id?: string },
     retries: number = API_CONFIG.MAX_RETRIES,
     initialDelay = API_CONFIG.INITIAL_RETRY_DELAY_MS,
-    onProgress?: RetryProgressCallback
+    onProgress?: RetryProgressCallback,
+    abortSignal?: AbortSignal
 ): Promise<T> => {
     let currentDelay = initialDelay;
     const startTime = Date.now();
 
     for (let i = 0; i < retries; i++) {
+        if (abortSignal?.aborted) throw new Error("AbortError");
+
         const executionMetadata: Record<string, unknown> = {};
         try {
             const result = await fn(executionMetadata);
@@ -135,7 +164,7 @@ export const callWithRetry = async <T>(
                     latency_ms: Date.now() - startTime,
                     job_id: context.job_id
                 });
-                throw new Error(getUserFriendlyError("DAILY_QUOTA_EXCEEDED"));
+                throw new Error(getUserFriendlyError("DAILY_QUOTA_EXCEEDED"), { cause: error });
             }
 
             const isQuotaError = (
@@ -149,8 +178,16 @@ export const callWithRetry = async <T>(
                 const delaySeconds = currentDelay / 1000;
                 const retryMsg = getRetryMessage(i + 1, retries, delaySeconds);
                 if (onProgress) onProgress(retryMsg, i + 1, retries);
-                await new Promise(resolve => setTimeout(resolve, currentDelay));
-                currentDelay = currentDelay * 2;
+
+                await new Promise((resolve, reject) => {
+                    const timeout = setTimeout(resolve, currentDelay);
+                    abortSignal?.addEventListener('abort', () => {
+                        clearTimeout(timeout);
+                        reject(new Error("AbortError"));
+                    }, { once: true });
+                });
+
+                currentDelay = currentDelay * API_CONFIG.RETRY_BACKOFF_MULTIPLIER;
             } else {
                 logToSupabase({
                     event_type: context.event_type,
@@ -162,8 +199,8 @@ export const callWithRetry = async <T>(
                     metadata: { attempt: i + 1 },
                     job_id: context.job_id
                 });
-                if (isQuotaError) throw new Error(getUserFriendlyError("RATE_LIMIT_EXCEEDED"));
-                throw new Error(getUserFriendlyError(err));
+                if (isQuotaError) throw new Error(getUserFriendlyError("RATE_LIMIT_EXCEEDED"), { cause: error });
+                throw new Error(getUserFriendlyError(err), { cause: error });
             }
         }
     }

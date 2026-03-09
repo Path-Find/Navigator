@@ -31,7 +31,14 @@ export const NotificationBanner: React.FC<NotificationBannerProps> = ({
     const linkRef = React.useRef<HTMLAnchorElement>(null);
 
     React.useEffect(() => {
-        if (linkRef.current && action?.href?.startsWith('javascript:')) {
+        const isDangerousProtocol = (url: string) => {
+            const normalized = url.trim().toLowerCase();
+            return normalized.startsWith('javascript:') ||
+                normalized.startsWith('data:') ||
+                normalized.startsWith('vbscript:');
+        };
+
+        if (linkRef.current && action?.href && isDangerousProtocol(action.href)) {
             linkRef.current.setAttribute('href', action.href);
         }
     }, [action?.href]);

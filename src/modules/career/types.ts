@@ -1,4 +1,4 @@
-export const COACH_VIEWS = ['coach-home', 'coach-role-models', 'coach-gap-analysis', 'coach-comparison', 'career-growth', 'skills'] as const;
+export const COACH_VIEWS = ['coach-home', 'coach-role-models', 'coach-gap-analysis', 'coach-comparison', 'career-growth', 'skills', 'career-orgs', 'career-salary'] as const;
 
 export type CoachViewType = typeof COACH_VIEWS[number];
 

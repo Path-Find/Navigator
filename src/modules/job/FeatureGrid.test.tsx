@@ -5,6 +5,17 @@ import { EventService } from '../../services/eventService';
 import { FEATURE_REGISTRY } from '../../featureRegistry';
 import type { User } from '@supabase/supabase-js';
 
+// Mock UserContext
+vi.mock('../../contexts/UserContext', () => ({
+    useUser: () => ({
+        lastArchetypeUpdate: null,
+        acceptedTosVersion: null,
+        user: null,
+        dismissedNotices: [],
+        dismissNotice: vi.fn(),
+    }),
+}));
+
 // Mock EventService
 vi.mock('../../services/eventService', () => ({
     EventService: {

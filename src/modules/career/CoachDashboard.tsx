@@ -10,6 +10,8 @@ import { RoleModelSection } from './components/RoleModelSection';
 import { GapAnalysisSection } from './components/GapAnalysisSection';
 import { RoleModelComparison } from './components/RoleModelComparison';
 import { GrowthPage } from './components/GrowthPage';
+import { OrgsSection } from './components/OrgsSection';
+import { SalaryInsights } from './components/SalaryInsights';
 import { useHeadlines } from '../../hooks/useHeadlines';
 import { PageHeader } from '../../components/ui/PageHeader';
 import type { CoachViewType } from './types';
@@ -17,6 +19,10 @@ import { useCoachContext } from './context/CoachContext';
 import { useSkillContext } from '../skills/context/SkillContext';
 import { useResumeContext } from '../resume/context/ResumeContext';
 import { useGlobalUI } from '../../contexts/GlobalUIContext';
+import { useLocalStorage } from '../../hooks/useLocalStorage';
+import { STORAGE_KEYS } from '../../constants';
+import type { ProfessionalOrg } from '../../types';
+import { useUser } from '../../contexts/UserContext';
 
 export const CoachDashboard: React.FC = () => {
     const {
@@ -31,7 +37,9 @@ export const CoachDashboard: React.FC = () => {
         handleUpdateTargetJob: onUpdateTargetJob
     } = useCoachContext();
 
+    const { isAdmin } = useUser();
     const { skills: userSkills } = useSkillContext();
+    const [orgs] = useLocalStorage<ProfessionalOrg[]>(STORAGE_KEYS.ORGS, []);
     const { resumes } = useResumeContext();
     const { currentView, setView: onViewChange } = useGlobalUI();
     const { showError } = useToast();
@@ -108,7 +116,7 @@ export const CoachDashboard: React.FC = () => {
 
     return (
         <SharedPageLayout maxWidth="full" animate={false} className="relative theme-coach" spacing="hero">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 relative z-10">
+            <div className="max-w-6xl mx-auto px-4 sm:px-6 relative z-10">
                 <input
                     type="file"
                     ref={fileInputRef}
@@ -147,6 +155,7 @@ export const CoachDashboard: React.FC = () => {
                         roleModels={roleModels}
                         targetJobs={targetJobs}
                         userSkills={userSkills}
+                        orgCount={orgs.length}
                         onViewChange={onViewChange}
                     />
                 )}
@@ -189,6 +198,14 @@ export const CoachDashboard: React.FC = () => {
                         />
                     )
                 }
+
+                {view === 'career-orgs' && (
+                    <OrgsSection />
+                )}
+
+                {view === 'career-salary' && isAdmin && (
+                    <SalaryInsights />
+                )}
 
                 {
                     comparisonRoleModelId && resumes[0] && (

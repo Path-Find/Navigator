@@ -34,7 +34,7 @@ export const EducationDashboard: React.FC = () => {
                 <div className="absolute top-40 right-1/4 w-96 h-96 bg-accent-primary/10 rounded-full blur-3xl mix-blend-multiply animate-blob animation-delay-2000" />
             </div>
 
-            <div className="max-w-7xl mx-auto px-4 sm:px-6">
+            <div className="max-w-6xl mx-auto px-4 sm:px-6">
                 <PageHeader
                     variant="hero"
                     title={activeHeadline.text}

@@ -27,9 +27,11 @@ export const CourseEditModal: React.FC<CourseEditModalProps> = ({
 
     useEffect(() => {
         if (isOpen) {
-            setEditedCourse(course);
-            setTargetSemIndex(currentSemIndex);
-            setConfirmDelete(false);
+            setTimeout(() => {
+                setEditedCourse(course);
+                setTargetSemIndex(currentSemIndex);
+                setConfirmDelete(false);
+            }, 0);
 
             const handleKeyDown = (e: KeyboardEvent) => {
                 if (e.key === 'Escape') onClose();

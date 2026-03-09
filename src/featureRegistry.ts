@@ -8,6 +8,7 @@
  *   - /education dashboard (tool cards)
  *   - /plans page (plan feature lists)
  */
+import type { ViewId } from './utils/navigation';
 
 // ─── Types ─────────────────────────────────────────────────────────────
 
@@ -54,19 +55,22 @@ export interface FeatureDefinition {
     /** Minimum plan tier that includes this feature without limits */
     tier: 'explorer' | 'plus' | 'pro';
     /** View identifier for homepage onNavigate() system */
-    targetView: string;
+    targetView: ViewId;
     /** Route path for react-router navigate() */
     link: string;
     /** Default ordering rank (lower = higher priority) */
     rank: number;
-    /** Only visible to admin/tester users */
-    requiresAdmin?: boolean;
+    /**
+     * Visibility stage of the feature.
+     * - 'admin'  — so unready it should not exist publicly; hidden from all public-facing surfaces
+     * - 'beta'   — committed to shipping; shown publicly as "Coming Soon"
+     * - 'public' — fully live (default when omitted)
+     */
+    stage?: 'admin' | 'beta' | 'public';
     /** Eligible for display in homepage spotlight grid */
     showOnHomepage?: boolean;
     /** Hand-picked to appear on plan cards */
     planHighlight?: boolean;
-    /** Feature is currently in development and restricted */
-    isComingSoon?: boolean;
     /** Optional badge text (manually overridden if present) */
     badge?: string;
     /** ISO date string for feature release (e.g. '2024-01-15') */
@@ -160,435 +164,10 @@ export const FEATURE_COLORS: Record<string, FeatureColor> = {
 
 // ─── Feature Registry ──────────────────────────────────────────────────
 
-export const FEATURE_REGISTRY: Record<string, FeatureDefinition> = {
-    JOBFIT: {
-        id: 'jobfit',
-        key: 'JOBFIT',
-        name: 'AI Job Analysis',
-        shortName: 'Match',
-        releaseDate: '2024-11-01', // No longer "New"
-        description: {
-            short: 'Instant 0–100 compatibility rating.',
-            full: 'Paste any job posting and see how you match based on your full profile—including your resume, skills, and academic transcript. Get a 0–100 score plus a detailed breakdown.',
-            plan: 'Simple match quality ratings for every role',
-        },
-        action: { short: 'View Match', full: 'View Match' },
-        iconName: 'Sparkles',
-        colorKey: 'indigo',
-        category: 'JOB',
-        tier: 'explorer',
-        targetView: 'job-home',
-        link: '/jobs',
-        rank: 1,
-        showOnHomepage: true,
-        planHighlight: true,
-    },
-    AI_SAFETY: {
-        id: 'ai-safety',
-        key: 'AI_SAFETY',
-        name: 'AI Safety Scan',
-        shortName: 'Safety',
-        description: {
-            short: 'Flags AI-banned postings automatically.',
-            full: 'Some employers ban AI-assisted applications. Navigator flags those postings automatically so you know before you submit.',
-            plan: 'Automatic AI-ban detection on job postings',
-        },
-        action: { short: 'Scan', full: 'Scan' },
-        iconName: 'Shield',
-        colorKey: 'amber',
-        category: 'JOB',
-        tier: 'plus',
-        targetView: 'job-home',
-        link: '/jobs',
-        rank: 15,
-    },
-    RESUME_TAILORING: {
-        id: 'resume-tailoring',
-        key: 'RESUME_TAILORING',
-        name: 'Resume Tailoring',
-        shortName: 'Tailor',
-        description: {
-            short: 'One-click bullet rewrites for any job.',
-            full: "Rewrite your resume bullets to match a job's exact keywords and requirements. Just pick a block and tailor it in one click.",
-            plan: 'AI-powered resume bullet rewrites per job',
-        },
-        action: { short: 'Tailor', full: 'Tailor' },
-        iconName: 'RefreshCw',
-        colorKey: 'rose',
-        category: 'JOB',
-        tier: 'plus',
-        targetView: 'resumes',
-        link: '/jobs/resumes',
-        releaseDate: '2024-12-15',
-        rank: 14,
-    },
-    KEYWORDS: {
-        id: 'keywords',
-        key: 'KEYWORDS',
-        name: 'Skills Gap Analysis',
-        shortName: 'Skills',
-        description: {
-            short: 'Identify missing skills to beat the ATS.',
-            full: 'Find out which keywords and skills your profile is missing for a specific role, so you can close the gap before you apply.',
-            plan: 'Identify and bridge missing keywords',
-        },
-        action: { short: 'Audit gaps', full: 'Audit' },
-        iconName: 'Zap',
-        colorKey: 'sky',
-        category: 'COACH',
-        tier: 'plus',
-        targetView: 'skills',
-        link: '/career/skills',
-        rank: 3,
-        showOnHomepage: true,
-        planHighlight: true,
-    },
-    RESUMES: {
-        id: 'resumes',
-        key: 'RESUMES',
-        name: 'Resume Profiles',
-        shortName: 'Resume',
-        description: {
-            short: 'Tailored summaries for every application.',
-            full: 'Manage multiple versions of your resume, each tailored to a different role or industry. Switch between them whenever you need.',
-            plan: 'Multiple resume versions for different roles',
-        },
-        action: { short: 'Manage', full: 'Manage' },
-        iconName: 'FileText',
-        colorKey: 'rose',
-        category: 'JOB',
-        tier: 'explorer',
-        targetView: 'resumes',
-        link: '/jobs/resumes',
-        rank: 5,
-        showOnHomepage: true,
-    },
-    COVER_LETTERS: {
-        id: 'cover_letters',
-        key: 'COVER_LETTERS',
-        name: 'Cover Letters',
-        shortName: 'Cover Letters',
-        description: {
-            short: 'Generate persuasive cover letters instantly.',
-            full: 'Generate a polished cover letter for any role, built from your actual experience and what the job is asking for.',
-            plan: 'AI-generated cover letters from your experience',
-        },
-        action: { short: 'Create', full: 'Write' },
-        iconName: 'PenTool',
-        colorKey: 'violet',
-        category: 'JOB',
-        tier: 'plus',
-        targetView: 'cover-letters',
-        link: '/jobs/cover-letters',
-        rank: 2,
-        showOnHomepage: true,
-        planHighlight: true,
-        releaseDate: '2025-01-10',
-    },
-    QUALITY_LOOP: {
-        id: 'quality-loop',
-        key: 'QUALITY_LOOP',
-        name: 'Quality Loop',
-        shortName: 'Quality Loop',
-        description: {
-            short: 'Multi-pass cover letter refinement.',
-            full: "A simulated hiring manager reads, scores, and rewrites your cover letter — running up to 3 revision passes until it's ready to send.",
-            plan: 'Multi-pass cover letter revision engine',
-        },
-        action: { short: 'Refine', full: 'Refine' },
-        iconName: 'RefreshCw',
-        colorKey: 'violet',
-        category: 'JOB',
-        tier: 'pro',
-        targetView: 'cover-letters',
-        link: '/jobs/cover-letters',
-        rank: 16,
-    },
-    HISTORY: {
-        id: 'history',
-        key: 'HISTORY',
-        name: 'Application Tracker',
-        shortName: 'History',
-        description: {
-            short: 'Save jobs from any site with one click.',
-            full: "Keep tabs on every job you've analyzed. Track your application status, review past results, and watch your scores over time.",
-            plan: 'Unlimited saving & tracking of roles',
-        },
-        action: { short: 'View all', full: 'View all' },
-        iconName: 'Bookmark',
-        colorKey: 'blue',
-        category: 'JOB',
-        tier: 'explorer',
-        targetView: 'history',
-        link: '/jobs/history',
-        rank: 6,
-        showOnHomepage: true,
-        planHighlight: true,
-    },
-    FEED: {
-        id: 'feed',
-        key: 'FEED',
-        name: 'Feed',
-        shortName: 'Feed',
-        description: {
-            short: 'Pre-scored matches from your alerts.',
-            full: 'A live feed of pre-scored job matches, automatically triaged from the alerts you forward. Your best opportunities, ranked and ready.',
-            plan: 'Live feed of ranked job matches',
-        },
-        action: { short: 'View feed', full: 'Open Feed' },
-        iconName: 'Zap',
-        colorKey: 'indigo-dark',
-        category: 'JOB',
-        tier: 'plus',
-        targetView: 'feed',
-        link: '/jobs/feed',
-        rank: 4,
-        showOnHomepage: true,
-        planHighlight: true,
-        releaseDate: '2025-02-15',
-    },
-    MAIL_IN: {
-        id: 'mail-in',
-        key: 'MAIL_IN',
-        name: 'Job Alerts',
-        shortName: 'Inbound',
-        description: {
-            short: 'Forward jobs to analysis via email.',
-            full: 'Forward your job board alerts to a unique Navigator email. Every listing gets analyzed and scored automatically in your feed.',
-            plan: 'Auto-analyze jobs forwarded via email',
-        },
-        action: { short: 'View token', full: 'Set up' },
-        iconName: 'Mail',
-        colorKey: 'amber-dark',
-        category: 'JOB',
-        tier: 'plus',
-        targetView: 'feed',
-        link: '/jobs/feed',
-        rank: 9,
-        showOnHomepage: true,
-        isComingSoon: true,
-    },
-    SKILLS_INTERVIEW: {
-        id: 'skills-verify',
-        key: 'SKILLS_INTERVIEW',
-        name: 'Skills Interview',
-        shortName: 'Interview',
-        description: {
-            short: 'Prove your skills with AI interviews.',
-            full: 'Prove your skills with a live AI-powered interview. Answer real questions, get instant feedback, and earn verified proficiency badges.',
-            plan: 'AI skill verification interviews',
-        },
-        action: { short: 'Start', full: 'Start' },
-        iconName: 'Shield',
-        colorKey: 'emerald',
-        category: 'COACH',
-        tier: 'plus',
-        targetView: 'skills',
-        link: '/career/skills/interview',
-        rank: 17,
-    },
-    INTERVIEW_ADVISOR: {
-        id: 'interview-advisor',
-        key: 'INTERVIEW_ADVISOR',
-        name: 'Interview Advisor',
-        shortName: 'Mock Interview',
-        description: {
-            short: 'Realistic mock interviews with scoring.',
-            full: 'Run realistic mock interviews for a specific job or general prep. Get scored in real time with smart, adaptive follow-up questions.',
-            plan: 'AI-powered mock interviews with scoring',
-        },
-        action: { short: 'Practice', full: 'Practice' },
-        iconName: 'MessageSquare',
-        colorKey: 'sky',
-        category: 'JOB',
-        tier: 'plus',
-        targetView: 'interviews',
-        link: '/jobs/interviews',
-        rank: 18,
-        isComingSoon: true,
-    },
-    COACH: {
-        id: 'coach',
-        key: 'COACH',
-        name: 'Career Roadmaps',
-        shortName: 'Roadmap',
-        description: {
-            short: 'Analyze skill gaps for any role.',
-            full: "See exactly what's between where you are now and where you want to be. Get a concrete, step-by-step plan to close the gap.",
-            plan: 'Step-by-step navigation to your goal role',
-        },
-        action: { short: 'Scale up', full: 'Learn more' },
-        iconName: 'TrendingUp',
-        colorKey: 'teal',
-        category: 'COACH',
-        tier: 'pro',
-        targetView: 'career-home',
-        link: '/career/growth',
-        rank: 7,
-        showOnHomepage: true,
-        planHighlight: true,
-    },
-    ROLE_MODELS: {
-        id: 'role-modeling',
-        key: 'ROLE_MODELS',
-        name: 'Role Modeling',
-        shortName: 'Role Models',
-        description: {
-            short: 'Compare your path to industry leaders.',
-            full: "Upload a mentor's LinkedIn profile and see a side-by-side comparison of your skills, experience, and credentials against theirs.",
-            plan: 'Compare your path to industry leaders',
-        },
-        action: { short: 'Compare', full: 'Compare' },
-        iconName: 'Users',
-        colorKey: 'teal',
-        category: 'COACH',
-        tier: 'pro',
-        targetView: 'career-home',
-        link: '/career/models',
-        rank: 19,
-        planHighlight: true,
-    },
-    EXTENSION: {
-        id: 'extension',
-        key: 'EXTENSION',
-        name: 'Browser Extension',
-        shortName: 'Extension',
-        description: {
-            short: 'Save jobs from any website instantly.',
-            full: "Save job postings from any website with a single click. Structured data is extracted instantly — no copying and pasting.",
-            plan: 'One-click job saving from any site',
-        },
-        action: { short: 'Install', full: 'Install' },
-        iconName: 'Globe',
-        colorKey: 'blue',
-        category: 'JOB',
-        tier: 'explorer',
-        targetView: 'history',
-        link: '/jobs',
-        rank: 20,
-    },
-    EDU: {
-        id: 'edu',
-        key: 'EDU',
-        name: 'Education',
-        shortName: 'Edu',
-        description: {
-            short: 'High-fidelity academic management.',
-            full: 'Access your central dashboard for degree tracking, GPA scenarios, and program discovery.',
-            plan: 'AI-powered tools for degree & program planning',
-        },
-        action: { short: 'Open', full: 'Open Hub' },
-        iconName: 'GraduationCap',
-        colorKey: 'amber',
-        category: 'EDUCATION',
-        tier: 'pro',
-        targetView: 'edu-home',
-        link: '/education',
-        rank: 8,
-        showOnHomepage: true,
-        planHighlight: true,
-    },
-    EDU_EXPLORER: {
-        id: 'edu-explorer',
-        key: 'EDU_EXPLORER',
-        name: 'Programs',
-        shortName: 'Programs',
-        description: {
-            short: "Explore master's degrees and certs.",
-            full: 'Get personalized recommendations for degrees and track your current program requirements using AI.',
-            plan: 'Personalized degree & certification recommendations',
-        },
-        action: { short: 'Explore', full: 'Explore' },
-        iconName: 'School',
-        colorKey: 'emerald',
-        category: 'EDUCATION',
-        tier: 'pro',
-        targetView: 'edu-programs',
-        link: '/education/programs',
-        rank: 11,
-        isComingSoon: true,
-    },
-    EDU_TRANSCRIPT: {
-        id: 'edu-transcript',
-        key: 'EDU_TRANSCRIPT',
-        name: 'Transcript',
-        shortName: 'Transcript',
-        releaseDate: '2025-02-23',
-        description: {
-            short: 'Manage coursework and monitor progress.',
-            full: 'Track your coursework, credits, and degree progress in one place.',
-            plan: 'Coursework and degree progress tracking',
-        },
-        action: { short: 'View', full: 'Open' },
-        iconName: 'GraduationCap',
-        colorKey: 'amber',
-        category: 'EDUCATION',
-        tier: 'explorer',
-        targetView: 'edu-transcript',
-        link: '/education/transcript',
-        rank: 10,
-    },
-    EDU_GPA: {
-        id: 'edu-gpa',
-        key: 'EDU_GPA',
-        name: 'GPA Calculator',
-        shortName: 'GPA',
-        description: {
-            short: 'Calculate targets and track performance.',
-            full: 'Calculate your current GPA and play out different grade scenarios. See exactly what it takes to reach your target number.',
-            plan: 'GPA calculation and scenario planning',
-        },
-        action: { short: 'Calculate', full: 'Calculate' },
-        iconName: 'Calculator',
-        colorKey: 'blue',
-        category: 'EDUCATION',
-        tier: 'explorer',
-        targetView: 'edu-gpa',
-        link: '/education/gpa',
-        rank: 12,
-    },
-    // ─── System Notices (Pseudo-features) ──────────────────────────────
-    _NOTICE_ARCHETYPE: {
-        id: '_notice_archetype',
-        key: '_NOTICE_ARCHETYPE',
-        name: 'Current Focus Update',
-        shortName: 'Update Focus',
-        description: {
-            short: 'Recommendations work best when your focus is current.',
-            full: 'It has been a few months since you updated your career focus. Review your trajectory to keep Navigator sharp.',
-            plan: '',
-        },
-        action: { short: 'Update Now', full: 'Update' },
-        iconName: 'Activity',
-        colorKey: 'indigo',
-        category: 'JOB',
-        tier: 'explorer',
-        targetView: 'settings', // Trigger settings modal
-        link: '#',
-        rank: 999,
-        showOnHomepage: false,
-    },
-    _NOTICE_TOS: {
-        id: '_notice_tos',
-        key: '_NOTICE_TOS',
-        name: 'Policy Update',
-        shortName: 'Policy Update',
-        description: {
-            short: 'We have updated our Terms & Privacy policy.',
-            full: 'Please review the latest changes to our Terms of Service and Privacy Policy to continue using Navigator.',
-            plan: '',
-        },
-        action: { short: 'Review', full: 'Review' },
-        iconName: 'Shield',
-        colorKey: 'rose',
-        category: 'JOB',
-        tier: 'explorer',
-        targetView: 'terms',
-        link: '/terms',
-        rank: 999,
-        showOnHomepage: false,
-    },
-} as const;
+import { FEATURE_REGISTRY } from './features.data';
+// Re-export
+export { FEATURE_REGISTRY };
+
 
 // ─── Categories ────────────────────────────────────────────────────────
 
@@ -622,6 +201,10 @@ export const FEATURE_RANKINGS: Record<string, string[]> = {
         'COVER_LETTERS', 'FEED', 'HISTORY', 'MAIL_IN',
     ],
     'admin': [
+        'JOBFIT', 'COACH', 'EDU', 'KEYWORDS', 'RESUMES',
+        'COVER_LETTERS', 'FEED', 'HISTORY', 'MAIL_IN',
+    ],
+    'tester': [
         'JOBFIT', 'COACH', 'EDU', 'KEYWORDS', 'RESUMES',
         'COVER_LETTERS', 'FEED', 'HISTORY', 'MAIL_IN',
     ],
@@ -669,36 +252,9 @@ export const shouldShowNewBadge = (feature: FeatureDefinition): boolean => {
         thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
 
         return releaseDate > thirtyDaysAgo;
-    } catch (e) {
+    } catch (_e) {
         console.error(`Invalid releaseDate for feature ${feature.id}: ${feature.releaseDate}`);
         return false;
     }
 };
 
-// ─── Backward Compatibility ────────────────────────────────────────────
-// These re-exports allow gradual migration from the old BENTO_CARDS API.
-// Consumers can switch to FEATURE_REGISTRY at their own pace.
-
-/** @deprecated Use FEATURE_REGISTRY instead */
-export const BENTO_CARDS_COMPAT = Object.fromEntries(
-    Object.entries(FEATURE_REGISTRY).map(([key, feature]) => [
-        key,
-        {
-            id: feature.id,
-            rank: feature.rank,
-            category: feature.category,
-            iconName: feature.iconName,
-            targetView: feature.targetView,
-            title: { marketing: feature.shortName, action: feature.shortName },
-            description: { marketing: feature.description.short, action: feature.description.full },
-            action: { marketing: feature.action.full, action: feature.action.short },
-            colors: getFeatureColor(feature),
-        },
-    ])
-);
-
-/** @deprecated Use FEATURE_CATEGORIES instead */
-export const BENTO_CATEGORIES_COMPAT = FEATURE_CATEGORIES;
-
-/** @deprecated Use FEATURE_RANKINGS instead */
-export const BENTO_RANKINGS_COMPAT = FEATURE_RANKINGS;

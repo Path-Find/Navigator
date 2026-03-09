@@ -1,4 +1,5 @@
 import { generateSkillQuestions } from './geminiService';
+import { LocalStorage } from '../utils/localStorage';
 
 interface SkillQuestions {
     skillName: string;
@@ -51,7 +52,7 @@ function getFallbackQuestions(skillName: string): string[] {
 
 function getFromCache(skillName: string, proficiency: string): string[] | null {
     try {
-        const cacheStr = localStorage.getItem(CACHE_KEY);
+        const cacheStr = LocalStorage.get(CACHE_KEY);
         if (!cacheStr) return null;
 
         const cache: SkillQuestions[] = JSON.parse(cacheStr);
@@ -78,7 +79,7 @@ function getFromCache(skillName: string, proficiency: string): string[] | null {
 
 function saveToCache(skillName: string, proficiency: string, questions: string[]): void {
     try {
-        const cacheStr = localStorage.getItem(CACHE_KEY);
+        const cacheStr = LocalStorage.get(CACHE_KEY);
         let cache: SkillQuestions[] = cacheStr ? JSON.parse(cacheStr) : [];
 
         // Remove old entry for this skill+level if exists
@@ -99,7 +100,7 @@ function saveToCache(skillName: string, proficiency: string, questions: string[]
             cache = cache.slice(-100);
         }
 
-        localStorage.setItem(CACHE_KEY, JSON.stringify(cache));
+        LocalStorage.set(CACHE_KEY, JSON.stringify(cache));
     } catch (error) {
         console.error('Error saving skill questions cache:', error);
     }

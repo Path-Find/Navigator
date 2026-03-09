@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useEffect, type ReactNode } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import { STORAGE_KEYS } from '../constants';
+import { LocalStorage } from '../utils/localStorage';
 import { getViewIdFromPath, type ViewId, getPathFromViewId } from '../utils/navigation';
 
 interface GlobalUIContextType {
@@ -37,7 +38,7 @@ export const GlobalUIProvider: React.FC<{ children: ReactNode }> = ({ children }
     const [isFocusedMode, setFocusedMode] = useState(false);
     const [isDark, setIsDark] = useState(() => {
         if (typeof window !== 'undefined') {
-            const saved = localStorage.getItem(STORAGE_KEYS.THEME);
+            const saved = LocalStorage.get(STORAGE_KEYS.THEME);
             if (saved) return saved === 'dark';
             return window.matchMedia('(prefers-color-scheme: dark)').matches;
         }
@@ -48,10 +49,10 @@ export const GlobalUIProvider: React.FC<{ children: ReactNode }> = ({ children }
     useEffect(() => {
         if (isDark) {
             document.documentElement.classList.add('dark');
-            localStorage.setItem(STORAGE_KEYS.THEME, 'dark');
+            LocalStorage.set(STORAGE_KEYS.THEME, 'dark');
         } else {
             document.documentElement.classList.remove('dark');
-            localStorage.setItem(STORAGE_KEYS.THEME, 'light');
+            LocalStorage.set(STORAGE_KEYS.THEME, 'light');
         }
     }, [isDark]);
 

@@ -1,4 +1,5 @@
 import { STORAGE_KEYS } from '../constants';
+import { LocalStorage } from '../utils/localStorage';
 
 export interface FeatureStats {
     [featureId: string]: {
@@ -28,7 +29,7 @@ export const EventService = {
 
     _increment: (featureId: string, type: 'interest' | 'usage'): void => {
         try {
-            const statsStr = localStorage.getItem(STORAGE_KEYS.DAILY_USAGE + '_statsv2') || '{}';
+            const statsStr = LocalStorage.get(STORAGE_KEYS.DAILY_USAGE + '_statsv2') || '{}';
             const stats: FeatureStats = JSON.parse(statsStr);
 
             if (!stats[featureId]) {
@@ -37,7 +38,7 @@ export const EventService = {
 
             stats[featureId][type]++;
 
-            localStorage.setItem(STORAGE_KEYS.DAILY_USAGE + '_statsv2', JSON.stringify(stats));
+            LocalStorage.set(STORAGE_KEYS.DAILY_USAGE + '_statsv2', JSON.stringify(stats));
 
             if (import.meta.env.DEV) {
                 console.log(`[Tracking] ${type === 'interest' ? 'Curiosity' : 'Usage'}: ${featureId} (Total: ${stats[featureId][type]})`);
@@ -52,7 +53,7 @@ export const EventService = {
      */
     getFeatureStats: (): FeatureStats => {
         try {
-            const statsStr = localStorage.getItem(STORAGE_KEYS.DAILY_USAGE + '_statsv2') || '{}';
+            const statsStr = LocalStorage.get(STORAGE_KEYS.DAILY_USAGE + '_statsv2') || '{}';
             return JSON.parse(statsStr);
         } catch (error) {
             console.error('Error getting feature stats:', error);
@@ -64,6 +65,6 @@ export const EventService = {
      * Reset all feature usage statistics.
      */
     resetStats: (): void => {
-        localStorage.removeItem(STORAGE_KEYS.DAILY_USAGE + '_statsv2');
+        LocalStorage.remove(STORAGE_KEYS.DAILY_USAGE + '_statsv2');
     }
 };

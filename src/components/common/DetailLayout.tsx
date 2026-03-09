@@ -9,7 +9,7 @@ interface DetailLayoutProps {
 export const DetailLayout: React.FC<DetailLayoutProps> = ({
     children,
     sidebar,
-    maxWidth = 'max-w-7xl'
+    maxWidth = 'max-w-6xl'
 }) => {
     return (
         <div className="flex-1 overflow-y-auto bg-neutral-50/50 dark:bg-neutral-900/50 p-4">

@@ -15,6 +15,8 @@ export default defineConfig({
           'vendor-ui': ['framer-motion', 'lucide-react', '@radix-ui/react-dialog', '@radix-ui/react-tooltip'],
           'vendor-supabase': ['@supabase/supabase-js'],
           'vendor-utils': ['zod', 'react-helmet-async'],
+          'vendor-charts': ['recharts'],
+          'vendor-stripe': ['@stripe/react-stripe-js', '@stripe/stripe-js'],
         }
       }
     },

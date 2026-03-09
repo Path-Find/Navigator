@@ -3,7 +3,7 @@ import { Scale, CheckCircle2, ShieldAlert, FileText, Ban, AlertTriangle } from '
 
 export const Terms: React.FC = () => {
 
-    const SimpleCard = ({ icon: Icon, title, description, color }: any) => (
+    const SimpleCard = ({ icon: Icon, title, description, color }: { icon: React.ElementType; title: string; description: string; color: { bg: string; text: string; accent: string; iconBg: string } }) => (
         <div className={`group relative h-full flex flex-col p-6 rounded-3xl border transition-all duration-300 ${color.bg} ${color.accent} hover:shadow-xl hover:-translate-y-1`}>
             <div className={`mb-4 inline-flex items-center justify-center w-12 h-12 rounded-2xl ${color.iconBg} text-white shadow-lg group-hover:scale-110 group-hover:rotate-3 transition-transform duration-300`}>
                 <Icon className="w-6 h-6" />

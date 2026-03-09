@@ -37,6 +37,7 @@ describe('GapAnalysisSection', () => {
         onRunGapAnalysis: vi.fn(),
         onGenerateRoadmap: vi.fn(),
         onToggleMilestone: vi.fn(),
+        onViewChange: vi.fn(),
     };
 
     it('renders empty state when no jobs are present and handles goal addition', async () => {

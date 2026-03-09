@@ -154,12 +154,14 @@ describe('getUsageStats', () => {
             monthInterviews: 0,
             roleModelCount: 0,
             totalAICalls: 100,
-            analysisLimit: 350,
-            analysisPeriod: 'weekly',
+            lifetimeAnalyses: 50,
+            analysisLimit: 100,
+            analysisPeriod: 'daily',
             emailLimit: 25,
             roleModelLimit: 25,
             interviewLimit: 5,
-            inboundEmailToken: 'token-123'
+            inboundEmailToken: 'token-123',
+            isFallback: false
         });
     });
 
@@ -236,11 +238,15 @@ describe('getUsageStats', () => {
     });
 
     it('should return default stats on error', async () => {
-        vi.mocked(supabase.from).mockImplementation(() => {
-            throw new Error('DB Error');
-        });
+        vi.mocked(supabase.from).mockReturnValue({
+            select: vi.fn().mockReturnThis(),
+            eq: vi.fn().mockReturnThis(),
+            gte: vi.fn().mockReturnThis(),
+            in: vi.fn().mockReturnThis(),
+            single: vi.fn().mockRejectedValue(new Error('DB Error'))
+        } as any);
 
-        const consoleSpy = vi.spyOn(console, 'error').mockImplementation(() => { });
+        const consoleSpy = vi.spyOn(console, 'warn').mockImplementation(() => { });
 
         const result = await getUsageStats(userId);
 
@@ -252,14 +258,16 @@ describe('getUsageStats', () => {
             monthInterviews: 0,
             roleModelCount: 0,
             totalAICalls: 0,
+            lifetimeAnalyses: 0,
             analysisLimit: 3,
             analysisPeriod: 'lifetime',
             emailLimit: 0,
             roleModelLimit: 0,
             interviewLimit: 0,
-            inboundEmailToken: undefined
+            inboundEmailToken: undefined,
+            isFallback: true
         });
-        expect(consoleSpy).toHaveBeenCalledWith('Error fetching usage stats:', expect.any(Error));
+        expect(consoleSpy).toHaveBeenCalledWith('Profile fetch failed, using fallback usage stats');
 
         consoleSpy.mockRestore();
     });

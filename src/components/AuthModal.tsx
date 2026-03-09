@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { supabase } from '../services/supabase';
-import { X, Mail, Lock, Loader2, ArrowRight, AlertCircle, CheckCircle, Sparkles, TrendingUp, Zap, FileText, GraduationCap, Bookmark, PenTool, RefreshCw, Shield, Users, Globe, Search, Calculator, MessageSquare, Rss } from 'lucide-react';
+import { X, Mail, Lock, Loader2, ArrowRight, AlertCircle, CheckCircle, Sparkles, TrendingUp, Zap, FileText, GraduationCap, Bookmark, PenTool, RefreshCw, Shield, Users, Globe, Search, Calculator, MessageSquare, Rss, Clock, Building2, Activity, School } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import { getUserFriendlyError } from '../utils/errorMessages';
 import { FEATURE_COLORS, type FeatureDefinition } from '../featureRegistry';
@@ -8,22 +8,37 @@ import { FEATURE_COLORS, type FeatureDefinition } from '../featureRegistry';
 const ICON_MAP: Record<string, LucideIcon> = {
     Sparkles, TrendingUp, Zap, FileText, GraduationCap, Bookmark,
     PenTool, Mail, RefreshCw, Shield, Users, Globe, Search, Calculator,
-    MessageSquare, Rss,
+    MessageSquare, Rss, Building2, Activity, School,
 };
 
 interface AuthModalProps {
     isOpen: boolean;
     onClose: () => void;
     featureContext?: FeatureDefinition;
+    authMode?: 'sign-in' | 'sign-up';
 }
 
-export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, featureContext }) => {
+export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, featureContext, authMode }) => {
     const [step, setStep] = useState(0); // 0: Email, 1: Password/Invite
     const [isSignUp, setIsSignUp] = useState(false);
+    const [showWaitlist, setShowWaitlist] = useState(false);
+    const [waitlistLoading, setWaitlistLoading] = useState(false);
+    const [waitlistSuccess, setWaitlistSuccess] = useState(false);
+
+    const getHeading = () => {
+        if (successMessage) return 'Success';
+        if (step === 0) {
+            if (authMode === 'sign-in') return 'Sign In';
+            if (authMode === 'sign-up') return 'Join Waitlist';
+            return 'Get Started';
+        }
+        return isSignUp ? 'Create Account' : 'Welcome Back';
+    };
 
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [loading, setLoading] = useState(false);
+    const [resetLoading, setResetLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [successMessage, setSuccessMessage] = useState<string | null>(null);
 
@@ -41,8 +56,11 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, featureCo
             setStep(0);
             setEmail('');
             setPassword('');
-
+            setSuccessMessage(null);
             setError(null);
+            setShowWaitlist(false);
+            setWaitlistSuccess(false);
+            setWaitlistLoading(false);
         }
 
         return () => {
@@ -65,7 +83,12 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, featureCo
             });
 
             if (!checkError) {
-                setIsSignUp(!exists);
+                if (!exists) {
+                    setShowWaitlist(true);
+                    setLoading(false);
+                    return;
+                }
+                setIsSignUp(false);
             } else {
                 // Background fallback: If RPC fails, we'll default to login
                 // but keep a way to switch if needed.
@@ -74,8 +97,8 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, featureCo
             }
 
             setStep(1);
-        } catch (err: any) {
-            setError(getUserFriendlyError(err));
+        } catch (err: unknown) {
+            setError(getUserFriendlyError(err instanceof Error ? err : new Error(String(err))));
         } finally {
             setLoading(false);
         }
@@ -107,10 +130,52 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, featureCo
                 await import('../services/storageService').then(m => m.Storage.syncLocalToCloud());
                 onClose(); // Close on successful login
             }
-        } catch (err: any) {
-            setError(getUserFriendlyError(err));
+        } catch (err: unknown) {
+            setError(getUserFriendlyError(err instanceof Error ? err : new Error(String(err))));
         } finally {
             setLoading(false);
+        }
+    };
+
+    const handleForgotPassword = async () => {
+        if (!email.trim()) {
+            setError('Please go back and enter your email first.');
+            return;
+        }
+        setResetLoading(true);
+        setError(null);
+        setSuccessMessage(null);
+
+        try {
+            const { error: resetError } = await supabase.auth.resetPasswordForEmail(email.trim(), {
+                redirectTo: `${window.location.origin}/settings`,
+            });
+            if (resetError) throw resetError;
+            setSuccessMessage('Password reset link sent! Check your inbox.');
+        } catch (err: unknown) {
+            setError(getUserFriendlyError(err instanceof Error ? err : new Error(String(err))));
+        } finally {
+            setResetLoading(false);
+        }
+    };
+
+    const handleJoinWaitlist = async (e: React.FormEvent) => {
+        e.preventDefault();
+        setWaitlistLoading(true);
+        setError(null);
+
+        try {
+            const { WaitlistService } = await import('../services/waitlistService');
+            const result = await WaitlistService.joinWaitlist(email, featureContext ? `feature_${featureContext.id}` : 'auth_modal');
+            if (result.success) {
+                setWaitlistSuccess(true);
+            } else {
+                setError(result.error || 'Failed to join waitlist.');
+            }
+        } catch (err) {
+            setError('Something went wrong. Please try again.');
+        } finally {
+            setWaitlistLoading(false);
         }
     };
 
@@ -214,6 +279,67 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, featureCo
                         </div>
                     )}
                 </form>
+            ) : showWaitlist ? (
+                <div className="animate-in fade-in slide-in-from-right-4 duration-300">
+                    {waitlistSuccess ? (
+                        <div className="text-center py-4">
+                            <div className="w-16 h-16 bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 rounded-full flex items-center justify-center mx-auto mb-4">
+                                <CheckCircle className="w-8 h-8" />
+                            </div>
+                            <h4 className="text-xl font-bold text-neutral-900 dark:text-white mb-2">You're on the list!</h4>
+                            <p className="text-sm text-neutral-600 dark:text-neutral-400 mb-6">We'll email you as soon as an invite spot opens up.</p>
+                            <button
+                                onClick={onClose}
+                                className="w-full py-3 bg-neutral-100 dark:bg-neutral-800 rounded-xl font-bold text-neutral-900 dark:text-white hover:bg-neutral-200 dark:hover:bg-neutral-700 transition-colors"
+                            >
+                                Got it
+                            </button>
+                        </div>
+                    ) : (
+                        <div className="space-y-6">
+                            <div className="p-4 bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-100 dark:border-indigo-800 rounded-2xl flex items-start gap-3">
+                                <Clock className="w-5 h-5 text-indigo-600 dark:text-indigo-400 shrink-0 mt-0.5" />
+                                <div>
+                                    <h5 className="text-sm font-bold text-indigo-900 dark:text-indigo-100 mb-1">Invite Required</h5>
+                                    Navigator is currently invite-only
+                                </div>
+                            </div>
+
+                            <div>
+                                <label className="block text-xs font-bold text-neutral-500 dark:text-neutral-400 uppercase tracking-wider mb-2 ml-1">Email</label>
+                                <div className="p-3 bg-neutral-50 dark:bg-neutral-800/50 rounded-xl flex items-center justify-between border border-neutral-100 dark:border-neutral-700 mb-6">
+                                    <div className="flex items-center gap-2">
+                                        <Mail className="w-4 h-4 text-neutral-400" />
+                                        <span className="text-sm font-medium text-neutral-600 dark:text-neutral-300 truncate max-w-[200px]">{email}</span>
+                                    </div>
+                                    <button
+                                        type="button"
+                                        onClick={() => setShowWaitlist(false)}
+                                        className="text-xs font-bold text-indigo-600 dark:text-indigo-400 hover:underline"
+                                    >
+                                        Change
+                                    </button>
+                                </div>
+
+                                <button
+                                    onClick={handleJoinWaitlist}
+                                    disabled={waitlistLoading}
+                                    className="w-full bg-neutral-900 dark:bg-white text-white dark:text-neutral-900 font-bold py-4 rounded-2xl shadow-lg hover:scale-[1.02] active:scale-[0.98] transition-all flex items-center justify-center gap-2 disabled:opacity-70"
+                                >
+                                    {waitlistLoading ? <Loader2 className="w-5 h-5 animate-spin" /> : <Sparkles className="w-5 h-5" />}
+                                    <span>Join the Waitlist</span>
+                                </button>
+                            </div>
+
+                            {error && (
+                                <div className="p-4 bg-rose-50 dark:bg-rose-900/20 border border-rose-100 dark:border-rose-800 rounded-2xl flex items-start gap-3 text-rose-600 dark:text-rose-400 text-sm">
+                                    <AlertCircle className="w-5 h-5 shrink-0 mt-0.5" />
+                                    <span className="font-medium">{error}</span>
+                                </div>
+                            )}
+                        </div>
+                    )}
+                </div>
             ) : (
                 <form onSubmit={handleAuthSubmit} className="space-y-5 animate-in fade-in slide-in-from-right-4 duration-300">
                     <div className="p-3 bg-neutral-50 dark:bg-neutral-800/50 rounded-xl flex items-center justify-between border border-neutral-100 dark:border-neutral-700 mb-4">
@@ -236,8 +362,13 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, featureCo
                         <div className="flex justify-between items-center mb-2 ml-1">
                             <label className="block text-xs font-bold text-neutral-500 dark:text-neutral-400 uppercase tracking-wider">Password</label>
                             {!isSignUp && (
-                                <button type="button" className="text-[10px] font-bold text-indigo-600 dark:text-indigo-400 hover:underline">
-                                    Forgot?
+                                <button
+                                    type="button"
+                                    onClick={handleForgotPassword}
+                                    disabled={resetLoading}
+                                    className="text-[10px] font-bold text-indigo-600 dark:text-indigo-400 hover:underline disabled:opacity-50"
+                                >
+                                    {resetLoading ? 'Sending...' : 'Forgot?'}
                                 </button>
                             )}
                         </div>
@@ -295,7 +426,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, featureCo
                         <div className="flex-1 flex flex-col bg-neutral-50 dark:bg-neutral-900/50">
                             <div className="px-8 py-6 border-b border-neutral-200/50 dark:border-neutral-800/50 flex justify-between items-center bg-gradient-to-r from-indigo-50/50 to-violet-50/50 dark:from-indigo-900/20 dark:to-violet-900/20">
                                 <h3 className="font-bold text-xl text-neutral-900 dark:text-white tracking-tight">
-                                    {successMessage ? 'Success' : step === 0 ? 'Get Started' : isSignUp ? 'Create Account' : 'Welcome Back'}
+                                    {getHeading()}
                                 </h3>
                                 <button
                                     onClick={onClose}

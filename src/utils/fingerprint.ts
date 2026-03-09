@@ -5,10 +5,13 @@
  * This is "Level 1" abuse prevention - easy to bypass but stops low-effort spam.
  */
 
+import { LocalStorage } from './localStorage';
+import { STORAGE_KEYS } from '../constants';
+
 export const getDeviceFingerprint = async (): Promise<string> => {
     try {
         // Check for existing ID
-        const stored = localStorage.getItem('nav_device_id');
+        const stored = LocalStorage.get(STORAGE_KEYS.DEVICE_ID);
         if (stored) return stored;
 
         // Generate new simple fingerprint
@@ -30,14 +33,14 @@ export const getDeviceFingerprint = async (): Promise<string> => {
         const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
 
         // Store and return
-        localStorage.setItem('nav_device_id', hashHex);
+        LocalStorage.set(STORAGE_KEYS.DEVICE_ID, hashHex);
         return hashHex;
     } catch {
         console.warn("Fingerprinting failed, generating random backup ID");
         // Fallback to random ID if fingerprinting fails (e.g. strict privacy settings)
         // We prefer a random ID over nothing, so we can at least track *this* session
         const randomId = crypto.randomUUID();
-        localStorage.setItem('nav_device_id', randomId);
+        LocalStorage.set(STORAGE_KEYS.DEVICE_ID, randomId);
         return randomId;
     }
 };

@@ -1,7 +1,7 @@
 import { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import type { SavedJob } from '../../types';
-import { Trash2, ArrowRight, Sparkles, Building, Calendar, Filter, Clock, MapPin, Hash, Layers, FileText, Zap } from 'lucide-react';
+import { Trash2, ArrowRight, Sparkles, Building, Calendar, Filter, Clock, FileText, Zap, ShieldAlert, Layers, Briefcase } from 'lucide-react';
 import { SharedPageLayout } from '../../components/common/SharedPageLayout';
 import { StandardSearchBar } from '../../components/common/StandardSearchBar';
 import { PageHeader } from '../../components/ui/PageHeader';
@@ -59,17 +59,17 @@ export default function History() {
         switch (status) {
             case 'offer': return { label: 'Offer', color: 'bg-green-100 text-green-700 border-green-200 dark:bg-green-900/30 dark:text-green-400 dark:border-green-800' };
             case 'interview': return { label: 'Interview', color: 'bg-purple-100 text-purple-700 border-purple-200 dark:bg-purple-900/30 dark:text-purple-400 dark:border-purple-800' };
-            case 'rejected': return { label: 'Rejected', color: 'bg-red-100 text-red-700 border-red-200 dark:bg-red-900/30 dark:text-red-400 dark:border-red-800' };
+            case 'rejected': return { label: 'Rejected', color: 'bg-rose-100 text-rose-700 border-rose-200 dark:bg-rose-900/30 dark:text-rose-400 dark:border-rose-800' };
             case 'ghosted': return { label: 'Ghosted', color: 'bg-neutral-100 text-neutral-500 border-neutral-200 dark:bg-neutral-800 dark:text-neutral-400 dark:border-neutral-700' };
             case 'applied': return { label: 'Applied', color: 'bg-blue-100 text-blue-700 border-blue-200 dark:bg-blue-900/30 dark:text-blue-400 dark:border-blue-800' };
-            case 'analyzing': return { label: 'Processing...', color: 'bg-accent-primary/10 text-accent-primary-hex border-accent-primary/20 animate-pulse' };
-            case 'error': return { label: 'Failed', color: 'bg-red-50 text-red-600 border-red-100 dark:bg-red-900/20 dark:text-red-400 dark:border-red-800' };
+            case 'analyzing': return { label: 'Saving...', color: 'bg-accent-primary/10 text-accent-primary-hex border-accent-primary/20 animate-pulse' };
+            case 'error': return { label: 'Action Required', color: 'bg-amber-50 text-amber-600 border-amber-100 dark:bg-amber-900/20 dark:text-amber-400 dark:border-amber-800' };
             default: return { label: 'Saved', color: 'bg-neutral-100 text-neutral-600 border-neutral-200 dark:bg-neutral-800 dark:text-neutral-400 dark:border-neutral-700' };
         }
     };
 
     const getCount = (filter: StatusFilter) => {
-        if (filter === 'all') return jobs.length;
+        if (filter === 'all') return jobs.filter(j => j.status !== 'feed').length;
         return jobs.filter(job => {
             if (filter === 'offer') return job.status === 'offer';
             if (filter === 'interview') return job.status === 'interview';
@@ -139,9 +139,10 @@ export default function History() {
                         const isAnalyzing = job.status === 'analyzing';
                         const isError = job.status === 'error';
                         const params = getStatusParams(job.status);
-                        const roleTitle = job.analysis?.distilledJob.roleTitle || job.position || 'Unknown Role';
-                        const companyName = job.analysis?.distilledJob.companyName || job.company || 'Unknown Company';
-                        const location = job.analysis?.distilledJob.location || 'Remote/Unknown';
+                        const roleTitle = job.analysis?.distilledJob.roleTitle || (job.position === 'New Opportunity' ? 'Untitled Job' : job.position) || 'Untitled Job';
+                        const rawCompany = job.analysis?.distilledJob.companyName || job.company || '';
+                        const companyName = (rawCompany === 'Analyzing...' || rawCompany === 'Processing...') ? '' : rawCompany;
+                        const location = job.analysis?.distilledJob.location || '';
                         const score = job.analysis?.compatibilityScore;
 
                         return (
@@ -149,21 +150,26 @@ export default function History() {
                                 key={job.id}
                                 onClick={() => handleJobClick(job)}
                                 variant="glass"
-                                className={`group p-6 sm:p-8 border-neutral-200 dark:border-neutral-800/50 hover:border-accent-primary/30 transition-all duration-500 overflow-hidden ${isAnalyzing ? 'cursor-default opacity-90' : 'cursor-pointer'} ${isError ? 'bg-rose-50/10 dark:bg-rose-950/5' : ''}`}
-                                glow
+                                className={`group p-6 sm:p-8 border-neutral-200 dark:border-neutral-800/50 hover:border-accent-primary/30 transition-all duration-500 overflow-hidden relative ${isAnalyzing ? 'cursor-default opacity-90' : 'cursor-pointer'} ${isError ? 'bg-gradient-to-br from-amber-50/40 via-rose-50/20 to-white dark:from-amber-950/10 dark:to-black border-amber-200/50 dark:border-amber-900/20 shadow-lg shadow-amber-500/5' : ''}`}
+                                glow={!isError}
                             >
+                                {isError && (
+                                    <div className="absolute top-0 right-0 w-32 h-32 bg-amber-500/5 rounded-full blur-3xl -mr-16 -mt-16 animate-pulse" />
+                                )}
                                 <div className="flex flex-col sm:flex-row gap-6 relative z-10">
                                     {/* Logo / Date Col */}
                                     <div className="flex sm:flex-col items-center sm:items-start justify-between sm:justify-start gap-4 shrink-0">
                                         <div className="relative">
-                                            <div className={`w-16 h-16 rounded-2xl flex items-center justify-center text-2xl font-black bg-neutral-50 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 text-neutral-500 dark:text-neutral-400 group-hover:scale-110 group-hover:rotate-3 transition-all duration-500 ${isAnalyzing ? 'animate-pulse' : ''}`}>
-                                                {isError ? '!' : companyName.charAt(0).toUpperCase()}
+                                            <div className={`w-16 h-16 rounded-2xl flex items-center justify-center text-2xl font-black transition-all duration-500 group-hover:scale-110 group-hover:rotate-3 ${isError ? 'bg-amber-100 dark:bg-amber-900 text-amber-600 border border-amber-200 dark:border-amber-800' : 'bg-neutral-50 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 text-neutral-500 dark:text-neutral-400'} ${isAnalyzing ? 'animate-pulse' : ''}`}>
+                                                {isError ? <ShieldAlert className="w-9 h-9" /> : companyName ? companyName.charAt(0).toUpperCase() : <Briefcase className="w-7 h-7" />}
                                             </div>
-                                            <div className="absolute -bottom-1 -right-1 w-6 h-6 bg-white dark:bg-neutral-900 rounded-lg shadow-sm border border-neutral-100 dark:border-neutral-800 flex items-center justify-center">
-                                                <div className={`w-2.5 h-2.5 rounded-full flex items-center justify-center ${isError ? 'bg-rose-500/20' : 'bg-accent-primary/20'}`}>
-                                                    <div className={`w-1.5 h-1.5 rounded-full ${isError ? 'bg-rose-500' : 'bg-accent-primary-hex'}`} />
+                                            {!isError && !isAnalyzing && (
+                                                <div className="absolute -bottom-1 -right-1 w-6 h-6 bg-white dark:bg-neutral-900 rounded-lg shadow-sm border border-neutral-100 dark:border-neutral-800 flex items-center justify-center">
+                                                    <div className="w-2.5 h-2.5 rounded-full flex items-center justify-center bg-accent-primary/20">
+                                                        <div className="w-1.5 h-1.5 rounded-full bg-accent-primary-hex" />
+                                                    </div>
                                                 </div>
-                                            </div>
+                                            )}
                                         </div>
                                         <div className="text-[10px] font-bold text-neutral-400 dark:text-neutral-500 flex items-center gap-1.5">
                                             <Calendar className="w-3 h-3" />
@@ -175,41 +181,26 @@ export default function History() {
                                     <div className="flex-1 min-w-0">
                                         <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4 mb-4">
                                             <div className="space-y-1">
-                                                <h3 className={`text-2xl font-black transition-colors truncate pr-4 tracking-tight leading-tight ${isError ? 'text-rose-900 dark:text-rose-400' : 'text-neutral-900 dark:text-white group-hover:text-accent-primary-hex'}`}>
-                                                    {isAnalyzing ? 'Processing Job...' : isError ? 'Incomplete Analysis' : roleTitle}
+                                                <h3 className={`text-2xl font-black transition-colors truncate pr-4 tracking-tight leading-tight ${isError ? 'text-rose-950 dark:text-rose-400/90' : 'text-neutral-900 dark:text-white group-hover:text-accent-primary-hex'}`}>
+                                                    {roleTitle}
                                                 </h3>
-                                                <div className="flex flex-wrap items-center gap-3 text-sm font-semibold text-neutral-500 dark:text-neutral-400">
-                                                    <div className="flex items-center gap-1.5">
-                                                        <Building className="w-4 h-4 text-neutral-400" />
-                                                        <span className={isError ? 'text-rose-600/60' : 'text-neutral-700 dark:text-neutral-300'}>
-                                                            {isAnalyzing ? 'Extracting details...' : isError ? 'Needs manual review' : companyName}
-                                                        </span>
-                                                    </div>
-                                                    {!isAnalyzing && !isError && (
+                                                <div className="flex flex-wrap items-center gap-2 text-sm font-semibold text-neutral-500 dark:text-neutral-400">
+                                                    {companyName && <span className="text-neutral-700 dark:text-neutral-300">{companyName}</span>}
+                                                    {!isError && location && (
                                                         <>
-                                                            <span className="w-1 h-1 rounded-full bg-neutral-300 dark:bg-neutral-700" />
-                                                            <div className="flex items-center gap-1.5">
-                                                                <MapPin className="w-4 h-4 text-neutral-400" />
-                                                                <span>{location}</span>
-                                                            </div>
-                                                            {job.analysis?.distilledJob.referenceCode && (
-                                                                <>
-                                                                    <span className="w-1 h-1 rounded-full bg-neutral-300 dark:bg-neutral-700" />
-                                                                    <div className="flex items-center gap-1.5">
-                                                                        <Hash className="w-4 h-4 text-neutral-400" />
-                                                                        <span className="font-mono text-[11px] tracking-wider">{job.analysis.distilledJob.referenceCode}</span>
-                                                                    </div>
-                                                                </>
-                                                            )}
+                                                            {companyName && <span className="w-1 h-1 rounded-full bg-neutral-300 dark:bg-neutral-700" />}
+                                                            <span className="text-neutral-500 dark:text-neutral-400">{location}</span>
                                                         </>
                                                     )}
                                                 </div>
                                             </div>
 
-                                            <div className={`self-start px-3 py-1 rounded-full text-[10px] font-black border flex items-center gap-2 transition-all ${params.color}`}>
-                                                <div className="w-1.5 h-1.5 rounded-full bg-current" />
-                                                {params.label}
-                                            </div>
+                                            {!isError && !isAnalyzing && (
+                                                <div className={`self-start px-3 py-1 rounded-full text-[10px] font-black border flex items-center gap-2 transition-all ${params.color}`}>
+                                                    <div className="w-1.5 h-1.5 rounded-full bg-current" />
+                                                    {params.label}
+                                                </div>
+                                            )}
                                         </div>
 
                                         {/* Footer */}
@@ -229,8 +220,8 @@ export default function History() {
                                                         </div>
                                                     </div>
                                                 ) : isError ? (
-                                                    <div className="text-[10px] font-black text-rose-500 flex items-center gap-2">
-                                                        <Trash2 className="w-3.5 h-3.5" /> Extraction failed
+                                                    <div className="text-xs font-bold text-amber-600 dark:text-amber-400">
+                                                        Analysis could not be completed
                                                     </div>
                                                 ) : (score !== undefined && score !== null) ? (
                                                     <div className={`px-4 py-2 rounded-2xl text-xs font-black border flex items-center gap-2 ${score >= 80 ? 'bg-emerald-50 text-emerald-700 border-emerald-100' :
@@ -255,7 +246,7 @@ export default function History() {
                                                         size="sm"
                                                         icon={<ArrowRight className="w-4 h-4" />}
                                                     >
-                                                        {isError ? 'Fix Issues' : 'View Analysis'}
+                                                        {isError ? 'Retry Analysis' : 'View Analysis'}
                                                     </Button>
                                                 )}
                                             </div>
@@ -266,8 +257,8 @@ export default function History() {
                         );
                     })
                 )}
-            </div>
+            </div >
 
-        </SharedPageLayout>
+        </SharedPageLayout >
     );
 }

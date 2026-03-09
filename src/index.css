@@ -1,4 +1,23 @@
 @import "tailwindcss";
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+@keyframes theme-pulse {
+  0% { filter: brightness(1); }
+  50% { filter: brightness(1.2) saturate(1.2); }
+  100% { filter: brightness(1); }
+}
+
+.animate-theme-pulse {
+  animation: theme-pulse 2s ease-in-out;
+}
 @custom-variant dark (&:is(.dark, .dark *));
 
 @theme {

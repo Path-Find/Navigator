@@ -3,7 +3,7 @@ import { render, screen, fireEvent } from '@testing-library/react';
 import '@testing-library/jest-dom';
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import ResumeEditor from './ResumeEditor';
-import { STORAGE_KEYS, TRACKING_EVENTS } from '../../constants';
+import { TRACKING_EVENTS } from '../../constants';
 import { EventService } from '../../services/eventService';
 import { useResumeContext } from './context/ResumeContext';
 
@@ -15,9 +15,18 @@ vi.mock('../../services/eventService', () => ({
 }));
 
 vi.mock('./context/ResumeContext', () => ({
-    useResumeContext: () => ({
-        clearImportError: vi.fn(),
+    useResumeContext: vi.fn(),
+}));
+
+vi.mock('../skills/context/SkillContext', () => ({
+    useSkillContext: () => ({
+        skills: [],
+        updateSkills: vi.fn(),
     }),
+}));
+
+vi.mock('react-router-dom', () => ({
+    useNavigate: () => vi.fn(),
 }));
 
 // Mock SharedPageLayout to simplify DOM
@@ -29,22 +38,23 @@ describe('ResumeEditor', () => {
     const mockOnSave = vi.fn();
     const mockOnImport = vi.fn();
 
-    const defaultProps = {
+    const makeContext = (overrides = {}) => ({
         resumes: [],
-        skills: [],
-        onSave: mockOnSave,
-        onImport: mockOnImport,
-        isParsing: false,
-        importError: null,
-        importTrigger: 0,
-    };
+        handleUpdateResumes: mockOnSave,
+        handleImportResume: mockOnImport,
+        isParsingResume: false,
+        importError: null as string | null,
+        clearImportError: vi.fn(),
+        ...overrides,
+    });
 
     beforeEach(() => {
         vi.clearAllMocks();
+        vi.mocked(useResumeContext).mockReturnValue(makeContext() as any);
     });
 
     it('renders the 3-card empty state when no resumes exist', () => {
-        render(<ResumeEditor {...defaultProps} />);
+        render(<ResumeEditor />);
 
         // Verify 3-card layout headers
         expect(screen.getByText('Foundation')).toBeInTheDocument();
@@ -57,7 +67,7 @@ describe('ResumeEditor', () => {
     });
 
     it('triggers file import when "Upload" zone is clicked', () => {
-        render(<ResumeEditor {...defaultProps} />);
+        render(<ResumeEditor />);
 
         // Find the DropZone container by its title
         const dropZoneTitle = screen.getByText('Upload');
@@ -73,7 +83,7 @@ describe('ResumeEditor', () => {
     });
 
     it('triggers file import when input changes', () => {
-        render(<ResumeEditor {...defaultProps} />);
+        render(<ResumeEditor />);
 
         const fileInput = document.querySelector('input[type="file"]') as HTMLInputElement;
         const file = new File(['dummy content'], 'resume.pdf', { type: 'application/pdf' });
@@ -83,7 +93,7 @@ describe('ResumeEditor', () => {
     });
 
     it('switches to manual entry when "Start Fresh" is clicked', () => {
-        render(<ResumeEditor {...defaultProps} />);
+        render(<ResumeEditor />);
 
         const startFreshBtn = screen.getByText('Start Fresh');
         fireEvent.click(startFreshBtn);
@@ -93,23 +103,20 @@ describe('ResumeEditor', () => {
     });
 
     it('displays loading state when isParsing is true', () => {
-        render(<ResumeEditor {...defaultProps} isParsing={true} />);
+        vi.mocked(useResumeContext).mockReturnValue(makeContext({ isParsingResume: true }) as any);
+        render(<ResumeEditor />);
 
         // When parsing, logic switches to full-page loading view
-        expect(screen.getByText('Analyzing your history...')).toBeInTheDocument();
-        expect(screen.getByText(/Intelligence Engine active/i)).toBeInTheDocument();
+        expect(screen.getByText('Summoning achievement hunters...')).toBeInTheDocument();
+        expect(screen.getByText(/Intelligence Engine Active/i)).toBeInTheDocument();
 
         // 3-card empty state should be gone
         expect(screen.queryByText('Foundation')).not.toBeInTheDocument();
     });
 
     it('displays import error when provided in empty state', () => {
-        const propsWithError = {
-            ...defaultProps,
-            importError: 'Failed to parse file'
-        };
-
-        render(<ResumeEditor {...propsWithError} />);
+        vi.mocked(useResumeContext).mockReturnValue(makeContext({ importError: 'Failed to parse file' }) as any);
+        render(<ResumeEditor />);
 
         expect(screen.getByText('Failed to parse file')).toBeInTheDocument();
 
@@ -119,12 +126,11 @@ describe('ResumeEditor', () => {
 
     it('tracks usage when saving', async () => {
         vi.useFakeTimers();
-        const propsWithResume = {
-            ...defaultProps,
+        vi.mocked(useResumeContext).mockReturnValue(makeContext({
             resumes: [{ id: '1', name: 'Test Resume', blocks: [] }]
-        };
+        }) as any);
 
-        render(<ResumeEditor {...propsWithResume} />);
+        render(<ResumeEditor />);
 
         vi.runAllTimers();
 
@@ -135,8 +141,7 @@ describe('ResumeEditor', () => {
     });
 
     it('does not render redundant section type badges on entry blocks', () => {
-        const propsWithBlocks = {
-            ...defaultProps,
+        vi.mocked(useResumeContext).mockReturnValue(makeContext({
             resumes: [{
                 id: '1',
                 name: 'Test Resume',
@@ -150,18 +155,17 @@ describe('ResumeEditor', () => {
                     isVisible: true
                 }]
             }]
-        };
+        }) as any);
 
-        render(<ResumeEditor {...propsWithBlocks} />);
+        render(<ResumeEditor />);
 
-        // The section header "Work Experience" should be there
-        expect(screen.getAllByText('Work Experience').length).toBeGreaterThan(0);
+        // The section header "Work" should be there
+        expect(screen.getByText('Work')).toBeInTheDocument();
 
-        // But the badge (which used the same text) should NOT be there as a separate element 
-        // with the specific badge styling classes we removed.
-        // We can't easily check for classes with getByText, but we can check the count.
-        // Previously there would be THREE (header, badge, and select option). 
-        // Now there should only be TWO (header and select option).
-        expect(screen.getAllByText('Work Experience')).toHaveLength(2);
+        // The block title should be rendered
+        expect(screen.getByDisplayValue('Software Engineer')).toBeInTheDocument();
+
+        // No redundant section type badge should appear alongside the block
+        expect(screen.queryByText('work')).not.toBeInTheDocument();
     });
 });

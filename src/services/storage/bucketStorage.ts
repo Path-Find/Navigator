@@ -10,8 +10,13 @@ export interface CanonicalRole {
     created_at?: string;
 }
 
+// Session-level cache — role guidelines rarely change
+const bucketCache = new Map<string, CanonicalRole | null>();
+
 export const BucketStorage = {
     async getBucket(title: string): Promise<CanonicalRole | null> {
+        if (bucketCache.has(title)) return bucketCache.get(title)!;
+
         const { data, error } = await supabase
             .from('canonical_roles')
             .select('*')
@@ -23,18 +28,28 @@ export const BucketStorage = {
             return null;
         }
 
+        bucketCache.set(title, data);
         return data;
     },
 
-    async ensureBucket(title: string): Promise<void> {
-        // Just insert if not exists, do nothing if it does
-        const { error } = await supabase
+    // Upsert and return the record in one round trip, then cache it
+    async ensureAndGetBucket(title: string): Promise<CanonicalRole | null> {
+        if (bucketCache.has(title)) return bucketCache.get(title)!;
+
+        const { data, error } = await supabase
             .from('canonical_roles')
-            .upsert({ id: title }, { onConflict: 'id' });
+            .upsert({ id: title }, { onConflict: 'id' })
+            .select()
+            .single();
 
         if (error) {
             console.error('Error ensuring bucket:', error);
+            bucketCache.set(title, null);
+            return null;
         }
+
+        bucketCache.set(title, data);
+        return data;
     },
 
     async searchBuckets(query: string): Promise<CanonicalRole[]> {

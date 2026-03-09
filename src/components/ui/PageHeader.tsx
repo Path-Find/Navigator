@@ -47,7 +47,7 @@ export const PageHeader: React.FC<PageHeaderProps> = ({
     if (variant === 'detail') {
         return (
             <div className={`border-b border-neutral-200/50 dark:border-neutral-800/50 sticky top-0 bg-white/80 dark:bg-neutral-900/80 backdrop-blur-md z-30 ${className}`}>
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 py-4 flex items-center justify-between">
+                <div className="max-w-6xl mx-auto px-4 sm:px-6 py-4 flex items-center justify-between">
                     <div className="flex items-center gap-4">
                         {onBack && (
                             <button

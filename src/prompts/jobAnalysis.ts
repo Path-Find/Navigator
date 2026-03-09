@@ -2,11 +2,15 @@ import { CONTENT_VALIDATION } from '../constants';
 
 export const JOB_ANALYSIS_PROMPTS = {
   JOB_FIT_ANALYSIS: {
-    DEFAULT: (jobDescription: string, resumeContext: string, bucketAdvice?: string[]) => `
+    DEFAULT: (jobDescription: string, resumeContext: string, bucketAdvice?: string[], trajectoryContext?: string) => `
     You are a Strategic Career Architect and Hiring Expert. Your job is to analyze this candidate's fit for the role with absolute professional objectivity.
     
     ${bucketAdvice ? `ROLE-SPECIFIC FOCUS (Follow these guidelines):
     ${bucketAdvice.map(a => `- ${a}`).join('\n')}
+    ` : ''}
+
+    ${trajectoryContext ? `SEMANTIC TRAJECTORY (The user's career path):
+    ${trajectoryContext}
     ` : ''}
 
     INPUT DATA:
@@ -40,6 +44,10 @@ export const JOB_ANALYSIS_PROMPTS = {
         "companyName": "Company name",
         "location": "City, State or Remote (Strictly geographical, exclude internal IDs)",
         "referenceCode": "Job ID or reference number (if found, otherwise null)",
+        "category": "technical" | "managerial" | "trades" | "healthcare" | "creative" | "general",
+        "canonicalTitle": "The most standard, high-level name for this role",
+        "isAiBanned": boolean,
+        "aiBanReason": "If banned, quote the prohibition policy, otherwise null",
         "keySkills": ["List of 5-8 priority skills found in the job post"],
         "requiredSkills": [
           { "name": "Skill Name", "level": "learning" | "comfortable" | "expert" }

@@ -9,7 +9,6 @@ import { ProtectedRoute } from './ProtectedRoute';
 // Context Hooks
 import { useJobContext } from '../../modules/job/context/JobContext';
 import { useResumeContext } from '../../modules/resume/context/ResumeContext';
-import { useUser } from '../../contexts/UserContext';
 
 // Core Modules
 import { NudgeCard } from '../NudgeCard';
@@ -52,7 +51,6 @@ export const AppRoutes: React.FC = () => {
 
     const { isLoading: isResumesLoading } = useResumeContext();
 
-    const { isAdmin } = useUser();
     const location = useLocation();
 
     // URL Job Sync Effect
@@ -66,200 +64,197 @@ export const AppRoutes: React.FC = () => {
 
     return (
         <ErrorBoundary>
-            <Suspense fallback={<LoadingState message="Synchronizing Navigator..." />}>
-                <Routes>
-                    {/* ... existing routes ... */}
-                    {/* Home / Analyze */}
-                    <Route path="/" element={
-                        <Suspense fallback={<LoadingState message="Loading Home..." />}>
-                            <>
-                                {nudgeJob && (
-                                    <div className="max-w-7xl mx-auto px-4 sm:px-6 mt-24">
-                                        <NudgeCard
-                                            job={nudgeJob}
-                                            onUpdateStatus={(status) => {
-                                                handleUpdateJob({ ...nudgeJob, status });
-                                                dismissNudge();
-                                            }}
-                                            onDismiss={dismissNudge}
-                                        />
-                                    </div>
-                                )}
-                                <HomePage />
-                            </>
+            <Routes>
+                {/* Home / Analyze */}
+                <Route path="/" element={
+                    <Suspense fallback={<LoadingState message="Loading Home..." />}>
+                        <>
+                            {nudgeJob && (
+                                <div className="max-w-6xl mx-auto px-4 sm:px-6 mt-24">
+                                    <NudgeCard
+                                        job={nudgeJob}
+                                        onUpdateStatus={(status) => {
+                                            handleUpdateJob({ ...nudgeJob, status });
+                                            dismissNudge();
+                                        }}
+                                        onDismiss={dismissNudge}
+                                    />
+                                </div>
+                            )}
+                            <HomePage />
+                        </>
+                    </Suspense>
+                } />
+
+                <Route path={ROUTES.WELCOME} element={
+                    <Suspense fallback={<LoadingState message="Preparing Welcome..." />}>
+                        <OnboardingPage />
+                    </Suspense>
+                } />
+
+                <Route path={ROUTES.VERIFY_EMAIL} element={
+                    <Suspense fallback={<LoadingState message="Verifying..." />}>
+                        <EmailVerificationScreen />
+                    </Suspense>
+                } />
+
+                <Route path={ROUTES.JOB_HOME} element={
+                    <Suspense fallback={<LoadingState message="Prepping Matcher..." />}>
+                        <JobMatchInput />
+                    </Suspense>
+                } />
+
+
+                {/* SEO Landing Pages (Dynamic) */}
+                <Route path={ROUTES.SEO_LANDING} element={
+                    <Suspense fallback={<LoadingState message="Loading Content..." />}>
+                        <SEOLandingPage />
+                    </Suspense>
+                } />
+
+                {/* Core Views */}
+                <Route element={<ProtectedRoute />}>
+                    <Route path={ROUTES.FEED} element={
+                        <Suspense fallback={<LoadingState message="Loading Feed..." />}>
+                            <NavigatorPro />
                         </Suspense>
                     } />
+                </Route>
 
-                    <Route path={ROUTES.WELCOME} element={
-                        <Suspense fallback={<LoadingState message="Preparing Welcome..." />}>
-                            <OnboardingPage />
+                <Route element={<ProtectedRoute requireAdmin />}>
+                    <Route path="/admin" element={
+                        <Suspense fallback={<LoadingState message="Loading Admin Console..." />}>
+                            <AdminDashboard />
                         </Suspense>
                     } />
+                </Route>
 
-                    <Route path={ROUTES.VERIFY_EMAIL} element={
-                        <Suspense fallback={<LoadingState message="Verifying..." />}>
-                            <EmailVerificationScreen />
-                        </Suspense>
-                    } />
-
-                    <Route path={ROUTES.JOB_HOME} element={
-                        <Suspense fallback={<LoadingState message="Prepping Matcher..." />}>
-                            <JobMatchInput />
-                        </Suspense>
-                    } />
-
-
-                    {/* SEO Landing Pages (Dynamic) */}
-                    <Route path={ROUTES.SEO_LANDING} element={
-                        <Suspense fallback={<LoadingState message="Loading Content..." />}>
-                            <SEOLandingPage />
-                        </Suspense>
-                    } />
-
-                    {/* Core Views */}
-                    <Route element={<ProtectedRoute />}>
-                        <Route path={ROUTES.FEED} element={
-                            <Suspense fallback={<LoadingState message="Loading Feed..." />}>
-                                <NavigatorPro />
-                            </Suspense>
-                        } />
-                    </Route>
-
-                    <Route element={<ProtectedRoute requireAdmin />}>
-                        <Route path="/admin" element={
-                            <Suspense fallback={<LoadingState message="Loading Admin Console..." />}>
-                                <AdminDashboard />
-                            </Suspense>
-                        } />
-                    </Route>
-
-                    <Route element={<ProtectedRoute />}>
-                        <Route path={ROUTES.RESUMES} element={
-                            <Suspense fallback={<LoadingState message="Opening Editor..." />}>
-                                {isResumesLoading ? <LoadingState message="Loading Resume..." /> : <ResumeEditor />}
-                            </Suspense>
-                        } />
-
-
-                        <Route path={ROUTES.INTERVIEWS} element={
-                            <Suspense fallback={<LoadingState message="Prepping Advisor..." />}>
-                                {isAdmin ? <InterviewAdvisor /> : <Navigate to={ROUTES.HOME} replace />}
-                            </Suspense>
-                        } />
-
-
-                        {/* Career Routes */}
-                        <Route path={ROUTES.CAREER_HOME + "/*"} element={
-                            <Suspense fallback={<LoadingState message="Consulting Career Coach..." />}>
-                                <CoachDashboard />
-                            </Suspense>
-                        } />
-
-                        {/* Skills is now distinct but under Career header */}
-                        <Route path={ROUTES.SKILLS} element={
-                            <Suspense fallback={<LoadingState message="Loading Skills Dashboard..." />}>
-                                <SkillsView />
-                            </Suspense>
-                        } />
-
-                        <Route path="/career/skills/interview" element={
-                            <Suspense fallback={<LoadingState message="Starting Interview..." />}>
-                                <SkillInterviewPage />
-                            </Suspense>
-                        } />
-
-                        {/* History */}
-                        <Route path={ROUTES.HISTORY} element={
-                            <Suspense fallback={<LoadingState message="Opening History..." />}>
-                                <History />
-                            </Suspense>
-                        } />
-
-                        <Route path={ROUTES.JOB_DETAIL} element={
-                            <Suspense fallback={<LoadingState message="Loading Job Detail..." />}>
-                                <JobDetail />
-                            </Suspense>
-                        } />
-
-                        <Route path={ROUTES.EDUCATION_HOME} element={
-                            <Suspense fallback={<LoadingState message="Loading Education Dashboard..." />}>
-                                <EducationDashboard />
-                            </Suspense>
-                        } />
-
-                        <Route path={ROUTES.COVER_LETTERS} element={
-                            <Suspense fallback={<LoadingState message="Opening Cover Letters..." />}>
-                                <CoverLetters />
-                            </Suspense>
-                        } />
-
-                        <Route path={ROUTES.TRANSCRIPT} element={
-                            <Suspense fallback={<LoadingState message="Loading Registry..." />}>
-                                <AcademicHQ />
-                            </Suspense>
-                        } />
-
-                        <Route path={ROUTES.GPA_CALCULATOR} element={
-                            <Suspense fallback={<LoadingState message="Loading GPA Calculator..." />}>
-                                <GPACalculatorPage />
-                            </Suspense>
-                        } />
-
-                        <Route path={ROUTES.PROGRAM_EXPLORER} element={
-                            <Suspense fallback={<LoadingState message="Loading Program Explorer..." />}>
-                                <ProgramExplorerPage />
-                            </Suspense>
-                        } />
-                    </Route>
-
-                    <Route path={ROUTES.PRIVACY} element={
-                        <Suspense fallback={<LoadingState message="Loading Privacy Policy..." />}>
-                            <Privacy />
-                        </Suspense>
-                    } />
-
-                    <Route path={ROUTES.TERMS} element={
-                        <Suspense fallback={<LoadingState message="Loading Terms..." />}>
-                            <Terms />
-                        </Suspense>
-                    } />
-
-                    <Route path={ROUTES.CONTACT} element={
-                        <Suspense fallback={<LoadingState message="Loading Contact..." />}>
-                            <Contact />
+                <Route element={<ProtectedRoute />}>
+                    <Route path={ROUTES.RESUMES} element={
+                        <Suspense fallback={<LoadingState message="Opening Editor..." />}>
+                            {isResumesLoading ? <LoadingState message="Loading Resume..." /> : <ResumeEditor />}
                         </Suspense>
                     } />
 
 
-                    <Route path={ROUTES.PLANS} element={
-                        <Suspense fallback={<LoadingState message="Loading Plans..." />}>
-                            <PlansPage />
+                    <Route path={ROUTES.INTERVIEWS} element={
+                        <Suspense fallback={<LoadingState message="Prepping Advisor..." />}>
+                            <InterviewAdvisor />
                         </Suspense>
                     } />
 
-                    <Route path={ROUTES.PLANS_COMPARE} element={
-                        <Suspense fallback={<LoadingState message="Loading Comparison..." />}>
-                            <ComparisonTable />
+
+                    {/* Career Routes */}
+                    <Route path={ROUTES.CAREER_HOME + "/*"} element={
+                        <Suspense fallback={<LoadingState message="Consulting Career Coach..." />}>
+                            <CoachDashboard />
                         </Suspense>
                     } />
 
-                    <Route path={ROUTES.FEATURES} element={
-                        <Suspense fallback={<LoadingState message="Loading Features..." />}>
-                            <FeaturesPage />
+                    {/* Skills is now distinct but under Career header */}
+                    <Route path={ROUTES.SKILLS} element={
+                        <Suspense fallback={<LoadingState message="Loading Skills Dashboard..." />}>
+                            <SkillsView />
                         </Suspense>
                     } />
 
-                    <Route element={<ProtectedRoute />}>
-                        <Route path={ROUTES.SETTINGS} element={
-                            <Suspense fallback={<LoadingState message="Loading Settings..." />}>
-                                <SettingsPage />
-                            </Suspense>
-                        } />
-                    </Route>
+                    <Route path="/career/skills/interview" element={
+                        <Suspense fallback={<LoadingState message="Starting Interview..." />}>
+                            <SkillInterviewPage />
+                        </Suspense>
+                    } />
 
-                    <Route path="*" element={<Navigate to={ROUTES.HOME} replace />} />
-                </Routes>
-            </Suspense>
+                    {/* History */}
+                    <Route path={ROUTES.HISTORY} element={
+                        <Suspense fallback={<LoadingState message="Opening History..." />}>
+                            <History />
+                        </Suspense>
+                    } />
+
+                    <Route path={ROUTES.JOB_DETAIL} element={
+                        <Suspense fallback={<LoadingState message="Loading Job Detail..." />}>
+                            <JobDetail />
+                        </Suspense>
+                    } />
+
+                    <Route path={ROUTES.EDUCATION_HOME} element={
+                        <Suspense fallback={<LoadingState message="Loading Education Dashboard..." />}>
+                            <EducationDashboard />
+                        </Suspense>
+                    } />
+
+                    <Route path={ROUTES.COVER_LETTERS} element={
+                        <Suspense fallback={<LoadingState message="Opening Cover Letters..." />}>
+                            <CoverLetters />
+                        </Suspense>
+                    } />
+
+                    <Route path={ROUTES.TRANSCRIPT} element={
+                        <Suspense fallback={<LoadingState message="Loading Registry..." />}>
+                            <AcademicHQ />
+                        </Suspense>
+                    } />
+
+                    <Route path={ROUTES.GPA_CALCULATOR} element={
+                        <Suspense fallback={<LoadingState message="Loading GPA Calculator..." />}>
+                            <GPACalculatorPage />
+                        </Suspense>
+                    } />
+
+                    <Route path={ROUTES.PROGRAM_EXPLORER} element={
+                        <Suspense fallback={<LoadingState message="Loading Program Explorer..." />}>
+                            <ProgramExplorerPage />
+                        </Suspense>
+                    } />
+                </Route>
+
+                <Route path={ROUTES.PRIVACY} element={
+                    <Suspense fallback={<LoadingState message="Loading Privacy Policy..." />}>
+                        <Privacy />
+                    </Suspense>
+                } />
+
+                <Route path={ROUTES.TERMS} element={
+                    <Suspense fallback={<LoadingState message="Loading Terms..." />}>
+                        <Terms />
+                    </Suspense>
+                } />
+
+                <Route path={ROUTES.CONTACT} element={
+                    <Suspense fallback={<LoadingState message="Loading Contact..." />}>
+                        <Contact />
+                    </Suspense>
+                } />
+
+
+                <Route path={ROUTES.PLANS} element={
+                    <Suspense fallback={<LoadingState message="Loading Plans..." />}>
+                        <PlansPage />
+                    </Suspense>
+                } />
+
+                <Route path={ROUTES.PLANS_COMPARE} element={
+                    <Suspense fallback={<LoadingState message="Loading Comparison..." />}>
+                        <ComparisonTable />
+                    </Suspense>
+                } />
+
+                <Route path={ROUTES.FEATURES} element={
+                    <Suspense fallback={<LoadingState message="Loading Features..." />}>
+                        <FeaturesPage />
+                    </Suspense>
+                } />
+
+                <Route element={<ProtectedRoute />}>
+                    <Route path={ROUTES.SETTINGS} element={
+                        <Suspense fallback={<LoadingState message="Loading Settings..." />}>
+                            <SettingsPage />
+                        </Suspense>
+                    } />
+                </Route>
+
+                <Route path="*" element={<Navigate to={ROUTES.HOME} replace />} />
+            </Routes>
         </ErrorBoundary>
     );
 };

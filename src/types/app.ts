@@ -5,6 +5,12 @@ import type { CustomSkill } from '../modules/skills/types';
 
 export type UserTier = 'free' | 'plus' | 'pro' | 'admin' | 'tester';
 
+export interface ProfessionalOrg {
+    id: string;
+    name: string;
+    addedAt: number;
+}
+
 export interface AppState {
     resumes: ResumeProfile[];
     jobs: SavedJob[];

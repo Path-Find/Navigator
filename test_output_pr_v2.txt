@@ -1,0 +1,246 @@
+
+> navigator@2.25.0 test:run
+> vitest run
+
+
+[1m[46m RUN [49m[22m [36mv4.0.18 [39m[90m/Users/ryan/Desktop/Production/Navigator[39m
+
+ [31m❯[39m src/services/usageLimits.test.ts [2m([22m[2m11 tests[22m[2m | [22m[31m1 failed[39m[2m)[22m[32m 30[2mms[22m[39m
+     [32m✓[39m should return allowed=true when usage limit is not reached[32m 4[2mms[22m[39m
+     [32m✓[39m should return denial reason when usage limit is reached[32m 0[2mms[22m[39m
+     [32m✓[39m should fail open (allow=true) when Supabase returns an error[32m 2[2mms[22m[39m
+     [32m✓[39m should fail open (allow=true) when an exception occurs[32m 1[2mms[22m[39m
+     [32m✓[39m should call rpc with correct arguments[32m 0[2mms[22m[39m
+     [32m✓[39m should log error when Supabase returns error[32m 0[2mms[22m[39m
+     [32m✓[39m should log exception when rpc throws[32m 0[2mms[22m[39m
+[31m     [31m×[31m should return usage stats correctly for pro tier[39m[32m 16[2mms[22m[39m
+     [32m✓[39m should return admin tier and unlimited limit for admin users[32m 1[2mms[22m[39m
+     [32m✓[39m should return tester tier and unlimited limit for tester users[32m 1[2mms[22m[39m
+     [32m✓[39m should return default stats on error[32m 1[2mms[22m[39m
+ [32m✓[39m src/modules/career/components/GapAnalysisSection.test.tsx [2m([22m[2m6 tests[22m[2m)[22m[32m 207[2mms[22m[39m
+ [31m❯[39m src/modules/job/FeatureGrid.test.tsx [2m([22m[2m3 tests[22m[2m | [22m[31m3 failed[39m[2m)[22m[32m 20[2mms[22m[39m
+[31m     [31m×[31m should call onShowAuth with config when logged out user clicks a card[39m[32m 16[2mms[22m[39m
+[31m     [31m×[31m should call onNavigate with targetView when logged in user clicks a card[39m[32m 1[2mms[22m[39m
+[31m     [31m×[31m should filter cards based on user tier/admin status[39m[32m 1[2mms[22m[39m
+ [31m❯[39m src/components/layout/Header.test.tsx [2m([22m[2m4 tests[22m[2m | [22m[31m4 failed[39m[2m)[22m[32m 25[2mms[22m[39m
+[31m     [31m×[31m should have the navigation pill correctly centered vertically[39m[32m 20[2mms[22m[39m
+[31m     [31m×[31m should render the Navigator logo[39m[32m 1[2mms[22m[39m
+[31m     [31m×[31m should render the Sign Out button when user is logged in[39m[32m 1[2mms[22m[39m
+[31m     [31m×[31m should render the dark mode toggle button[39m[32m 1[2mms[22m[39m
+ [31m❯[39m src/modules/job/History.test.tsx [2m([22m[2m11 tests[22m[2m | [22m[31m11 failed[39m[2m)[22m[32m 47[2mms[22m[39m
+[31m     [31m×[31m should render empty state when no jobs[39m[32m 16[2mms[22m[39m
+[31m     [31m×[31m should render job list[39m[32m 2[2mms[22m[39m
+[31m     [31m×[31m should filter jobs by search query[39m[32m 4[2mms[22m[39m
+[31m     [31m×[31m should filter by company name[39m[32m 2[2mms[22m[39m
+[31m     [31m×[31m should be case insensitive[39m[32m 4[2mms[22m[39m
+[31m     [31m×[31m should show all jobs when search is cleared[39m[32m 1[2mms[22m[39m
+[31m     [31m×[31m should call onSelectJob when job is clicked[39m[32m 1[2mms[22m[39m
+[31m     [31m×[31m should display fit scores[39m[32m 2[2mms[22m[39m
+[31m     [31m×[31m should show analyzing and error states in saved filter[39m[32m 5[2mms[22m[39m
+[31m     [31m×[31m should display progress bar with custom message[39m[32m 8[2mms[22m[39m
+[31m     [31m×[31m should restrict access when analyzing[39m[32m 1[2mms[22m[39m
+[90mstderr[2m | src/modules/resume/ResumeEditor.test.tsx[2m > [22m[2mResumeEditor[2m > [22m[2mswitches to manual entry when "Start Fresh" is clicked
+[22m[39mIn HTML, <div> cannot be a descendant of <p>.
+This will cause a hydration error.
+
+  <ResumeEditor>
+    <SharedPageLayout className="theme-resume" spacing="compact" maxWidth="6xl">
+      <div data-testid="shared-pag...">
+        <style>
+        <div>
+        <GlobalDragOverlay>
+        <div>
+        <input>
+        <PageHeader>
+        <div className="flex flex-...">
+          <div>
+          <aside className="hidden lg:...">
+            <Card variant="premium" className="p-5 border...">
+              <div className="relative r..." onClick={undefined}>
+                <div className="relative z...">
+                  <div className="flex items...">
+>                   <p className="text-[10px] font-black text-emerald-500 tracking-tight flex items-center gap-1.5">
+>                     <div className="w-1 h-1 bg-emerald-500 rounded-full shadow-[0_0_8px_rgba(16,185,129,0.4)]">
+                      ...
+                    ...
+                  ...
+            ...
+
+
+ [32m✓[39m src/modules/resume/ResumeEditor.test.tsx [2m([22m[2m8 tests[22m[2m)[22m[33m 467[2mms[22m[39m
+ [32m✓[39m src/utils/secureStorage.test.ts [2m([22m[2m5 tests[22m[2m)[22m[32m 41[2mms[22m[39m
+Not implemented: HTMLCanvasElement's getContext() method: without installing the canvas npm package
+ [32m✓[39m src/hooks/useLocalStorage.test.ts [2m([22m[2m4 tests[22m[2m)[22m[32m 26[2mms[22m[39m
+ [32m✓[39m src/contexts/UserContext.test.tsx [2m([22m[2m1 test[22m[2m)[22m[32m 71[2mms[22m[39m
+ [32m✓[39m src/components/common/UnifiedUploadHero.test.tsx [2m([22m[2m4 tests[22m[2m)[22m[32m 173[2mms[22m[39m
+ [32m✓[39m src/modules/grad/hooks/useAcademicLogic.test.ts [2m([22m[2m5 tests[22m[2m)[22m[32m 31[2mms[22m[39m
+ [31m❯[39m tests/system-cards.spec.ts [2m([22m[2m0 test[22m[2m)[22m
+[90mstdout[2m | src/services/scraperService.test.ts[2m > [22m[2mScraperService[2m > [22m[2mshould fetch jobs from targets concurrently and parse HTML
+[22m[39mFetching live feed...
+[TTC] Fetching from https://career17.sapsf.com/career?company=TTC...
+
+[90mstdout[2m | src/services/scraperService.test.ts[2m > [22m[2mScraperService[2m > [22m[2mshould handle fetch errors gracefully
+[22m[39mFetching live feed...
+[TTC] Fetching from https://career17.sapsf.com/career?company=TTC...
+
+[90mstderr[2m | src/services/scraperService.test.ts[2m > [22m[2mScraperService[2m > [22m[2mshould handle fetch errors gracefully
+[22m[39mError fetching TTC: Error: Network error
+    at [90m/Users/ryan/Desktop/Production/Navigator/[39msrc/services/scraperService.test.ts:37:49
+    at [90mfile:///Users/ryan/Desktop/Production/Navigator/[39mnode_modules/[4m@vitest/runner[24m/dist/index.js:145:11
+    at [90mfile:///Users/ryan/Desktop/Production/Navigator/[39mnode_modules/[4m@vitest/runner[24m/dist/index.js:915:26
+    at [90mfile:///Users/ryan/Desktop/Production/Navigator/[39mnode_modules/[4m@vitest/runner[24m/dist/index.js:1243:20
+    at new Promise (<anonymous>)
+    at runWithTimeout [90m(file:///Users/ryan/Desktop/Production/Navigator/[39mnode_modules/[4m@vitest/runner[24m/dist/index.js:1209:10[90m)[39m
+    at [90mfile:///Users/ryan/Desktop/Production/Navigator/[39mnode_modules/[4m@vitest/runner[24m/dist/index.js:1653:37
+    at Traces.$ [90m(file:///Users/ryan/Desktop/Production/Navigator/[39mnode_modules/[4mvitest[24m/dist/chunks/traces.CCmnQaNT.js:142:27[90m)[39m
+    at trace [90m(file:///Users/ryan/Desktop/Production/Navigator/[39mnode_modules/[4mvitest[24m/dist/chunks/test.B8ej_ZHS.js:239:21[90m)[39m
+    at runTest [90m(file:///Users/ryan/Desktop/Production/Navigator/[39mnode_modules/[4m@vitest/runner[24m/dist/index.js:1653:12[90m)[39m
+
+ [32m✓[39m src/services/scraperService.test.ts [2m([22m[2m2 tests[22m[2m)[22m[32m 8[2mms[22m[39m
+ [32m✓[39m src/constants.test.ts [2m([22m[2m20 tests[22m[2m)[22m[32m 5[2mms[22m[39m
+ [32m✓[39m src/services/ai/aiCore.test.ts [2m([22m[2m9 tests[22m[2m)[22m[32m 4[2mms[22m[39m
+ [32m✓[39m src/services/ai/resumeAiService.test.ts [2m([22m[2m1 test[22m[2m)[22m[32m 7[2mms[22m[39m
+ [32m✓[39m src/modules/grad/utils/gpaUtils.test.ts [2m([22m[2m7 tests[22m[2m)[22m[32m 2[2mms[22m[39m
+ [32m✓[39m src/services/storage/blockUtils.test.ts [2m([22m[2m33 tests[22m[2m)[22m[32m 6[2mms[22m[39m
+ [32m✓[39m src/services/storage/jobStorage.test.ts [2m([22m[2m3 tests[22m[2m)[22m[32m 5[2mms[22m[39m
+ [32m✓[39m src/utils/archetypeUtils.test.ts [2m([22m[2m5 tests[22m[2m)[22m[32m 3[2mms[22m[39m
+ [32m✓[39m src/utils/lazyWithRetry.test.ts [2m([22m[2m2 tests[22m[2m)[22m[32m 2[2mms[22m[39m
+ [32m✓[39m src/services/storage/storageCore.test.ts [2m([22m[2m2 tests[22m[2m)[22m[32m 1[2mms[22m[39m
+
+[31m⎯⎯⎯⎯⎯⎯[39m[1m[41m Failed Suites 1 [49m[22m[31m⎯⎯⎯⎯⎯⎯⎯[39m
+
+[41m[1m FAIL [22m[49m tests/system-cards.spec.ts[2m [ tests/system-cards.spec.ts ][22m
+[31m[1mError[22m: Playwright Test did not expect test() to be called here.
+Most common reasons include:
+- You are calling test() in a configuration file.
+- You are calling test() in a file that is imported by the configuration file.
+- You have two different versions of @playwright/test. This usually happens
+  when one of the dependencies in your package.json depends on @playwright/test.[39m
+[90m [2m❯[22m TestTypeImpl._currentSuite node_modules/playwright/lib/common/testType.js:[2m75:13[22m[39m
+[90m [2m❯[22m TestTypeImpl._createTest node_modules/playwright/lib/common/testType.js:[2m88:24[22m[39m
+[90m [2m❯[22m node_modules/playwright/lib/transform/transform.js:[2m282:12[22m[39m
+[36m [2m❯[22m tests/system-cards.spec.ts:[2m3:1[22m[39m
+    [90m  1| [39m[35mimport[39m { test[33m,[39m expect } [35mfrom[39m [32m'@playwright/test'[39m[33m;[39m
+    [90m  2| [39m
+    [90m  3| [39m[34mtest[39m([32m'system update cards swap logic'[39m[33m,[39m [35masync[39m ({ page }) [33m=>[39m {
+    [90m   | [39m[31m^[39m
+    [90m  4| [39m    [35mawait[39m page[33m.[39m[34mgoto[39m([32m'http://localhost:5173/'[39m)[33m;[39m
+    [90m  5| [39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[1/20]⎯[22m[39m
+
+
+[31m⎯⎯⎯⎯⎯⎯[39m[1m[41m Failed Tests 19 [49m[22m[31m⎯⎯⎯⎯⎯⎯⎯[39m
+
+[41m[1m FAIL [22m[49m src/services/usageLimits.test.ts[2m > [22mgetUsageStats[2m > [22mshould return usage stats correctly for pro tier
+[31m[1mAssertionError[22m: expected { Object (tier, todayAnalyses, ...) } to deeply equal { Object (tier, todayAnalyses, ...) }[39m
+
+[32m- Expected[39m
+[31m+ Received[39m
+
+[33m@@ -1,8 +1,8 @@[39m
+[2m  {[22m
+[32m-   "analysisLimit": 350,[39m
+[32m-   "analysisPeriod": "weekly",[39m
+[31m+   "analysisLimit": 100,[39m
+[31m+   "analysisPeriod": "daily",[39m
+[2m    "emailLimit": 25,[22m
+[2m    "inboundEmailToken": "token-123",[22m
+[2m    "interviewLimit": 5,[22m
+[2m    "monthInterviews": 0,[22m
+[2m    "roleModelCount": 0,[22m
+
+[36m [2m❯[22m src/services/usageLimits.test.ts:[2m149:24[22m[39m
+    [90m147| [39m        [35mconst[39m result [33m=[39m [35mawait[39m [34mgetUsageStats[39m(userId)[33m;[39m
+    [90m148| [39m
+    [90m149| [39m        [34mexpect[39m(result)[33m.[39m[34mtoEqual[39m({
+    [90m   | [39m                       [31m^[39m
+    [90m150| [39m            tier[33m:[39m [32m'pro'[39m[33m,[39m
+    [90m151| [39m            todayAnalyses[33m:[39m [34m5[39m[33m,[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[2/20]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m src/components/layout/Header.test.tsx[2m > [22mHeader Layout[2m > [22mshould have the navigation pill correctly centered vertically
+[41m[1m FAIL [22m[49m src/components/layout/Header.test.tsx[2m > [22mHeader Layout[2m > [22mshould render the Navigator logo
+[41m[1m FAIL [22m[49m src/components/layout/Header.test.tsx[2m > [22mHeader Layout[2m > [22mshould render the Sign Out button when user is logged in
+[41m[1m FAIL [22m[49m src/components/layout/Header.test.tsx[2m > [22mHeader Layout[2m > [22mshould render the dark mode toggle button
+[31m[1mTypeError[22m: Cannot read properties of undefined (reading 'startsWith')[39m
+[36m [2m❯[22m getModeFromViewId src/utils/navigation.ts:[2m111:32[22m[39m
+    [90m109| [39m
+    [90m110| [39m[35mexport[39m [35mconst[39m getModeFromViewId [33m=[39m (viewId[33m:[39m string) [33m=>[39m {
+    [90m111| [39m    const isCoachMode = viewId.startsWith('career') || viewId.startsWi…
+    [90m   | [39m                               [31m^[39m
+    [90m112| [39m    [35mconst[39m isEduMode [33m=[39m viewId[33m.[39m[34mstartsWith[39m([32m'edu'[39m)[33m;[39m
+    [90m113| [39m    const isJobMode = !isCoachMode && !isEduMode && !['privacy', 'home…
+[90m [2m❯[22m Header src/components/layout/Header.tsx:[2m15:40[22m[39m
+[90m [2m❯[22m Object.react_stack_bottom_frame node_modules/react-dom/cjs/react-dom-client.development.js:[2m25904:20[22m[39m
+[90m [2m❯[22m renderWithHooks node_modules/react-dom/cjs/react-dom-client.development.js:[2m7662:22[22m[39m
+[90m [2m❯[22m updateFunctionComponent node_modules/react-dom/cjs/react-dom-client.development.js:[2m10166:19[22m[39m
+[90m [2m❯[22m beginWork node_modules/react-dom/cjs/react-dom-client.development.js:[2m11778:18[22m[39m
+[90m [2m❯[22m runWithFiberInDEV node_modules/react-dom/cjs/react-dom-client.development.js:[2m874:13[22m[39m
+[90m [2m❯[22m performUnitOfWork node_modules/react-dom/cjs/react-dom-client.development.js:[2m17641:22[22m[39m
+[90m [2m❯[22m workLoopSync node_modules/react-dom/cjs/react-dom-client.development.js:[2m17469:41[22m[39m
+[90m [2m❯[22m renderRootSync node_modules/react-dom/cjs/react-dom-client.development.js:[2m17450:11[22m[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[3/20]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m src/modules/job/FeatureGrid.test.tsx[2m > [22mFeatureGrid[2m > [22mshould call onShowAuth with config when logged out user clicks a card
+[41m[1m FAIL [22m[49m src/modules/job/FeatureGrid.test.tsx[2m > [22mFeatureGrid[2m > [22mshould call onNavigate with targetView when logged in user clicks a card
+[41m[1m FAIL [22m[49m src/modules/job/FeatureGrid.test.tsx[2m > [22mFeatureGrid[2m > [22mshould filter cards based on user tier/admin status
+[31m[1mError[22m: useUser must be used within a UserProvider[39m
+[36m [2m❯[22m useUser src/contexts/UserContext.tsx:[2m275:15[22m[39m
+    [90m273| [39m    [35mconst[39m context [33m=[39m [34museContext[39m([33mUserContext[39m)[33m;[39m
+    [90m274| [39m    [35mif[39m (context [33m===[39m undefined) {
+    [90m275| [39m        [35mthrow[39m [35mnew[39m [33mError[39m([32m'useUser must be used within a UserProvider'[39m)[33m;[39m
+    [90m   | [39m              [31m^[39m
+    [90m276| [39m    }
+    [90m277| [39m    [35mreturn[39m context[33m;[39m
+[90m [2m❯[22m FeatureGrid src/modules/job/FeatureGrid.tsx:[2m53:109[22m[39m
+[90m [2m❯[22m Object.react_stack_bottom_frame node_modules/react-dom/cjs/react-dom-client.development.js:[2m25904:20[22m[39m
+[90m [2m❯[22m renderWithHooks node_modules/react-dom/cjs/react-dom-client.development.js:[2m7662:22[22m[39m
+[90m [2m❯[22m updateFunctionComponent node_modules/react-dom/cjs/react-dom-client.development.js:[2m10166:19[22m[39m
+[90m [2m❯[22m beginWork node_modules/react-dom/cjs/react-dom-client.development.js:[2m11778:18[22m[39m
+[90m [2m❯[22m runWithFiberInDEV node_modules/react-dom/cjs/react-dom-client.development.js:[2m874:13[22m[39m
+[90m [2m❯[22m performUnitOfWork node_modules/react-dom/cjs/react-dom-client.development.js:[2m17641:22[22m[39m
+[90m [2m❯[22m workLoopSync node_modules/react-dom/cjs/react-dom-client.development.js:[2m17469:41[22m[39m
+[90m [2m❯[22m renderRootSync node_modules/react-dom/cjs/react-dom-client.development.js:[2m17450:11[22m[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[4/20]⎯[22m[39m
+
+[41m[1m FAIL [22m[49m src/modules/job/History.test.tsx[2m > [22mHistory[2m > [22mshould render empty state when no jobs
+[41m[1m FAIL [22m[49m src/modules/job/History.test.tsx[2m > [22mHistory[2m > [22mshould render job list
+[41m[1m FAIL [22m[49m src/modules/job/History.test.tsx[2m > [22mHistory[2m > [22mshould filter jobs by search query
+[41m[1m FAIL [22m[49m src/modules/job/History.test.tsx[2m > [22mHistory[2m > [22mshould filter by company name
+[41m[1m FAIL [22m[49m src/modules/job/History.test.tsx[2m > [22mHistory[2m > [22mshould be case insensitive
+[41m[1m FAIL [22m[49m src/modules/job/History.test.tsx[2m > [22mHistory[2m > [22mshould show all jobs when search is cleared
+[41m[1m FAIL [22m[49m src/modules/job/History.test.tsx[2m > [22mHistory[2m > [22mshould call onSelectJob when job is clicked
+[41m[1m FAIL [22m[49m src/modules/job/History.test.tsx[2m > [22mHistory[2m > [22mshould display fit scores
+[41m[1m FAIL [22m[49m src/modules/job/History.test.tsx[2m > [22mHistory[2m > [22mshould show analyzing and error states in saved filter
+[41m[1m FAIL [22m[49m src/modules/job/History.test.tsx[2m > [22mHistory[2m > [22mshould display progress bar with custom message
+[41m[1m FAIL [22m[49m src/modules/job/History.test.tsx[2m > [22mHistory[2m > [22mshould restrict access when analyzing
+[31m[1mError[22m: useJobContext must be used within a JobProvider[39m
+[36m [2m❯[22m useJobContext src/modules/job/context/JobContext.tsx:[2m36:15[22m[39m
+    [90m 34| [39m    [35mconst[39m context [33m=[39m [34museContext[39m([33mJobContext[39m)[33m;[39m
+    [90m 35| [39m    [35mif[39m ([33m![39mcontext) {
+    [90m 36| [39m        throw new Error('useJobContext must be used within a JobProvid…
+    [90m   | [39m              [31m^[39m
+    [90m 37| [39m    }
+    [90m 38| [39m    [35mreturn[39m context[33m;[39m
+[90m [2m❯[22m History src/modules/job/History.tsx:[2m27:81[22m[39m
+[90m [2m❯[22m Object.react_stack_bottom_frame node_modules/react-dom/cjs/react-dom-client.development.js:[2m25904:20[22m[39m
+[90m [2m❯[22m renderWithHooks node_modules/react-dom/cjs/react-dom-client.development.js:[2m7662:22[22m[39m
+[90m [2m❯[22m updateFunctionComponent node_modules/react-dom/cjs/react-dom-client.development.js:[2m10166:19[22m[39m
+[90m [2m❯[22m beginWork node_modules/react-dom/cjs/react-dom-client.development.js:[2m11778:18[22m[39m
+[90m [2m❯[22m runWithFiberInDEV node_modules/react-dom/cjs/react-dom-client.development.js:[2m874:13[22m[39m
+[90m [2m❯[22m performUnitOfWork node_modules/react-dom/cjs/react-dom-client.development.js:[2m17641:22[22m[39m
+[90m [2m❯[22m workLoopSync node_modules/react-dom/cjs/react-dom-client.development.js:[2m17469:41[22m[39m
+[90m [2m❯[22m renderRootSync node_modules/react-dom/cjs/react-dom-client.development.js:[2m17450:11[22m[39m
+
+[31m[2m⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯[5/20]⎯[22m[39m
+
+
+[2m Test Files [22m [1m[31m5 failed[39m[22m[2m | [22m[1m[32m17 passed[39m[22m[90m (22)[39m
+[2m      Tests [22m [1m[31m19 failed[39m[22m[2m | [22m[1m[32m127 passed[39m[22m[90m (146)[39m
+[2m   Start at [22m 11:24:46
+[2m   Duration [22m 4.50s[2m (transform 2.01s, setup 3.48s, import 4.67s, tests 1.18s, environment 14.47s)[22m
+

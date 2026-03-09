@@ -30,26 +30,6 @@ export const AppLayout: React.FC<{ children: React.ReactNode }> = ({ children })
 
     return (
         <div className={`min-h-screen flex flex-col bg-white dark:bg-[#000000] font-sans selection:bg-emerald-500/30 text-neutral-900 dark:text-neutral-100 transition-colors duration-500 ${isCoachMode ? 'theme-coach' : isEduMode ? 'theme-edu' : 'theme-job'}`}>
-            <style>{`
-                @media (prefers-reduced-motion: reduce) {
-                    *, *::before, *::after {
-                        animation-duration: 0.01ms !important;
-                        animation-iteration-count: 1 !important;
-                        transition-duration: 0.01ms !important;
-                        scroll-behavior: auto !important;
-                    }
-                }
-
-                @keyframes theme-pulse {
-                    0% { filter: brightness(1); }
-                    50% { filter: brightness(1.2) saturate(1.2); }
-                    100% { filter: brightness(1); }
-                }
-
-                .animate-theme-pulse {
-                    animation: theme-pulse 2s ease-in-out;
-                }
-            `}</style>
             <ToastContainer />
             <Analytics />
 

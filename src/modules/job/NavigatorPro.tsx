@@ -10,6 +10,7 @@ import type { JobFeedItem, ResumeRow } from '../../types';
 import { SharedPageLayout } from '../../components/common/SharedPageLayout';
 import { PageHeader } from '../../components/ui/PageHeader';
 import { STORAGE_KEYS } from '../../constants';
+import { LocalStorage } from '../../utils/localStorage';
 import { StandardSearchBar } from '../../components/common/StandardSearchBar';
 import { StandardFilterGroup } from '../../components/common/StandardFilterGroup';
 
@@ -23,7 +24,7 @@ export const NavigatorPro: React.FC = () => {
     } = useJobContext();
     const [feed, setFeed] = useState<JobFeedItem[]>([]);
     const [loading, setLoading] = useState(true);
-    const [analyzingId, setAnalyzingId] = useState<string | null>(null);
+    const [processingId, setProcessingId] = useState<string | null>(null);
     const [filterHighMatch, setFilterHighMatch] = useState(false);
     const [filterClosingSoon, setFilterClosingSoon] = useState(false);
     const [searchTerm, setSearchTerm] = useState('');
@@ -41,8 +42,8 @@ export const NavigatorPro: React.FC = () => {
         const ONE_DAY = 24 * 60 * 60 * 1000;
 
         // Check if we have cached data
-        const cachedData = localStorage.getItem(STORAGE_KEYS.FEED_CACHE);
-        const cachedTimestamp = localStorage.getItem(STORAGE_KEYS.FEED_CACHE_TIMESTAMP);
+        const cachedData = LocalStorage.get(STORAGE_KEYS.FEED_CACHE);
+        const cachedTimestamp = LocalStorage.get(STORAGE_KEYS.FEED_CACHE_TIMESTAMP);
 
         if (cachedData && cachedTimestamp) {
             const age = Date.now() - (parseInt(cachedTimestamp) || 0);
@@ -53,8 +54,8 @@ export const NavigatorPro: React.FC = () => {
                     return;
                 } catch {
                     // Cache corrupted — fall through to fetch fresh data
-                    localStorage.removeItem(STORAGE_KEYS.FEED_CACHE);
-                    localStorage.removeItem(STORAGE_KEYS.FEED_CACHE_TIMESTAMP);
+                    LocalStorage.remove(STORAGE_KEYS.FEED_CACHE);
+                    LocalStorage.remove(STORAGE_KEYS.FEED_CACHE_TIMESTAMP);
                 }
             }
         }
@@ -94,8 +95,8 @@ export const NavigatorPro: React.FC = () => {
             setFeed(combinedFeed);
 
             // Cache the raw feed data
-            localStorage.setItem(STORAGE_KEYS.FEED_CACHE, JSON.stringify(combinedFeed));
-            localStorage.setItem(STORAGE_KEYS.FEED_CACHE_TIMESTAMP, Date.now().toString());
+            LocalStorage.set(STORAGE_KEYS.FEED_CACHE, JSON.stringify(combinedFeed));
+            LocalStorage.set(STORAGE_KEYS.FEED_CACHE_TIMESTAMP, Date.now().toString());
 
             // Trigger background analysis only for scraped jobs that don't have it
             setTimeout(() => analyzeJobsInBackground(scraperData), 100);
@@ -107,49 +108,62 @@ export const NavigatorPro: React.FC = () => {
     };
 
     const analyzeJobsInBackground = async (jobs: JobFeedItem[]) => {
-        // Get user's resume and tier
-        const { data: resumes } = await supabase
-            .from('resumes')
-            .select('*')
-            .order('created_at', { ascending: false })
-            .limit(1);
+        try {
+            // Get user's resume and tier
+            const { data: resumes } = await supabase
+                .from('resumes')
+                .select('*')
+                .order('created_at', { ascending: false })
+                .limit(1);
 
-        if (!resumes || resumes.length === 0) {
-            return;
-        }
-
-        const resume = resumes[0];
-
-        // Check which jobs already have analysis in Supabase
-        const jobUrls = jobs.map(j => j.url);
-        const { data: existingJobs } = await supabase
-            .from('jobs')
-            .select('url, analysis')
-            .in('url', jobUrls);
-
-
-
-        // Analyze jobs that don't have cached analysis
-        for (const job of jobs) {
-            const existing = existingJobs?.find(j => j.url === job.url);
-
-            if (existing?.analysis?.matchScore) {
-                // Use cached match score
-                setFeed(prevFeed => prevFeed.map(f =>
-                    f.id === job.id ? { ...f, matchScore: existing.analysis.matchScore } : f
-                ));
-            } else {
-                // Analyze new job
-                await analyzeAndCacheJob(job, resume);
+            if (!resumes || resumes.length === 0) {
+                return;
             }
-        }
 
+            const resume = resumes[0] as ResumeRow;
+
+            // Check which jobs already have analysis in Supabase
+            const jobUrls = jobs.map(j => j.url);
+            const { data: existingJobs } = await supabase
+                .from('jobs')
+                .select('url, analysis')
+                .in('url', jobUrls);
+
+            // Separate cached vs uncached jobs
+            const jobsToAnalyze: JobFeedItem[] = [];
+            for (const job of jobs) {
+                const existing = existingJobs?.find(j => j.url === job.url);
+                if (existing?.analysis?.compatibilityScore) {
+                    // Use cached match score immediately
+                    setFeed(prevFeed => prevFeed.map(f =>
+                        f.id === job.id ? { ...f, matchScore: existing.analysis.compatibilityScore } : f
+                    ));
+                } else {
+                    jobsToAnalyze.push(job);
+                }
+            }
+
+            // Analyze uncached jobs in parallel batches (3 at a time to avoid rate limits)
+            const CONCURRENCY = 3;
+            for (let i = 0; i < jobsToAnalyze.length; i += CONCURRENCY) {
+                const batch = jobsToAnalyze.slice(i, i + CONCURRENCY);
+                await Promise.all(batch.map(job => analyzeAndCacheJob(job, resume)));
+            }
+        } catch (error) {
+            console.error("Background analysis failed:", error);
+        }
     };
 
     const analyzeAndCacheJob = async (job: JobFeedItem, resume: ResumeRow) => {
         try {
             // 1. Scrape Job Text
-            const jobText = await ScraperService.scrapeJobText(job.url);
+            let jobText = "";
+            try {
+                jobText = await ScraperService.scrapeJobContent(job.url);
+            } catch (error) {
+                console.error(`Failed to scrape text for ${job.url}:`, error);
+            }
+
             if (!jobText) {
                 console.warn(`Skipping analysis for ${job.title} - no text found`);
                 return;
@@ -166,13 +180,14 @@ export const NavigatorPro: React.FC = () => {
             ));
 
             // 4. Cache in Supabase
+            // Important: Keep status as 'feed' so it remains in the feed and doesn't clutter history until user takes action
             await supabase.from('jobs').upsert({
                 user_id: resume.user_id,
                 job_title: job.title,
                 company: job.company,
                 url: job.url,
                 analysis: analysis, // Store full analysis JSON
-                status: 'saved'
+                status: 'feed'
             }, { onConflict: 'url' });
 
         } catch (error) {
@@ -180,11 +195,11 @@ export const NavigatorPro: React.FC = () => {
         }
     };
 
-    const handleAnalyze = async (job: JobFeedItem) => {
-        setAnalyzingId(job.id);
+    const handleAction = async (job: JobFeedItem) => {
+        setProcessingId(job.id);
         // Invalidate feed cache so promoted job won't reappear
-        localStorage.removeItem(STORAGE_KEYS.FEED_CACHE);
-        localStorage.removeItem(STORAGE_KEYS.FEED_CACHE_TIMESTAMP);
+        LocalStorage.remove(STORAGE_KEYS.FEED_CACHE);
+        LocalStorage.remove(STORAGE_KEYS.FEED_CACHE_TIMESTAMP);
         if (job.source === 'email' && onPromoteFromFeed) {
             await onPromoteFromFeed(job.id);
         } else {
@@ -296,8 +311,16 @@ export const NavigatorPro: React.FC = () => {
             ) : (
                 <div className="space-y-4">
                     {displayFeed.length === 0 && (
-                        <div className="text-center py-12 text-neutral-500">
-                            No jobs found matching your filter.
+                        <div className="text-center py-20 space-y-4">
+                            <div className="w-16 h-16 bg-neutral-100 dark:bg-neutral-800 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                                <Sparkles className="w-7 h-7 text-neutral-300 dark:text-neutral-600" />
+                            </div>
+                            <h3 className="text-lg font-bold text-neutral-700 dark:text-neutral-300">No matches yet</h3>
+                            <p className="text-sm text-neutral-400 max-w-sm mx-auto">
+                                {searchTerm || filterHighMatch || filterClosingSoon
+                                    ? 'No jobs match your current filters. Try adjusting your criteria.'
+                                    : 'Your personalized feed will populate as new opportunities are discovered.'}
+                            </p>
                         </div>
                     )}
                     {displayFeed.map((job) => (
@@ -311,11 +334,10 @@ export const NavigatorPro: React.FC = () => {
                             <div className="flex gap-4">
                                 {/* Logo Placeholder */}
                                 <div className={`w-12 h-12 rounded-xl flex items-center justify-center shrink-0 font-bold text-xl
-                                    ${job.source === 'ttc' ? 'bg-red-50 text-red-600 dark:bg-red-900/20' :
-                                        job.source === 'email' ? 'bg-indigo-50 text-indigo-600 dark:bg-indigo-900/20' :
-                                            'bg-blue-50 text-blue-600 dark:bg-blue-900/20'}
+                                    ${job.source === 'email' ? 'bg-indigo-50 text-indigo-600 dark:bg-indigo-900/20' :
+                                        'bg-blue-50 text-blue-600 dark:bg-blue-900/20'}
                                 `}>
-                                    {job.source === 'ttc' ? 'T' : job.source === 'email' ? 'E' : 'C'}
+                                    {job.company.charAt(0).toUpperCase()}
                                 </div>
 
                                 <div className="flex-1 min-w-0">
@@ -342,14 +364,14 @@ export const NavigatorPro: React.FC = () => {
 
                                     <div className="mt-6 flex items-center gap-3">
                                         <button
-                                            onClick={() => handleAnalyze(job)}
-                                            disabled={analyzingId === job.id}
+                                            onClick={() => handleAction(job)}
+                                            disabled={processingId === job.id}
                                             className="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2.5 rounded-xl transition-all shadow-sm hover:shadow-md flex items-center justify-center gap-2 disabled:opacity-70 disabled:cursor-wait"
                                         >
-                                            {analyzingId === job.id ? (
+                                            {processingId === job.id ? (
                                                 <>
                                                     <Loader2 className="w-4 h-4 animate-spin" />
-                                                    Analyzing...
+                                                    Processing...
                                                 </>
                                             ) : (
                                                 <>
@@ -363,8 +385,8 @@ export const NavigatorPro: React.FC = () => {
                                             <button
                                                 onClick={() => {
                                                     // Invalidate cache so saved job won't reappear on next load
-                                                    localStorage.removeItem(STORAGE_KEYS.FEED_CACHE);
-                                                    localStorage.removeItem(STORAGE_KEYS.FEED_CACHE_TIMESTAMP);
+                                                    LocalStorage.remove(STORAGE_KEYS.FEED_CACHE);
+                                                    LocalStorage.remove(STORAGE_KEYS.FEED_CACHE_TIMESTAMP);
                                                     onSaveFromFeed(job.id);
                                                 }}
                                                 className="p-2.5 bg-neutral-100 dark:bg-neutral-800 hover:bg-neutral-200 dark:hover:bg-neutral-700 text-neutral-400 hover:text-indigo-600 rounded-xl transition-colors"

@@ -1,10 +1,20 @@
 
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2"
 
-export const corsHeaders = {
-    'Access-Control-Allow-Origin': '*',
-    'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
-}
+const ALLOWED_ORIGINS = [
+    Deno.env.get('SITE_URL') ?? '',
+    'http://localhost:5173',
+    'http://localhost:4173',
+].filter(Boolean);
+
+const getCorsHeaders = (req: Request) => {
+    const origin = req.headers.get('Origin') ?? '';
+    const allowedOrigin = ALLOWED_ORIGINS.includes(origin) ? origin : '';
+    return {
+        'Access-Control-Allow-Origin': allowedOrigin,
+        'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
+    };
+};
 
 const MAX_LOG_LENGTH = 200;
 const sanitizeLog = (val: unknown) => {
@@ -39,7 +49,7 @@ export const TIER_MODELS: Record<string, { extraction: string; analysis: string 
 export const handler = async (req: Request) => {
     // Handle CORS preflight request
     if (req.method === 'OPTIONS') {
-        return new Response('ok', { headers: corsHeaders })
+        return new Response('ok', { headers: getCorsHeaders(req) })
     }
 
     try {
@@ -91,17 +101,16 @@ export const handler = async (req: Request) => {
                 used: limitCheck.used,
                 limit: limitCheck.limit
             }), {
-                headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+                headers: { ...getCorsHeaders(req), 'Content-Type': 'application/json' },
                 status: 429, // Correct Rate Limit status code
             });
         }
 
         // 2. PARSE REQUEST & RESOLVE MODEL
-        // We no longer trust the client to provide modelName
-        const { payload, task = "analysis", generationConfig, feature } = await req.json()
+        const { payload, task = "analysis", generationConfig, feature, model } = await req.json()
 
         // Validate task
-        const validTasks = ['extraction', 'analysis', 'interview'];
+        const validTasks = ['extraction', 'analysis', 'interview', 'embedding'];
         const safeTask = validTasks.includes(task) ? task : 'analysis';
 
         if (safeTask === 'interview' && userTier === 'free') {
@@ -109,7 +118,7 @@ export const handler = async (req: Request) => {
                 error: "limit_reached",
                 message: "Interviews are a premium feature available on Plus and Pro tiers."
             }), {
-                headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+                headers: { ...getCorsHeaders(req), 'Content-Type': 'application/json' },
                 status: 403,
             });
         }
@@ -136,7 +145,7 @@ export const handler = async (req: Request) => {
                         used: monthlyInterviews,
                         limit: interviewLimit
                     }), {
-                        headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+                        headers: { ...getCorsHeaders(req), 'Content-Type': 'application/json' },
                         status: 429,
                     });
                 }
@@ -156,7 +165,7 @@ export const handler = async (req: Request) => {
                 error: "upgrade_required",
                 message: "This feature requires a Plus or Pro plan."
             }), {
-                headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+                headers: { ...getCorsHeaders(req), 'Content-Type': 'application/json' },
                 status: 403,
             });
         }
@@ -166,15 +175,20 @@ export const handler = async (req: Request) => {
                 error: "upgrade_required",
                 message: "This feature requires a Pro plan."
             }), {
-                headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+                headers: { ...getCorsHeaders(req), 'Content-Type': 'application/json' },
                 status: 403,
             });
         }
 
         const tierConfig = TIER_MODELS[userTier] || TIER_MODELS.free;
-        const modelName = safeTask === 'extraction' ? tierConfig.extraction : tierConfig.analysis;
+        let modelName = safeTask === 'extraction' ? tierConfig.extraction : tierConfig.analysis;
 
-        console.log(`User ${sanitizeLog(user.id)} (${sanitizeLog(userTier)}) performing ${sanitizeLog(safeTask)} using ${sanitizeLog(modelName)}`);
+        // Overwrite if it's an embedding task or if a specific model was requested (R&D only)
+        if (safeTask === 'embedding') {
+            modelName = model || 'text-embedding-004';
+        }
+
+        console.log("User action:", { userId: sanitizeLog(user.id), tier: sanitizeLog(userTier), task: sanitizeLog(safeTask), model: sanitizeLog(modelName) });
 
         // 3. RETRIEVE API KEY
         const apiKey = Deno.env.get('GEMINI_API_KEY')
@@ -197,7 +211,8 @@ export const handler = async (req: Request) => {
         }
 
         // 5. CALL GEMINI API VIA FETCH
-        const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${apiKey}`;
+        const method = safeTask === 'embedding' ? 'embedContent' : 'generateContent';
+        const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:${method}?key=${apiKey}`;
 
         let response;
         try {
@@ -212,7 +227,7 @@ export const handler = async (req: Request) => {
                     // Inject a safety rule for all analysis tasks
                     systemInstruction: safeTask === 'analysis' ? {
                         role: 'system',
-                        parts: [{ text: "CRITICAL: First validate if the provided content is a job description or job-related. If it is NOT a job, your entire response must be: {\"error\": \"not_a_job\"}. Otherwise, proceed with the requested analysis." }]
+                        parts: [{ text: "CRITICAL: First validate if the provided content is a job description or related job metadata. Ignore website navigation, headers, and boilerplate. As long as there is mention of a role, responsibilities, or requirements anywhere in the text, proceed with the requested analysis. If it is purely non-job related content (e.g. a recipe or a weather report), return: {\"error\": \"not_a_job\"}." }]
                     } : undefined
                 })
             });
@@ -236,7 +251,16 @@ export const handler = async (req: Request) => {
 
         const data = await response.json();
 
-        // Extract text from standard Gemini response structure
+        // Handle Embedding Response
+        if (safeTask === 'embedding') {
+            const embedding = data.embedding?.values || [];
+            return new Response(JSON.stringify({ embedding }), {
+                headers: { ...getCorsHeaders(req), 'Content-Type': 'application/json' },
+                status: 200,
+            });
+        }
+
+        // Handle Generation Response
         let text = "";
         if (data.candidates && data.candidates[0] && data.candidates[0].content && data.candidates[0].content.parts) {
             text = data.candidates[0].content.parts.map((p: { text: string }) => p.text).join('');
@@ -245,7 +269,7 @@ export const handler = async (req: Request) => {
         // 6. CONTENT VALIDATION & REFUND
         // If the AI returns a "not_a_job" flag (which we instruct it to do in prompts), we refund the credit
         if (safeTask === 'analysis' && (text.includes('"error": "not_a_job"') || text.includes('not_a_job'))) {
-            console.warn(`Analysis rejected by AI (not a job) for user ${sanitizeLog(user.id)}`);
+            console.warn("Analysis rejected by AI (not a job) for user:", { userId: sanitizeLog(user.id) });
             if (quotaIncremented) {
                 const { error: decError } = await supabase.rpc('decrement_analysis_count', {
                     p_user_id: user.id
@@ -257,7 +281,7 @@ export const handler = async (req: Request) => {
                 error: "not_a_job",
                 message: "This content doesn't look like a valid job description."
             }), {
-                headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+                headers: { ...getCorsHeaders(req), 'Content-Type': 'application/json' },
                 status: 400,
             });
         }
@@ -285,7 +309,7 @@ export const handler = async (req: Request) => {
         }
 
         return new Response(JSON.stringify({ text, usage: data.usageMetadata }), {
-            headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+            headers: { ...getCorsHeaders(req), 'Content-Type': 'application/json' },
             status: 200,
         })
 
@@ -293,7 +317,7 @@ export const handler = async (req: Request) => {
         const message = error instanceof Error ? error.message : String(error);
         console.error("Gemini Proxy Error:", sanitizeLog(message));
         return new Response(JSON.stringify({ error: `Edge Function Error: ${message}` }), {
-            headers: { ...corsHeaders, 'Content-Type': 'application/json' },
+            headers: { ...getCorsHeaders(req), 'Content-Type': 'application/json' },
             status: 500, // Correctly return an error status code
         })
     }

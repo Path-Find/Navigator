@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { useNavigate } from 'react-router-dom';
 import type { SavedJob, AppState } from '../../../types';
 import { Storage } from '../../../services/storageService';
@@ -7,14 +7,20 @@ import { ScraperService } from '../../../services/scraperService';
 import { checkAnalysisLimit, getUsageStats, type UsageStats, type UsageLimitResult } from '../../../services/usageLimits';
 import { useToast } from '../../../contexts/ToastContext';
 import { useUser } from '../../../contexts/UserContext';
-import { ROUTES } from '../../../constants';
+import { ROUTES, TIME_PERIODS } from '../../../constants';
+import { useNextGen } from '../../../hooks/useNextGen';
+import { RdFeedbackService } from '../../../services/ai/rd/feedbackService';
 
 export const useJobManager = () => {
     const { user, isAdmin } = useUser();
     const { showInfo, showError } = useToast();
+    const isNextGen = useNextGen();
     const navigate = useNavigate();
 
     const [jobs, setJobs] = useState<SavedJob[]>([]);
+    const jobsRef = useRef<SavedJob[]>([]);
+    useEffect(() => { jobsRef.current = jobs; }, [jobs]);
+
     const [activeJobId, setActiveJobId] = useState<string | null>(null);
     const [isLoading, setIsLoading] = useState(true);
 
@@ -23,6 +29,7 @@ export const useJobManager = () => {
         tier: isAdmin ? 'admin' : 'free',
         todayAnalyses: 0,
         weekAnalyses: 0,
+        lifetimeAnalyses: 0,
         todayEmails: 0,
         monthInterviews: 0,
         roleModelCount: 0,
@@ -31,41 +38,75 @@ export const useJobManager = () => {
         analysisPeriod: 'lifetime',
         emailLimit: 0,
         roleModelLimit: isAdmin ? Infinity : 0,
-        interviewLimit: isAdmin ? Infinity : 0
+        interviewLimit: isAdmin ? Infinity : 0,
+        isFallback: false
     });
     const [upgradeModalData, setUpgradeModalData] = useState<UsageLimitResult | null>(null);
 
-    // Initial Load
+    // Initial Load — jobs and usage stats fire in parallel
     useEffect(() => {
         let mounted = true;
         setIsLoading(true);
-        Storage.getJobs().then(loadedJobs => {
-            if (mounted) {
-                setJobs(loadedJobs);
-                setIsLoading(false);
+
+        const loadInitialData = async () => {
+            try {
+                // 1. Sync local to cloud first (if logged in) to ensure we have the latest on both ends
+                if (user) {
+                    await Storage.syncLocalToCloud().catch(err => {
+                        console.error("Initial sync failed:", err);
+                        showError("Cloud Sync Error: Some items haven't been backed up. Check your connection.");
+                    });
+                }
+
+                // 2. Fetch data in parallel
+                const [loadedJobs, stats] = await Promise.all([
+                    Storage.getJobs(),
+                    user ? getUsageStats(user.id).catch(err => {
+                        console.error("Usage stats fetch failed:", err);
+                        return undefined;
+                    }) : Promise.resolve(undefined)
+                ]);
+
+                if (!mounted) return;
+
+                if (loadedJobs) setJobs(loadedJobs);
+                if (stats) {
+                    if (stats.isFallback) {
+                        showInfo("Unable to verify current usage. Using restricted offline mode.");
+                    }
+                    setUsageStats(stats);
+                }
+            } catch (err) {
+                console.error("Fatal error during initial load:", err);
+                if (mounted) showError("Failed to load your data. Please check your connection.");
+            } finally {
+                if (mounted) setIsLoading(false);
             }
-        });
+        };
+
+        loadInitialData();
+
         return () => { mounted = false; };
     }, [user?.id]);
-
-    // Sync Usage Stats
-    useEffect(() => {
-        if (!user) return;
-        let mounted = true;
-        getUsageStats(user.id).then(stats => {
-            if (mounted) setUsageStats(stats);
-        }).catch(console.error);
-        return () => { mounted = false; };
-    }, [user]);
 
     const activeJob = jobs.find(j => j.id === activeJobId);
 
     const handleUpdateJob = useCallback(async (updatedJob: SavedJob) => {
+        const oldJob = jobsRef.current.find(j => j.id === updatedJob.id);
+        const statusChanged = oldJob && oldJob.status !== updatedJob.status;
+
         // Optimistic update
         setJobs(prev => prev.map(j => j.id === updatedJob.id ? updatedJob : j));
 
         try {
             await Storage.updateJob(updatedJob);
+
+            // Phase 1/2: Feedback Loop & Outcome Triangulation
+            if (isNextGen && user && statusChanged) {
+                if (['applied', 'interview', 'offer', 'rejected'].includes(updatedJob.status || '')) {
+                    RdFeedbackService.captureOutcome(user.id, updatedJob.id, updatedJob.status!);
+                }
+            }
         } catch (err) {
             console.error("FAILED TO PERSIST JOB:", err);
             showError("Critical: Failed to save changes.");
@@ -151,7 +192,7 @@ export const useJobManager = () => {
     }, [user, isAdmin, navigate]);
 
     const handleSaveFromFeed = useCallback(async (jobId: string) => {
-        const job = jobs.find(j => j.id === jobId);
+        const job = jobsRef.current.find(j => j.id === jobId);
         if (!job) return;
 
         const updatedJob: SavedJob = {
@@ -162,10 +203,10 @@ export const useJobManager = () => {
         await Storage.updateJob(updatedJob);
         setJobs(prev => prev.map(j => j.id === jobId ? updatedJob : j));
         showInfo("Saved to your history!");
-    }, [jobs, showInfo]);
+    }, [showInfo]);
 
     const handlePromoteFromFeed = useCallback(async (jobId: string) => {
-        const job = jobs.find(j => j.id === jobId);
+        const job = jobsRef.current.find(j => j.id === jobId);
         if (!job) {
             showError("Job not found in local state.");
             return;
@@ -181,18 +222,20 @@ export const useJobManager = () => {
         setActiveJobId(jobId);
         navigate(ROUTES.JOB_DETAIL.replace(':id', jobId));
         showInfo("Promoting job alert to application...");
-    }, [jobs, navigate, showInfo, showError]);
+    }, [navigate, showInfo, showError]);
 
     const handleDraftApplication = useCallback(async (url: string) => {
         const jobId = crypto.randomUUID();
+        const now = Date.now();
         const newJob: SavedJob = {
             id: jobId,
-            company: 'Analyzing...',
-            position: 'Drafting Application...',
+            company: '',
+            position: 'New Job',
             description: '',
             url,
             resumeId: 'master',
-            dateAdded: Date.now(),
+            dateAdded: now,
+            updatedAt: now,
             status: 'analyzing' as const,
         };
 
@@ -206,9 +249,9 @@ export const useJobManager = () => {
     const handleDeleteJob = useCallback((id: string) => {
         Storage.deleteJob(id);
         setJobs(prev => prev.filter(j => j.id !== id));
-        if (activeJobId === id) setActiveJobId(null);
-        navigate('/history');
-    }, [activeJobId, navigate]);
+        setActiveJobId(prev => prev === id ? null : prev);
+        navigate(ROUTES.HISTORY);
+    }, [navigate]);
 
     const [nudgeDismissed, setNudgeDismissed] = useState(false);
     const [nudgeJob, setNudgeJob] = useState<SavedJob | null>(null);
@@ -220,7 +263,7 @@ export const useJobManager = () => {
         const now = Date.now();
         const staleJob = jobs.find(j =>
             j.status === 'applied' &&
-            (now - j.dateAdded) > (7 * 24 * 60 * 60 * 1000)
+            (now - j.dateAdded) > TIME_PERIODS.APPLIED_NUDGE_THRESHOLD_MS
         );
 
         if (staleJob) {
@@ -249,7 +292,7 @@ export const useJobManager = () => {
         handleAnalyzeJob,
         handlePromoteFromFeed,
         handleSaveFromFeed,
-        closeUpgradeModal: () => setUpgradeModalData(null),
+        closeUpgradeModal: useCallback(() => setUpgradeModalData(null), []),
         dismissNudge
     };
 };

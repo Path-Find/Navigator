@@ -8,7 +8,6 @@ import {
   AI_TEMPERATURE,
   HEADLINES,
   TRACKING_EVENTS,
-  BENTO_CATEGORIES,
   DATE_FORMATS,
   RESUME_SECTION_TYPES,
   EXTERNAL_LINKS,
@@ -120,14 +119,6 @@ describe('constants', () => {
       expect(Object.keys(TRACKING_EVENTS)).toContain('JOB_FIT');
       expect(Object.keys(TRACKING_EVENTS)).toContain('RESUMES');
       expect(Object.keys(TRACKING_EVENTS)).toContain('COVER_LETTERS');
-    });
-  });
-
-  describe('BENTO_CATEGORIES', () => {
-    it('should have standard UI categories', () => {
-      expect(Object.values(BENTO_CATEGORIES)).toContain('JOB');
-      expect(Object.values(BENTO_CATEGORIES)).toContain('COACH');
-      expect(Object.values(BENTO_CATEGORIES)).toContain('EDUCATION');
     });
   });
 

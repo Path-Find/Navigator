@@ -1,0 +1,357 @@
+
+> navigator@2.25.0 lint
+> eslint .
+
+
+/Users/ryan/Desktop/Production/Navigator/extension/src/content/extractor.ts
+  32:31  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  32:37  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  45:30  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  51:39  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  57:31  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/ryan/Desktop/Production/Navigator/extension/src/popup/Popup.tsx
+   18:12  warning  'savedJobId' is assigned a value but never used  @typescript-eslint/no-unused-vars
+  122:21  warning  Unexpected any. Specify a different type         @typescript-eslint/no-explicit-any
+
+/Users/ryan/Desktop/Production/Navigator/scripts/test-ingestion.ts
+  8:16  warning  'testIngestion' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/ryan/Desktop/Production/Navigator/src/components/AuthModal.tsx
+   77:23  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  110:23  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/ryan/Desktop/Production/Navigator/src/components/auth/EmailVerificationScreen.tsx
+  28:8  warning  React Hook useEffect has a missing dependency: 'user'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+/Users/ryan/Desktop/Production/Navigator/src/components/common/FeaturePreviews.tsx
+  477:14  warning  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  react-refresh/only-export-components
+
+/Users/ryan/Desktop/Production/Navigator/src/components/common/PageLayout.tsx
+  49:121  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/ryan/Desktop/Production/Navigator/src/components/common/UnifiedUploadHero.tsx
+   83:69  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   84:66  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  106:71  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  107:68  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/ryan/Desktop/Production/Navigator/src/components/edu/CourseEditModal.tsx
+  30:13  error  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+/Users/ryan/Desktop/Production/Navigator/src/components/edu/CourseEditModal.tsx:30:13
+  28 |     useEffect(() => {
+  29 |         if (isOpen) {
+> 30 |             setEditedCourse(course);
+     |             ^^^^^^^^^^^^^^^ Avoid calling setState() directly within an effect
+  31 |             setTargetSemIndex(currentSemIndex);
+  32 |             setConfirmDelete(false);
+  33 |  react-hooks/set-state-in-effect
+
+/Users/ryan/Desktop/Production/Navigator/src/components/edu/CourseVerificationModal.tsx
+  24:100  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/ryan/Desktop/Production/Navigator/src/components/layout/Header.tsx
+  153:87   warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  153:128  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  174:104  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/ryan/Desktop/Production/Navigator/src/contexts/GlobalUIContext.tsx
+  21:14  warning  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  react-refresh/only-export-components
+
+/Users/ryan/Desktop/Production/Navigator/src/contexts/ModalContext.tsx
+  20:14  warning  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  react-refresh/only-export-components
+
+/Users/ryan/Desktop/Production/Navigator/src/contexts/ToastContext.tsx
+  71:14  warning  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  react-refresh/only-export-components
+
+/Users/ryan/Desktop/Production/Navigator/src/contexts/UserContext.test.tsx
+  43:14  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  76:71  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  82:36  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  89:30  warning  'e' is defined but never used             @typescript-eslint/no-unused-vars
+
+/Users/ryan/Desktop/Production/Navigator/src/contexts/UserContext.tsx
+   26:72  warning  Unexpected any. Specify a different type                                                                                        @typescript-eslint/no-explicit-any
+   93:34  warning  Unexpected any. Specify a different type                                                                                        @typescript-eslint/no-explicit-any
+   94:45  warning  Unexpected any. Specify a different type                                                                                        @typescript-eslint/no-explicit-any
+   95:81  warning  Unexpected any. Specify a different type                                                                                        @typescript-eslint/no-explicit-any
+  100:46  warning  Unexpected any. Specify a different type                                                                                        @typescript-eslint/no-explicit-any
+  139:79  warning  Unexpected any. Specify a different type                                                                                        @typescript-eslint/no-explicit-any
+  140:79  warning  Unexpected any. Specify a different type                                                                                        @typescript-eslint/no-explicit-any
+  151:79  warning  Unexpected any. Specify a different type                                                                                        @typescript-eslint/no-explicit-any
+  272:14  warning  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  react-refresh/only-export-components
+
+/Users/ryan/Desktop/Production/Navigator/src/featureRegistry.ts
+  672:14  warning  'e' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/ryan/Desktop/Production/Navigator/src/hooks/useHeadlines.ts
+  20:9  warning  Unused eslint-disable directive (no problems were reported from 'react-hooks/purity')
+
+/Users/ryan/Desktop/Production/Navigator/src/index.tsx
+  17:10  warning  Fast refresh only works when a file has exports. Move your component(s) to a separate file  react-refresh/only-export-components
+
+/Users/ryan/Desktop/Production/Navigator/src/modules/admin/AdminDashboard.tsx
+    6:122  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   32:18   warning  'err' is defined but never used           @typescript-eslint/no-unused-vars
+  133:42   warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/ryan/Desktop/Production/Navigator/src/modules/career/components/GapAnalysisSection.test.tsx
+  106:53  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  128:52  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  151:52  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/ryan/Desktop/Production/Navigator/src/modules/career/components/GapAnalysisSection.tsx
+  42:5  warning  'onViewChange' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/ryan/Desktop/Production/Navigator/src/modules/career/context/CoachContext.tsx
+   9:17  warning  Unexpected any. Specify a different type                                                                                        @typescript-eslint/no-explicit-any
+  16:74  warning  Unexpected any. Specify a different type                                                                                        @typescript-eslint/no-explicit-any
+  16:87  warning  Unexpected any. Specify a different type                                                                                        @typescript-eslint/no-explicit-any
+  22:33  warning  Unexpected any. Specify a different type                                                                                        @typescript-eslint/no-explicit-any
+  27:14  warning  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  react-refresh/only-export-components
+
+/Users/ryan/Desktop/Production/Navigator/src/modules/grad/MAEligibility.tsx
+  31:23  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/ryan/Desktop/Production/Navigator/src/modules/grad/ProgramExplorerPage.tsx
+  66:47  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/ryan/Desktop/Production/Navigator/src/modules/grad/SkillExtractor.tsx
+  30:47  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/ryan/Desktop/Production/Navigator/src/modules/grad/hooks/useAcademicLogic.test.ts
+  15:35  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  20:56  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  28:37  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/ryan/Desktop/Production/Navigator/src/modules/grad/hooks/useAcademicLogic.ts
+   45:31  warning  Unexpected any. Specify a different type                 @typescript-eslint/no-explicit-any
+   55:21  warning  Unexpected any. Specify a different type                 @typescript-eslint/no-explicit-any
+   95:13  error    'newSemesters' is never reassigned. Use 'const' instead  prefer-const
+  147:23  warning  Unexpected any. Specify a different type                 @typescript-eslint/no-explicit-any
+
+/Users/ryan/Desktop/Production/Navigator/src/modules/job/CoverLetterEditor.tsx
+  144:54   warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  456:111  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  456:179  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  457:74   warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  460:75   warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  474:71   warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/ryan/Desktop/Production/Navigator/src/modules/job/InterviewAdvisor.tsx
+   88:49  error    Error: Cannot call impure function during render
+
+`Math.random` is an impure function. Calling an impure function can produce unstable results that update unpredictably when the component happens to re-render. (https://react.dev/reference/rules/components-and-hooks-must-be-pure#components-and-hooks-must-be-idempotent).
+
+/Users/ryan/Desktop/Production/Navigator/src/modules/job/InterviewAdvisor.tsx:88:49
+  86 |
+  87 |         // Shuffle and pick 2-3
+> 88 |         return [...allBullets].sort(() => 0.5 - Math.random()).slice(0, 3);
+     |                                                 ^^^^^^^^^^^^^ Cannot call impure function
+  89 |     }, [resumes]);
+  90 |
+  91 |     const messagesEndRef = React.useRef<HTMLDivElement>(null);  react-hooks/purity
+  138:53  warning  Unexpected any. Specify a different type                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        @typescript-eslint/no-explicit-any
+  149:24  error    Error: Cannot call impure function during render
+
+`Date.now` is an impure function. Calling an impure function can produce unstable results that update unpredictably when the component happens to re-render. (https://react.dev/reference/rules/components-and-hooks-must-be-pure#components-and-hooks-must-be-idempotent).
+
+/Users/ryan/Desktop/Production/Navigator/src/modules/job/InterviewAdvisor.tsx:149:24
+  147 |             impact: suggestion.impact,
+  148 |             source: 'Interview Advisor',
+> 149 |             dateAdded: Date.now()
+      |                        ^^^^^^^^^^ Cannot call impure function
+  150 |         };
+  151 |
+  152 |         const updatedResume = {                                                          react-hooks/purity
+
+/Users/ryan/Desktop/Production/Navigator/src/modules/job/JobDetail.tsx
+  510:61  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/ryan/Desktop/Production/Navigator/src/modules/job/JobMatchInput.tsx
+   52:35  warning  Unexpected any. Specify a different type                                                                                @typescript-eslint/no-explicit-any
+  121:8   warning  React Hook useEffect has a missing dependency: 'handleJobSubmission'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+/Users/ryan/Desktop/Production/Navigator/src/modules/job/NavigatorPro.tsx
+  38:8  warning  React Hook useEffect has a missing dependency: 'loadFeedWithCache'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+/Users/ryan/Desktop/Production/Navigator/src/modules/job/context/JobContext.tsx
+  33:14  warning  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  react-refresh/only-export-components
+
+/Users/ryan/Desktop/Production/Navigator/src/modules/job/hooks/useInterview.ts
+   30:23  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   45:23  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  109:23  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/ryan/Desktop/Production/Navigator/src/modules/job/hooks/useJobDetailLogic.ts
+  133:8   warning  React Hook useCallback has an unnecessary dependency: 'showSuccess'. Either exclude it or remove the dependency array  react-hooks/exhaustive-deps
+  191:28  warning  '_' is assigned a value but never used                                                                                 @typescript-eslint/no-unused-vars
+  217:8   warning  React Hook useCallback has an unnecessary dependency: 'showSuccess'. Either exclude it or remove the dependency array  react-hooks/exhaustive-deps
+
+/Users/ryan/Desktop/Production/Navigator/src/modules/legal/Privacy.tsx
+  6:68  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/ryan/Desktop/Production/Navigator/src/modules/legal/Terms.tsx
+  6:68  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/ryan/Desktop/Production/Navigator/src/modules/onboarding/OnboardingPage.tsx
+  204:18  warning  'e' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/ryan/Desktop/Production/Navigator/src/modules/onboarding/PlansOnboardingStep.tsx
+  128:25  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/ryan/Desktop/Production/Navigator/src/modules/onboarding/WelcomeScreen.tsx
+  180:22  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  346:68  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/ryan/Desktop/Production/Navigator/src/modules/plans/PlansPage.tsx
+  75:25  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/ryan/Desktop/Production/Navigator/src/modules/resume/ResumeEditor.test.tsx
+  6:10  warning  'STORAGE_KEYS' is defined but never used      @typescript-eslint/no-unused-vars
+  8:10  warning  'useResumeContext' is defined but never used  @typescript-eslint/no-unused-vars
+
+/Users/ryan/Desktop/Production/Navigator/src/modules/resume/ResumeEditor.tsx
+   84:23  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  192:48  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/ryan/Desktop/Production/Navigator/src/modules/resume/context/ResumeContext.tsx
+  25:14  warning  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  react-refresh/only-export-components
+  96:8   warning  React Hook useCallback has an unnecessary dependency: 'showSuccess'. Either exclude it or remove the dependency array           react-hooks/exhaustive-deps
+
+/Users/ryan/Desktop/Production/Navigator/src/modules/skills/SkillInterviewPage.tsx
+  39:11  warning  The 'rawSkills' logical expression could make the dependencies of useMemo Hook (at line 40) change on every render. To fix this, wrap the initialization of 'rawSkills' in its own useMemo() Hook  react-hooks/exhaustive-deps
+
+/Users/ryan/Desktop/Production/Navigator/src/modules/skills/context/SkillContext.tsx
+  20:14  warning  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  react-refresh/only-export-components
+
+/Users/ryan/Desktop/Production/Navigator/src/services/ai/interviewAiService.ts
+  24:30  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  83:30  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/ryan/Desktop/Production/Navigator/src/services/ai/jobAiService.ts
+  144:84  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/ryan/Desktop/Production/Navigator/src/services/scraperService.test.ts
+  22:26  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  37:26  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/ryan/Desktop/Production/Navigator/src/services/storage/blockUtils.test.ts
+  108:40  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  115:40  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  123:40  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/ryan/Desktop/Production/Navigator/src/services/storage/resumeStorage.ts
+  41:65  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/ryan/Desktop/Production/Navigator/src/services/storageService.ts
+  43:51  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  56:55  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  67:55  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/ryan/Desktop/Production/Navigator/src/services/usageLimits.test.ts
+   20:99  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   30:96  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   39:80  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   74:74  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   83:68  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  141:79  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  142:72  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  144:36  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  189:79  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  190:72  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  192:36  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  225:79  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  226:72  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  228:36  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/ryan/Desktop/Production/Navigator/src/services/usageLimits.ts
+  171:42   warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  171:77   warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  171:111  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  182:40   warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  184:40   warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  185:40   warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/ryan/Desktop/Production/Navigator/src/test/setup.ts
+   76:20  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  103:33  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/ryan/Desktop/Production/Navigator/src/utils/archetypeUtils.test.ts
+  14:18  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  23:18  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  32:18  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/ryan/Desktop/Production/Navigator/src/utils/lazyWithRetry.ts
+   9:55  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  20:25  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/ryan/Desktop/Production/Navigator/src/utils/secureStorage.test.ts
+  16:24  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  22:24  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  32:37  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  34:18  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/ryan/Desktop/Production/Navigator/src/utils/test-setup-bun.ts
+   5:27  warning  Unexpected any. Specify a different type                                                                             @typescript-eslint/no-explicit-any
+   6:18  warning  Unexpected any. Specify a different type                                                                             @typescript-eslint/no-explicit-any
+  13:8   warning  Unexpected any. Specify a different type                                                                             @typescript-eslint/no-explicit-any
+  17:27  warning  Unexpected any. Specify a different type                                                                             @typescript-eslint/no-explicit-any
+  18:3   warning  Use "@ts-expect-error" instead of "@ts-ignore", as "@ts-ignore" will do nothing if the following line is error-free  @typescript-eslint/ban-ts-comment
+  19:18  warning  Unexpected any. Specify a different type                                                                             @typescript-eslint/no-explicit-any
+  22:8   warning  Unexpected any. Specify a different type                                                                             @typescript-eslint/no-explicit-any
+  26:27  warning  Unexpected any. Specify a different type                                                                             @typescript-eslint/no-explicit-any
+  27:3   warning  Use "@ts-expect-error" instead of "@ts-ignore", as "@ts-ignore" will do nothing if the following line is error-free  @typescript-eslint/ban-ts-comment
+  28:18  warning  Unexpected any. Specify a different type                                                                             @typescript-eslint/no-explicit-any
+  32:8   warning  Unexpected any. Specify a different type                                                                             @typescript-eslint/no-explicit-any
+
+/Users/ryan/Desktop/Production/Navigator/supabase/functions/create-checkout-session/index.ts
+  111:21  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/ryan/Desktop/Production/Navigator/supabase/functions/gemini-proxy/index.ts
+  224:28  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/ryan/Desktop/Production/Navigator/supabase/functions/inbound-email/index.ts
+   23:15  warning  'fromEmail' is assigned a value but never used  @typescript-eslint/no-unused-vars
+  165:27  warning  Unexpected any. Specify a different type        @typescript-eslint/no-explicit-any
+  225:21  warning  Unexpected any. Specify a different type        @typescript-eslint/no-explicit-any
+
+/Users/ryan/Desktop/Production/Navigator/supabase/functions/scrape-jobs/dns_rebinding_protection.test.ts
+   1:24  warning  'beforeAll' is defined but never used     @typescript-eslint/no-unused-vars
+   1:35  warning  'afterAll' is defined but never used      @typescript-eslint/no-unused-vars
+   5:49  warning  'recordType' is defined but never used    @typescript-eslint/no-unused-vars
+  13:16  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  18:67  warning  'input' is defined but never used         @typescript-eslint/no-unused-vars
+  18:93  warning  'init' is defined but never used          @typescript-eslint/no-unused-vars
+  64:17  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/ryan/Desktop/Production/Navigator/supabase/functions/scrape-jobs/index.ts
+  235:21  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/ryan/Desktop/Production/Navigator/supabase/functions/scrape-jobs/validator.ts
+  118:31  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  119:37  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  275:21  warning  Empty block statement                     no-empty
+  299:5   warning  Unnecessary try/catch wrapper             no-useless-catch
+
+/Users/ryan/Desktop/Production/Navigator/supabase/functions/scrape-jobs/validator_hardening.test.ts
+   57:25  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   66:25  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   75:25  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   84:25  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+   93:25  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+  116:21  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+/Users/ryan/Desktop/Production/Navigator/supabase/functions/stripe-webhook/index.ts
+  107:19  warning  Unexpected any. Specify a different type  @typescript-eslint/no-explicit-any
+
+✖ 176 problems (4 errors, 172 warnings)
+  1 error and 1 warning potentially fixable with the `--fix` option.
+

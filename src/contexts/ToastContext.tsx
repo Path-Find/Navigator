@@ -40,10 +40,10 @@ export const ToastProvider: React.FC<{ children: React.ReactNode }> = ({ childre
             const id = `toast-${Date.now()}-${Math.random()}`;
             const newToasts = [...prev, { id, message, type }];
 
-            // Auto-remove after 3 seconds
+            // Auto-remove after 6 seconds (standard is 3s but Navigator has complex outputs)
             setTimeout(() => {
                 removeToast(id);
-            }, 3000);
+            }, 6000);
 
             return newToasts;
         });

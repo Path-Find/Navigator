@@ -28,7 +28,7 @@ export const ProgramExplorerPage: React.FC = () => {
 
     return (
         <SharedPageLayout maxWidth="full" className="relative theme-edu" spacing="compact">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 py-6">
+            <div className="max-w-6xl mx-auto px-4 sm:px-6 py-6">
                 <PageHeader
                     variant="simple"
                     title="Programs"
@@ -63,7 +63,7 @@ export const ProgramExplorerPage: React.FC = () => {
                             </div>
 
                             <ProgramExplorer
-                                onSelect={(p: any) => {
+                                onSelect={(p: { institution: string; name: string }) => {
                                     setSelectedProgram(`${p.institution} - ${p.name}`);
                                     // Scroll to analyzer
                                     setTimeout(() => {

@@ -10,6 +10,9 @@ export const paymentService = {
             throw new Error('User not authenticated');
         }
 
+        // TEMP: Kill switch for new checkouts
+        throw new Error("Navigator is currently invite-only. Please join the waitlist in your account settings or on the plans page.");
+
         // Get fresh session with valid access token
         const { data: { session } } = await supabase.auth.getSession();
         if (!session?.access_token) {
@@ -31,11 +34,8 @@ export const paymentService = {
                     console.error('[PaymentService] Error body:', errorBody);
                     const message = errorBody?.details || errorBody?.error || errorBody?.message || errorBody?.msg || error.message;
                     throw new Error(message);
-                } catch (parseErr) {
-                    // If we can't parse the body, use the raw message
-                    if (parseErr instanceof Error && parseErr.message !== error.message) {
-                        throw parseErr;
-                    }
+                } catch (_parseErr) {
+                    // If we can't parse the body, we just fall through to the default error
                 }
             }
 

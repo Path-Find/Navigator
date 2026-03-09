@@ -21,7 +21,7 @@ export const CourseVerificationModal: React.FC<CourseVerificationModalProps> = (
 
     if (!isOpen) return null;
 
-    const handleCourseChange = (semIndex: number, courseIndex: number, field: keyof Course, value: any) => {
+    const handleCourseChange = (semIndex: number, courseIndex: number, field: keyof Course, value: string | number) => {
         const newSemesters = [...editableTranscript.semesters];
         const newCourses = [...newSemesters[semIndex].courses];
         newCourses[courseIndex] = { ...newCourses[courseIndex], [field]: value };

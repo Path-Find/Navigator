@@ -28,7 +28,7 @@ interface JobContextType {
     closeUpgradeModal: () => void;
 }
 
-const JobContext = createContext<JobContextType | undefined>(undefined);
+export const JobContext = createContext<JobContextType | undefined>(undefined);
 
 export const useJobContext = () => {
     const context = useContext(JobContext);
@@ -39,13 +39,31 @@ export const useJobContext = () => {
 };
 
 export const JobProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
-    const jobManager = useJobManager();
+    const {
+        jobs, activeJobId, activeJob, isLoading, usageStats,
+        upgradeModalData, nudgeJob, setActiveJobId, handleUpdateJob,
+        handleJobCreated, handleDraftApplication, handleDeleteJob,
+        handleAnalyzeJob, handlePromoteFromFeed, handleSaveFromFeed,
+        closeUpgradeModal, dismissNudge
+    } = useJobManager();
+
+    const value = React.useMemo(() => ({
+        jobs, activeJobId, activeJob, isLoading, usageStats,
+        upgradeModalData, nudgeJob, setActiveJobId, handleUpdateJob,
+        handleJobCreated, handleDraftApplication, handleDeleteJob,
+        handleAnalyzeJob, handlePromoteFromFeed, handleSaveFromFeed,
+        closeUpgradeModal, dismissNudge,
+        showUpgradeModal: !!upgradeModalData,
+    }), [
+        jobs, activeJobId, activeJob, isLoading, usageStats,
+        upgradeModalData, nudgeJob, setActiveJobId, handleUpdateJob,
+        handleJobCreated, handleDraftApplication, handleDeleteJob,
+        handleAnalyzeJob, handlePromoteFromFeed, handleSaveFromFeed,
+        closeUpgradeModal, dismissNudge
+    ]);
 
     return (
-        <JobContext.Provider value={{
-            ...jobManager,
-            showUpgradeModal: !!jobManager.upgradeModalData,
-        }}>
+        <JobContext.Provider value={value}>
             {children}
         </JobContext.Provider>
     );

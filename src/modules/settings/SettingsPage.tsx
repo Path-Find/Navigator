@@ -10,6 +10,7 @@ import { Button } from '../../components/ui/Button';
 import { SharedPageLayout } from '../../components/common/SharedPageLayout';
 import { PageHeader } from '../../components/ui/PageHeader';
 import { useNavigate } from 'react-router-dom';
+import { NextGenCalibration } from './components/NextGenCalibration';
 
 export const SettingsPage: React.FC = () => {
     const { user, userTier, isTester, isAdmin, simulatedTier, journey, updateProfile } = useUser();
@@ -171,14 +172,14 @@ export const SettingsPage: React.FC = () => {
                                             </span>
                                         </div>
                                         <span className="text-sm font-bold text-neutral-900 dark:text-white">
-                                            {(usageStats?.analysisPeriod === 'weekly' ? usageStats?.weekAnalyses : usageStats?.todayAnalyses) || 0} <span className="text-neutral-300 dark:text-neutral-600 font-normal">/ {usageStats?.analysisLimit === Infinity || ((isAdmin || isTester) && !simulatedTier) ? '∞' : usageStats?.analysisLimit || 0}</span>
+                                            {(usageStats?.analysisPeriod === 'weekly' ? usageStats?.weekAnalyses : usageStats?.analysisPeriod === 'lifetime' ? usageStats?.lifetimeAnalyses : usageStats?.todayAnalyses) || 0} <span className="text-neutral-300 dark:text-neutral-600 font-normal">/ {usageStats?.analysisLimit === Infinity || ((isAdmin || isTester) && !simulatedTier) ? '∞' : usageStats?.analysisLimit || 0}</span>
                                         </span>
                                     </div>
 
                                     <div className="h-2 w-full bg-neutral-100 dark:bg-neutral-800 rounded-full overflow-hidden">
                                         <div
                                             className="h-full bg-gradient-to-r from-emerald-500 to-emerald-400 transition-all duration-1000"
-                                            style={{ width: `${(isAdmin || isTester) && !simulatedTier ? 0 : Math.min(100, ((usageStats?.analysisPeriod === 'weekly' ? usageStats?.weekAnalyses : usageStats?.todayAnalyses) || 0) / (usageStats?.analysisLimit || 1) * 100)}%` }}
+                                            style={{ width: `${(isAdmin || isTester) && !simulatedTier ? 0 : Math.min(100, ((usageStats?.analysisPeriod === 'weekly' ? usageStats?.weekAnalyses : usageStats?.analysisPeriod === 'lifetime' ? usageStats?.lifetimeAnalyses : usageStats?.todayAnalyses) || 0) / (usageStats?.analysisLimit || 1) * 100)}%` }}
                                         />
                                     </div>
                                 </div>
@@ -237,6 +238,7 @@ export const SettingsPage: React.FC = () => {
                                 <div className="flex items-center gap-2 mb-1">
                                     <span className="text-sm font-bold text-neutral-700 dark:text-neutral-300">Browser Extension</span>
                                 </div>
+                                <p className="text-xs text-neutral-400 leading-relaxed -mt-2 mb-2">Save jobs from any website with one click. Connect the extension using your access token.</p>
 
                                 <Button
                                     variant="ghost"
@@ -261,6 +263,7 @@ export const SettingsPage: React.FC = () => {
                                     </span>
                                 )}
                             </div>
+                            <p className="text-xs text-neutral-400 leading-relaxed -mt-2 mb-2">Forward job alert emails to your personal Navigator address to auto-import opportunities.</p>
 
                             {(usageStats?.inboundEmailToken || isAdmin || isTester) ? (
                                 <Button
@@ -287,7 +290,11 @@ export const SettingsPage: React.FC = () => {
                 </div>
             </div>
 
-
+            {isAdmin && (
+                <div className="mt-12">
+                    <NextGenCalibration />
+                </div>
+            )}
         </SharedPageLayout>
     );
 };

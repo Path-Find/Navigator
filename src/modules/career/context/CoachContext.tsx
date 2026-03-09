@@ -1,25 +1,25 @@
 import React, { createContext, useContext } from 'react';
-import type { RoleModelProfile, TargetJob } from '../../../types';
+import type { RoleModelProfile, TargetJob, Transcript, ResumeProfile, CustomSkill } from '../../../types';
 
 import { useCoachManager } from '../hooks/useCoachManager';
 
 interface CoachContextType {
     roleModels: RoleModelProfile[];
     targetJobs: TargetJob[];
-    transcript: any | null;
+    transcript: Transcript | null;
     activeAnalysisIds: Set<string>;
     isLoading: boolean;
 
     // Actions
     handleAddRoleModel: (file: File) => Promise<void>;
     handleDeleteRoleModel: (id: string) => Promise<void>;
-    handleRunGapAnalysis: (targetJobId: string, contextState: { resumes: any, skills: any }) => Promise<void>;
+    handleRunGapAnalysis: (targetJobId: string, contextState: { resumes: ResumeProfile[], skills: CustomSkill[] }) => Promise<void>;
     handleGenerateRoadmap: (targetJobId: string) => Promise<void>;
     handleToggleMilestone: (targetJobId: string, milestoneId: string) => Promise<void>;
     handleTargetJobCreated: (url: string) => Promise<void>;
     handleEmulateRoleModel: (roleModelId: string) => Promise<void>;
     handleUpdateTargetJob: (targetJob: TargetJob) => Promise<void>;
-    setTranscript: (transcript: any | null) => void;
+    setTranscript: (transcript: Transcript | null) => void;
 }
 
 const CoachContext = createContext<CoachContextType | undefined>(undefined);

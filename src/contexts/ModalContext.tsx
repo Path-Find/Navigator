@@ -6,6 +6,7 @@ export type ModalType = 'AUTH' | 'UPGRADE' | 'INTERVIEW' | null;
 export interface ModalData {
     feature?: FeatureDefinition;
     initialView?: 'upgrade' | 'compare';
+    authMode?: 'sign-in' | 'sign-up';
 }
 
 interface ModalContextType {

@@ -34,7 +34,7 @@ export const Contact: React.FC = () => {
 
     return (
         <div className="min-h-screen bg-white dark:bg-black text-neutral-900 dark:text-white pt-24 pb-20">
-            <div className="max-w-7xl mx-auto px-4">
+            <div className="max-w-6xl mx-auto px-4">
                 <div className="grid lg:grid-cols-2 gap-16 items-start">
                     {/* Left Side: Content */}
                     <div className="space-y-8">

@@ -9,8 +9,10 @@ export const ERROR_MESSAGES = {
   API_KEY_PERMISSION_DENIED: "API key doesn't have permission. Check your Google Cloud console.",
   API_KEY_WRONG_FORMAT: "API key format is incorrect. It should start with 'AI...'",
 
-  // Quota errors
-  DAILY_QUOTA_EXCEEDED: "You've reached your daily API limit. Try again tomorrow, or upgrade to Navigator Pro for unlimited access.",
+  // Quota & Limit errors
+  DAILY_QUOTA_EXCEEDED: "You've reached your daily limit. Try again tomorrow, or upgrade to Navigator Pro for unlimited access.",
+  WEEKLY_QUOTA_EXCEEDED: "You've reached your weekly limit. Consider upgrading for a higher cap.",
+  FREE_LIMIT_REACHED: "You've used all your free analyses! Upgrade to Navigator Plus or Pro to keep going.",
   RATE_LIMIT_EXCEEDED: "The AI is working hard right now! Please take a quick break and try again in a moment.",
 
   // Network errors
@@ -30,8 +32,8 @@ export const ERROR_MESSAGES = {
   AUTH_INVALID_INVITE: "Invalid or expired invite code. If you're having trouble, please contact support.",
 
   // Generic errors
-  UNKNOWN_ERROR: "Something went wrong. Please try again.",
-  SERVER_ERROR: "Server error. Our team has been notified. Please try again later.",
+  UNKNOWN_ERROR: "Unable to complete request. Please refresh or try again.",
+  SERVER_ERROR: "The system is currently busy. Please try again in a few moments.",
   NOT_A_JOB: "This content doesn't look like a valid job description. Please check your source and try again.",
 } as const;
 
@@ -43,12 +45,23 @@ export function getUserFriendlyError(error: Error | string): string {
   // Use lowercase for insensitive matching, but keep original for fallback
   const message = originalMessage.toLowerCase();
 
-  // Daily quota
-  if (message.includes('daily_quota_exceeded') || message.includes('perday')) {
+  // Plan & Quota limits
+  if (message.includes('free_limit_reached') || (message.includes('limit') && message.includes('free'))) {
+    return ERROR_MESSAGES.FREE_LIMIT_REACHED;
+  }
+  if (message.includes('weekly_limit_reached')) {
+    return ERROR_MESSAGES.WEEKLY_QUOTA_EXCEEDED;
+  }
+  if (message.includes('daily_limit_reached') || message.includes('daily_quota_exceeded') || message.includes('perday')) {
     return ERROR_MESSAGES.DAILY_QUOTA_EXCEEDED;
   }
 
-  // Rate limiting
+  // General "limit" catch-all if we didn't specify the tier
+  if (message.includes('limit reached') || message.includes('limit_reached')) {
+    return ERROR_MESSAGES.DAILY_QUOTA_EXCEEDED;
+  }
+
+  // Rate limiting (429 generally)
   if (message.includes('rate_limit_exceeded') || message.includes('429') || message.includes('quota')) {
     return ERROR_MESSAGES.RATE_LIMIT_EXCEEDED;
   }
@@ -98,10 +111,18 @@ export function getUserFriendlyError(error: Error | string): string {
     return ERROR_MESSAGES.AUTH_INVALID_INVITE;
   }
 
-  // If no match, return the original message (it might already be friendly)
-  // or a generic error if it looks too technical
-  if (message.length > 100 || message.includes('error:') || message.includes('at ')) {
+  // If no match, return the original message if it doesn't look like a code crash
+  const isCodeCrash = message.includes('at ') || message.includes('node_modules') || (message.includes('error:') && message.length > 150);
+
+  if (isCodeCrash || message.length > 300) {
     return ERROR_MESSAGES.UNKNOWN_ERROR;
+  }
+
+  // Edge Function / Proxy issues
+  if (message.includes('non-2xx') || message.includes('proxy error') || message.includes('edge function') || message.includes('status code')) {
+    if (message.includes('401')) return "Session expired. Please log out and back in.";
+    if (message.includes('429')) return ERROR_MESSAGES.RATE_LIMIT_EXCEEDED;
+    return "Analysis timed out or service busy. Try again in 10 seconds.";
   }
 
   return originalMessage;

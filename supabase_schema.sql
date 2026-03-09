@@ -45,11 +45,17 @@ create table jobs (
   company text,
   original_text text,
   url text,
+  location text, -- Added for geographic filtering
   source_type text default 'manual',
   analysis jsonb, -- Stores the Analysis result
-  status text default 'new' check (status in ('new', 'saved', 'applied', 'interview', 'offer', 'rejected', 'ghosted', 'feed', 'error')),
+  status text default 'new' check (status in ('new', 'saved', 'applied', 'interview', 'offer', 'rejected', 'ghosted', 'feed', 'error', 'analyzing')),
+  resume_id text, -- Link to the resume used
+  cover_letter text,
+  cover_letter_critique jsonb,
+  fit_score numeric,
   canonical_role text, -- Added for role farming
-  date_added timestamp with time zone default timezone('utc'::text, now()) not null
+  date_added timestamp with time zone default timezone('utc'::text, now()) not null,
+  updated_at timestamp with time zone default timezone('utc'::text, now()) not null
 );
 
 -- CANONICAL_ROLES: Stores standard job titles and their manually-vetted guidelines
@@ -254,7 +260,6 @@ create trigger on_auth_user_created
 create or replace function redeem_invite_code(code_input text)
 returns boolean
 language plpgsql
-language plpgsql
 security definer
 set search_path = public
 as $$
@@ -317,7 +322,8 @@ DECLARE
   v_today_email_count INT;
   v_is_admin BOOLEAN;
   v_is_tester BOOLEAN;
-  
+  v_email_verified BOOLEAN;
+
   -- Limits
   v_inbound_email_limit INT;
   v_inbound_job_limit INT;
@@ -578,7 +584,7 @@ RETURNS TRIGGER AS $$
 BEGIN
   -- If the requester is not a superuser/service_role
   -- we prevent changes to these specific columns
-  IF (current_setting('role') <> 'service_role') THEN
+  IF (current_user <> 'service_role') THEN
     NEW.subscription_tier = OLD.subscription_tier;
     NEW.is_admin = OLD.is_admin;
     NEW.is_tester = OLD.is_tester;

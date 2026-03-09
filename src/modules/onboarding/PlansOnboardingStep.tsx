@@ -114,7 +114,7 @@ export const PlansOnboardingStep: React.FC<PlansOnboardingStepProps> = ({
             const priceId = isAnnual ? PLAN_PRICING[activeTierKey].PRICE_ID_ANNUAL : PLAN_PRICING[activeTierKey].PRICE_ID_MONTHLY;
 
             if (!priceId || priceId.includes('placeholder')) {
-                alert('Stripe configuration missing. Please check .env or constants.');
+                setAuthError('Payment setup is not complete. Please contact support.');
                 setLoadingTier(null);
                 return;
             }
@@ -125,9 +125,9 @@ export const PlansOnboardingStep: React.FC<PlansOnboardingStepProps> = ({
             const { url } = await paymentService.createCheckoutSession(priceId, returnUrl);
             window.location.href = url;
 
-        } catch (error: any) {
+        } catch (error: unknown) {
             console.error('Checkout error:', error);
-            const message = error.message || 'Failed to initiate checkout.';
+            const message = error instanceof Error ? error.message : 'Failed to initiate checkout.';
             setAuthError(message);
         } finally {
             setLoadingTier(null);

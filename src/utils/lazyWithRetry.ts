@@ -17,11 +17,12 @@ export function lazyWithRetry<T extends ComponentType<any>>(
         try {
             const component = await componentImport();
             return 'default' in component ? component : { default: component };
-        } catch (error: any) {
+        } catch (error: unknown) {
+            const err = error instanceof Error ? error : new Error(String(error));
             const isChunkLoadError =
-                error.message.includes('Failed to fetch dynamically imported module') ||
-                error.message.includes('Loading chunk') ||
-                error.message.includes('Load chunk');
+                err.message.includes('Failed to fetch dynamically imported module') ||
+                err.message.includes('Loading chunk') ||
+                err.message.includes('Load chunk');
 
             if (isChunkLoadError) {
                 if (!pageHasBeenForceRefreshed) {

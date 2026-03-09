@@ -3,8 +3,18 @@ import type { User } from '@supabase/supabase-js';
 import { supabase } from '../services/supabase';
 import { Storage } from '../services/storageService';
 import { getDeviceFingerprint } from '../utils/fingerprint';
+import { STORAGE_KEYS } from '../constants';
+import { LocalStorage } from '../utils/localStorage';
+import { invalidateUserIdCache } from '../services/storage/storageCore';
 
 import type { UserTier } from '../types';
+
+const getTestUser = (): User | null => {
+    if (typeof window !== 'undefined' && LocalStorage.get('navigator_test_user')) {
+        return { id: 'test-user', email: 'test@example.com' } as unknown as User;
+    }
+    return null;
+};
 
 interface UserContextType {
     user: User | null;
@@ -12,18 +22,19 @@ interface UserContextType {
     actualTier: UserTier; // Real tier from DB
     isTester: boolean;
     isAdmin: boolean;
+    isNextGenEnabled: boolean;
     isLoading: boolean;
     signOut: () => Promise<void>;
     setSimulatedTier: (tier: UserTier | null) => void; // Admin-only: simulate viewing as different tier
     simulatedTier: UserTier | null;
-    updateProfile: (updates: Partial<{ first_name: string; last_name: string; device_id: string; journey: string; last_archetype_update: number; accepted_tos_version: number }>) => Promise<void>;
+    updateProfile: (updates: Partial<{ first_name: string; last_name: string; device_id: string; journey: string; last_archetype_update: number; accepted_tos_version: number; next_gen_enabled: boolean }>) => Promise<void>;
     journey: string; // User's onboarding journey stage (student, job-hunter, etc.)
     lastArchetypeUpdate: number;
     acceptedTosVersion: number;
     dismissedNotices: Record<string, number>;
     dismissNotice: (id: string, snoozeDays?: number) => void;
     isEmailVerified: boolean;
-    resendVerificationEmail: () => Promise<{ success: boolean; error?: any }>;
+    resendVerificationEmail: () => Promise<{ success: boolean; error?: unknown }>;
     refreshUser: () => Promise<void>;
 }
 
@@ -35,28 +46,29 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const [simulatedTier, setSimulatedTier] = useState<UserTier | null>(null);
     const [isTester, setIsTester] = useState(false);
     const [isAdmin, setIsAdmin] = useState(false);
+    const [isNextGenEnabled, setIsNextGenEnabled] = useState(false);
     const [journey, setJourney] = useState<string>(() => {
         if (typeof window !== 'undefined') {
-            return localStorage.getItem('navigator_user_journey') || 'job-hunter';
+            return LocalStorage.get(STORAGE_KEYS.USER_JOURNEY) || 'job-hunter';
         }
         return 'job-hunter';
     });
     const [lastArchetypeUpdate, setLastArchetypeUpdate] = useState<number>(() => {
         if (typeof window !== 'undefined') {
-            return parseInt(localStorage.getItem('navigator_last_archetype_update') || '0');
+            return parseInt(LocalStorage.get(STORAGE_KEYS.LAST_ARCHETYPE_UPDATE) || '0');
         }
         return 0;
     });
     const [acceptedTosVersion, setAcceptedTosVersion] = useState<number>(() => {
         if (typeof window !== 'undefined') {
-            return parseInt(localStorage.getItem('navigator_accepted_tos_version') || '0');
+            return parseInt(LocalStorage.get(STORAGE_KEYS.ACCEPTED_TOS_VERSION) || '0');
         }
         return 0;
     });
     const [dismissedNotices, setDismissedNotices] = useState<Record<string, number>>(() => {
         if (typeof window !== 'undefined') {
             try {
-                return JSON.parse(localStorage.getItem('navigator_dismissed_notices') || '{}');
+                return JSON.parse(LocalStorage.get(STORAGE_KEYS.DISMISSED_NOTICES) || '{}');
             } catch {
                 return {};
             }
@@ -74,57 +86,71 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
         setIsEmailVerified(!!currentUser?.email_confirmed_at);
         if (currentUser) {
             try {
+                // Fetch profile with resiliency. If one column fails, try fetching basic info.
                 const { data, error } = await supabase
                     .from('profiles')
-                    .select('subscription_tier, is_admin, is_tester')
+                    .select('subscription_tier, is_admin, is_tester, next_gen_enabled, journey, device_id, last_archetype_update, accepted_tos_version')
                     .eq('id', currentUser.id)
                     .single();
 
-                if (data && !error) {
-                    const tier = data.subscription_tier as UserTier;
-                    setActualTier(data.is_admin ? 'admin' : tier);
-                    setIsAdmin(data.is_admin || false);
-                    setIsTester(data.is_tester || false);
+                let profileData: any = data;
+
+                if (error && error.code === 'PGRST204') {
+                    // Fallback to absolute basics if schema mismatch
+                    const basic = await supabase
+                        .from('profiles')
+                        .select('subscription_tier, is_admin, is_tester')
+                        .eq('id', currentUser.id)
+                        .single();
+                    profileData = basic.data;
+                }
+
+                if (profileData) {
+                    const tier = (profileData.subscription_tier as UserTier) || 'free';
+                    setActualTier(profileData.is_admin ? 'admin' : tier);
+                    setIsAdmin(profileData.is_admin || false);
+                    setIsTester(profileData.is_tester || false);
+                    setIsNextGenEnabled(profileData.next_gen_enabled || false);
 
                     // If they have an account, they've implicitly accepted privacy/terms
-                    // Sync this to localStorage to prevent redundant redirects
-                    localStorage.setItem('navigator_privacy_accepted', 'true');
+                    LocalStorage.set(STORAGE_KEYS.PRIVACY_ACCEPTED, 'true');
 
-                    if ((data as any).journey) {
-                        setJourney((data as any).journey);
-                        localStorage.setItem('navigator_user_journey', (data as any).journey);
+                    const meta = profileData as any;
+                    if (meta.journey) {
+                        setJourney(meta.journey);
+                        LocalStorage.set(STORAGE_KEYS.USER_JOURNEY, meta.journey);
+                    }
+                    if (meta.last_archetype_update) {
+                        setLastArchetypeUpdate(meta.last_archetype_update);
+                        LocalStorage.set(STORAGE_KEYS.LAST_ARCHETYPE_UPDATE, meta.last_archetype_update.toString());
+                    }
+                    if (meta.accepted_tos_version) {
+                        setAcceptedTosVersion(meta.accepted_tos_version);
+                        LocalStorage.set(STORAGE_KEYS.ACCEPTED_TOS_VERSION, meta.accepted_tos_version.toString());
                     }
 
                     // Abuse Prevention: Sync device fingerprint
                     getDeviceFingerprint().then(fingerprint => {
-                        if (data && (data as any).device_id !== fingerprint) {
+                        if (profileData && (profileData as any).device_id !== fingerprint) {
                             supabase.from('profiles').update({ device_id: fingerprint }).eq('id', currentUser.id).then(({ error: syncError }) => {
                                 if (syncError) {
-                                    // Handle missing column gracefully - don't log as error if it's just a missing column
                                     if (syncError.code === 'PGRST204' || syncError.message?.includes('device_id')) {
-                                        console.warn("Device fingerprinting skipped: 'device_id' column not found in profiles Table.");
-                                    } else {
-                                        console.error("Failed to sync device fingerprint", syncError);
+                                        console.warn("Device fingerprinting skipped: column missing.");
                                     }
                                 }
                             });
                         }
                     }).catch(err => console.warn("Device fingerprint failed:", err));
-                } else if (error) {
-                    if (import.meta.env.DEV) {
-                        console.error('Error fetching user profile:', error);
-                    }
                 }
             } catch (err) {
-                if (import.meta.env.DEV) {
-                    console.error('Error fetching user profile:', err);
-                }
+                console.error('Error fetching user profile:', err);
             }
         } else {
             setActualTier('free');
             setIsTester(false);
             setIsAdmin(false);
-            setSimulatedTier(null); // Clear simulation on logout
+            setIsNextGenEnabled(false);
+            setSimulatedTier(null);
         }
         setIsLoading(false);
     };
@@ -132,26 +158,17 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
     useEffect(() => {
         // Initial Session Check
         supabase.auth.getSession().then(({ data: { session } }) => {
-            if (session?.user) {
-                processUser(session.user);
-            } else if (typeof window !== 'undefined' && localStorage.getItem('navigator_test_user')) {
-                // Mock user for E2E tests
-                processUser({ id: 'test-user', email: 'test@example.com' } as any);
-                setActualTier((localStorage.getItem('navigator_user_tier') as any) || 'free');
-            } else {
-                processUser(null);
+            const testUser = getTestUser();
+            processUser(session?.user ?? testUser);
+            if (!session?.user && testUser) {
+                setActualTier((LocalStorage.get('navigator_user_tier') as UserTier) || 'free');
             }
         }).catch(() => processUser(null));
 
         // Auth Change Listener
         const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-            if (session?.user) {
-                processUser(session.user);
-            } else if (typeof window !== 'undefined' && localStorage.getItem('navigator_test_user')) {
-                processUser({ id: 'test-user', email: 'test@example.com' } as any);
-            } else {
-                processUser(null);
-            }
+            invalidateUserIdCache();
+            processUser(session?.user ?? getTestUser());
         });
 
         return () => subscription.unsubscribe();
@@ -168,54 +185,78 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
         window.location.href = '/';
     };
 
-    const updateProfile = async (updates: Partial<{ first_name: string; last_name: string; device_id: string; journey: string; last_archetype_update: number; accepted_tos_version: number }>) => {
+    const updateProfile = async (updates: Partial<{ first_name: string; last_name: string; device_id: string; journey: string; last_archetype_update: number; accepted_tos_version: number; next_gen_enabled: boolean }>) => {
         if (!user) {
             // If not logged in, just update local state/storage
             if (updates.journey) {
                 setJourney(updates.journey);
-                localStorage.setItem('navigator_user_journey', updates.journey);
+                LocalStorage.set(STORAGE_KEYS.USER_JOURNEY, updates.journey);
             }
             if (updates.last_archetype_update) {
                 setLastArchetypeUpdate(updates.last_archetype_update);
-                localStorage.setItem('navigator_last_archetype_update', updates.last_archetype_update.toString());
+                LocalStorage.set(STORAGE_KEYS.LAST_ARCHETYPE_UPDATE, updates.last_archetype_update.toString());
             }
             if (updates.accepted_tos_version) {
                 setAcceptedTosVersion(updates.accepted_tos_version);
-                localStorage.setItem('navigator_accepted_tos_version', updates.accepted_tos_version.toString());
+                LocalStorage.set(STORAGE_KEYS.ACCEPTED_TOS_VERSION, updates.accepted_tos_version.toString());
             }
             return;
         }
 
-        const { error } = await supabase.from('profiles').update(updates).eq('id', user.id);
+        // Store current state for rollback
+        const oldJourney = journey;
+        const oldLastArchetypeUpdate = lastArchetypeUpdate;
+        const oldAcceptedTosVersion = acceptedTosVersion;
+        const oldNextGenEnabled = isNextGenEnabled;
 
-        // Optimistically update local state for better UX, even if DB update fails 
-        // (common if schema is out of sync in local dev)
+        // Optimistically update local state for better UX
         if (updates.journey) {
             setJourney(updates.journey);
-            localStorage.setItem('navigator_user_journey', updates.journey);
+            LocalStorage.set(STORAGE_KEYS.USER_JOURNEY, updates.journey);
 
             // Auto-update archetype timestamp when journey is changed
             const now = Date.now();
             setLastArchetypeUpdate(now);
-            localStorage.setItem('navigator_last_archetype_update', now.toString());
+            LocalStorage.set(STORAGE_KEYS.LAST_ARCHETYPE_UPDATE, now.toString());
         }
 
         if (updates.last_archetype_update) {
             setLastArchetypeUpdate(updates.last_archetype_update);
-            localStorage.setItem('navigator_last_archetype_update', updates.last_archetype_update.toString());
+            LocalStorage.set(STORAGE_KEYS.LAST_ARCHETYPE_UPDATE, updates.last_archetype_update.toString());
         }
 
         if (updates.accepted_tos_version) {
             setAcceptedTosVersion(updates.accepted_tos_version);
-            localStorage.setItem('navigator_accepted_tos_version', updates.accepted_tos_version.toString());
+            LocalStorage.set(STORAGE_KEYS.ACCEPTED_TOS_VERSION, updates.accepted_tos_version.toString());
         }
 
+        if (updates.next_gen_enabled !== undefined) {
+            setIsNextGenEnabled(updates.next_gen_enabled);
+        }
+
+        const { error } = await supabase.from('profiles').update(updates).eq('id', user.id);
+
         if (error) {
-            // Handle missing column gracefully in manual updates too
-            if (error.code === 'PGRST204' || error.message?.includes('device_id') || error.message?.includes('journey') || error.message?.includes('last_archetype_update') || error.message?.includes('accepted_tos_version')) {
+            // Handle missing column gracefully
+            const isGraceful = error.code === 'PGRST204' || error.message?.includes('device_id') || error.message?.includes('journey') || error.message?.includes('last_archetype_update') || error.message?.includes('accepted_tos_version');
+
+            if (isGraceful) {
                 console.warn("Profile update partially skipped: some columns might be missing in DB.");
             } else {
-                console.error("Failed to update profile context", error);
+                console.error("Failed to update profile context. Rolling back.", error);
+
+                // Rollback local state
+                setJourney(oldJourney);
+                setLastArchetypeUpdate(oldLastArchetypeUpdate);
+                setAcceptedTosVersion(oldAcceptedTosVersion);
+                setIsNextGenEnabled(oldNextGenEnabled);
+
+                // Rollback storage
+                LocalStorage.set(STORAGE_KEYS.USER_JOURNEY, oldJourney);
+                LocalStorage.set(STORAGE_KEYS.LAST_ARCHETYPE_UPDATE, oldLastArchetypeUpdate.toString());
+                LocalStorage.set(STORAGE_KEYS.ACCEPTED_TOS_VERSION, oldAcceptedTosVersion.toString());
+
+                throw error; // Re-throw so UI can show error toast
             }
         }
     };
@@ -224,7 +265,7 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
         const expiration = snoozeDays > 0 ? Date.now() + snoozeDays * 24 * 60 * 60 * 1000 : Infinity;
         const updated = { ...dismissedNotices, [id]: expiration };
         setDismissedNotices(updated);
-        localStorage.setItem('navigator_dismissed_notices', JSON.stringify(updated));
+        LocalStorage.set(STORAGE_KEYS.DISMISSED_NOTICES, JSON.stringify(updated));
     };
 
     const resendVerificationEmail = async () => {
@@ -250,6 +291,7 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
             actualTier,
             isTester,
             isAdmin,
+            isNextGenEnabled,
             isLoading,
             signOut,
             simulatedTier,

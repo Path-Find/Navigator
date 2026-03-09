@@ -39,7 +39,7 @@ export const AcademicHQ: React.FC = () => {
     return (
         <SharedPageLayout maxWidth="full" className="relative">
             <GlobalDragOverlay onDrop={handleFileUpload} />
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 py-8">
+            <div className="max-w-6xl mx-auto px-4 sm:px-6 py-8">
 
                 {!transcript ? (
                     <AcademicHero

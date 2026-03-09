@@ -66,6 +66,29 @@ async function storeKey(db: IDBDatabase, key: CryptoKey): Promise<void> {
  * Primary storage is IndexedDB (non-extractable).
  * Migration: If a key exists in localStorage, it's imported and moved to IndexedDB.
  */
+async function getLegacyFingerprintKey(): Promise<CryptoKey> {
+  // Create a stable fingerprint from browser/device characteristics
+  const fingerprint = [
+    navigator.userAgent,
+    navigator.language,
+    new Date().getTimezoneOffset().toString(),
+    screen.colorDepth.toString(),
+    screen.width.toString() + 'x' + screen.height.toString()
+  ].join('|');
+
+  const encoder = new TextEncoder();
+  const data = encoder.encode(fingerprint);
+  const hash = await crypto.subtle.digest('SHA-256', data);
+
+  return crypto.subtle.importKey(
+    'raw',
+    hash,
+    { name: ENCRYPTION_ALGORITHM },
+    false,
+    ['encrypt', 'decrypt']
+  );
+}
+
 export async function getMasterKey(): Promise<CryptoKey> {
   const db = await openDB();
   let key = await getStoredKey(db);
@@ -110,6 +133,38 @@ export async function getMasterKey(): Promise<CryptoKey> {
     }
   }
 
+  // Check for data encrypted with the vulnerable fingerprint-derived key
+  let hasLegacyData = false;
+  for (let i = 0; i < localStorage.length; i++) {
+    const k = localStorage.key(i);
+    if (k && k.startsWith(STORAGE_PREFIX)) {
+      hasLegacyData = true;
+      break;
+    }
+  }
+
+  if (hasLegacyData) {
+    try {
+      const fingerprintKey = await getLegacyFingerprintKey();
+
+      key = await crypto.subtle.generateKey(
+        {
+          name: ENCRYPTION_ALGORITHM,
+          length: 256
+        },
+        false,
+        ['encrypt', 'decrypt']
+      );
+
+      await migrateLegacyData(fingerprintKey, key);
+      await storeKey(db, key);
+
+      return key;
+    } catch (e) {
+      console.error('Failed to migrate fingerprint-derived key:', e);
+    }
+  }
+
   // Generate new random non-extractable key
   key = await crypto.subtle.generateKey(
     {
@@ -151,7 +206,7 @@ async function encrypt(plaintext: string, key?: CryptoKey): Promise<string> {
     return btoa(String.fromCharCode(...combined));
   } catch (error) {
     console.error('Encryption failed:', error);
-    throw new Error('Failed to encrypt data');
+    throw new Error('Failed to encrypt data', { cause: error });
   }
 }
 
@@ -177,8 +232,8 @@ async function decrypt(encryptedData: string, key?: CryptoKey): Promise<string> 
 
     const decoder = new TextDecoder();
     return decoder.decode(decryptedBuffer);
-  } catch {
-    throw new Error('Failed to decrypt data');
+  } catch (error) {
+    throw new Error('Failed to decrypt data', { cause: error });
   }
 }
 

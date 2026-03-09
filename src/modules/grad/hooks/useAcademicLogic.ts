@@ -34,26 +34,25 @@ export const useAcademicLogic = () => {
         setParseError(null);
 
         try {
-            const reader = new FileReader();
-            reader.readAsDataURL(file);
-            reader.onload = async () => {
-                const base64 = (reader.result as string).split(',')[1];
-                try {
-                    const parsed = await parseTranscript(base64, file.type);
-                    setTempTranscript(parsed);
-                    setShowVerification(true);
-                } catch (err: any) {
-                    setParseError(err.message || 'Failed to parse transcript');
-                } finally {
-                    setIsParsing(false);
-                }
-            };
-            reader.onerror = () => {
-                setParseError('Failed to read file');
-                setIsParsing(false);
-            };
-        } catch (e: any) {
-            setParseError(e.message || 'An unexpected error occurred');
+            await new Promise<void>((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = async () => {
+                    const base64 = (reader.result as string).split(',')[1];
+                    try {
+                        const parsed = await parseTranscript(base64, file.type);
+                        setTempTranscript(parsed);
+                        setShowVerification(true);
+                        resolve();
+                    } catch (err: unknown) {
+                        reject(err);
+                    }
+                };
+                reader.onerror = () => reject(new Error('Failed to read file'));
+                reader.readAsDataURL(file);
+            });
+        } catch (e: unknown) {
+            setParseError(e instanceof Error ? e.message : 'An unexpected error occurred');
+        } finally {
             setIsParsing(false);
         }
     }, [setTempTranscript, setShowVerification]);
@@ -92,7 +91,7 @@ export const useAcademicLogic = () => {
         const { semIndex: sourceSemIndex, courseIndex } = editingCourse;
         const targetIndex = targetSemIndex !== undefined ? targetSemIndex : sourceSemIndex;
 
-        let newSemesters = [...transcript.semesters];
+        const newSemesters = [...transcript.semesters];
 
         if (sourceSemIndex === targetIndex) {
             // Simple update within the same semester
@@ -144,8 +143,8 @@ export const useAcademicLogic = () => {
             if (result.targetCredits) {
                 setTargetCredits(result.targetCredits);
             }
-        } catch (err: any) {
-            showError(err.message || "Failed to analyze program requirements");
+        } catch (err: unknown) {
+            showError(err instanceof Error ? err.message : "Failed to analyze program requirements");
         } finally {
             setIsAnalyzingRequirements(false);
         }

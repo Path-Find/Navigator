@@ -28,8 +28,8 @@ export const MAEligibility: React.FC<MAEligibilityProps> = ({ transcript, initia
         try {
             const analysis = await analyzeMAEligibility(transcript, targetProgram);
             setResult(analysis);
-        } catch (err: any) {
-            showError(err.message || "Failed to analyze eligibility");
+        } catch (err: unknown) {
+            showError(err instanceof Error ? err.message : "Failed to analyze eligibility");
         } finally {
             setIsAnalyzing(false);
         }
