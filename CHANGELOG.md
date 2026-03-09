@@ -4,6 +4,18 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## [2.31.7] - 2026-03-08
+
+### Maintenance & Stability
+- **Abortable AI Services**: Integrated `AbortController` support across `aiCore`, `jobAiService`, and `useJobAnalysis`. Rapid navigation or switching jobs now correctly cancels stale in-flight AI requests, preventing race conditions and improving performance.
+- **Conflict Resolution (Jobs & Resumes)**: Implemented `updatedAt` timestamps and comparison logic during cloud synchronization. The engine now uses these timestamps to ensure the most recent version of a job or resume is preserved across multi-device sessions.
+- **PDF Extraction Optimization**: Refactored PDF text extraction to process pages sequentially rather than in parallel. This significantly reduces memory spikes and prevents browser crashes when handling large resume files.
+- **Descriptive PDF Errors**: Upgraded extraction logic to throw and log descriptive errors for empty or corrupted PDFs, replacing the silent "empty string" fallback that caused confused AI responses.
+- **Vault Migration Guard**: Added a 3-second execution budget to the `migrateVaultData` loop. This prevents the primary application thread from blocking for too long if a user has an extremely large amount of encrypted data to re-key.
+- **Safe Analysis Fallbacks**: Standardized the `analyzeJobFit` return signature to provide safe default values when no resumes are present. Prevents "TypeError: undefined" crashes in Sidebar and Analysis components for new users.
+- **Cloud Sync Resilience**: Updated `syncLocalToCloud` to correctly propagate task errors, ensuring that background sync failures are surfaced via toast notifications rather than failing silently.
+- **Technical Roadmap**: Updated `docs/ROADMAP_TECHNICAL.md` to track recently completed stability initiatives and maintenance priorities.
+
 ### Professional Modeling Engine (R&D)
 - **Phase 3: Personalized style Overrides**: Implemented the "Style Transformer" (`RdStyleService`) which distills user feedback into active instructions. These instructions are now "dark-wired" into the generation loop to automatically adjust AI output to the user's personal voice.
 - **Phase 2: Semantic Trajectory Mapping**: Established the `RdEmbeddingService` using `text-embedding-004` to map professional experience into a 768-dimensional latent space. Implemented `RdTrajectoryService` to calculate the "Growth Vector" (semantic drift) between past profile versions and current target roles.

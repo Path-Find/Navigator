@@ -74,7 +74,10 @@ export const Storage = {
                     date_added: new Date(job.dateAdded || Date.now()).toISOString()
                 }));
                 syncTasks.push(supabase.from('jobs').insert(payload).then(({ error }) => {
-                    if (error) console.error("Cloud Sync Error (Sync Jobs):", error);
+                    if (error) {
+                        console.error("Cloud Sync Error (Sync Jobs):", error);
+                        throw new Error(`Sync Jobs failed: ${error.message}`);
+                    }
                 }));
             }
         }
@@ -93,7 +96,10 @@ export const Storage = {
                     updated_at: new Date().toISOString()
                 }));
                 syncTasks.push(supabase.from('user_skills').upsert(payload, { onConflict: 'user_id,name' }).then(({ error }) => {
-                    if (error) console.error("Cloud Sync Error (Sync Skills):", error);
+                    if (error) {
+                        console.error("Cloud Sync Error (Sync Skills):", error);
+                        throw new Error(`Sync Skills failed: ${error.message}`);
+                    }
                 }));
             }
         }
@@ -111,7 +117,10 @@ export const Storage = {
                     content: model
                 }));
                 syncTasks.push(supabase.from('role_models').insert(payload).then(({ error }) => {
-                    if (error) console.error("Cloud Sync Error (Sync Role Models):", error);
+                    if (error) {
+                        console.error("Cloud Sync Error (Sync Role Models):", error);
+                        throw new Error(`Sync Role Models failed: ${error.message}`);
+                    }
                 }));
             }
         }
@@ -135,7 +144,10 @@ export const Storage = {
                     date_added: new Date(target.dateAdded || Date.now()).toISOString()
                 }));
                 syncTasks.push(supabase.from('target_jobs').upsert(payload).then(({ error }) => {
-                    if (error) console.error("Cloud Sync Error (Sync Target Jobs):", error);
+                    if (error) {
+                        console.error("Cloud Sync Error (Sync Target Jobs):", error);
+                        throw new Error(`Sync Target Jobs failed: ${error.message}`);
+                    }
                 }));
             }
         }

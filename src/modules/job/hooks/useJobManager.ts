@@ -38,7 +38,8 @@ export const useJobManager = () => {
         analysisPeriod: 'lifetime',
         emailLimit: 0,
         roleModelLimit: isAdmin ? Infinity : 0,
-        interviewLimit: isAdmin ? Infinity : 0
+        interviewLimit: isAdmin ? Infinity : 0,
+        isFallback: false
     });
     const [upgradeModalData, setUpgradeModalData] = useState<UsageLimitResult | null>(null);
 
@@ -51,7 +52,10 @@ export const useJobManager = () => {
             try {
                 // 1. Sync local to cloud first (if logged in) to ensure we have the latest on both ends
                 if (user) {
-                    await Storage.syncLocalToCloud().catch(err => console.error("Initial sync failed:", err));
+                    await Storage.syncLocalToCloud().catch(err => {
+                        console.error("Initial sync failed:", err);
+                        showError("Cloud Sync Error: Some items haven't been backed up. Check your connection.");
+                    });
                 }
 
                 // 2. Fetch data in parallel
@@ -66,7 +70,12 @@ export const useJobManager = () => {
                 if (!mounted) return;
 
                 if (loadedJobs) setJobs(loadedJobs);
-                if (stats) setUsageStats(stats);
+                if (stats) {
+                    if (stats.isFallback) {
+                        showInfo("Unable to verify current usage. Using restricted offline mode.");
+                    }
+                    setUsageStats(stats);
+                }
             } catch (err) {
                 console.error("Fatal error during initial load:", err);
                 if (mounted) showError("Failed to load your data. Please check your connection.");
@@ -217,6 +226,7 @@ export const useJobManager = () => {
 
     const handleDraftApplication = useCallback(async (url: string) => {
         const jobId = crypto.randomUUID();
+        const now = Date.now();
         const newJob: SavedJob = {
             id: jobId,
             company: '',
@@ -224,7 +234,8 @@ export const useJobManager = () => {
             description: '',
             url,
             resumeId: 'master',
-            dateAdded: Date.now(),
+            dateAdded: now,
+            updatedAt: now,
             status: 'analyzing' as const,
         };
 

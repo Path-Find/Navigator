@@ -11,6 +11,7 @@ import {
     Sparkles, AlertCircle,
     Check
 } from 'lucide-react';
+import { useToast } from '../../contexts/ToastContext';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ROUTES } from '../../constants';
 import { InterviewChat } from '../../components/common/InterviewChat';
@@ -36,6 +37,7 @@ export const SkillInterviewPage: React.FC = () => {
     const location = useLocation();
     const navigate = useNavigate();
     const { handleInterviewComplete } = useSkillContext();
+    const { showInfo } = useToast();
 
     // Accept array of skills from router state, enforced cap for quality
     const rawSkills = (location.state?.skills as { name: string; proficiency: string }[]) || [];
@@ -70,6 +72,9 @@ export const SkillInterviewPage: React.FC = () => {
                 const { data: { user } } = await supabase.auth.getUser();
                 if (!user) return;
                 const stats = await getUsageStats(user.id);
+                if (stats.isFallback) {
+                    showInfo("Unable to verify assessment credits. You may be unable to start new sessions.");
+                }
                 setUsageInfo({ used: stats.monthInterviews, total: stats.interviewLimit });
             } catch (err) {
                 console.error('Failed to fetch usage:', err);

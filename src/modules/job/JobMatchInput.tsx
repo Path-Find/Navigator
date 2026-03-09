@@ -106,6 +106,7 @@ const JobMatchInput: React.FC = () => {
             url: sourceUrl,
             resumeId: resumes[0]?.id || 'master',
             dateAdded: Date.now(),
+            updatedAt: Date.now(),
             status: 'analyzing',
         };
 

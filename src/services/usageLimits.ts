@@ -34,6 +34,7 @@ export interface UsageStats {
     roleModelLimit: number;
     interviewLimit: number;
     inboundEmailToken?: string;
+    isFallback: boolean;
 }
 
 /**
@@ -240,7 +241,8 @@ export const getUsageStats = async (userId: string): Promise<UsageStats> => {
             emailLimit: limits.DAILY_EMAILS,
             roleModelLimit: limits.ROLE_MODELS ?? 0,
             interviewLimit: limits.SKILLS_INTERVIEWS ?? 0,
-            inboundEmailToken: tier === 'free' ? undefined : profile?.inbound_email_token
+            inboundEmailToken: tier === 'free' ? undefined : profile?.inbound_email_token,
+            isFallback: false
         };
     } catch (err) {
         console.error('Error fetching usage stats:', err);
@@ -258,7 +260,8 @@ export const getUsageStats = async (userId: string): Promise<UsageStats> => {
             emailLimit: 0,
             roleModelLimit: 0,
             interviewLimit: 0,
-            inboundEmailToken: undefined
+            inboundEmailToken: undefined,
+            isFallback: true
         };
     }
 };

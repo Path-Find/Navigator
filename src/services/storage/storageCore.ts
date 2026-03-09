@@ -44,7 +44,16 @@ async function migrateVaultData(): Promise<void> {
         if (k) keysToCheck.push(k);
     }
 
+    const startTime = Date.now();
+    const MIGRATION_TIMEOUT_MS = 3000; // 3s budget for migration
+
     for (const key of keysToCheck) {
+        // Break if we exceed the budget to prevent long UI blocks
+        if (Date.now() - startTime > MIGRATION_TIMEOUT_MS) {
+            console.warn(`[Vault] Migration budget exceeded after ${keysToCheck.indexOf(key)}/${keysToCheck.length} items. Remainder will be lazy-migrated.`);
+            break;
+        }
+
         const raw = localStorage.getItem(key);
         if (!raw) continue;
 

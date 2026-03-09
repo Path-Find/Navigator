@@ -49,8 +49,9 @@ Transforming text-based profiles into a mathematical career space.
 - [x] **Master Profile**: Implement vectorization for "Master Profile" updates to establish a semantic "Zero Point."
 
 ### 2. Similarity Infrastructure
+- [x] **Similarity Distance Engine**: Implemented `RdSimilarityService` with Cosine Similarity logic.
+- [x] **Match Score Fallback**: Established a vector-based "Semantic Match Score" to augment keyword analysis.
 - [ ] **Role Model Matching**: Implement vector-based matching logic to find Role Models (Buckets) with high semantic overlap.
-- [ ] **Fallback Logic**: Develop the "Match Score" fallback that uses vector distance when keyword matching fails.
 
 ---
 

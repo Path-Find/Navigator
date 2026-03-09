@@ -23,7 +23,7 @@ export interface EmbeddingParams {
     feature?: string;
 }
 
-export const getModel = async (params: ModelParams) => {
+export const getModel = async (params: ModelParams & { signal?: AbortSignal }) => {
     return {
         generateContent: async (payload: { contents: { role: string; parts: ({ text: string } | { inlineData: { mimeType: string; data: string } })[] }[]; generationConfig?: Record<string, unknown> }) => {
             const { generationConfig: payloadGenerationConfig, ...contentsOnly } = payload;
@@ -33,7 +33,8 @@ export const getModel = async (params: ModelParams) => {
                     task: params.task,
                     generationConfig: payloadGenerationConfig ?? params.generationConfig,
                     feature: params.feature
-                }
+                },
+                signal: params.signal
             });
 
             if (error) throw new Error(`Proxy Error: ${error.message}`);
@@ -122,12 +123,15 @@ export const callWithRetry = async <T>(
     context: { event_type: string; prompt: string; model: string; metadata?: Record<string, unknown>; job_id?: string },
     retries: number = API_CONFIG.MAX_RETRIES,
     initialDelay = API_CONFIG.INITIAL_RETRY_DELAY_MS,
-    onProgress?: RetryProgressCallback
+    onProgress?: RetryProgressCallback,
+    abortSignal?: AbortSignal
 ): Promise<T> => {
     let currentDelay = initialDelay;
     const startTime = Date.now();
 
     for (let i = 0; i < retries; i++) {
+        if (abortSignal?.aborted) throw new Error("AbortError");
+
         const executionMetadata: Record<string, unknown> = {};
         try {
             const result = await fn(executionMetadata);
@@ -174,7 +178,15 @@ export const callWithRetry = async <T>(
                 const delaySeconds = currentDelay / 1000;
                 const retryMsg = getRetryMessage(i + 1, retries, delaySeconds);
                 if (onProgress) onProgress(retryMsg, i + 1, retries);
-                await new Promise(resolve => setTimeout(resolve, currentDelay));
+
+                await new Promise((resolve, reject) => {
+                    const timeout = setTimeout(resolve, currentDelay);
+                    abortSignal?.addEventListener('abort', () => {
+                        clearTimeout(timeout);
+                        reject(new Error("AbortError"));
+                    }, { once: true });
+                });
+
                 currentDelay = currentDelay * API_CONFIG.RETRY_BACKOFF_MULTIPLIER;
             } else {
                 logToSupabase({

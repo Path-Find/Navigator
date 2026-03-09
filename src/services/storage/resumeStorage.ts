@@ -1,7 +1,6 @@
 import { supabase } from '../supabase';
 import { Vault, getUserId, areBlocksEqual } from './storageCore';
 import { STORAGE_KEYS } from '../../constants';
-import { Logger } from '../../utils/logger';
 import { withTimeout } from '../../utils/promiseUtils';
 import type { ResumeProfile } from '../../types';
 
@@ -42,12 +41,15 @@ export const ResumeStorage = {
                     const localHasData = profiles.some(p => p.blocks.length > 0);
                     const cloudHasData = (cloudProfiles as ResumeProfile[]).some(p => p.blocks?.length > 0);
 
-                    if (cloudHasData || !localHasData) {
+                    const cloudUpdatedAt = (cloudProfiles as ResumeProfile[]).reduce((max, p) => Math.max(max, p.updatedAt || 0), 0);
+                    const localUpdatedAt = profiles.reduce((max, p) => Math.max(max, p.updatedAt || 0), 0);
+
+                    if (cloudUpdatedAt > localUpdatedAt + 1000 || (!localHasData && cloudHasData)) {
                         profiles = cloudProfiles;
                         await Vault.setSecure(STORAGE_KEYS.RESUMES, profiles);
-                    } else {
-                        // Keep local data, it's more complete
-                        Logger.log("[ResumeStorage] Cloud resumes seem empty or less complete than local. Keeping local for sync.");
+                    } else if (localUpdatedAt > cloudUpdatedAt + 1000) {
+                        // Local is newer, sync back to cloud
+                        this.saveResumes(profiles).catch(err => console.error("[ResumeStorage] Sync-back failed:", err));
                     }
                 }
             }
@@ -57,9 +59,11 @@ export const ResumeStorage = {
 
     async saveResumes(resumes: ResumeProfile[]) {
         const userId = await getUserId();
+        const now = Date.now();
+        const updatedResumes = resumes.map(r => ({ ...r, updatedAt: now }));
 
         await Promise.all([
-            Vault.setSecure(STORAGE_KEYS.RESUMES, resumes),
+            Vault.setSecure(STORAGE_KEYS.RESUMES, updatedResumes),
             (async () => {
                 if (!userId) return;
 
@@ -71,12 +75,12 @@ export const ResumeStorage = {
 
                 if (data) {
                     const { error: updateError } = await withTimeout(
-                        supabase.from('resumes').update({ content: resumes, name: 'Default Profile' }).eq('id', data.id)
+                        supabase.from('resumes').update({ content: updatedResumes, name: 'Default Profile' }).eq('id', data.id)
                     );
                     if (updateError) throw updateError;
                 } else {
                     const { error: insertError } = await withTimeout(
-                        supabase.from('resumes').insert({ user_id: userId, name: 'Default Profile', content: resumes })
+                        supabase.from('resumes').insert({ user_id: userId, name: 'Default Profile', content: updatedResumes })
                     );
                     if (insertError) throw insertError;
                 }

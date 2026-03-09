@@ -302,7 +302,7 @@ export const useCoverLetterEditor = ({
             handleGenerateCoverLetter();
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
+    }, [bestResume, !!localJob.coverLetter, !!localJob.coverLetterCritique]);
 
     return {
         generating,

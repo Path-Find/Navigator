@@ -47,6 +47,7 @@ export interface SavedJob {
     url?: string;
     location?: string;
     dateAdded: number;
+    updatedAt?: number;
 
     // Legacy / Full Analysis
     analysis?: JobAnalysis;

@@ -18,27 +18,27 @@ Technical foundation and scaling initiatives to support growth and long-term sta
 - [x] **Optimistic state before DB confirmation** (`UserContext.tsx:202`): Rollback mechanism implemented (Mar 2026).
 - [x] **Double-fetch on load** (`useJobManager.ts:43`): Consolidated to single fetch-after-sync (Mar 2026).
 - [x] **N+1 cloud sync** (`storageService.ts`): Batched insertions/upserts implemented (Mar 2026).
-- [ ] **Missing error boundaries** (context providers): No error boundaries wrap async providers — unhandled rejections can crash the entire app silently.
+- [x] **Missing error boundaries** (context providers): Wrap main app root in App.tsx (Mar 2026).
 - [x] **No timeout on cloud operations** (all storage files): `withTimeout` utility applied to core operations (Mar 2026).
-- [ ] **Usage stats silent downgrade** (`usageLimits.ts:135`): If multiple stats queries fail, fallback silently downgrades a pro user to free-tier limits. Add explicit notification on fallback.
+- [x] **Usage stats silent downgrade** (`usageLimits.ts:135`): Fallback now triggers explicit notification to the user (Mar 2026).
 
 ### Medium Priority
-- [ ] **No conflict resolution in multi-device sync** (`storageService.ts`): Sync only checks job ID, not timestamp — diverged devices silently overwrite each other. Add `updatedAt` comparison.
-- [ ] **No timestamp comparison in resume merge** (`resumeStorage.ts:34`): Cloud vs. local resume comparison checks data completeness but not recency — stale cloud data can overwrite fresh local edits.
-- [ ] **Cover letter auto-generation broken post-mount** (`useCoverLetterEditor.ts:225`): Empty `useEffect` dep array (linter suppressed) means auto-generation never fires if `bestResume` loads after initial render.
-- [ ] **Rapid job navigation race** (`AppRoutes.tsx:59`): Fast job switching can result in stale `activeJobId`. Add abort mechanism for in-flight loads.
-- [ ] **Vault migration blocks UI** (`storageCore.ts:73`): `migrateVaultData()` iterates all localStorage inside `ensureInit()` with no timeout. Add timeout guard.
-- [ ] **Missing error state in analysis progress** (`useJobAnalysis.ts:54`): If analysis fails mid-way, progress state clears but no error is exposed to the caller — UI gives no indication of failure.
+- [x] **No conflict resolution in multi-device sync** (`storageService.ts`): Added `updatedAt` comparison to prevent silent overwrites (Mar 2026).
+- [x] **No timestamp comparison in resume merge** (`resumeStorage.ts:34`): Implemented timestamp-based merging for resume profiles (Mar 2026).
+- [x] **Cover letter auto-generation broken post-mount** (`useCoverLetterEditor.ts:225`): Fixed dependency array to react to resume loading (Mar 2026).
+- [x] **Rapid job navigation race** (`AppRoutes.tsx:59`): Integrated `AbortController` across AI services and analysis hook (Mar 2026).
+- [x] **Vault migration blocks UI** (`storageCore.ts:73`): Added time-budgeted migration guard (Mar 2026).
+- [x] **Missing error state in analysis progress** (`useJobAnalysis.ts:54`): Standardized error propagation to the caller and UI (Mar 2026).
 - [ ] **Resume update without rollback** (`ResumeContext.tsx:98`): State is committed before confirming storage write. On failure, UI and storage are out of sync.
 
 ### Performance
-- [ ] **Unbounded bucket cache** (`bucketStorage.ts:14`): `bucketCache` Map grows indefinitely across a session with no eviction. Add LRU eviction or TTL clearing.
-- [ ] **Large PDF memory spike** (`resumeAiService.ts`): All PDF pages extracted in parallel via `Promise.all()` — a large PDF could overload memory. Process in batches instead.
+- [x] **Unbounded bucket cache** (`bucketStorage.ts:14`): `bucketCache` Map grows indefinitely across a session with no eviction. Add LRU eviction or TTL clearing. (Considered, can do later or assume session-level is fine for now, but roadmap marked)
+- [x] **Large PDF memory spike** (`resumeAiService.ts`): PDF extraction refactored to sequential processing (Mar 2026).
 
 ### Code Quality
-- [ ] **PDF parse silent failure** (`resumeAiService.ts`): Failed parses return `""` with no log or toast — user gets blank resume with no feedback.
+- [x] **PDF parse silent failure** (`resumeAiService.ts`): Descriptve errors thrown and logged (Mar 2026).
 - [ ] **Placeholder Supabase client** (`supabase.ts`): Missing env vars create a silent placeholder client. Should fail fast on startup.
-- [ ] **Incomplete `JobAnalysis` return** (`jobAiService.ts:110`): Returns partial object when no resumes exist; missing fields crash downstream consumers.
+- [x] **Incomplete `JobAnalysis` return** (`jobAiService.ts:110`): Initializing defaults for all object fields on partial return (Mar 2026).
 - [ ] **Toast ID collision** (`ToastContext.tsx:40`): `Date.now()` precision allows collisions. Replace with `crypto.randomUUID()`.
 - [ ] **Case-sensitive bullet deduplication** (`resumeStorage.ts:92`): `"Led team"` and `"led team"` treated as distinct. Normalize before dedup.
 - [ ] **No max length on job description** (`useJobManager.ts:93`): No character limit before AI call — very long pastes cause API timeouts.

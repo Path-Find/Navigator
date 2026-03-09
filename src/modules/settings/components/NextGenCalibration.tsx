@@ -1,50 +1,27 @@
 import React, { useEffect, useState } from 'react';
-import { Shield, Activity, RefreshCw, Zap } from 'lucide-react';
+import { Shield, Activity, RefreshCw, Zap, TrendingUp, ArrowRight, Share2, Target } from 'lucide-react';
 import { RdFeedbackService } from '../../../services/ai/rd/feedbackService';
 import { RdStyleService } from '../../../services/ai/rd/styleService';
 import { RdTrajectoryService } from '../../../services/ai/rd/trajectoryService';
 import { RdEmbeddingService } from '../../../services/ai/rd/embeddingService';
+import { RdSimilarityService, type SimilarityResult } from '../../../services/ai/rd/similarityService';
 import { ResumeStorage } from '../../../services/storage/resumeStorage';
 import { CoachStorage } from '../../../services/storage/coachStorage';
 import type { GrowthTrajectory } from '../../../services/ai/rd/types';
 import { useUser } from '../../../contexts/UserContext';
 import { Button } from '../../../components/ui/Button';
-import { TrendingUp, ArrowRight, Share2 } from 'lucide-react';
 
 export const NextGenCalibration: React.FC = () => {
     const { user, isNextGenEnabled, updateProfile } = useUser();
     const [stats, setStats] = useState<{ total: number; breakdown: Record<string, number> } | null>(null);
     const [style, setStyle] = useState<string | null>(null);
     const [trajectory, setTrajectory] = useState<GrowthTrajectory | null>(null);
+    const [similarity, setSimilarity] = useState<SimilarityResult | null>(null);
     const [targetTitle, setTargetTitle] = useState<string>('');
     const [isLoading, setIsLoading] = useState(false);
     const [isTrajectoryLoading, setIsTrajectoryLoading] = useState(false);
     const [isVectorizing, setIsVectorizing] = useState(false);
-
-    const handleSyncLatentSpace = async () => {
-        if (!user) return;
-        setIsVectorizing(true);
-        try {
-            const resumes = await ResumeStorage.getResumes();
-            const master = resumes.find(r => r.id === 'master') || resumes[0];
-            if (!master) return;
-
-            // Vectorize each visible block
-            const promises = master.blocks
-                .filter(b => b.isVisible && b.bullets.length > 0)
-                .map(b => RdEmbeddingService.vectorizeAndStore(
-                    user.id,
-                    `[${b.type}] ${b.title} at ${b.organization}: ${b.bullets.join(' ')}`,
-                    'experience_block',
-                    b.id
-                ));
-
-            await Promise.all(promises);
-            await loadModelData(); // Refresh signal stats
-        } finally {
-            setIsVectorizing(false);
-        }
-    };
+    const [isSimilarityLoading, setIsSimilarityLoading] = useState(false);
 
     const loadModelData = async () => {
         if (!user) return;
@@ -58,11 +35,35 @@ export const NextGenCalibration: React.FC = () => {
             setStats(statsData);
             setStyle(styleData);
 
-            if (targets.length > 0) {
+            if (targets.length > 0 && !targetTitle) {
                 setTargetTitle(targets[0].title);
             }
         } finally {
             setIsLoading(false);
+        }
+    };
+
+    const handleSyncLatentSpace = async () => {
+        if (!user) return;
+        setIsVectorizing(true);
+        try {
+            const resumes = await ResumeStorage.getResumes();
+            const master = resumes.find(r => r.id === 'master') || resumes[0];
+            if (!master) return;
+
+            const promises = master.blocks
+                .filter(b => b.isVisible && b.bullets.length > 0)
+                .map(b => RdEmbeddingService.vectorizeAndStore(
+                    user.id,
+                    `[${b.type}] ${b.title} at ${b.organization}: ${b.bullets.join(' ')}`,
+                    'experience_block',
+                    b.id
+                ));
+
+            await Promise.all(promises);
+            await loadModelData();
+        } finally {
+            setIsVectorizing(false);
         }
     };
 
@@ -74,6 +75,17 @@ export const NextGenCalibration: React.FC = () => {
             setTrajectory(trajectoryData);
         } finally {
             setIsTrajectoryLoading(false);
+        }
+    };
+
+    const handleTestMatchDistance = async () => {
+        if (!user || !targetTitle) return;
+        setIsSimilarityLoading(true);
+        try {
+            const match = await RdSimilarityService.calculateSemanticMatch(user.id, targetTitle);
+            setSimilarity(match);
+        } finally {
+            setIsSimilarityLoading(false);
         }
     };
 
@@ -117,7 +129,7 @@ export const NextGenCalibration: React.FC = () => {
                         <Shield className="w-3.5 h-3.5 text-indigo-400" />
                         <span className="text-xs font-bold text-neutral-400 uppercase tracking-wider">Active Personal Style</span>
                     </div>
-                    <div className="bg-white dark:bg-neutral-900 rounded-2xl p-4 border border-neutral-100 dark:border-neutral-800 min-h-[100px] flex flex-col">
+                    <div className="bg-white dark:bg-neutral-900 rounded-2xl p-4 border border-neutral-100 dark:border-neutral-800 min-h-[120px] flex flex-col">
                         {style ? (
                             <p className="text-xs font-mono text-neutral-600 dark:text-neutral-400 leading-relaxed italic">
                                 "{style}"
@@ -161,7 +173,7 @@ export const NextGenCalibration: React.FC = () => {
                             Object.entries(stats.breakdown).map(([type, count]) => (
                                 <div key={type} className="flex justify-between items-center text-xs">
                                     <span className="capitalize text-neutral-500">{type.replace('_', ' ')}</span>
-                                    <span className="font-bold text-neutral-900 dark:text-white bg-neutral-100 dark:bg-neutral-800 px-2 py-0.5 rounded-lg">{count} tokens</span>
+                                    <span className="font-bold text-neutral-900 dark:text-white bg-neutral-100 dark:bg-neutral-800 px-2 py-0.5 rounded-lg">{count} signals</span>
                                 </div>
                             ))
                         ) : (
@@ -177,69 +189,94 @@ export const NextGenCalibration: React.FC = () => {
                 </div>
             </div>
 
-            {/* Trajectory Analysis (Level 2) */}
-            <div className="mt-8 pt-8 border-t border-neutral-100 dark:border-neutral-800">
-                <div className="flex items-center justify-between mb-6">
-                    <div className="flex items-center gap-2">
-                        <TrendingUp className="w-4 h-4 text-violet-500" />
-                        <span className="text-xs font-bold text-neutral-400 uppercase tracking-wider">Semantic Trajectory (Level 2)</span>
-                    </div>
-                    <div className="flex items-center gap-3">
+            {/* Target Role Controls */}
+            <div className="mt-8 pt-6 border-t border-neutral-100 dark:border-neutral-800">
+                <div className="flex items-center gap-3 mb-6">
+                    <div className="flex-1 relative">
+                        <Target className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-neutral-400" />
                         <input
                             type="text"
                             value={targetTitle}
                             onChange={(e) => setTargetTitle(e.target.value)}
-                            placeholder="Target Role..."
-                            className="text-xs bg-white dark:bg-neutral-900 border border-neutral-100 dark:border-neutral-800 rounded-lg px-3 py-1.5 outline-none focus:ring-1 focus:ring-violet-500/30 w-48"
+                            placeholder="Type a Role Title (e.g. Senior Product Manager)..."
+                            className="w-full text-xs bg-white dark:bg-neutral-900 border border-neutral-100 dark:border-neutral-800 rounded-xl pl-9 pr-3 py-2.5 outline-none focus:ring-1 focus:ring-indigo-500/30 font-medium"
                         />
-                        <Button
-                            variant="premium"
-                            size="sm"
-                            className="!text-[10px] !py-1.5"
-                            onClick={loadTrajectory}
-                            loading={isTrajectoryLoading}
-                            disabled={!targetTitle}
-                        >
-                            Project Path
-                        </Button>
                     </div>
+                    <Button
+                        variant="premium"
+                        size="sm"
+                        className="!text-[10px] !py-2"
+                        onClick={loadTrajectory}
+                        loading={isTrajectoryLoading}
+                        disabled={!targetTitle}
+                        icon={<TrendingUp className="w-3 h-3" />}
+                    >
+                        Project Trajectory (L2)
+                    </Button>
+                    <Button
+                        variant="secondary"
+                        size="sm"
+                        className="!text-[10px] !py-2"
+                        onClick={handleTestMatchDistance}
+                        loading={isSimilarityLoading}
+                        disabled={!targetTitle}
+                        icon={<Activity className="w-3 h-3" />}
+                    >
+                        Test Match Match Distance (L4)
+                    </Button>
                 </div>
 
-                {trajectory ? (
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6 animate-in fade-in slide-in-from-bottom-2">
-                        <div className="md:col-span-2 bg-white dark:bg-neutral-900 rounded-2xl p-6 border border-neutral-100 dark:border-neutral-800">
-                            <h5 className="text-sm font-bold text-neutral-900 dark:text-white mb-2">{trajectory.heading}</h5>
-                            <div className="flex items-center gap-3 my-4">
-                                <span className="px-3 py-1 bg-neutral-100 dark:bg-neutral-800 rounded-lg text-[10px] font-bold text-neutral-500 capitalize">{trajectory.archetypeShift.from}</span>
-                                <ArrowRight className="w-3 h-3 text-neutral-300" />
-                                <span className="px-3 py-1 bg-violet-500/10 text-violet-500 rounded-lg text-[10px] font-bold capitalize">{trajectory.archetypeShift.to}</span>
-                            </div>
-                            <div className="mt-4 p-4 bg-violet-500/5 rounded-xl border border-violet-500/10">
-                                <p className="text-xs text-neutral-600 dark:text-neutral-400 leading-relaxed italic">
-                                    {trajectory.trajectoryGap}
-                                </p>
-                            </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    {/* Trajectory Output */}
+                    <div className="bg-white dark:bg-neutral-900 rounded-2xl p-5 border border-neutral-100 dark:border-neutral-800">
+                        <div className="flex items-center gap-2 mb-4">
+                            <TrendingUp className="w-3.5 h-3.5 text-violet-500" />
+                            <span className="text-[10px] font-black text-neutral-400 uppercase tracking-widest">Growth Vector</span>
                         </div>
-                        <div className="bg-neutral-50 dark:bg-neutral-900/50 rounded-2xl p-6 border border-neutral-100 dark:border-neutral-800">
-                            <span className="text-[10px] font-bold text-neutral-400 uppercase tracking-widest block mb-4">Growth Signals</span>
+                        {trajectory ? (
                             <div className="space-y-3">
-                                {trajectory.keyGrowthSignals.map((signal, i) => (
-                                    <div key={i} className="flex items-start gap-2">
-                                        <div className="w-1 h-1 rounded-full bg-violet-400 mt-1.5 shrink-0" />
-                                        <span className="text-[11px] text-neutral-600 dark:text-neutral-400 leading-tight">{signal}</span>
-                                    </div>
-                                ))}
+                                <h5 className="text-xs font-bold text-neutral-900 dark:text-white">{trajectory.heading}</h5>
+                                <div className="flex items-center gap-2">
+                                    <span className="px-2 py-0.5 bg-neutral-100 dark:bg-neutral-800 rounded-md text-[9px] font-bold text-neutral-500">{trajectory.archetypeShift.from}</span>
+                                    <ArrowRight className="w-2.5 h-2.5 text-neutral-300" />
+                                    <span className="px-2 py-0.5 bg-violet-500/10 text-violet-500 rounded-md text-[9px] font-bold">{trajectory.archetypeShift.to}</span>
+                                </div>
+                                <p className="text-[11px] text-neutral-500 leading-relaxed italic">{trajectory.trajectoryGap}</p>
                             </div>
+                        ) : (
+                            <p className="text-xs text-neutral-400 py-8 text-center italic">Run projection to see path analysis.</p>
+                        )}
+                    </div>
+
+                    {/* Similarity Output */}
+                    <div className="bg-white dark:bg-neutral-900 rounded-2xl p-5 border border-neutral-100 dark:border-neutral-800">
+                        <div className="flex items-center gap-2 mb-4">
+                            <Activity className="w-3.5 h-3.5 text-emerald-500" />
+                            <span className="text-[10px] font-black text-neutral-400 uppercase tracking-widest">Semantic Match Distance</span>
                         </div>
+                        {similarity ? (
+                            <div className="space-y-4">
+                                <div className="flex items-center justify-between">
+                                    <span className="text-2xl font-black text-neutral-900 dark:text-white">{similarity.score}%</span>
+                                    <span className={`text-[10px] font-black px-2 py-0.5 rounded-full ${similarity.score > 70 ? 'bg-emerald-500/10 text-emerald-500' : 'bg-amber-500/10 text-amber-500'}`}>
+                                        {similarity.score > 80 ? 'EXCELLENT ALIGNMENT' : similarity.score > 60 ? 'HIGH POTENTIAL' : 'MODERATE DRIFT'}
+                                    </span>
+                                </div>
+                                <p className="text-[11px] text-neutral-500 leading-relaxed">{similarity.explanation}</p>
+                                <div className="space-y-2">
+                                    {similarity.matchedBlocks.map((block, i) => (
+                                        <div key={i} className="flex items-center justify-between text-[10px]">
+                                            <span className="text-neutral-400 font-medium truncate max-w-[150px]">Block ID: {block.title.substring(0, 8)}...</span>
+                                            <span className="font-bold text-neutral-600">{Math.round(block.score * 100)}%</span>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        ) : (
+                            <p className="text-xs text-neutral-400 py-8 text-center italic">Test distance to see vector alignment.</p>
+                        )}
                     </div>
-                ) : (
-                    <div className="bg-white dark:bg-neutral-900/50 rounded-2xl p-12 border border-dashed border-neutral-200 dark:border-neutral-800 flex flex-col items-center justify-center text-center">
-                        <TrendingUp className="w-8 h-8 text-neutral-200 dark:text-neutral-800 mb-4" />
-                        <p className="text-xs text-neutral-400 max-w-xs">
-                            Select or type a target role to calculate the semantic drift and growth path.
-                        </p>
-                    </div>
-                )}
+                </div>
             </div>
         </div>
     );

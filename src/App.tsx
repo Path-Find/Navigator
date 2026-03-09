@@ -12,29 +12,32 @@ import { HelmetProvider } from 'react-helmet-async';
 import { AppLayout } from './components/layout/AppLayout';
 import { AppRoutes } from './components/layout/AppRoutes';
 import { useTheme } from './hooks/useTheme';
+import { ErrorBoundary } from './components/ErrorBoundary';
 
 const App: React.FC = () => {
   // Theme Initialization
   useTheme();
 
   return (
-    <HelmetProvider>
-      <ModalProvider>
-        <GlobalUIProvider>
-          <SkillProvider>
-            <ResumeProvider>
-              <JobProvider>
-                <CoachProvider>
-                  <AppLayout>
-                    <AppRoutes />
-                  </AppLayout>
-                </CoachProvider>
-              </JobProvider>
-            </ResumeProvider>
-          </SkillProvider>
-        </GlobalUIProvider>
-      </ModalProvider>
-    </HelmetProvider>
+    <ErrorBoundary>
+      <HelmetProvider>
+        <ModalProvider>
+          <GlobalUIProvider>
+            <SkillProvider>
+              <ResumeProvider>
+                <JobProvider>
+                  <CoachProvider>
+                    <AppLayout>
+                      <AppRoutes />
+                    </AppLayout>
+                  </CoachProvider>
+                </JobProvider>
+              </ResumeProvider>
+            </SkillProvider>
+          </GlobalUIProvider>
+        </ModalProvider>
+      </HelmetProvider>
+    </ErrorBoundary>
   );
 };
 

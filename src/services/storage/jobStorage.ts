@@ -38,6 +38,7 @@ export const JobStorage = {
                         fitScore: row.fit_score,
                         status: row.status as SavedJob['status'],
                         dateAdded: new Date(row.date_added || row.created_at || Date.now()).getTime(),
+                        updatedAt: new Date(row.updated_at || row.date_added || row.created_at || Date.now()).getTime(),
                         resumeId: row.resume_id,
                         coverLetter: row.cover_letter,
                         coverLetterCritique: row.cover_letter_critique,
@@ -51,14 +52,27 @@ export const JobStorage = {
                         let finalJob = cloudJob;
 
                         if (localMatch) {
-                            if (!cloudJob.analysis && localMatch.analysis) {
-                                finalJob = { ...finalJob, analysis: localMatch.analysis, status: localMatch.status };
-                                needsRepair = true;
-                            }
+                            // Conflict Resolution: If cloud is significantly newer (>1s), use it.
+                            // If local is significantly newer, keep local and mark for cloud update.
+                            const cloudTime = cloudJob.updatedAt || 0;
+                            const localTime = localMatch.updatedAt || 0;
 
-                            if ((!cloudJob.description || cloudJob.description.length < 50) && localMatch.description && localMatch.description.length > 50) {
-                                finalJob = { ...finalJob, description: localMatch.description };
+                            if (cloudTime > localTime + 1000) {
+                                finalJob = cloudJob;
+                            } else if (localTime > cloudTime + 1000) {
+                                finalJob = localMatch;
                                 needsRepair = true;
+                            } else {
+                                // Close timestamps — use standard field-level healing
+                                if (!cloudJob.analysis && localMatch.analysis) {
+                                    finalJob = { ...finalJob, analysis: localMatch.analysis, status: localMatch.status };
+                                    needsRepair = true;
+                                }
+
+                                if ((!cloudJob.description || cloudJob.description.length < 50) && localMatch.description && localMatch.description.length > 50) {
+                                    finalJob = { ...finalJob, description: localMatch.description };
+                                    needsRepair = true;
+                                }
                             }
 
                             if (needsRepair) {
@@ -108,7 +122,8 @@ export const JobStorage = {
                         cover_letter: job.coverLetter,
                         cover_letter_critique: job.coverLetterCritique,
                         fit_score: job.analysis?.compatibilityScore,
-                        date_added: new Date(job.dateAdded).toISOString()
+                        date_added: new Date(job.dateAdded).toISOString(),
+                        updated_at: new Date(job.updatedAt || job.dateAdded).toISOString()
                     })
                 );
                 if (error) throw error;
@@ -140,7 +155,8 @@ export const JobStorage = {
                         resume_id: updatedJob.resumeId,
                         cover_letter: updatedJob.coverLetter,
                         cover_letter_critique: updatedJob.coverLetterCritique,
-                        fit_score: updatedJob.analysis?.compatibilityScore
+                        fit_score: updatedJob.analysis?.compatibilityScore,
+                        updated_at: new Date().toISOString()
                     }).eq('id', updatedJob.id)
                         .eq('user_id', userId)
                 );

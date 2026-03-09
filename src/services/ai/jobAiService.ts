@@ -146,7 +146,8 @@ export const analyzeJobFit = async (
     onProgress?: RetryProgressCallback,
     jobId?: string,
     transcript?: Transcript | null,
-    trajectoryContext?: string
+    trajectoryContext?: string,
+    abortSignal?: AbortSignal
 ): Promise<JobAnalysis> => {
     if (onProgress) onProgress("Cleaning and Analyzing", 1, 1);
 
@@ -156,7 +157,20 @@ export const analyzeJobFit = async (
     if (resumes.length === 0) {
         // Just extract basic info if no resumes provided
         const { distilledJob } = await extractJobInfo(cleanedDescription, onProgress);
-        return { distilledJob, cleanedDescription } as JobAnalysis;
+        return {
+            distilledJob: {
+                ...distilledJob,
+                keySkills: distilledJob.keySkills || [],
+                coreResponsibilities: distilledJob.coreResponsibilities || [],
+                applicationDeadline: distilledJob.applicationDeadline || null
+            },
+            cleanedDescription,
+            compatibilityScore: 0,
+            reasoning: "Resume required for compatibility analysis. Please upload one to see strengths, weaknesses, and a match score.",
+            strengths: [],
+            weaknesses: [],
+            bestResumeProfileId: undefined
+        } as JobAnalysis;
     }
 
     const resumeContext = resumes.map(stringifyProfile).join('\n---\n');
@@ -174,11 +188,11 @@ export const analyzeJobFit = async (
     const analysisPrompt = JOB_ANALYSIS_PROMPTS.JOB_FIT_ANALYSIS.DEFAULT(cleanedDescription, (resumeContext + skillsContext + educationContext), undefined, trajectoryContext);
 
     const analysis = await callWithRetry(async (metadata) => {
-        const model = await getModel({ task: 'analysis', generationConfig: { responseMimeType: "application/json" } });
+        const model = await getModel({ task: 'analysis', generationConfig: { responseMimeType: "application/json" }, signal: abortSignal });
         const response = await model.generateContent({ contents: [{ role: "user", parts: [{ text: analysisPrompt }] }] });
         metadata.token_usage = response.response.usageMetadata;
         return JSON.parse(sanitizeInput(cleanJsonOutput(response.response.text())));
-    }, { event_type: 'analysis', prompt: analysisPrompt, model: 'dynamic', job_id: jobId }, undefined, undefined, onProgress);
+    }, { event_type: 'analysis', prompt: analysisPrompt, model: 'dynamic', job_id: jobId }, undefined, undefined, onProgress, abortSignal);
 
     // Validation: If we have no score and no skills, something went wrong
     if (!analysis.compatibilityScore && (!analysis.distilledJob?.keySkills?.length)) {
