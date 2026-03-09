@@ -9,9 +9,9 @@ All notable changes to this project will be documented in this file.
 - **Semantic Trajectory Mapping**: Established the `RdEmbeddingService` using `text-embedding-004` to map professional experience into a 768-dimensional latent space. Implemented `RdTrajectoryService` to calculate the "Growth Vector" (semantic drift) between past profile versions and current target roles.
 - **High-Fidelity Feedback Logs**: Integrated `RdFeedbackService` into the core generation and tailoring hooks. The engine now captures explicit picks (A/B testing), implicit edits, and real-world outcomes (Interview/Offer) to calibrate user-specific models.
 - **Modeling Infrastructure**: Launched the `rd_user_embeddings` data store with `pgvector` support and implemented a secure, per-user R&D feature gating system (`isNextGenEnabled`).
-- **Roadmap Visualization**: Introduced `docs/ROADMAP_NEXTGEN.md` to track the five levels of the Modeling Engine architecture.
+- **Roadmap Visualization**: Introduced `docs/ROADMAP_NEXTGEN.md` to track the Modeling Engine architecture.
 - **The Distiller**: Successfully implemented the LLM-powered style distillation logic. The engine now dynamically fetches the 25 most recent "Sensory Signals" (A/B picks, manual edits) and routes them through a low-temperature `MODELING_DISTILLER` pass to generate a personalized 60-word "Style Guide" for AI generations.
-- **R&D Calibration Dashboard**: Launched a hidden admin-only calibration interface in Settings to visualize and trigger Level 1 (Style) and Level 2 (Trajectory) modeling. Includes real-time signal density stats and a **Trajectory Projection UI** to visualize professional archetype shifts.
+- **R&D Calibration Dashboard**: Launched a hidden admin-only calibration interface in Settings to visualize and trigger Style and Trajectory modeling. Includes real-time signal density stats and a **Trajectory Projection UI** to visualize professional archetype shifts.
 - **Invite-Only / Waitlist Pivot**: Transitioned to a premium "Invite-Only" model. New users and those looking to upgrade can now join a Waitlist (`WaitlistService`). Simplified all growth-gated messaging across the app for better optics.
 
 ### Changed
