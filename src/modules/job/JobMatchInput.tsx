@@ -143,6 +143,20 @@ const JobMatchInput: React.FC = () => {
         }
 
         setError(null);
+
+        // Pre-flight check for known-difficult domains to save time and tokens
+        try {
+            const { ScraperService } = await import('../../services/scraperService');
+            if (!ScraperService.isUrlScrapable(trimmedUrl)) {
+                setUrl('');
+                lastUrlRef.current = '';
+                setError("This domain has a high failure rate for automatic scraping. Please paste the job description below:");
+                return;
+            }
+        } catch (e) {
+            // Service import failed, proceed to try scrape which will fail safely anyway
+        }
+
         setIsScrapingUrl(true);
 
         try {
@@ -152,8 +166,12 @@ const JobMatchInput: React.FC = () => {
         } catch (err: any) {
             const msg = err instanceof Error ? err.message : String(err);
             setUrl(''); // Clear URL since it failed
+            lastUrlRef.current = ''; // Clear ref so it doesn't persist to manual paste
             setManualDescription(''); // Ensure JD field is clean
-            if (msg.includes("403") || msg.includes("Forbidden")) {
+
+            if (msg === "DOMAIN_BLOCKED") {
+                setError("This domain has a high failure rate for automatic scraping. Please paste the job description below:");
+            } else if (msg.includes("403") || msg.includes("Forbidden")) {
                 setError("This site blocks automated access. Please paste the job description below:");
             } else if (msg.includes("timeout")) {
                 setError("The connection timed out. Please paste the job description below:");

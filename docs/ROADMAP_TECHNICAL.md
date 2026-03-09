@@ -21,6 +21,9 @@ Technical foundation and scaling initiatives to support growth and long-term sta
 - [x] **Missing error boundaries** (context providers): Wrap main app root in App.tsx (Mar 2026).
 - [x] **No timeout on cloud operations** (all storage files): `withTimeout` utility applied to core operations (Mar 2026).
 - [x] **Usage stats silent downgrade** (`usageLimits.ts:135`): Fallback now triggers explicit notification to the user (Mar 2026).
+- [x] **Interview Advisor Restoration** (`InterviewAdvisor.tsx`): Fixed broken imports, missing logic, and React state update warnings (Mar 2026).
+- [x] **Onboarding & Skill Module Cleanup**: Removed 100+ unused imports/variables and resolved critical build and lint failures (Mar 2026).
+
 
 ### Medium Priority
 - [x] **No conflict resolution in multi-device sync** (`storageService.ts`): Added `updatedAt` comparison to prevent silent overwrites (Mar 2026).

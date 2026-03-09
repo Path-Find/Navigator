@@ -204,6 +204,10 @@ export const FEATURE_RANKINGS: Record<string, string[]> = {
         'JOBFIT', 'COACH', 'EDU', 'KEYWORDS', 'RESUMES',
         'COVER_LETTERS', 'FEED', 'HISTORY', 'MAIL_IN',
     ],
+    'tester': [
+        'JOBFIT', 'COACH', 'EDU', 'KEYWORDS', 'RESUMES',
+        'COVER_LETTERS', 'FEED', 'HISTORY', 'MAIL_IN',
+    ],
 };
 
 // ─── Helper Functions ──────────────────────────────────────────────────

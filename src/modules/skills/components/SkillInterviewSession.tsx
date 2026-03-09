@@ -1,4 +1,3 @@
-import React from 'react';
 import { CheckCircle2, AlertCircle } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { InterviewChat } from '../../../components/common/InterviewChat';

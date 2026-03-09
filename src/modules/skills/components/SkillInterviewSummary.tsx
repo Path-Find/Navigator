@@ -1,4 +1,3 @@
-import React from 'react';
 import { Sparkles, Check, X } from 'lucide-react';
 import { motion } from 'framer-motion';
 

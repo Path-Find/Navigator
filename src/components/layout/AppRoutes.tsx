@@ -9,7 +9,6 @@ import { ProtectedRoute } from './ProtectedRoute';
 // Context Hooks
 import { useJobContext } from '../../modules/job/context/JobContext';
 import { useResumeContext } from '../../modules/resume/context/ResumeContext';
-import { useUser } from '../../contexts/UserContext';
 
 // Core Modules
 import { NudgeCard } from '../NudgeCard';
@@ -52,7 +51,6 @@ export const AppRoutes: React.FC = () => {
 
     const { isLoading: isResumesLoading } = useResumeContext();
 
-    const { isAdmin } = useUser();
     const location = useLocation();
 
     // URL Job Sync Effect
@@ -141,7 +139,7 @@ export const AppRoutes: React.FC = () => {
 
                     <Route path={ROUTES.INTERVIEWS} element={
                         <Suspense fallback={<LoadingState message="Prepping Advisor..." />}>
-                            {isAdmin ? <InterviewAdvisor /> : <Navigate to={ROUTES.HOME} replace />}
+                            <InterviewAdvisor />
                         </Suspense>
                     } />
 

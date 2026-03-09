@@ -1,4 +1,3 @@
-import React from 'react';
 import { Sparkles, AlertCircle } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { ROUTES } from '../../../constants';

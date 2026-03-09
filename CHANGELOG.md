@@ -2,7 +2,19 @@
 
 All notable changes to this project will be documented in this file.
 
-## [Unreleased]
+## [2.31.10] - 2026-03-09
+### Added
+- **Dynamic Reliability Filtering**: Replaced the hardcoded blocklist with an automated tracking system. The app now calculates the failure rate for every job board. If a domain (like LinkedIn) fails more than 80% of the time (over at least 5 attempts), it is automatically soft-blocked to save users from unnecessary "Scraping..." wait times.
+
+- **Interview Advisor Restoration**: Fixed broken imports and restored missing functionality in `InterviewAdvisor.tsx`. Resolved a React rendering edge case where state updates were triggered synchronously inside an effect.
+- **Onboarding & Skill Module Cleanup**: Cleaned up 100+ unused imports and variables across the Onboarding flow and Skill Interview components to resolve critical build and lint failures.
+- **Restrictive Interview Advisor Access**: Removed a hard-coded `isAdmin` check that prevented Plus and Pro users from accessing the Mock Interview Advisor.
+- **Education Visibility**: Fixed a bug where Education-specific dashboard cards were hidden from students on the homepage.
+- **URL Scrape Persistence**: Resolved an issue where a broken job URL would persist and be attached to manual job description submissions after a scraping failure.
+- **Tester Tier Symmetry**: Synced feature rankings for the `tester` tier to match administration privileges, ensuring consistent development and QA previews.
+
+### Changed
+- **Interview Component Strong Typing**: Replaced broad `any` prop definitions in `InterviewSelection` and `InterviewSessionScreen` with specific interfaces to improve code quality and prevent regressions.
 
 ## [2.31.9] - 2026-03-09
 

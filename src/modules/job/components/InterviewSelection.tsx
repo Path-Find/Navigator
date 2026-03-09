@@ -1,4 +1,3 @@
-import React from 'react';
 import { Target, Zap, Sparkles, MessageSquare, CheckCircle2 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
@@ -9,7 +8,16 @@ import { SharedPageLayout } from '../../../components/common/SharedPageLayout';
 import { PageHeader } from '../../../components/ui/PageHeader';
 import { AlertCircle } from 'lucide-react';
 
-export const InterviewSelection = ({ limitError, handleStartGeneral, handleStartTailored, selectedJobId, setSelectedJobId, jobs }: any) => {
+interface SelectionProps {
+    limitError: string | null;
+    handleStartGeneral: () => Promise<void>;
+    handleStartTailored: () => Promise<void>;
+    selectedJobId: string | null;
+    setSelectedJobId: (id: string | null) => void;
+    jobs: any[];
+}
+
+export const InterviewSelection = ({ limitError, handleStartGeneral, handleStartTailored, selectedJobId, setSelectedJobId, jobs }: SelectionProps) => {
     const navigate = useNavigate();
     return (
         <SharedPageLayout className="theme-job" spacing="compact" maxWidth="6xl">

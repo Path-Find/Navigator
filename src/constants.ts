@@ -29,6 +29,8 @@ export const CONTENT_VALIDATION = {
   MIN_PDF_TEXT_LENGTH: 50,
   MIN_SCRAPED_TEXT_LENGTH: 50,
   MAX_JOB_DESCRIPTION_LENGTH: 15000,
+  SCRAPE_FAILURE_THRESHOLD: 0.8, // 80% failure rate triggers a block
+  SCRAPE_MIN_ATTEMPTS: 5,         // Minimum attempts before blocking a domain
 } as const;
 
 // Job Analysis Thresholds
@@ -100,6 +102,7 @@ export const STORAGE_KEYS = {
   DISMISSED_NOTICES: 'navigator_dismissed_notices',
   DEVICE_ID: 'nav_device_id',
   ONBOARDING_STATE: 'onboarding_state',
+  DOMAIN_RELIABILITY: 'navigator_domain_reliability',
 } as const;
 
 // Feature Tracking Events

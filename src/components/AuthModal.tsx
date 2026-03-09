@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { supabase } from '../services/supabase';
-import { X, Mail, Lock, Loader2, ArrowRight, AlertCircle, CheckCircle, Sparkles, TrendingUp, Zap, FileText, GraduationCap, Bookmark, PenTool, RefreshCw, Shield, Users, Globe, Search, Calculator, MessageSquare, Rss, Clock } from 'lucide-react';
+import { X, Mail, Lock, Loader2, ArrowRight, AlertCircle, CheckCircle, Sparkles, TrendingUp, Zap, FileText, GraduationCap, Bookmark, PenTool, RefreshCw, Shield, Users, Globe, Search, Calculator, MessageSquare, Rss, Clock, Building2, Activity, School } from 'lucide-react';
 import type { LucideIcon } from 'lucide-react';
 import { getUserFriendlyError } from '../utils/errorMessages';
 import { FEATURE_COLORS, type FeatureDefinition } from '../featureRegistry';
@@ -8,7 +8,7 @@ import { FEATURE_COLORS, type FeatureDefinition } from '../featureRegistry';
 const ICON_MAP: Record<string, LucideIcon> = {
     Sparkles, TrendingUp, Zap, FileText, GraduationCap, Bookmark,
     PenTool, Mail, RefreshCw, Shield, Users, Globe, Search, Calculator,
-    MessageSquare, Rss,
+    MessageSquare, Rss, Building2, Activity, School,
 };
 
 interface AuthModalProps {

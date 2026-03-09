@@ -6,18 +6,35 @@ import { InterviewChat } from '../../../components/common/InterviewChat';
 import type { ChatMessage } from '../../../components/common/InterviewChat';
 import { handleBankSuggestion } from '../utils/interviewUtils';
 
+interface SessionProps {
+    questions: any[];
+    currentQuestionIndex: number;
+    responses: Record<string, any>;
+    mode: string;
+    resumes: any[];
+    resumeSnippets: { text: string; source: string }[];
+    isSessionLoading: boolean;
+    isLoading: boolean;
+    userResponse: string;
+    setUserResponse: (v: string) => void;
+    handleSubmit: () => void;
+    nextQuestion: () => void;
+    isLastQuestion: boolean;
+    handleUpdateResume: (resume: any) => Promise<void>;
+}
+
 export const InterviewSessionScreen = ({
-    questions, currentQuestionIndex, responses, mode, resumes, resumeSnippets, 
-    isSessionLoading, isLoading, userResponse, setUserResponse, handleSubmit, 
+    questions, currentQuestionIndex, responses, mode, resumes, resumeSnippets,
+    isSessionLoading, isLoading, userResponse, setUserResponse, handleSubmit,
     nextQuestion, isLastQuestion, handleUpdateResume
-}: any) => {
+}: SessionProps) => {
     const [copiedText, setCopiedText] = useState<string | null>(null);
 
     const onBankSuggestion = React.useCallback(async (suggestion: any) => {
         await handleBankSuggestion(suggestion, resumes, handleUpdateResume);
     }, [resumes, handleUpdateResume]);
 
-const chatMessages = React.useMemo((): ChatMessage[] => {
+    const chatMessages = React.useMemo((): ChatMessage[] => {
         if (mode !== 'session' || !questions || questions.length === 0) return [];
 
         const msgs: ChatMessage[] = [];
@@ -96,8 +113,8 @@ const chatMessages = React.useMemo((): ChatMessage[] => {
                                         <span>Resume Suggestions Based on your Answer</span>
                                     </div>
                                     <div className="space-y-2">
-                                        {resp.analysis.resumeSuggestions.map((suggestion, sIdx) => {
-                                            const isBanked = resumes[0]?.suggestedUpdates?.some(u => u.suggestion === suggestion.suggestion);
+                                        {resp.analysis.resumeSuggestions.map((suggestion: any, sIdx: number) => {
+                                            const isBanked = resumes[0]?.suggestedUpdates?.some((u: any) => u.suggestion === suggestion.suggestion);
 
                                             return (
                                                 <div key={sIdx} className="bg-white dark:bg-neutral-900/50 rounded-xl p-3 border border-indigo-100 dark:border-indigo-500/10 group/suggest">
@@ -245,5 +262,5 @@ const chatMessages = React.useMemo((): ChatMessage[] => {
 
 
 
-    
+
 };

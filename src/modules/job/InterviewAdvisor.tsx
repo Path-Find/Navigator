@@ -1,37 +1,14 @@
-import { InterviewSelection } from './components/InterviewSelection';
-import { InterviewSessionScreen } from './components/InterviewSessionScreen';
-import { computeSnippets } from './utils/interviewUtils';
-import React, { useState } from 'react';
-import {
-    MessageSquare,
-    Sparkles,
-    Target,
-    Zap,
-    CheckCircle2,
-    Loader2,
-    AlertCircle,
-    FileText,
-    Copy,
-    ShieldCheck,
-    Check
-} from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { supabase } from '../../services/supabase';
+import { checkInterviewLimit } from '../../services/usageLimits';
+import { useToast } from '../../contexts/ToastContext';
+import { useGlobalUI } from '../../contexts/GlobalUIContext';
 import { useJobContext } from './context/JobContext';
 import { useResumeContext } from '../resume/context/ResumeContext';
 import { useInterview } from './hooks/useInterview';
-import { useNavigate } from 'react-router-dom';
-import { ROUTES } from '../../constants';
-import { motion } from 'framer-motion';
-import { checkInterviewLimit } from '../../services/usageLimits';
-import { BentoCard } from '../../components/ui/BentoCard';
-import { FEATURE_COLORS } from '../../featureRegistry';
-import { supabase } from '../../services/supabase';
-import { SharedPageLayout } from '../../components/common/SharedPageLayout';
-import { PageHeader } from '../../components/ui/PageHeader';
-import { useGlobalUI } from '../../contexts/GlobalUIContext';
-import { LoadingState } from '../../components/common/LoadingState';
-import { useToast } from '../../contexts/ToastContext';
-import { InterviewChat } from '../../components/common/InterviewChat';
-import type { ChatMessage } from '../../components/common/InterviewChat';
+import { computeSnippets } from './utils/interviewUtils';
+import { InterviewSelection } from './components/InterviewSelection';
+import { InterviewSessionScreen } from './components/InterviewSessionScreen';
 
 export const InterviewAdvisor: React.FC = () => {
     const { jobs } = useJobContext();
@@ -54,12 +31,11 @@ export const InterviewAdvisor: React.FC = () => {
     const [selectedJobId, setSelectedJobId] = useState<string | null>(null);
     const [userResponse, setUserResponse] = useState('');
     const [limitError, setLimitError] = useState<string | null>(null);
-        const navigate = useNavigate();
 
     const { isFocusedMode, setFocusedMode } = useGlobalUI();
     const { showError } = useToast();
 
-    React.useEffect(() => {
+    useEffect(() => {
         if (mode === 'session') {
             setFocusedMode(true);
         } else {
@@ -69,16 +45,13 @@ export const InterviewAdvisor: React.FC = () => {
     }, [mode, setFocusedMode]);
 
     // Reset mode if focused mode is disabled externally (e.g., from Header 'Exit')
-    React.useEffect(() => {
+    useEffect(() => {
         if (mode === 'session' && !isFocusedMode) {
-            setMode('selection');
+            setTimeout(() => setMode('selection'), 0);
         }
     }, [mode, isFocusedMode]);
 
-    const [resumeSnippets, setResumeSnippets] = React.useState<{ text: string; source: string }[]>([]);
-
-    
-
+    const [resumeSnippets, setResumeSnippets] = useState<{ text: string; source: string }[]>([]);
 
     const handleStartTailored = async () => {
         const { data: { user } } = await supabase.auth.getUser();
@@ -122,12 +95,10 @@ export const InterviewAdvisor: React.FC = () => {
         setUserResponse('');
     };
 
-    
-    
     const isSessionLoading = mode === 'session' && questions.length === 0 && isLoading;
 
     if (mode === 'session') {
-        return <InterviewSessionScreen 
+        return <InterviewSessionScreen
             questions={questions}
             currentQuestionIndex={currentQuestionIndex}
             responses={responses}
@@ -145,7 +116,7 @@ export const InterviewAdvisor: React.FC = () => {
         />;
     }
 
-    return <InterviewSelection 
+    return <InterviewSelection
         limitError={limitError}
         handleStartGeneral={handleStartGeneral}
         handleStartTailored={handleStartTailored}
@@ -154,3 +125,5 @@ export const InterviewAdvisor: React.FC = () => {
         jobs={jobs}
     />;
 };
+
+export default InterviewAdvisor;

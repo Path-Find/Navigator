@@ -25,6 +25,8 @@ Building the foundation of the user's personal model.
 - [x] **Selection Tracking**: Log A/B stylistic selections to measure preference.
 - [x] **Edit Monitoring**: Monitor manual edits for style-drift detection.
 - [x] **Outcome Correlation**: Correlate "Interview" and "Offer" status changes to successful modeling states.
+- [ ] **Interview Response Vectorization**: Integrate interview transcripts into the professional latent space to refine the personal style model.
+
 
 ### Level 2: Semantic Trajectory Mapping (In Progress)
 - [x] **Trajectory Mapper Prompt**: Established `TRAJECTORY_MAPPER_PROMPT` for path analysis.

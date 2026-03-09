@@ -9,16 +9,7 @@ import { useSkillContext } from './context/SkillContext';
 import { useGlobalUI } from '../../contexts/GlobalUIContext';
 import { checkInterviewLimit, getUsageStats } from '../../services/usageLimits';
 import { supabase } from '../../services/supabase';
-import {
-    CheckCircle2, X,
-    Sparkles, AlertCircle,
-    Check
-} from 'lucide-react';
 import { useToast } from '../../contexts/ToastContext';
-import { motion, AnimatePresence } from 'framer-motion';
-import { ROUTES } from '../../constants';
-import { InterviewChat } from '../../components/common/InterviewChat';
-import type { ChatMessage } from '../../components/common/InterviewChat';
 
 type InterviewStep = 'intro' | 'interview' | 'summary';
 
@@ -258,40 +249,37 @@ export const SkillInterviewPage: React.FC = () => {
                 <div className="fixed top-20 right-0 w-96 h-96 bg-emerald-500/5 rounded-full blur-[100px] pointer-events-none" />
                 <div className="fixed bottom-0 left-0 w-96 h-96 bg-teal-500/5 rounded-full blur-[100px] pointer-events-none" />
 
-                <div className={`flex-1 w-full ${step === 'intro' ? 'max-w-5xl' : 'max-w-3xl'} mx-auto px-4 py-8 relative z-10 flex flex-col transition-all duration-500`}>
-                    <AnimatePresence mode="wait">
-                        
-                        {step === 'intro' && (
-                            <SkillInterviewIntro 
-                                isLoading={isLoading} 
-                                limitError={limitError} 
-                                usageInfo={usageInfo} 
-                                handleStart={handleStart} 
-                                skills={skills} 
-                                isCapped={isCapped}
-                                MAX_SKILLS_PER_SESSION={MAX_SKILLS_PER_SESSION}
-                            />
-                        )}
-                        {step === 'interview' && (
-                            <SkillInterviewSession 
-                                messages={messages}
-                                userAnswer={userAnswer}
-                                setUserAnswer={setUserAnswer}
-                                handleSubmitAnswer={handleSubmitAnswer}
-                                isAnalyzing={isAnalyzing}
-                            />
-                        )}
-                        {step === 'summary' && (
-                            <SkillInterviewSummary 
-                                verifiedCount={verifiedCount}
-                                skills={skills}
-                                skillScores={skillScores}
-                                verifiedSkills={verifiedSkills}
-                                handleClose={handleClose}
-                                handleFinish={handleFinish}
-                            />
-                        )}
-</AnimatePresence>
+                <div className="flex-1 w-full max-w-3xl mx-auto px-4 py-8 relative z-10 flex flex-col transition-all duration-500">
+                    {step === 'intro' && (
+                        <SkillInterviewIntro
+                            isLoading={isLoading}
+                            limitError={limitError}
+                            usageInfo={usageInfo}
+                            handleStart={handleStart}
+                            skills={skills}
+                            isCapped={isCapped}
+                            MAX_SKILLS_PER_SESSION={MAX_SKILLS_PER_SESSION}
+                        />
+                    )}
+                    {step === 'interview' && (
+                        <SkillInterviewSession
+                            messages={messages}
+                            userAnswer={userAnswer}
+                            setUserAnswer={setUserAnswer}
+                            handleSubmitAnswer={handleSubmitAnswer}
+                            isAnalyzing={isAnalyzing}
+                        />
+                    )}
+                    {step === 'summary' && (
+                        <SkillInterviewSummary
+                            verifiedCount={verifiedCount}
+                            skills={skills}
+                            skillScores={skillScores}
+                            verifiedSkills={verifiedSkills}
+                            handleClose={handleClose}
+                            handleFinish={handleFinish}
+                        />
+                    )}
                 </div>
             </div>
         </div>

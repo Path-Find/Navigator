@@ -2,7 +2,7 @@ import React, { useMemo } from 'react';
 import { FEATURE_REGISTRY, FEATURE_RANKINGS, getFeatureColor, shouldShowNewBadge, type FeatureDefinition } from '../../featureRegistry';
 import { getPreviewComponent } from '../../components/common/FeaturePreviews';
 import type { ViewId } from '../../utils/navigation';
-import { Mail, TrendingUp, PenTool, Sparkles, FileText, GraduationCap, Bookmark, Zap, RefreshCw, Shield, Users, Globe, Search, Calculator, MessageSquare, Rss, Activity, type LucideIcon } from 'lucide-react';
+import { Mail, TrendingUp, PenTool, Sparkles, FileText, GraduationCap, Bookmark, Zap, RefreshCw, Shield, Users, Globe, Search, Calculator, MessageSquare, Rss, Activity, Building2, School, type LucideIcon } from 'lucide-react';
 import { BentoCard } from '../../components/ui/BentoCard';
 import { EventService } from '../../services/eventService';
 import type { User as SupabaseUser } from '@supabase/supabase-js';
@@ -28,6 +28,8 @@ const ICON_MAP: Record<string, LucideIcon> = {
     MessageSquare,
     Rss,
     Activity,
+    Building2,
+    School,
 } as const;
 
 interface FeatureGridProps {
@@ -70,8 +72,8 @@ export const FeatureGrid: React.FC<FeatureGridProps> = ({
             const config = FEATURE_REGISTRY[key];
             if (!config || !config.showOnHomepage) return false;
 
-            // Education requires Admin/Tester
-            if (config.category === 'EDUCATION') return isAdmin || isTester;
+            // Education requires Admin/Tester/Student
+            if (config.category === 'EDUCATION') return isAdmin || isTester || journey === 'student';
 
             return true;
         });

@@ -1,9 +1,8 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Sparkles, Upload, ArrowRight, ArrowLeft, Check, Loader2, GraduationCap, Search, Building2, Shield, Lock, Zap, PenTool } from 'lucide-react';
+import { ArrowRight, GraduationCap, Search, Building2 } from 'lucide-react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useResumeContext } from '../resume/context/ResumeContext';
-import { TranscriptUpload } from '../grad/TranscriptUpload';
 import { PlansOnboardingStep } from './PlansOnboardingStep';
 import type { ExperienceBlock } from '../resume/types';
 import { ROUTES, STORAGE_KEYS } from '../../constants';

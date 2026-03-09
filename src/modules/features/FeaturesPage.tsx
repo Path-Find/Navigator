@@ -5,7 +5,7 @@ import {
     Sparkles, PenTool, RefreshCw, Zap, Shield, Bookmark,
     TrendingUp, Users, FileText, Mail, Rss, Globe,
     GraduationCap, Search, Calculator, MessageSquare,
-    Activity, School,
+    Activity, School, Building2,
     type LucideIcon,
 } from 'lucide-react';
 import { BentoCard } from '../../components/ui/BentoCard';
@@ -13,6 +13,7 @@ import { getAllFeatures, getFeatureColor } from '../../featureRegistry';
 import { getPreviewComponent } from '../../components/common/FeaturePreviews';
 import { useUser } from '../../contexts/UserContext';
 import { useModal } from '../../contexts/ModalContext';
+import { useGlobalUI } from '../../contexts/GlobalUIContext';
 import { ROUTES } from '../../constants';
 
 // ─── Types ────────────────────────────────────────────────────────────
@@ -24,7 +25,7 @@ type Tier = 'all' | 'explorer' | 'plus' | 'pro';
 const ICON_MAP: Record<string, LucideIcon> = {
     Sparkles, TrendingUp, Zap, FileText, GraduationCap, Bookmark,
     PenTool, Mail, RefreshCw, Shield, Users, Globe,
-    Search, Calculator, MessageSquare, Rss, Activity, School,
+    Search, Calculator, MessageSquare, Rss, Activity, School, Building2,
 };
 
 // ─── Filter Tabs ──────────────────────────────────────────────────────
@@ -46,6 +47,7 @@ export const FeaturesPage: React.FC = () => {
     const navigate = useNavigate();
     const { user, userTier, isAdmin, isLoading } = useUser();
     const { openModal } = useModal();
+    const { setView } = useGlobalUI();
 
     useEffect(() => {
         if (!isLoading && !hasSetDefaultRef.current && user) {
@@ -156,8 +158,8 @@ export const FeaturesPage: React.FC = () => {
                             const color = getFeatureColor(feature);
                             const Icon = ICON_MAP[feature.iconName];
 
-                            const tierLevelMap: Record<string, number> = { free: 0, explorer: 0, plus: 1, pro: 2, admin: 3 };
-                            const userLevel = tierLevelMap[userTier] ?? 0;
+                            const tierLevelMap: Record<string, number> = { free: 0, explorer: 0, plus: 1, pro: 2, admin: 3, tester: 3 };
+                            const userLevel = tierLevelMap[userTier as string] ?? 0;
                             const featureLevel = tierLevelMap[feature.tier] ?? 0;
                             const hasAccess = userLevel >= featureLevel;
 
@@ -194,6 +196,7 @@ export const FeaturesPage: React.FC = () => {
                                             }
                                             if (user) {
                                                 if (hasAccess) {
+                                                    if (feature.targetView) setView(feature.targetView);
                                                     if (feature.link) navigate(feature.link);
                                                 } else {
                                                     openModal('UPGRADE');
