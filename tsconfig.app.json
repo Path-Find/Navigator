@@ -34,6 +34,8 @@
   "exclude": [
     "src/**/*.test.ts",
     "src/**/*.test.tsx",
+    "src/**/*.bench.ts",
+    "src/**/*.bench.tsx",
     "src/test",
     "src/utils/test-setup-bun.ts"
   ]
