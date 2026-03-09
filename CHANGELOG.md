@@ -4,6 +4,8 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## [2.31.9] - 2026-03-09
+
 ### Changed
 - **Code Health Sweep**: Resolved major linting warnings across the project. Replaced generic `any` types with disciplined interfaces (`ProcessedJob`, specific `PromiseSettledResult`s) in `jobStorage.ts` and `usageLimits.ts`.
 - **Hook Optimization**: Added missing dependencies to `useEffect`, `useMemo`, and `useCallback` hooks in `useCoachManager` and `EmailVerificationScreen` to prevent stale closure bugs.
