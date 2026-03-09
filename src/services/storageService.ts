@@ -71,7 +71,8 @@ export const Storage = {
                     cover_letter: job.coverLetter,
                     cover_letter_critique: job.coverLetterCritique,
                     fit_score: job.analysis?.compatibilityScore,
-                    date_added: new Date(job.dateAdded || Date.now()).toISOString()
+                    date_added: new Date(job.dateAdded || Date.now()).toISOString(),
+                    updated_at: new Date(job.updatedAt || job.dateAdded || Date.now()).toISOString()
                 }));
                 syncTasks.push(supabase.from('jobs').insert(payload).then(({ error }) => {
                     if (error) {

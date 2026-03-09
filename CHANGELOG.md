@@ -7,6 +7,8 @@ All notable changes to this project will be documented in this file.
 ### Changed
 - **Code Health Sweep**: Resolved major linting warnings across the project. Replaced generic `any` types with disciplined interfaces (`ProcessedJob`, specific `PromiseSettledResult`s) in `jobStorage.ts` and `usageLimits.ts`.
 - **Hook Optimization**: Added missing dependencies to `useEffect`, `useMemo`, and `useCallback` hooks in `useCoachManager` and `EmailVerificationScreen` to prevent stale closure bugs.
+- **Component Modularity**: Extracted large, monolithic components (`OnboardingPage`, `InterviewAdvisor`, `SkillInterviewPage`, `ResumeEditor`) into smaller, focused single-responsibility files (routing, selection, session, summary screens) with custom hooks (`useResumeEditor`).
+- **Data Encapsulation**: Extracted the static `FEATURE_REGISTRY` object out of the UI and into a dedicated data file (`src/features.data.ts`), clarifying the separation between UI tracking and metadata definitions.
 
 ### Fixed
 - **Storage Core Migration**: Increased the migration timeout budget from 3s to 5s and refined the Base64 regex detection in `Vault` to prevent silently skipping the PBKDF2 iteration migration.

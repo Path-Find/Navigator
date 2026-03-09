@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import type { ExperienceBlock } from './types';
 import { Upload, Loader2, Plus, Trash2, Briefcase, GraduationCap, Code, Layers, Calendar, UserCircle, FileText, Zap, Sparkles, Heart, Download, ArrowRightLeft, ChevronUp, ChevronDown, X, Check } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { TRACKING_EVENTS, ROUTES } from '../../constants';
+import { ROUTES } from '../../constants';
 import { isRecognizedSkill } from '../../data/skillDatabase';
 import { SharedPageLayout } from '../../components/common/SharedPageLayout';
 import { PageHeader } from '../../components/ui/PageHeader';
@@ -11,7 +11,7 @@ import { Card } from '../../components/ui/Card';
 import { Button } from '../../components/ui/Button';
 import { Alert } from '../../components/ui/Alert';
 import { useResumeContext } from './context/ResumeContext';
-import { EventService } from '../../services/eventService';
+import { useResumeEditor } from './hooks/useResumeEditor';
 import { UnifiedUploadHero } from '../../components/common/UnifiedUploadHero';
 import { GlobalDragOverlay } from '../../components/common/GlobalDragOverlay';
 import { ResumePreview } from './components/ResumePreview';
@@ -64,8 +64,21 @@ export const ResumeEditor: React.FC = () => {
 
     const initialResume = resumes.length > 0 ? resumes[0] : { id: 'primary', name: 'Primary Experience', blocks: [] };
 
-    const [blocks, setBlocks] = useState<ExperienceBlock[]>(initialResume.blocks || []);
-    const [movingBlockId, setMovingBlockId] = useState<string | null>(null);
+    const {
+        blocks,
+        movingBlockId,
+        setMovingBlockId,
+        addBlock,
+        removeBlock,
+        updateBlock,
+        updateBullet,
+        addBullet,
+        removeBullet,
+        moveBullet,
+        handleApplySuggestion,
+        handleDismissSuggestion
+    } = useResumeEditor(initialResume, resumes, onSave);
+
     const [hasStartedManually, setHasStartedManually] = useState(false);
     const [parsingMessageIndex, setParsingMessageIndex] = useState(0);
     const [isPreviewOpen, setIsPreviewOpen] = useState(false);
@@ -90,14 +103,6 @@ export const ResumeEditor: React.FC = () => {
         return () => clearInterval(interval);
     }, [isParsing, PARSING_MESSAGES.length]);
 
-
-
-    useEffect(() => {
-        if (resumes.length > 0) {
-            setBlocks(resumes[0].blocks);
-        }
-    }, [resumes]);
-
     // Clear error on unmount
     useEffect(() => {
         return () => {
@@ -105,118 +110,11 @@ export const ResumeEditor: React.FC = () => {
         };
     }, [clearImportError]);
 
-
-
-    useEffect(() => {
-        const handler = setTimeout(() => {
-            const updatedProfile = { ...initialResume, blocks };
-            onSave([updatedProfile]);
-            // Track usage of resume builder
-            EventService.trackUsage(TRACKING_EVENTS.RESUMES);
-        }, 800);
-        return () => clearTimeout(handler);
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [blocks, initialResume.id]);
-
     const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];
         if (!file) return;
         onImport(file);
         if (fileInputRef.current) fileInputRef.current.value = '';
-    };
-
-    const addBlock = (type: SectionType) => {
-        if (type === 'summary' && blocks.some(b => b.type === 'summary')) return;
-        const newBlock: ExperienceBlock = {
-            id: crypto.randomUUID(),
-            type: type,
-            title: type === 'summary' ? 'Professional Summary' : '',
-            organization: '',
-            dateRange: '',
-            bullets: [''],
-            isVisible: true
-        };
-        setBlocks([...blocks, newBlock]);
-    };
-
-    const removeBlock = (id: string) => {
-        setBlocks(blocks.filter(b => b.id !== id));
-    };
-
-    const updateBlock = (id: string, field: keyof ExperienceBlock, value: string | string[] | boolean) => {
-        setBlocks(blocks.map(b => b.id === id ? { ...b, [field]: value } : b));
-    };
-
-    const updateBullet = (blockId: string, index: number, value: string) => {
-        setBlocks(blocks.map(b => {
-            if (b.id !== blockId) return b;
-            const newBullets = [...b.bullets];
-            newBullets[index] = value;
-            return { ...b, bullets: newBullets };
-        }));
-    };
-
-    const addBullet = (blockId: string, text: string = '') => {
-        setBlocks(prev => prev.map(b => {
-            if (b.id !== blockId) return b;
-            // If the last bullet is empty and we're inserting non-empty text, fill that slot
-            const newBullets = [...b.bullets];
-            if (text !== '' && newBullets.length > 0 && newBullets[newBullets.length - 1] === '') {
-                newBullets[newBullets.length - 1] = text;
-            } else {
-                newBullets.push(text);
-            }
-            return { ...b, bullets: newBullets };
-        }));
-    };
-
-    const removeBullet = (blockId: string, index: number) => {
-        setBlocks(blocks.map(b => {
-            if (b.id !== blockId) return b;
-            return { ...b, bullets: b.bullets.filter((_: string, i: number) => i !== index) };
-        }));
-    };
-
-    const moveBullet = (blockId: string, index: number, direction: 'up' | 'down') => {
-        setBlocks(blocks.map(b => {
-            if (b.id !== blockId) return b;
-            const newBullets = [...b.bullets];
-            const targetIndex = direction === 'up' ? index - 1 : index + 1;
-            if (targetIndex >= 0 && targetIndex < newBullets.length) {
-                [newBullets[index], newBullets[targetIndex]] = [newBullets[targetIndex], newBullets[index]];
-            }
-            return { ...b, bullets: newBullets };
-        }));
-    };
-
-    const handleApplySuggestion = (suggestion: { id: string; type: string; suggestion: string }) => {
-        if (suggestion.type === 'add' || suggestion.type === 'update') {
-            // Find summary block or add one
-            const summaryBlock = blocks.find(b => b.type === 'summary');
-            if (summaryBlock) {
-                addBullet(summaryBlock.id, suggestion.suggestion);
-            } else {
-                const newBlock: ExperienceBlock = {
-                    id: crypto.randomUUID(),
-                    type: 'summary',
-                    title: 'Professional Summary',
-                    organization: '',
-                    dateRange: '',
-                    bullets: [suggestion.suggestion],
-                    isVisible: true
-                };
-                setBlocks([newBlock, ...blocks]);
-            }
-        }
-        handleDismissSuggestion(suggestion.id);
-    };
-
-    const handleDismissSuggestion = (suggestionId: string) => {
-        const updatedProfile = {
-            ...initialResume,
-            suggestedUpdates: (initialResume.suggestedUpdates || []).filter(s => s.id !== suggestionId)
-        };
-        onSave([updatedProfile]);
     };
 
     const handlePrint = () => {
