@@ -101,6 +101,54 @@ describe('secureStorage', () => {
       // Should have opened IndexedDB
       expect(window.indexedDB.open).toHaveBeenCalled();
     });
+
+    it('should migrate data encrypted with legacy fingerprint key', async () => {
+      // Mock the browser characteristics to match the test env
+      const fingerprint = [
+        navigator.userAgent,
+        navigator.language,
+        new Date().getTimezoneOffset().toString(),
+        screen.colorDepth.toString(),
+        screen.width.toString() + 'x' + screen.height.toString()
+      ].join('|');
+
+      const encoder = new TextEncoder();
+      const hash = await crypto.subtle.digest('SHA-256', encoder.encode(fingerprint));
+      const fingerprintKey = await crypto.subtle.importKey(
+        'raw',
+        hash,
+        { name: 'AES-GCM' },
+        false,
+        ['encrypt']
+      );
+
+      // Encrypt data with fingerprint key
+      const plaintext = 'fingerprint_secret';
+      const iv = crypto.getRandomValues(new Uint8Array(12));
+      const encryptedBuffer = await crypto.subtle.encrypt(
+        { name: 'AES-GCM', iv },
+        fingerprintKey,
+        new TextEncoder().encode(plaintext)
+      );
+      const combined = new Uint8Array(iv.length + encryptedBuffer.byteLength);
+      combined.set(iv, 0);
+      combined.set(new Uint8Array(encryptedBuffer), iv.length);
+      const encryptedBase64 = btoa(String.fromCharCode(...combined));
+
+      // ONLY set the data, no jobfit_master_key_v1 to simulate purely derived key users
+      localStorage.setItem('jobfit_secure_test_fingerprint', encryptedBase64);
+
+      // Trigger migration
+      await getMasterKey();
+
+      // Verify data is re-encrypted and accessible
+      const retrieved = await getSecureItem('test_fingerprint');
+      expect(retrieved).toBe(plaintext);
+
+      // Verify that the stored value is DIFFERENT (re-encrypted with new key)
+      const newEncrypted = localStorage.getItem('jobfit_secure_test_fingerprint');
+      expect(newEncrypted).not.toBe(encryptedBase64);
+    });
   });
 
   describe('security', () => {
