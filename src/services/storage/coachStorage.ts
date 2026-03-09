@@ -35,6 +35,27 @@ export const CoachStorage = {
         return roleModels;
     },
 
+    async addRoleModels(roleModels: RoleModelProfile[]) {
+        if (roleModels.length === 0) return await Vault.getSecure(STORAGE_KEYS.ROLE_MODELS) || [];
+
+        const existing: RoleModelProfile[] = await Vault.getSecure(STORAGE_KEYS.ROLE_MODELS) || [];
+        const updated = [...roleModels, ...existing];
+        await Vault.setSecure(STORAGE_KEYS.ROLE_MODELS, updated);
+
+        const userId = await getUserId();
+        if (userId) {
+            const payload = roleModels.map(roleModel => ({
+                id: roleModel.id,
+                user_id: userId,
+                name: roleModel.name,
+                content: roleModel
+            }));
+            const { error } = await supabase.from('role_models').insert(payload);
+            if (error) console.error("Failed to sync role models to cloud:", error);
+        }
+        return updated;
+    },
+
     async addRoleModel(roleModel: RoleModelProfile) {
         const existing: RoleModelProfile[] = await Vault.getSecure(STORAGE_KEYS.ROLE_MODELS) || [];
         const updated = [roleModel, ...existing];
@@ -117,6 +138,43 @@ export const CoachStorage = {
             }
         }
         return targetJobs;
+    },
+
+    async saveTargetJobs(targetJobs: TargetJob[]) {
+        if (targetJobs.length === 0) return await Vault.getSecure(STORAGE_KEYS.TARGET_JOBS) || [];
+
+        const existing: TargetJob[] = await Vault.getSecure(STORAGE_KEYS.TARGET_JOBS) || [];
+        let updated = [...existing];
+
+        targetJobs.forEach(targetJob => {
+            const index = updated.findIndex(tj => tj.id === targetJob.id);
+            if (index !== -1) {
+                updated[index] = targetJob;
+            } else {
+                updated = [targetJob, ...updated];
+            }
+        });
+        await Vault.setSecure(STORAGE_KEYS.TARGET_JOBS, updated);
+
+        const userId = await getUserId();
+        if (userId) {
+            const payload = targetJobs.map(targetJob => ({
+                id: targetJob.id,
+                user_id: userId,
+                title: targetJob.title,
+                description: targetJob.description,
+                role_model_id: targetJob.roleModelId,
+                gap_analysis: targetJob.gapAnalysis,
+                roadmap: targetJob.roadmap,
+                type: targetJob.type || 'goal',
+                strict_mode: targetJob.strictMode ?? true,
+                date_added: new Date(targetJob.dateAdded).toISOString()
+            }));
+
+            const { error } = await supabase.from('target_jobs').upsert(payload);
+            if (error) console.error("Failed to sync target jobs to cloud:", error);
+        }
+        return updated;
     },
 
     async saveTargetJob(targetJob: TargetJob) {

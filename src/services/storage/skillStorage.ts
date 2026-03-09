@@ -45,6 +45,57 @@ export const SkillStorage = {
         return skills;
     },
 
+    async saveSkills(skillsList: Partial<CustomSkill>[]): Promise<CustomSkill[]> {
+        if (skillsList.length === 0) return [];
+
+        const userId = await getUserId();
+        if (!userId) {
+            const skills: CustomSkill[] = await Vault.getSecure(STORAGE_KEYS.SKILLS) || [];
+            const newSkills = skillsList.map(skill => {
+                const existingIdx = skills.findIndex(s => s.name === skill.name);
+                return {
+                    ...skill,
+                    id: existingIdx !== -1 ? skills[existingIdx].id : crypto.randomUUID(),
+                    user_id: 'anonymous',
+                    created_at: existingIdx !== -1 ? skills[existingIdx].created_at : new Date().toISOString(),
+                    updated_at: new Date().toISOString()
+                } as CustomSkill;
+            });
+
+            newSkills.forEach(newSkill => {
+                const existingIdx = skills.findIndex(s => s.name === newSkill.name);
+                if (existingIdx !== -1) skills[existingIdx] = newSkill;
+                else skills.push(newSkill);
+            });
+
+            await Vault.setSecure(STORAGE_KEYS.SKILLS, skills);
+            return newSkills;
+        }
+
+        const payload = skillsList.map(skill => ({
+            user_id: userId,
+            name: skill.name,
+            proficiency: skill.proficiency,
+            evidence: skill.evidence,
+            updated_at: new Date().toISOString()
+        }));
+
+        const { data, error } = await supabase
+            .from('user_skills')
+            .upsert(payload, { onConflict: 'user_id,name' })
+            .select();
+
+        if (error) throw error;
+
+        let localSkills: CustomSkill[] = await Vault.getSecure(STORAGE_KEYS.SKILLS) || [];
+        const namesToUpdate = new Set(skillsList.map(s => s.name));
+        localSkills = localSkills.filter(s => !namesToUpdate.has(s.name));
+        localSkills.push(...(data as CustomSkill[]));
+        await Vault.setSecure(STORAGE_KEYS.SKILLS, localSkills);
+
+        return data as CustomSkill[];
+    },
+
     async saveSkill(skill: Partial<CustomSkill>): Promise<CustomSkill> {
         const userId = await getUserId();
         if (!userId) {

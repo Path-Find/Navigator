@@ -98,6 +98,37 @@ export const JobStorage = {
         return jobs;
     },
 
+    async addJobs(jobs: SavedJob[]) {
+        if (jobs.length === 0) return await Vault.getSecure(STORAGE_KEYS.JOBS_HISTORY) || [];
+
+        const localJobs: SavedJob[] = await Vault.getSecure(STORAGE_KEYS.JOBS_HISTORY) || [];
+        const updated = [...jobs, ...localJobs];
+        await Vault.setSecure(STORAGE_KEYS.JOBS_HISTORY, updated);
+
+        const userId = await getUserId();
+        if (userId) {
+            const payload = jobs.map(job => ({
+                user_id: userId,
+                id: job.id,
+                job_title: job.analysis?.distilledJob?.roleTitle || job.position || 'Untitled Role',
+                company: job.analysis?.distilledJob?.companyName || job.company || 'Unknown Company',
+                original_text: job.description,
+                url: job.url,
+                analysis: job.analysis,
+                canonical_role: job.analysis?.distilledJob?.canonicalTitle,
+                status: job.status || 'saved',
+                resume_id: job.resumeId,
+                cover_letter: job.coverLetter,
+                cover_letter_critique: job.coverLetterCritique,
+                date_added: new Date(job.dateAdded).toISOString()
+            }));
+
+            const { error } = await supabase.from('jobs').insert(payload);
+            if (error) console.error("Cloud Sync Error (Add Jobs):", error);
+        }
+        return updated;
+    },
+
     async addJob(job: SavedJob) {
         const localJobs: SavedJob[] = await Vault.getSecure(STORAGE_KEYS.JOBS_HISTORY) || [];
         const updated = [job, ...localJobs];
