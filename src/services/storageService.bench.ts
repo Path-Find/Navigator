@@ -69,19 +69,17 @@ describe('Storage syncLocalToCloud Benchmark', () => {
             return [];
         });
 
-        const mockEq = vi.fn().mockResolvedValue({ data: [] });
-        mockEq.mockImplementation((field, val) => {
-            if (field === 'user_id') return Promise.resolve({ data: [] }); // return empty cloud list
-            return { limit: vi.fn(() => ({ maybeSingle: vi.fn().mockResolvedValue({ data: { id: 'resume1' } }) })) };
-        });
+        const mockQueryBuilder = {
+            select: vi.fn().mockReturnThis(),
+            insert: vi.fn().mockReturnThis(),
+            upsert: vi.fn().mockReturnThis(),
+            eq: vi.fn().mockReturnThis(),
+            limit: vi.fn().mockReturnThis(),
+            maybeSingle: vi.fn().mockResolvedValue({ data: { id: 'resume1' } }),
+            then: vi.fn((onfulfilled) => Promise.resolve({ data: [], error: null }).then(onfulfilled))
+        } as any;
 
-        const mockSelect = vi.fn().mockReturnValue({ eq: mockEq });
-
-        vi.mocked(supabase.from).mockReturnValue({
-            select: mockSelect,
-            insert: vi.fn().mockResolvedValue({ error: null }),
-            upsert: vi.fn().mockReturnValue({ select: vi.fn().mockReturnValue({ single: vi.fn().mockResolvedValue({ data: {}, error: null }) }) })
-        } as any);
+        vi.mocked(supabase.from).mockReturnValue(mockQueryBuilder);
     });
 
     bench('syncLocalToCloud with many local items', async () => {

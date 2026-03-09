@@ -2,6 +2,22 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2.31.11] - 2026-03-09
+
+### Security
+- **Local Storage Encryption**: Strengthened encryption key derivation using `crypto.subtle.generateKey` to create cryptographically secure 256-bit AES-GCM keys. Added a secure migration path for legacy data.
+- **SSRF Protection**: Verified and reinforced Server-Side Request Forgery (SSRF) protections in the `scrape-jobs` Edge Function.
+- **Log Injection**: Prevented potential CRLF log injection vulnerabilities in the Gemini Proxy and verified the absence of sensitive logging in `UserContext`.
+- **Sanitization & Escaping**: Resolved code scanning alerts by fixing incomplete multi-character sanitization and double-escaping bugs in the job scraper and extension content extractor.
+- **Security Policy**: Updated `SECURITY.md` with refined vulnerability reporting guidelines and response timelines.
+
+### Added
+- **Cloud Sync Optimization**: Resolved N+1 sync issues by batching job, skill, and target job insertions, drastically speeding up local-to-cloud synchronization.
+
+### Fixed
+- **Code Health**: Resolved specific `any` types in `FeatureGrid.tsx` and `NavigatorPro.tsx`, and verified `HEADLINES` constant extraction.
+- **Test Coverage**: Added comprehensive test suites for block comparison logic, event service error handling, and `cleanJsonOutput` edge cases.
+
 ## [2.31.10] - 2026-03-09
 ### Added
 - **Dynamic Reliability Filtering**: Replaced the hardcoded blocklist with an automated tracking system. The app now calculates the failure rate for every job board. If a domain (like LinkedIn) fails more than 80% of the time (over at least 5 attempts), it is automatically soft-blocked to save users from unnecessary "Scraping..." wait times.

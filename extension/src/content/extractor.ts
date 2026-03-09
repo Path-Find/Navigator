@@ -9,8 +9,8 @@ function stripHtml(html: string): string {
         const doc = parser.parseFromString(html, 'text/html');
         return (doc.body.textContent || '').trim();
     } catch {
-        // Fallback for environments where DOMParser is unavailable or fails
-        return html.replace(/<[^>]*>?/gm, '').trim();
+        // Fallback for environments where DOMParser is unavailable or fails (e.g. background service worker context)
+        return html.replace(/<[^>]+>/g, '').trim();
     }
 }
 

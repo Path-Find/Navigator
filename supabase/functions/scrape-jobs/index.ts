@@ -97,11 +97,15 @@ Deno.serve(async (req) => {
             text = text.replace(/<[^>]+>/g, " ");
 
             // 4. Clean up whitespace and entities
-            text = text
-                .replace(/&nbsp;/g, " ")
-                .replace(/&amp;/g, "&")
-                .replace(/&lt;/g, "<")
-                .replace(/&gt;/g, ">")
+            const entities: Record<string, string> = {
+                '&nbsp;': ' ',
+                '&amp;': '&',
+                '&lt;': '<',
+                '&gt;': '>',
+                '&quot;': '"',
+                '&#39;': "'",
+            };
+            text = text.replace(/&(?:nbsp|amp|lt|gt|quot|#39);/g, (m) => entities[m])
                 .replace(/\s+/g, " ")
                 .trim()
                 .substring(0, 50000);
@@ -164,7 +168,7 @@ Deno.serve(async (req) => {
             }
 
             cleanHtml = cleanHtml
-                .replace(/<!--([\s\S]*?)-->/gim, "")
+                .replace(/<!--[\s\S]*?-->/g, "")
                 .replace(/\s+/g, " ")
                 .substring(0, 30000);
 
