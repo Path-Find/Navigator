@@ -269,7 +269,7 @@ export const handler = async (req: Request) => {
         // 6. CONTENT VALIDATION & REFUND
         // If the AI returns a "not_a_job" flag (which we instruct it to do in prompts), we refund the credit
         if (safeTask === 'analysis' && (text.includes('"error": "not_a_job"') || text.includes('not_a_job'))) {
-            console.warn(`Analysis rejected by AI (not a job) for user ${sanitizeLog(user.id)}`);
+            console.warn("Analysis rejected by AI (not a job) for user:", { userId: sanitizeLog(user.id) });
             if (quotaIncremented) {
                 const { error: decError } = await supabase.rpc('decrement_analysis_count', {
                     p_user_id: user.id
