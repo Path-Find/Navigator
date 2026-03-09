@@ -2,6 +2,14 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2.31.8] - 2026-03-08
+
+### Fixed
+- **Database Schema Drift**: Resolved a critical issue where the Supabase `jobs` table was missing columns (`updated_at`, `location`, `resume_id`, `cover_letter`, `cover_letter_critique`, `fit_score`), causing "schema cache" errors and blocking cloud synchronization.
+- **Status Validation**: Expanded the `jobs` status constraint to include the `'analyzing'` state, preventing database insertion failures for jobs that are saved mid-analysis.
+- **Job Match UX**: Fixed a state-sharing bug in the job input screen where failed scrape URLs would persist and conflict with the manual description fallback.
+- **Submission Routing**: Ensured that form submissions correctly route to the manual description buffer when a scraping error is present, preventing redundant sync failures.
+
 ## [2.31.7] - 2026-03-08
 
 ### Added

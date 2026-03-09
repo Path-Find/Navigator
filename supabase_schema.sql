@@ -45,11 +45,17 @@ create table jobs (
   company text,
   original_text text,
   url text,
+  location text, -- Added for geographic filtering
   source_type text default 'manual',
   analysis jsonb, -- Stores the Analysis result
-  status text default 'new' check (status in ('new', 'saved', 'applied', 'interview', 'offer', 'rejected', 'ghosted', 'feed', 'error')),
+  status text default 'new' check (status in ('new', 'saved', 'applied', 'interview', 'offer', 'rejected', 'ghosted', 'feed', 'error', 'analyzing')),
+  resume_id text, -- Link to the resume used
+  cover_letter text,
+  cover_letter_critique jsonb,
+  fit_score numeric,
   canonical_role text, -- Added for role farming
-  date_added timestamp with time zone default timezone('utc'::text, now()) not null
+  date_added timestamp with time zone default timezone('utc'::text, now()) not null,
+  updated_at timestamp with time zone default timezone('utc'::text, now()) not null
 );
 
 -- CANONICAL_ROLES: Stores standard job titles and their manually-vetted guidelines
