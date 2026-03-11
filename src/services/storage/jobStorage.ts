@@ -227,8 +227,9 @@ export const JobStorage = {
                 console.log(`Sync: Uploading ${missingFromCloud.length} unsynced jobs to cloud...`);
 
                 // Upload in small batches to avoid hitting limits
-                for (const job of missingFromCloud) {
-                    await supabase.from('jobs').insert({
+                const BATCH_SIZE = 50;
+                for (let i = 0; i < missingFromCloud.length; i += BATCH_SIZE) {
+                    const batch = missingFromCloud.slice(i, i + BATCH_SIZE).map(job => ({
                         user_id: userId,
                         id: job.id,
                         job_title: job.analysis?.distilledJob?.roleTitle || job.position || 'Untitled Role',
@@ -245,7 +246,8 @@ export const JobStorage = {
                         date_added: new Date(job.dateAdded || Date.now()).toISOString(),
                         source_type: 'manual',
                         fit_score: job.analysis?.compatibilityScore
-                    });
+                    }));
+                    await supabase.from('jobs').insert(batch);
                 }
                 console.log("Sync: Bulk upload complete.");
             }
