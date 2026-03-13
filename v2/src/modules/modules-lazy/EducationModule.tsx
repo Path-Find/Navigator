@@ -1,0 +1,19 @@
+import React from 'react';
+import { Routes, Route } from 'react-router-dom';
+import { EducationDashboard } from '../grad/EducationDashboard';
+import { AcademicHQ } from '../grad/AcademicHQ';
+import { GPACalculatorPage } from '../grad/GPACalculatorPage';
+import { ProgramExplorerPage } from '../grad/ProgramExplorerPage';
+
+const EducationModule: React.FC = () => {
+    return (
+        <Routes>
+            <Route path="/edu" element={<EducationDashboard />} />
+            <Route path="/edu/transcript" element={<AcademicHQ />} />
+            <Route path="/edu/gpa" element={<GPACalculatorPage />} />
+            <Route path="/edu/programs" element={<ProgramExplorerPage />} />
+        </Routes>
+    );
+};
+
+export default EducationModule;
