@@ -1,0 +1,134 @@
+{
+  "total_count": 2,
+  "jobs": [
+    {
+      "id": 66367340769,
+      "run_id": 22875900577,
+      "workflow_name": "Deploy to GitHub Pages",
+      "head_branch": "main",
+      "run_url": "https://api.github.com/repos/ryanphanna/Navigator/actions/runs/22875900577",
+      "run_attempt": 1,
+      "node_id": "CR_kwDOQ3_UIs8AAAAPc81A4Q",
+      "head_sha": "96c439eee38e3c9e75149235f260e6f27e374836",
+      "url": "https://api.github.com/repos/ryanphanna/Navigator/actions/jobs/66367340769",
+      "html_url": "https://github.com/ryanphanna/Navigator/actions/runs/22875900577/job/66367340769",
+      "status": "completed",
+      "conclusion": "failure",
+      "created_at": "2026-03-09T21:36:01Z",
+      "started_at": "2026-03-09T21:36:03Z",
+      "completed_at": "2026-03-09T21:36:11Z",
+      "name": "build",
+      "steps": [
+        {
+          "name": "Set up job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 1,
+          "started_at": "2026-03-09T21:36:04Z",
+          "completed_at": "2026-03-09T21:36:06Z"
+        },
+        {
+          "name": "Checkout",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 2,
+          "started_at": "2026-03-09T21:36:06Z",
+          "completed_at": "2026-03-09T21:36:07Z"
+        },
+        {
+          "name": "Setup Node",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 3,
+          "started_at": "2026-03-09T21:36:07Z",
+          "completed_at": "2026-03-09T21:36:08Z"
+        },
+        {
+          "name": "Install dependencies",
+          "status": "completed",
+          "conclusion": "failure",
+          "number": 4,
+          "started_at": "2026-03-09T21:36:08Z",
+          "completed_at": "2026-03-09T21:36:09Z"
+        },
+        {
+          "name": "Build",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 5,
+          "started_at": "2026-03-09T21:36:09Z",
+          "completed_at": "2026-03-09T21:36:09Z"
+        },
+        {
+          "name": "Upload artifact",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 6,
+          "started_at": "2026-03-09T21:36:09Z",
+          "completed_at": "2026-03-09T21:36:09Z"
+        },
+        {
+          "name": "Post Setup Node",
+          "status": "completed",
+          "conclusion": "skipped",
+          "number": 11,
+          "started_at": "2026-03-09T21:36:09Z",
+          "completed_at": "2026-03-09T21:36:09Z"
+        },
+        {
+          "name": "Post Checkout",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 12,
+          "started_at": "2026-03-09T21:36:09Z",
+          "completed_at": "2026-03-09T21:36:10Z"
+        },
+        {
+          "name": "Complete job",
+          "status": "completed",
+          "conclusion": "success",
+          "number": 13,
+          "started_at": "2026-03-09T21:36:10Z",
+          "completed_at": "2026-03-09T21:36:10Z"
+        }
+      ],
+      "check_run_url": "https://api.github.com/repos/ryanphanna/Navigator/check-runs/66367340769",
+      "labels": [
+        "ubuntu-latest"
+      ],
+      "runner_id": 1000002629,
+      "runner_name": "GitHub Actions 1000002629",
+      "runner_group_id": 0,
+      "runner_group_name": "GitHub Actions"
+    },
+    {
+      "id": 66367361373,
+      "run_id": 22875900577,
+      "workflow_name": "Deploy to GitHub Pages",
+      "head_branch": "main",
+      "run_url": "https://api.github.com/repos/ryanphanna/Navigator/actions/runs/22875900577",
+      "run_attempt": 1,
+      "node_id": "CR_kwDOQ3_UIs8AAAAPc82RXQ",
+      "head_sha": "96c439eee38e3c9e75149235f260e6f27e374836",
+      "url": "https://api.github.com/repos/ryanphanna/Navigator/actions/jobs/66367361373",
+      "html_url": "https://github.com/ryanphanna/Navigator/actions/runs/22875900577/job/66367361373",
+      "status": "completed",
+      "conclusion": "skipped",
+      "created_at": "2026-03-09T21:36:11Z",
+      "started_at": "2026-03-09T21:36:11Z",
+      "completed_at": "2026-03-09T21:36:11Z",
+      "name": "deploy",
+      "steps": [
+
+      ],
+      "check_run_url": "https://api.github.com/repos/ryanphanna/Navigator/check-runs/66367361373",
+      "labels": [
+        "ubuntu-latest"
+      ],
+      "runner_id": null,
+      "runner_name": null,
+      "runner_group_id": null,
+      "runner_group_name": null
+    }
+  ]
+}
