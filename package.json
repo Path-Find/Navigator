@@ -1,6 +1,7 @@
 {
   "name": "navigator-root",
-  "version": "1.0.0",
+  "description": "A premium, AI-powered career co-pilot to analyze job compatibility, bridge skill gaps, and optimize your academic journey using Google Gemini.",
+  "version": "2.32.0",
   "private": true,
   "scripts": {
     "v2:dev": "npm run dev --prefix v2",
