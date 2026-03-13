@@ -29,8 +29,3 @@ The modern career path is fragmented. Job seekers juggle siloed resumes, navigat
 - [Security](./SECURITY.md)
 
 Created by [Ryan Hanna](https://github.com/ryanphanna) | [ryanisnota.pro](https://ryanisnota.pro)
-
-
-
-
-
