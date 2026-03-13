@@ -1,7 +1,5 @@
-import React, { useState, useRef } from 'react';
+import React, { useState } from 'react';
 import { SharedPageLayout } from '../../components/common/SharedPageLayout';
-import { EventService } from '../../services/eventService';
-import { TRACKING_EVENTS } from '../../constants';
 import { useToast } from '../../contexts/ToastContext';
 
 // Refactored Components
@@ -23,6 +21,7 @@ import { useLocalStorage } from '../../hooks/useLocalStorage';
 import { STORAGE_KEYS } from '../../constants';
 import type { ProfessionalOrg } from '../../types';
 import { useUser } from '../../contexts/UserContext';
+import { useRoleModelUpload } from './hooks/useRoleModelUpload';
 
 export const CoachDashboard: React.FC = () => {
     const {
@@ -42,55 +41,31 @@ export const CoachDashboard: React.FC = () => {
     const [orgs] = useLocalStorage<ProfessionalOrg[]>(STORAGE_KEYS.ORGS, []);
     const { resumes } = useResumeContext();
     const { currentView, setView: onViewChange } = useGlobalUI();
-    const { showError } = useToast();
+    const toast = useToast();
 
     // Cast view safely for the dashboard
     const view = (currentView.startsWith('career') || currentView.startsWith('coach'))
         ? (currentView as CoachViewType)
         : 'coach-home';
     // State
-    const [isUploading, setIsUploading] = useState(false);
     const [uploadProgress, setUploadProgress] = useState({ current: 0, total: 0 });
     const [selectedRoleModelId, setSelectedRoleModelId] = useState<string | null>(null);
     const [comparisonRoleModelId, setComparisonRoleModelId] = useState<string | null>(null);
     const [url, setUrl] = useState('');
     const [isScrapingUrl, setIsScrapingUrl] = useState(false);
     const [error, setError] = useState<string | null>(null);
-    const fileInputRef = useRef<HTMLInputElement>(null);
+
+    const {
+        fileInputRef,
+        isUploading,
+        handleFiles,
+        handleFileChange,
+        triggerUpload,
+    } = useRoleModelUpload({ onAddRoleModel, toast });
 
     const activeHeadline = useHeadlines('goal');
 
     // Handlers
-    const handleFiles = async (files: File[]) => {
-        if (files.length === 0) return;
-
-        setIsUploading(true);
-        setUploadProgress({ current: 0, total: files.length });
-
-        try {
-            for (let i = 0; i < files.length; i++) {
-                setUploadProgress(prev => ({ ...prev, current: i + 1 }));
-                await onAddRoleModel(files[i]);
-                EventService.trackUsage(TRACKING_EVENTS.COACH);
-            }
-        } catch (err) {
-            showError(err instanceof Error ? err.message : 'Failed to add role model.');
-        } finally {
-            setIsUploading(false);
-            setUploadProgress({ current: 0, total: 0 });
-            if (fileInputRef.current) fileInputRef.current.value = '';
-        }
-    };
-
-    const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
-        const files = Array.from(e.target.files || []);
-        handleFiles(files);
-    };
-
-    const triggerUpload = () => {
-        fileInputRef.current?.click();
-    };
-
     const handleTargetJobSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         if (!url.trim() || isScrapingUrl) return;
