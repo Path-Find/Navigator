@@ -4,6 +4,8 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## [2.31.12] - 2026-03-13
+
 ### Optimization
 - **Module-Based Route Splitting**: Implemented a coarse-grained lazy loading architecture by clustering routes into `JobModule`, `ResumeModule`, `CareerModule`, and `EducationModule`. This significantly reduces the initial application bundle by deferring the loading of module-specific providers, components, and heavy dependencies until they are actually navigated to.
 - **Granular Feature Preview Loading**: Refactored the `FeaturePreviews` component to split ~20 SVG-heavy preview components into standalone, lazily-loaded chunks. This strips over 300KB of unused SVG path data from the initial homepage payload.
