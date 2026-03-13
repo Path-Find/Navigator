@@ -1,0 +1,15 @@
+{
+  "name": "navigator-root",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "v2:dev": "npm run dev --prefix v2",
+    "v2:build": "npm run build --prefix v2",
+    "v2:lint": "npm run lint --prefix v2",
+    "v2:test": "npm run test --prefix v2",
+    "extension:dev": "npm run dev --prefix v2/extension",
+    "extension:build": "npm run build --prefix v2/extension",
+    "build": "npm run build --prefix v2",
+    "install": "npm install --prefix v2"
+  }
+}
