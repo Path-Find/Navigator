@@ -2,7 +2,7 @@
 
 All notable changes to this project will be documented in this file.
 
-## [Unreleased]
+## [2.32.0] - 2026-03-13
 
 ### Optimization
 - **Module-Based Route Splitting**: Implemented a coarse-grained lazy loading architecture by clustering routes into `JobModule`, `ResumeModule`, `CareerModule`, and `EducationModule`. This significantly reduces the initial application bundle by deferring the loading of module-specific providers, components, and heavy dependencies until they are actually navigated to.
