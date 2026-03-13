@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Upload, Loader2, Plus, Briefcase, Code, Zap, Sparkles, Heart, FileText, Download, X } from 'lucide-react';
+import { Upload, Loader2, Plus, FileText, Download } from 'lucide-react';
 import { SharedPageLayout } from '../../components/common/SharedPageLayout';
 import { PageHeader } from '../../components/ui/PageHeader';
 import { Card } from '../../components/ui/Card';
@@ -12,6 +12,9 @@ import { GlobalDragOverlay } from '../../components/common/GlobalDragOverlay';
 import { ResumePreview } from './components/ResumePreview';
 import { ResumeSectionEditor } from './components/ResumeSectionEditor';
 import { ResumeDiscoverySidebar } from './components/ResumeDiscoverySidebar';
+import { ResumeParsingScreen } from './components/ResumeParsingScreen';
+import { ResumePreviewModal } from './components/ResumePreviewModal';
+import { ResumePrintStyles } from './components/ResumePrintStyles';
 import { SECTIONS, getSortDate, getTypeColor } from './constants';
 import { useSkillContext } from '../skills/context/SkillContext';
 
@@ -48,27 +51,8 @@ export const ResumeEditor: React.FC = () => {
     } = useResumeEditor(initialResume, resumes, onSave);
 
     const [hasStartedManually, setHasStartedManually] = useState(false);
-    const [parsingMessageIndex, setParsingMessageIndex] = useState(0);
     const [isPreviewOpen, setIsPreviewOpen] = useState(false);
     const fileInputRef = useRef<HTMLInputElement>(null);
-
-    const PARSING_MESSAGES = [
-        { title: "Summoning achievement hunters...", subtitle: "Scouring your past for those gold-medal moments.", icon: Briefcase },
-        { title: "Powering up impact engine...", subtitle: "Translating your hard work into career-defining fuel.", icon: Zap },
-        { title: "Deciphering skill matrix...", subtitle: "Translating your 'can-do' attitude into 'done-that' proof.", icon: Code },
-        { title: "Celebrating your altruism...", subtitle: "Ensuring your community impact gets the spotlight it deserves.", icon: Heart },
-        { title: "Adding finishing sparkles...", subtitle: "Polishing every bullet point until it shines like a supernova.", icon: Sparkles }
-    ];
-
-    useEffect(() => {
-        let interval: ReturnType<typeof setInterval> | undefined;
-        if (isParsing) {
-            interval = setInterval(() => {
-                setParsingMessageIndex((prev) => (prev + 1) % PARSING_MESSAGES.length);
-            }, 3000);
-        }
-        return () => clearInterval(interval);
-    }, [isParsing, PARSING_MESSAGES.length]);
 
     useEffect(() => {
         return () => {
@@ -90,95 +74,12 @@ export const ResumeEditor: React.FC = () => {
     const showEmptyState = blocks.length === 0 && !hasStartedManually && !isParsing;
 
     if (isParsing) {
-        const CurrentIcon = PARSING_MESSAGES[parsingMessageIndex].icon;
-        return (
-            <SharedPageLayout>
-                <div className="flex flex-col items-center justify-center min-h-[70vh] space-y-12 animate-in fade-in zoom-in-95 duration-1000">
-                    <div className="relative group">
-                        <div className="absolute inset-x-[-100px] inset-y-[-100px] bg-indigo-500/10 blur-[100px] rounded-full animate-pulse transition-all duration-1000" />
-
-                        <div className="relative">
-                            <div className="absolute inset-0 rounded-full border-2 border-dashed border-indigo-200/50 animate-[spin_10s_linear_infinite]" />
-
-                            <Card variant="glass" className="relative w-32 h-32 flex items-center justify-center rounded-[2.5rem] shadow-2xl border-indigo-100/50 dark:border-white/5 bg-white/40 dark:bg-neutral-900/40 backdrop-blur-xl overflow-hidden group-hover:scale-105 transition-transform duration-500">
-                                <div className="absolute inset-0 bg-gradient-to-tr from-indigo-500/10 to-purple-500/10 opacity-0 group-hover:opacity-100 transition-opacity" />
-                                <CurrentIcon className="w-10 h-10 text-indigo-600 dark:text-indigo-400 animate-in zoom-in-50 fade-in duration-500" key={parsingMessageIndex} />
-                            </Card>
-
-                            <div className="absolute -top-2 -right-2 w-4 h-4 bg-indigo-500 rounded-full shadow-[0_0_15px_rgba(99,102,241,0.5)] animate-bounce" />
-                        </div>
-                    </div>
-
-                    <div className="text-center space-y-6 max-w-md mx-auto relative px-4">
-                        <div className="space-y-2">
-                            <h2 className="text-4xl md:text-5xl font-black text-neutral-900 dark:text-white tracking-tight animate-in slide-in-from-bottom-4 duration-700" key={`title-${parsingMessageIndex}`}>
-                                {PARSING_MESSAGES[parsingMessageIndex].title}
-                            </h2>
-                            <p className="text-lg text-neutral-500 dark:text-neutral-400 font-medium leading-relaxed animate-in slide-in-from-bottom-2 duration-700 delay-100" key={`subtitle-${parsingMessageIndex}`}>
-                                {PARSING_MESSAGES[parsingMessageIndex].subtitle}
-                            </p>
-                        </div>
-                    </div>
-
-                    <div className="flex flex-col items-center gap-4">
-                        <div className="flex items-center gap-3 px-6 py-3 bg-indigo-50 dark:bg-indigo-900/20 rounded-2xl border border-indigo-100/50 dark:border-indigo-800/50 shadow-sm animate-in fade-in slide-in-from-bottom-8 duration-1000 delay-300">
-                            <Sparkles className="w-5 h-5 text-indigo-500 animate-pulse" />
-                            <span className="text-sm font-black text-indigo-600 dark:text-indigo-400 tracking-wider">
-                                Intelligence Engine Active
-                            </span>
-                        </div>
-
-                        <div className="flex gap-2">
-                            {PARSING_MESSAGES.map((_, i) => (
-                                <div
-                                    key={i}
-                                    className={`h-1.5 rounded-full transition-all duration-500 ${i === parsingMessageIndex ? 'w-8 bg-indigo-500' : 'w-1.5 bg-neutral-200 dark:bg-neutral-800'}`}
-                                />
-                            ))}
-                        </div>
-                    </div>
-                </div>
-            </SharedPageLayout>
-        );
+        return <ResumeParsingScreen />;
     }
 
     return (
         <SharedPageLayout className="theme-resume" spacing="compact" maxWidth="6xl">
-            <style>
-                {`
-                    @media print {
-                        body {
-                            background: white !important;
-                            padding: 0 !important;
-                            margin: 0 !important;
-                        }
-                        .no-print {
-                            display: none !important;
-                        }
-                        .print-only {
-                            display: block !important;
-                        }
-                        .print-container {
-                            display: block !important;
-                            max-width: 100% !important;
-                            width: 100% !important;
-                            margin: 0 !important;
-                            padding: 0 !important;
-                        }
-                        #resume-preview {
-                            display: block !important;
-                            visibility: visible !important;
-                            position: static !important;
-                            width: 100% !important;
-                            margin: 0 !important;
-                            padding: 0 !important;
-                        }
-                        .page-layout-root {
-                            display: none !important;
-                        }
-                    }
-                `}
-            </style>
+            <ResumePrintStyles />
 
             <div id="resume-preview" className="hidden print-only bg-white">
                 <ResumePreview blocks={blocks} />
@@ -357,38 +258,12 @@ export const ResumeEditor: React.FC = () => {
                 </div>
             )}
 
-            {/* Preview Modal */}
-            {isPreviewOpen && (
-                <div className="fixed inset-0 z-[100] flex items-center justify-center p-4 md:p-8 animate-in fade-in duration-300">
-                    <div className="absolute inset-0 bg-neutral-900/60 backdrop-blur-xl" onClick={() => setIsPreviewOpen(false)} />
-                    <div className="relative bg-neutral-100 dark:bg-neutral-950 w-full max-w-5xl h-full rounded-[2rem] shadow-2xl overflow-hidden border border-white/10 flex flex-col">
-                        <div className="px-8 py-6 border-b border-neutral-200 dark:border-neutral-800 flex justify-between items-center bg-white dark:bg-neutral-900">
-                            <div className="flex items-center gap-3">
-                                <div className="p-2 bg-indigo-500/10 rounded-xl text-indigo-600">
-                                    <FileText className="w-5 h-5" />
-                                </div>
-                                <h3 className="font-black text-xl text-neutral-900 dark:text-white">Preview</h3>
-                            </div>
-                            <div className="flex items-center gap-3">
-                                <Button onClick={handlePrint} variant="secondary" size="sm" icon={<Download className="w-3.5 h-3.5" />}>
-                                    Download PDF
-                                </Button>
-                                <button
-                                    onClick={() => setIsPreviewOpen(false)}
-                                    className="p-2 text-neutral-400 hover:text-neutral-900 dark:hover:text-white hover:bg-neutral-100 dark:hover:bg-neutral-800 rounded-full transition-all"
-                                >
-                                    <X className="w-5 h-5" />
-                                </button>
-                            </div>
-                        </div>
-                        <div className="flex-1 overflow-y-auto p-8 md:p-12 scrollbar-none">
-                            <div className="mx-auto shadow-2xl origin-top scale-[0.85] md:scale-100">
-                                <ResumePreview blocks={blocks} />
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            )}
+            <ResumePreviewModal
+                isOpen={isPreviewOpen}
+                blocks={blocks}
+                onClose={() => setIsPreviewOpen(false)}
+                onPrint={handlePrint}
+            />
         </SharedPageLayout>
     );
 };
