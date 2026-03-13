@@ -51,6 +51,8 @@ All notable changes to this project will be documented in this file.
 - **Job Manager Decomposition**: Refactored `useJobManager` into smaller, focused helpers. Extracted nudge logic into `useApplicationNudge`, consolidated initial load into `loadInitialJobsAndUsage`, and centralized usage-limit handling in `useUsageLimits` to improve readability and reduce duplication.
 - **Job Analysis Hook Hardening**: Simplified `useJobAnalysis` by extracting `createAbortController`, `loadTranscriptFromCache`, and `buildTrajectoryContext` helpers. Improved abort handling and error reporting while preserving existing NextGen trajectory and transcript behavior.
 - **Job & Interview Utility Safety**: Hardened job utilities with stricter typing and safer fallbacks. `copyResumeToClipboard` now returns a boolean success flag and guards against missing clipboard APIs, while `computeSnippets` and `handleBankSuggestion` in `interviewUtils.ts` use typed suggestion kinds and deterministic random sampling without relying on array sort side effects.
+- **Resume Parsing & Preview Components**: Extracted the resume parsing screen, preview modal, and print-specific styles from `ResumeEditor.tsx` into focused components (`ResumeParsingScreen`, `ResumePreviewModal`, `ResumePrintStyles`) for clearer separation of concerns and easier future changes.
+- **Coach Role Model Upload Hook**: Moved role model upload state and side effects out of `CoachDashboard.tsx` into a dedicated `useRoleModelUpload` hook, keeping the dashboard component focused on high-level career/coach view orchestration.
 
 ### Changed
 - **V2 Architecture Transition**: Consolidated the core application into the `v2/` directory for better modularity and structural clarity.
