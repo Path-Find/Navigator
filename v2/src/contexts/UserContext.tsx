@@ -79,16 +79,16 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
         }
 
         // Start non-blocking fingerprinting immediately
-        getDeviceFingerprint().then(fingerprint => {
+        (getDeviceFingerprint() as Promise<string>).then(fingerprint => {
             if (currentUser) {
-                supabase.from('profiles').select('device_id').eq('id', currentUser.id).single().then(({ data }) => {
+                (supabase.from('profiles').select('device_id').eq('id', currentUser.id).single() as unknown as Promise<any>).then(({ data }) => {
                     const profile = data as Pick<ProfileRow, 'device_id'> | null;
                     if (profile && profile.device_id !== fingerprint) {
-                        supabase.from('profiles').update({ device_id: fingerprint }).eq('id', currentUser.id).then(({ error }) => {
+                        (supabase.from('profiles').update({ device_id: fingerprint }).eq('id', currentUser.id) as unknown as Promise<any>).then(({ error }) => {
                             if (error) console.warn("Fingerprint update failed:", error);
                         }).catch((err: unknown) => console.warn("Fingerprint update failed:", err));
                     }
-                }).catch((err: unknown) => console.warn("Fingerprint profile fetch failed:", err));
+                }).catch(() => console.warn("Fingerprint profile fetch failed"));
             }
         }).catch((err: unknown) => console.warn("Device fingerprint failed:", err));
 

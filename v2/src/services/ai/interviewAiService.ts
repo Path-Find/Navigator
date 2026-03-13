@@ -21,7 +21,7 @@ export const generateTailoredInterviewQuestions = async (
         const response = await model.generateContent({ contents: [{ role: "user", parts: [{ text: prompt }] }] });
         metadata.token_usage = response.response.usageMetadata;
         const questions = JSON.parse(cleanJsonOutput(response.response.text()));
-        return (questions as object[]).map(q => ({ ...q, id: crypto.randomUUID() }));
+        return (questions as InterviewQuestion[]).map(q => ({ ...q, id: crypto.randomUUID() }));
     }, { event_type: 'interview_generation', prompt, model: 'dynamic', job_id: jobId });
 };
 
@@ -65,7 +65,7 @@ export const generateGeneralBehavioralQuestions = async (resumeContext: string):
         const response = await model.generateContent({ contents: [{ role: "user", parts: [{ text: prompt }] }] });
         metadata.token_usage = response.response.usageMetadata;
         const questions = JSON.parse(cleanJsonOutput(response.response.text()));
-        return (questions as object[]).map(q => ({ ...q, id: crypto.randomUUID() }));
+        return (questions as InterviewQuestion[]).map(q => ({ ...q, id: crypto.randomUUID() }));
     }, { event_type: 'interview_generation_general', prompt, model: AI_MODELS.EXTRACTION });
 };
 

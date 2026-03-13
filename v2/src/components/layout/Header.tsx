@@ -41,12 +41,12 @@ export const Header: React.FC = () => {
             label: 'Jobs',
             icon: Briefcase,
             isActive: !isCoachMode && !isEduMode && !['privacy', 'home', 'admin', 'plans', 'plans-compare', 'settings', 'welcome', 'features', 'terms', 'contact'].includes(currentView),
-            defaultView: 'job-home',
+            defaultView: 'job-home' as ViewId,
             items: [
-                { id: 'resumes', label: 'Resume', icon: FileText },
-                ...(isAdmin ? [{ id: 'interviews', label: 'Interviews', icon: MessageSquare }] : []),
-                { id: 'feed', label: 'Feed', icon: Sparkles },
-                { id: 'history', label: 'History', icon: Bookmark },
+                { id: 'resumes' as ViewId, label: 'Resume', icon: FileText },
+                ...(isAdmin ? [{ id: 'interviews' as ViewId, label: 'Interviews', icon: MessageSquare }] : []),
+                { id: 'feed' as ViewId, label: 'Feed', icon: Sparkles },
+                { id: 'history' as ViewId, label: 'History', icon: Bookmark },
 
             ]
         },
@@ -55,10 +55,10 @@ export const Header: React.FC = () => {
             label: 'Career',
             icon: TrendingUp,
             isActive: isCoachMode,
-            defaultView: 'coach-home',
+            defaultView: 'coach-home' as ViewId,
             items: [
-                { id: 'skills', label: 'Skills', icon: Target },
-                { id: 'coach-role-models', label: 'Mentors', icon: Users },
+                { id: 'skills' as ViewId, label: 'Skills', icon: Target },
+                { id: 'coach-role-models' as ViewId, label: 'Mentors', icon: Users },
             ]
         },
         {
@@ -66,10 +66,10 @@ export const Header: React.FC = () => {
             label: 'Education',
             icon: GraduationCap,
             isActive: isEduMode,
-            defaultView: 'edu-home',
+            defaultView: 'edu-home' as ViewId,
             items: [
-                { id: 'edu-transcript', label: 'Transcript', icon: GraduationCap },
-                { id: 'edu-programs', label: 'Pathfinding', icon: Sparkles }
+                { id: 'edu-transcript' as ViewId, label: 'Transcript', icon: GraduationCap },
+                { id: 'edu-programs' as ViewId, label: 'Pathfinding', icon: Sparkles }
             ]
         },
         {
@@ -77,7 +77,7 @@ export const Header: React.FC = () => {
             label: 'Upgrade',
             icon: Sparkles,
             isActive: ['plans', 'plans-compare'].includes(currentView),
-            defaultView: 'plans',
+            defaultView: 'plans' as ViewId,
             items: []
         }
     ].filter(group => {
