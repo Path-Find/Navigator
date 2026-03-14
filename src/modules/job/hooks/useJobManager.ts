@@ -31,6 +31,7 @@ export interface UseJobManagerReturn {
     handlePromoteFromFeed: (jobId: string) => Promise<void>;
     handleSaveFromFeed: (jobId: string) => Promise<void>;
     closeUpgradeModal: () => void;
+    checkAndConsumeAnalysis: () => Promise<UsageLimitResult>;
     dismissNudge: () => void;
 }
 
@@ -384,6 +385,7 @@ export const useJobManager = (): UseJobManagerReturn => {
         handlePromoteFromFeed,
         handleSaveFromFeed,
         closeUpgradeModal: useCallback(() => setUpgradeModalData(null), []),
+        checkAndConsumeAnalysis,
         dismissNudge
     };
 };

@@ -9,7 +9,7 @@ const CareerModule: React.FC = () => {
     return (
         <CoachProvider>
             <Routes>
-                <Route path="/career/*" element={<CoachDashboard />} />
+                <Route path="/" element={<CoachDashboard />} />
                 <Route path="/skills" element={<SkillsView />} />
                 <Route path="/skills/interview" element={<SkillInterviewPage />} />
             </Routes>

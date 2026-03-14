@@ -26,6 +26,7 @@ interface JobContextType {
     handlePromoteFromFeed: (jobId: string) => Promise<void>;
     handleSaveFromFeed: (jobId: string) => Promise<void>;
     closeUpgradeModal: () => void;
+    checkAndConsumeAnalysis: () => Promise<UsageLimitResult>;
 }
 
 export const JobContext = createContext<JobContextType | undefined>(undefined);
@@ -44,7 +45,7 @@ export const JobProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         upgradeModalData, nudgeJob, setActiveJobId, handleUpdateJob,
         handleJobCreated, handleDraftApplication, handleDeleteJob,
         handleAnalyzeJob, handlePromoteFromFeed, handleSaveFromFeed,
-        closeUpgradeModal, dismissNudge
+        closeUpgradeModal, dismissNudge, checkAndConsumeAnalysis
     } = useJobManager();
 
     const value = React.useMemo(() => ({
@@ -52,14 +53,14 @@ export const JobProvider: React.FC<{ children: React.ReactNode }> = ({ children 
         upgradeModalData, nudgeJob, setActiveJobId, handleUpdateJob,
         handleJobCreated, handleDraftApplication, handleDeleteJob,
         handleAnalyzeJob, handlePromoteFromFeed, handleSaveFromFeed,
-        closeUpgradeModal, dismissNudge,
+        closeUpgradeModal, dismissNudge, checkAndConsumeAnalysis,
         showUpgradeModal: !!upgradeModalData,
     }), [
         jobs, activeJobId, activeJob, isLoading, usageStats,
         upgradeModalData, nudgeJob, setActiveJobId, handleUpdateJob,
         handleJobCreated, handleDraftApplication, handleDeleteJob,
         handleAnalyzeJob, handlePromoteFromFeed, handleSaveFromFeed,
-        closeUpgradeModal, dismissNudge
+        closeUpgradeModal, dismissNudge, checkAndConsumeAnalysis
     ]);
 
     return (

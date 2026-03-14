@@ -27,11 +27,12 @@ const HomePage: React.FC = () => {
             maxWidth="full"
             className="relative theme-job"
             spacing="hero"
+            animate={false}
         >
             {/* Hero Background Elements */}
             <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-6xl h-[600px] pointer-events-none z-0">
-                <div className="absolute top-[-100px] left-1/4 w-[400px] h-[400px] bg-indigo-500/10 dark:bg-indigo-500/5 blur-[120px] rounded-full animate-[pulse_8s_ease-in-out_infinite]" />
-                <div className="absolute top-[100px] right-1/4 w-[400px] h-[400px] bg-emerald-500/10 dark:bg-emerald-500/5 blur-[120px] rounded-full animate-[pulse_10s_ease-in-out_infinite_1s]" />
+                <div className="absolute top-[-100px] left-1/4 w-[400px] h-[400px] bg-indigo-500/10 dark:bg-indigo-500/5 blur-[80px] rounded-full animate-[pulse_4s_ease-in-out_infinite]" />
+                <div className="absolute top-[100px] right-1/4 w-[400px] h-[400px] bg-emerald-500/10 dark:bg-emerald-500/5 blur-[80px] rounded-full animate-[pulse_5s_ease-in-out_infinite_1s]" />
             </div>
 
             <PageHeader

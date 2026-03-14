@@ -150,7 +150,8 @@ export const ROUTES = {
   FEED: '/jobs/feed',
   HISTORY: '/jobs/history',
   COVER_LETTERS: '/jobs/cover-letters',
-  JOB_DETAIL: '/jobs/match/:id',
+  JOB_DETAIL: '/jobs/:id',
+  JOB_MATCH: '/jobs/match',
   PRO_FEED: '/jobs/pro', // Alias if needed
 
   // Career Section

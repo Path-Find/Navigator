@@ -2,6 +2,36 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2.32.1] - 2026-03-13
+
+### UX & Polish
+- **Job History Redesign**: Redesigned the Job History Card (`History.tsx`) to consolidate metadata into a single row, increase text readability, improve alignment, and added a location `MapPin` icon.
+- **Match Score Labels**: Enhanced the Match Score display on the History Card to include qualitative labels (e.g., "Excellent Match", "Strong Fit") alongside the percentage score.
+- **Graceful Loading States**: Added a `JobProcessingState` to the `JobDetail` component to display a smooth loading indicator while job data is fetched from IndexedDB, preventing jarring blank screens.
+
+### Fixed
+- **Blank Screen on Job Details**: Fixed a nested routing mismatch (`/jobs/:id`) in the `JobModule` that prevented the job details page from rendering, causing a completely blank screen when navigating from the History tab.
+- **False Analysis Timeout Errors**: Resolved an issue where users received a generic "Analysis timed out" error instead of the proper "Daily Quota Exceeded" modal. Re-wired quota limit checks (`checkAndConsumeAnalysis()`) into the manual retry handler and improved proxy error transparency.
+- **Job Creation Redirection**: Unified and corrected routing paths across `useJobManager` to ensure users are consistently redirected to the correct job detail view after job creation or promotion.
+- **Processing State Null Safety**: Improved null safety in `JobProcessingState.tsx` to prevent crashes when job properties are temporarily unavailable during load.
+- **Analyze Button Logic**: Resolved a state-tracking issue where the "View Match" button remained disabled during manual fallback after a scraping error. The button now correctly enables and updates its label to "Analyze" once valid job text is provided.
+- **Resume Editor Stability**: Eliminated distracting slide-in and scroll-entry animations in the resume module that caused perceived layout instability and "narrowing" effects during page loads.
+- **Job Match Visibility**: Fixed an issue where the Job Match URL input field was hidden on the `/jobs` page due to a routing conflict with the new dashboard.
+- **Career Dashboard Routing**: Fixed a routing issue in `CareerModule` where absolute paths in nested routes caused no matches to be found.
+- **Education Section Navigation**: Resolved navigation issues in the Education section by aligning route paths and transitioning to relative paths for consistent matching.
+- **Improved User Existence Check**: Hardened the `check_user_exists` Supabase function to use case-insensitive lookups and fallback to `normalized_email`.
+- **AI Proxy Authentication**: Resolved "401 Unauthorized" errors in `aiCore.ts` by explicitly injecting the Supabase session token into Edge Function calls.
+- **Resume Navigation Loop**: Fixed a critical infinite loop in the `useResumeEditor` hook that caused the application to hang or trigger server-side connection resets when navigating to the Resume section.
+- **Job Submission UX Polish**: Improved the `JobMatchInput` component to prevent clearing fields on error, fixed "View Match" label state logic, and added an automatic toggle to Manual Mode for failed scrapes or long-text inputs.
+
+### Performance
+- **Dashboard Optimization**: Significantly improved homepage snappiness by reducing background blur complexity and shortening pulse animation durations.
+- **Instant Interaction**: Disabled initial fade-in animations on the primary dashboard to allow for immediate interaction upon navigation.
+- **Database Lookups**: Added optimized indexes for `email` and `normalized_email` lookups in the profiles table.
+
+### Diagnostics
+- **Login Flow Logging**: Added temporary console logging to the sign-in process to assist with debugging intermittent authentication issues.
+
 ## [2.32.0] - 2026-03-13
 
 ### Optimization

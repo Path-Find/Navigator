@@ -29,7 +29,7 @@ export const ResumeDiscoverySidebar: React.FC<ResumeDiscoverySidebarProps> = ({
     const { verifiedSkills, uniqueDiscovered } = useSkillDiscovery(blocks, skills);
 
     return (
-        <aside className="hidden lg:block sticky top-32 w-80 shrink-0 space-y-6 animate-in slide-in-from-right-8 duration-1000 no-print pt-14">
+        <aside className="hidden lg:block sticky top-32 w-80 shrink-0 space-y-6 no-print pt-14">
             {/* Discovery Bank */}
             {initialResume.suggestedUpdates && initialResume.suggestedUpdates.length > 0 && (
                 <Card variant="premium" className="p-5 border-indigo-100 dark:border-indigo-900/30 bg-indigo-50/10 dark:bg-indigo-950/5">

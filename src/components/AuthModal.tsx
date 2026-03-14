@@ -82,12 +82,17 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, featureCo
                 email_input: email.toLowerCase().trim()
             });
 
+            console.log('Auth check:', { email, exists, error: checkError });
+
             if (!checkError) {
-                if (!exists) {
+                // If the user definitely does not exist, show waitlist
+                if (exists === false) {
                     setShowWaitlist(true);
                     setLoading(false);
                     return;
                 }
+                // If exists is true, or if it's something unexpected (like null/undefined), 
+                // we'll default to the sign-in flow for safety.
                 setIsSignUp(false);
             } else {
                 // Background fallback: If RPC fails, we'll default to login

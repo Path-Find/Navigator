@@ -139,7 +139,7 @@ export const AppRoutes: React.FC = () => {
                     } />
 
                     {/* Education Cluster */}
-                    <Route path="/edu/*" element={
+                    <Route path="/education/*" element={
                         <Suspense fallback={<LoadingState message="Loading Education..." />}>
                             <EducationModule />
                         </Suspense>

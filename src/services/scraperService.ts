@@ -54,8 +54,16 @@ export const ScraperService = {
 
         // Use Supabase Edge Function for secure, server-side scraping
         try {
+            const { data: { session } } = await supabase.auth.getSession();
+            if (!session) {
+                throw new Error("Proxy Error: Authentication required. Please sign in again.");
+            }
+
             const { data, error } = await supabase.functions.invoke('scrape-jobs', {
-                body: { url: targetUrl, mode: 'text' }
+                body: { url: targetUrl, mode: 'text' },
+                headers: {
+                    Authorization: `Bearer ${session.access_token}`
+                }
             });
 
             if (error) {

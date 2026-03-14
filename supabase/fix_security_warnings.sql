@@ -7,12 +7,13 @@ create or replace function public.check_user_exists(email_input text)
 returns boolean
 language plpgsql
 security definer
-set search_path = public -- Fixes "Search Path Mutable" warning
+set search_path = public
 as $$
 begin
   return exists(
     select 1 from profiles 
-    where email = email_input
+    where lower(email) = lower(email_input)
+    or normalized_email = lower(email_input)
   );
 end;
 $$;
@@ -33,3 +34,7 @@ as $$
     and is_admin = true
   );
 $$;
+
+-- 3. Add Indexes for existence checks
+CREATE INDEX IF NOT EXISTS idx_profiles_email ON profiles(email);
+CREATE INDEX IF NOT EXISTS idx_profiles_normalized_email ON profiles(normalized_email);

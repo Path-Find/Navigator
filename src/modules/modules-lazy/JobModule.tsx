@@ -15,8 +15,11 @@ const JobSyncEffect: React.FC = () => {
     const location = useLocation();
 
     useEffect(() => {
-        const match = location.pathname.match(/\/jobs\/match\/([^/]+)/);
-        const urlJobId = match ? match[1] : null;
+        const pathParts = location.pathname.split('/');
+        const urlJobId = (pathParts[1] === 'jobs' && pathParts[2] && !['match', 'history', 'resumes', 'interviews', 'feed', 'cover-letters'].includes(pathParts[2])) 
+            ? pathParts[2] 
+            : null;
+        
         if (urlJobId !== activeJobId) {
             setActiveJobId(urlJobId);
         }
@@ -47,18 +50,26 @@ const HomePageWithNudge: React.FC = () => {
 };
 
 const JobModuleContent: React.FC = () => {
+    const location = useLocation();
+    const isRoot = location.pathname === '/';
+
     return (
         <>
             <JobSyncEffect />
             <Routes>
-                <Route path="/" element={<HomePageWithNudge />} />
-                <Route path="/jobs" element={<JobMatchInput />} />
-                <Route path="/jobs/match/:jobId" element={<JobMatchInput />} />
-                <Route path="/history" element={<History />} />
-                <Route path="/jobs/:id" element={<JobDetail />} />
-                <Route path="/cover-letters" element={<CoverLetters />} />
-                <Route path="/feed" element={<NavigatorPro />} />
-                <Route path="/interviews" element={<InterviewAdvisor />} />
+                <Route path="/" element={isRoot ? <HomePageWithNudge /> : <JobMatchInput />} />
+                <Route path="match" element={<JobMatchInput />} />
+                <Route path="history" element={<History />} />
+                <Route path="cover-letters" element={<CoverLetters />} />
+                <Route path="feed" element={<NavigatorPro />} />
+                <Route path="interviews" element={<InterviewAdvisor />} />
+                
+                {/* ID-based routes, absolute-like matching as backup */}
+                <Route path=":id" element={<JobDetail />} />
+                
+                {/* Legacy / Compatibility paths if parent is root */}
+                <Route path="jobs/match" element={<JobMatchInput />} />
+                <Route path="jobs/:id" element={<JobDetail />} />
             </Routes>
         </>
     );

@@ -27,6 +27,12 @@ export const getModel = async (params: ModelParams & { signal?: AbortSignal }) =
     return {
         generateContent: async (payload: { contents: { role: string; parts: ({ text: string } | { inlineData: { mimeType: string; data: string } })[] }[]; generationConfig?: Record<string, unknown> }) => {
             const { generationConfig: payloadGenerationConfig, ...contentsOnly } = payload;
+            const { data: { session } } = await supabase.auth.getSession();
+            if (!session) {
+                console.error("AI Proxy call failed: No active session found.");
+                throw new Error("Proxy Error: Authentication required. Please sign in again.");
+            }
+
             const { data, error } = await supabase.functions.invoke('gemini-proxy', {
                 body: {
                     payload: contentsOnly,
@@ -34,10 +40,20 @@ export const getModel = async (params: ModelParams & { signal?: AbortSignal }) =
                     generationConfig: payloadGenerationConfig ?? params.generationConfig,
                     feature: params.feature
                 },
-                signal: params.signal
+                signal: params.signal,
+                headers: {
+                    Authorization: `Bearer ${session.access_token}`
+                }
             });
 
-            if (error) throw new Error(`Proxy Error: ${error.message}`);
+            if (error) {
+                let details = '';
+                const errObj = error as any;
+                if (errObj.context) {
+                    details = typeof errObj.context === 'string' ? errObj.context : JSON.stringify(errObj.context);
+                }
+                throw new Error(`Proxy Error: ${error.message}${details ? ` - ${details}` : ''}`);
+            }
             if (data?.error) {
                 if (data.error === 'upgrade_required') throw new Error(`upgrade_required: ${data.message}`);
                 throw new Error(`AI Error: ${data.error}`);

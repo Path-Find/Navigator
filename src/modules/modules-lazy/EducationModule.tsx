@@ -8,10 +8,10 @@ import { ProgramExplorerPage } from '../grad/ProgramExplorerPage';
 const EducationModule: React.FC = () => {
     return (
         <Routes>
-            <Route path="/edu" element={<EducationDashboard />} />
-            <Route path="/edu/transcript" element={<AcademicHQ />} />
-            <Route path="/edu/gpa" element={<GPACalculatorPage />} />
-            <Route path="/edu/programs" element={<ProgramExplorerPage />} />
+            <Route path="/" element={<EducationDashboard />} />
+            <Route path="/transcript" element={<AcademicHQ />} />
+            <Route path="/gpa" element={<GPACalculatorPage />} />
+            <Route path="/programs" element={<ProgramExplorerPage />} />
         </Routes>
     );
 };

@@ -19,7 +19,7 @@ import { Card } from '../../components/ui/Card';
 import { Storage } from '../../services/storageService';
 
 import type { SavedJob } from '../../types';
-import { STORAGE_KEYS, TRACKING_EVENTS } from '../../constants';
+import { STORAGE_KEYS, TRACKING_EVENTS, ROUTES } from '../../constants';
 import { LocalStorage } from '../../utils/localStorage';
 
 import { useUser } from '../../contexts/UserContext';
@@ -114,7 +114,7 @@ const JobMatchInput: React.FC = () => {
             await Storage.addJob(newJob);
             EventService.trackUsage(TRACKING_EVENTS.JOB_FIT);
             onJobCreated(newJob);
-            navigate(`/jobs/match/${jobId}`);
+            navigate(ROUTES.JOB_DETAIL.replace(':id', newJob.id));
             showSuccess("Matching started");
             setIsAnalyzing(false);
         } catch {
@@ -138,7 +138,8 @@ const JobMatchInput: React.FC = () => {
         const isLikelyUrl = trimmedUrl.startsWith('http') || (trimmedUrl.includes('.') && !trimmedUrl.includes(' '));
         if (!isLikelyUrl && trimmedUrl.length > 50) {
             setManualDescription(trimmedUrl);
-            handleJobSubmission({ type: 'text', content: trimmedUrl });
+            setIsManualMode(true); // Switch to manual mode if a long string is pasted instead of URL
+            setError(null);
             return;
         }
 
@@ -165,9 +166,11 @@ const JobMatchInput: React.FC = () => {
             handleJobSubmission({ type: 'text', content: text });
         } catch (err: any) {
             const msg = err instanceof Error ? err.message : String(err);
-            setUrl(''); // Clear URL since it failed
-            lastUrlRef.current = ''; // Clear ref so it doesn't persist to manual paste
-            setManualDescription(''); // Ensure JD field is clean
+            // DO NOT clear URL or manualDescription here, let the user see what happened
+            // setUrl(''); 
+            // lastUrlRef.current = ''; 
+            // setManualDescription(''); 
+            setIsManualMode(true); // Switch to manual mode so they can fix/paste
 
             if (msg === "DOMAIN_BLOCKED") {
                 setError("This domain has a high failure rate for automatic scraping. Please paste the job description below:");
@@ -250,16 +253,16 @@ const JobMatchInput: React.FC = () => {
                                     )}
                                 </div>
 
-                                <Button
+                                 <Button
                                     type="submit"
-                                    disabled={!url.trim() || isScrapingUrl || isAnalyzing}
+                                    disabled={isScrapingUrl || isAnalyzing || (error ? !manualDescription.trim() : !url.trim())}
                                     variant="accent"
                                     size="lg"
                                     loading={isScrapingUrl || isAnalyzing}
                                     icon={<Sparkles className="w-5 h-5" />}
                                     className="w-full md:w-auto"
                                 >
-                                    {isScrapingUrl ? 'Accessing' : isAnalyzing ? 'Matching' : 'View Match'}
+                                    {isScrapingUrl ? 'Accessing' : isAnalyzing ? 'Matching' : (error || isManualMode) ? 'Analyze' : 'View Match'}
                                 </Button>
                             </div>
                         </Card>

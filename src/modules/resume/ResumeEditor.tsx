@@ -93,7 +93,7 @@ export const ResumeEditor: React.FC = () => {
         const CurrentIcon = PARSING_MESSAGES[parsingMessageIndex].icon;
         return (
             <SharedPageLayout>
-                <div className="flex flex-col items-center justify-center min-h-[70vh] space-y-12 animate-in fade-in zoom-in-95 duration-1000">
+                <div className="flex flex-col items-center justify-center min-h-[70vh] space-y-12">
                     <div className="relative group">
                         <div className="absolute inset-x-[-100px] inset-y-[-100px] bg-indigo-500/10 blur-[100px] rounded-full animate-pulse transition-all duration-1000" />
 
@@ -279,7 +279,7 @@ export const ResumeEditor: React.FC = () => {
             ) : (
                 <div className="flex flex-col lg:flex-row gap-8 items-start relative print-container">
                     {/* Left Column: Editor Sections */}
-                    <div className="flex-1 space-y-12 animate-in slide-in-from-left-4 duration-700">
+                    <div className="flex-1 space-y-12">
                         {importError && (
                             <div className="mb-10">
                                 <Alert

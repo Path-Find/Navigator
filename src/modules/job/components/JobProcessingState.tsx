@@ -62,14 +62,14 @@ export const JobProcessingState: React.FC<JobProcessingStateProps> = ({
 
                     <div className="space-y-4">
                         <div className="flex justify-between items-end text-[10px] font-bold text-neutral-400">
-                            <span className="text-accent-primary-hex animate-pulse">{job.progressMessage || analysisProgress || "Thinking"}</span>
-                            <span className="text-neutral-900 dark:text-white">{job.progress || 0}%</span>
+                            <span className="text-accent-primary-hex animate-pulse">{job?.progressMessage || analysisProgress || "Thinking"}</span>
+                            <span className="text-neutral-900 dark:text-white">{job?.progress || 0}%</span>
                         </div>
                         <div className="h-2 w-full bg-neutral-100 dark:bg-neutral-800/50 rounded-full p-1 overflow-hidden border border-neutral-200/50 dark:border-white/5">
                             <motion.div
                                 className="h-full bg-gradient-to-r from-accent-primary-hex to-accent-secondary-hex rounded-full relative"
                                 initial={{ width: "2%" }}
-                                animate={{ width: `${Math.max(5, job.progress || 5)}%` }}
+                                animate={{ width: `${Math.max(5, job?.progress || 5)}%` }}
                                 transition={{ duration: 0.5, ease: "easeOut" }}
                             >
                                 <div className="absolute inset-0 bg-white/30 animate-[shimmer_2s_infinite] -translate-x-full" />

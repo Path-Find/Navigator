@@ -103,7 +103,8 @@ export const useJobAnalysis = (
             setAnalysisProgress(null);
         } catch (err) {
             const error = err as Error;
-            if (error.message === 'AbortError') return;
+            console.error("useJobAnalysis performAnalysis caught an error:", error);
+            if (error.message === 'AbortError' || error.message.includes('aborted')) return;
             setAnalysisProgress(null);
             showError("Analysis failed: " + error.message);
         } finally {

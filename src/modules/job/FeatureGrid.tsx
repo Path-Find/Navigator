@@ -153,7 +153,7 @@ export const FeatureGrid: React.FC<FeatureGridProps> = ({
     };
 
     return (
-        <div className={`mb-8 animate-in fade-in slide-in-from-bottom-8 duration-700 delay-150 w-full ${className}`}>
+        <div className={`mb-8 animate-in fade-in slide-in-from-bottom-4 duration-300 w-full ${className}`}>
             <div className={`grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-8 max-w-6xl mx-auto px-4`}>
                 {cardKeys.map((key) => {
                     const config = FEATURE_REGISTRY[key];

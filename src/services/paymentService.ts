@@ -15,12 +15,15 @@ export const paymentService = {
 
         // Get fresh session with valid access token
         const { data: { session } } = await supabase.auth.getSession();
-        if (!session?.access_token) {
+        if (!session || !session.access_token) {
             throw new Error('User not authenticated');
         }
 
         const { data, error } = await supabase.functions.invoke('create-checkout-session', {
-            body: { priceId, returnUrl }
+            body: { priceId, returnUrl },
+            headers: {
+                Authorization: `Bearer ${session.access_token}`
+            }
         });
 
 
@@ -58,8 +61,16 @@ export const paymentService = {
             throw new Error('User not authenticated');
         }
 
+        const { data: { session: portalSession } } = await supabase.auth.getSession();
+        if (!portalSession || !portalSession.access_token) {
+            throw new Error('User not authenticated');
+        }
+
         const { data, error } = await supabase.functions.invoke('create-portal-session', {
-            body: { returnUrl }
+            body: { returnUrl },
+            headers: {
+                Authorization: `Bearer ${portalSession.access_token}`
+            }
         });
 
         if (error) {
