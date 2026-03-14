@@ -15,14 +15,16 @@ export const paymentService = {
 
         // Get fresh session with valid access token
         const { data: { session } } = await supabase.auth.getSession();
-        if (!session || !session.access_token) {
+        const accessToken = session?.access_token;
+        
+        if (!accessToken) {
             throw new Error('User not authenticated');
         }
 
         const { data, error } = await supabase.functions.invoke('create-checkout-session', {
             body: { priceId, returnUrl },
             headers: {
-                Authorization: `Bearer ${session.access_token}`
+                Authorization: `Bearer ${accessToken}`
             }
         });
 

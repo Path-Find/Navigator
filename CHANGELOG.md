@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file.
 
+## [Unreleased]
+
+### Fixed
+- **TypeScript Payment Service Errors**: Fixed `TS18047` by verifying `session.access_token` existence before passing it in the `paymentService.ts` Edge Function.
+- **Duplicate Admin Service File**: Removed an unused duplicate `adminService.ts` file in `src/modules/admin/services/`.
+
 ## [2.32.1] - 2026-03-13
 
 ### UX & Polish
