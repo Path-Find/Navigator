@@ -2,7 +2,7 @@
 
 All notable changes to this project will be documented in this file.
 
-## [Unreleased]
+## [2.32.2] - 2026-03-13
 
 ### Fixed
 - **TypeScript Payment Service Errors**: Fixed `TS18047` by verifying `session.access_token` existence before passing it in the `paymentService.ts` Edge Function.
