@@ -8,6 +8,7 @@ import { useResumeContext } from '../../resume/context/ResumeContext';
 import { getBestResume } from '../utils/jobUtils';
 import type { SavedJob } from '../types';
 import type { ExperienceBlock } from '../../resume/types';
+import { SECTIONS } from '../../resume/constants';
 import type { ModalType, ModalData } from '../../../contexts/ModalContext';
 
 interface ResumeTabProps {
@@ -50,10 +51,10 @@ export const ResumeTab: React.FC<ResumeTabProps> = ({
 
     return (
         <div className="pb-8">
-            <div className="space-y-12 p-8 md:p-12 bg-white dark:bg-neutral-900 rounded-3xl border border-neutral-100 dark:border-neutral-800 shadow-sm">
+            <div className="space-y-8 p-6 bg-white dark:bg-neutral-900 rounded-3xl border border-neutral-100 dark:border-neutral-800 shadow-sm">
                 {userTier === 'free' && (
-                    <div className="flex items-center justify-between gap-4 px-6 py-4 rounded-2xl border border-indigo-200 dark:border-indigo-500/20 bg-indigo-50/70 dark:bg-indigo-950/20">
-                        <div className="flex items-center gap-3 min-w-0">
+                    <div className="flex items-start justify-between gap-4 px-6 py-4 rounded-2xl border border-indigo-200 dark:border-indigo-500/20 bg-indigo-50/70 dark:bg-indigo-950/20">
+                        <div className="flex items-start gap-3 min-w-0">
                             <Wand2 className="w-4 h-4 text-indigo-500 shrink-0" />
                             <p className="text-xs font-bold text-neutral-600 dark:text-neutral-400 leading-relaxed">
                                 Upgrade to rewrite every bullet for this specific role — this is what the trial was building toward.
@@ -61,7 +62,7 @@ export const ResumeTab: React.FC<ResumeTabProps> = ({
                         </div>
                         <button
                             onClick={() => openModal('UPGRADE', { initialView: 'upgrade' })}
-                            className="shrink-0 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-[10px] font-black uppercase tracking-widest rounded-xl transition-all shadow-md shadow-indigo-500/20 active:scale-95"
+                            className="shrink-0 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-xl transition-all shadow-md shadow-indigo-500/20 active:scale-95"
                         >
                             Upgrade
                         </button>
@@ -69,10 +70,8 @@ export const ResumeTab: React.FC<ResumeTabProps> = ({
                 )}
                 {userTier !== 'free' && (
                     <section>
-                        <div className="flex justify-between items-center mb-6 border-b border-neutral-100 dark:border-neutral-800/50 pb-4">
-                            <h3 className="text-xs font-black text-indigo-600 dark:text-indigo-400 flex items-center gap-2">
-                                <Wand2 className="w-3.5 h-3.5" /> Professional Summary
-                            </h3>
+                        <div className="flex justify-between items-start mb-6 border-b border-neutral-100 dark:border-neutral-800/50 pb-4">
+                            <h3 className="text-xs font-bold text-indigo-500 dark:text-indigo-400">Professional Summary</h3>
                             <Button
                                 onClick={handleGenerateSummary}
                                 disabled={generatingSummary}
@@ -81,20 +80,14 @@ export const ResumeTab: React.FC<ResumeTabProps> = ({
                                 className="text-[9px]"
                                 icon={generatingSummary ? <Loader2 className="w-3 h-3 animate-spin" /> : <Sparkles className="w-3 h-3" />}
                             >
-                                {job.tailoredSummary ? 'Redraft' : 'Draft Tailored Summary'}
+                                {job.tailoredSummary ? 'Regenerate' : 'Generate Summary'}
                             </Button>
                         </div>
                         {job.tailoredSummary ? (
                             <div className="relative group">
-                                <p className="text-sm text-neutral-700 dark:text-neutral-300 leading-relaxed font-medium italic border-l-2 border-indigo-500/20 pl-6 py-1">
+                                <p className="text-sm text-neutral-700 dark:text-neutral-300 leading-relaxed font-medium border-l-2 border-indigo-500/20 pl-6 py-1">
                                     {job.tailoredSummary}
                                 </p>
-                                <button
-                                    onClick={() => { navigator.clipboard.writeText(job.tailoredSummary || ''); showSuccess('Summary copied!'); }}
-                                    className="mt-4 text-[9px] font-black tracking-widest text-neutral-400 hover:text-indigo-500 flex items-center gap-2 transition-all"
-                                >
-                                    <Copy className="w-3 h-3" /> Copy optimized summary
-                                </button>
                             </div>
                         ) : (
                             <p className="text-xs text-neutral-400 italic">Generate a high-impact professional summary meticulously tailored for this role.</p>
@@ -102,96 +95,120 @@ export const ResumeTab: React.FC<ResumeTabProps> = ({
                     </section>
                 )}
 
-                <section>
-                    <div className="flex justify-between items-center mb-8 border-b border-neutral-100 dark:border-neutral-800/50 pb-4">
-                        <h3 className="text-xs font-black text-indigo-600 dark:text-indigo-400">Experience & Achievements</h3>
-                        <div className="flex items-center gap-2">
-                            {userTier !== 'free' && (
-                                <Button
-                                    onClick={() => {
-                                        const blocks = bestResume?.blocks.filter((b: ExperienceBlock) => analysis?.recommendedBlockIds ? analysis.recommendedBlockIds.includes(b.id) : b.isVisible) || [];
-                                        handleBulkTailor(blocks);
-                                    }}
-                                    disabled={!!bulkTailoringProgress || !!tailoringBlockId}
-                                    variant="secondary"
-                                    size="xs"
-                                    className="text-[9px]"
-                                    icon={bulkTailoringProgress ? <Loader2 className="w-3 h-3 animate-spin" /> : <Sparkles className="w-3 h-3" />}
-                                >
-                                    {bulkTailoringProgress ? `Tailoring ${bulkTailoringProgress.current}/${bulkTailoringProgress.total}` : 'Tailor All'}
-                                </Button>
-                            )}
-                            <Button
-                                onClick={handleCopyResume}
-                                disabled={generating}
-                                variant="secondary"
-                                size="xs"
-                                className="text-[9px]"
-                                icon={generating ? <Loader2 className="w-3 h-3 animate-spin" /> : <Copy className="w-3 h-3" />}
-                            >
-                                Copy Full
-                            </Button>
-                        </div>
-                    </div>
+                {(() => {
+                    const recommendedBlocks = bestResume?.blocks.filter((b: ExperienceBlock) =>
+                        analysis?.recommendedBlockIds ? analysis.recommendedBlockIds.includes(b.id) : b.isVisible
+                    ) || [];
 
-                    <div className="space-y-10">
-                        {bestResume?.blocks
-                            .filter((b: ExperienceBlock) => analysis?.recommendedBlockIds ? analysis.recommendedBlockIds.includes(b.id) : b.isVisible)
-                            .map((block: ExperienceBlock) => {
-                                const tailoredBullets = job.tailoredResumes?.[block.id];
-                                const isTailoring = tailoringBlockId === block.id;
-                                return (
-                                    <div key={block.id} className="space-y-4">
-                                        <div className="group relative">
-                                            <div className="flex justify-between items-start mb-4">
-                                                <div>
-                                                    <h4 className="font-bold text-neutral-900 dark:text-white text-base tracking-tight">{block.title}</h4>
-                                                    <div className="text-[11px] text-neutral-500 font-bold mt-0.5">
-                                                        {block.organization} <span className="mx-2 text-neutral-300">•</span> {block.dateRange}
-                                                    </div>
+                    const renderBlock = (block: ExperienceBlock, showTailor: boolean) => {
+                        const tailoredBullets = job.tailoredResumes?.[block.id];
+                        const isTailoring = tailoringBlockId === block.id;
+                        return (
+                            <div key={block.id} className="space-y-4">
+                                <div className="group relative">
+                                    <div className="flex justify-between items-start mb-4">
+                                        <div>
+                                            <h4 className="font-bold text-neutral-900 dark:text-white text-base tracking-tight">{block.title}</h4>
+                                            {(block.organization || block.dateRange) && (
+                                                <div className="text-[11px] text-neutral-500 font-bold mt-0.5">
+                                                    {block.organization} <span className="mx-2 text-neutral-300">•</span> {block.dateRange}
                                                 </div>
-                                                <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                                                    {tailoredBullets && (
-                                                        <button
-                                                            onClick={() => handleResetBlock(block.id)}
-                                                            className="text-[9px] font-bold text-neutral-400 hover:text-neutral-600 bg-neutral-50 dark:bg-neutral-800 px-2 py-1 rounded-md transition-all"
-                                                            title="Reset to original"
-                                                        >
-                                                            Reset
-                                                        </button>
-                                                    )}
+                                            )}
+                                        </div>
+                                        {showTailor && (
+                                            <div className="flex items-start gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                                                {tailoredBullets && (
+                                                    <button
+                                                        onClick={() => handleResetBlock(block.id)}
+                                                        className="text-[9px] font-bold text-neutral-400 hover:text-neutral-600 bg-neutral-50 dark:bg-neutral-800 px-2 py-1 rounded-md transition-all"
+                                                        title="Reset to original"
+                                                    >
+                                                        Reset
+                                                    </button>
+                                                )}
+                                                {userTier !== 'free' && (
+                                                    <Button
+                                                        onClick={() => handleHyperTailor(block)}
+                                                        disabled={isTailoring || !!bulkTailoringProgress || (job.tailorCounts?.[block.id] || 0) >= RESUME_TAILORING.MAX_TAILORS_PER_BLOCK}
+                                                        variant="secondary"
+                                                        size="xs"
+                                                        className="text-[9px] h-7"
+                                                        icon={isTailoring ? <Loader2 className="w-3 h-3 animate-spin" /> : <Sparkles className="w-3 h-3" />}
+                                                    >
+                                                        {isTailoring ? 'Rewriting' : tailoredBullets ? 'Retry' : 'Tailor'}
+                                                    </Button>
+                                                )}
+                                            </div>
+                                        )}
+                                    </div>
+                                    <ul className="space-y-3">
+                                        {(tailoredBullets || block.bullets).map((bullet: string, i: number) => (
+                                            <li
+                                                key={i}
+                                                className={`relative pl-6 text-sm leading-relaxed ${tailoredBullets ? 'text-neutral-800 dark:text-neutral-200 font-bold' : 'text-neutral-600 dark:text-neutral-400 font-medium'}`}
+                                            >
+                                                <div className={`absolute left-0 top-2 w-1.5 h-1.5 rounded-full ${tailoredBullets ? 'bg-indigo-50 shadow-[0_0_8px_rgba(99,102,241,0.4)]' : 'bg-neutral-300 dark:bg-neutral-700'}`} />
+                                                {bullet}
+                                            </li>
+                                        ))}
+                                    </ul>
+                                </div>
+                            </div>
+                        );
+                    };
+
+                    // Use the same SECTIONS definition as the resume editor — single source of truth
+                    const tailorableSections = new Set(['work', 'volunteer', 'project', 'other']);
+                    const allTailorableBlocks = recommendedBlocks.filter((b: ExperienceBlock) => tailorableSections.has(b.type));
+
+                    return (
+                        <>
+                            {SECTIONS.filter(s => s.type !== 'summary' && s.type !== 'skill').map(section => {
+                                const sectionBlocks = recommendedBlocks.filter((b: ExperienceBlock) => b.type === section.type);
+                                if (sectionBlocks.length === 0) return null;
+                                const canTailor = tailorableSections.has(section.type);
+                                const isFirstTailorable = canTailor && SECTIONS.find(s => tailorableSections.has(s.type) && recommendedBlocks.some((b: ExperienceBlock) => b.type === s.type))?.type === section.type;
+
+                                return (
+                                    <section key={section.type}>
+                                        <div className="flex justify-between items-start mb-8 border-b border-neutral-100 dark:border-neutral-800/50 pb-4">
+                                            <h3 className="text-xs font-bold text-indigo-500 dark:text-indigo-400">{section.label}</h3>
+                                            {isFirstTailorable && (
+                                                <div className="flex items-start gap-2">
                                                     {userTier !== 'free' && (
                                                         <Button
-                                                            onClick={() => handleHyperTailor(block)}
-                                                            disabled={isTailoring || !!bulkTailoringProgress || (job.tailorCounts?.[block.id] || 0) >= RESUME_TAILORING.MAX_TAILORS_PER_BLOCK}
-                                                            variant={tailoredBullets ? "secondary" : "accent"}
+                                                            onClick={() => handleBulkTailor(allTailorableBlocks)}
+                                                            disabled={!!bulkTailoringProgress || !!tailoringBlockId}
+                                                            variant="secondary"
                                                             size="xs"
-                                                            className="text-[9px] h-7"
-                                                            icon={isTailoring ? <Loader2 className="w-3 h-3 animate-spin" /> : <Sparkles className="w-3 h-3" />}
+                                                            className="text-[9px]"
+                                                            icon={bulkTailoringProgress ? <Loader2 className="w-3 h-3 animate-spin" /> : <Sparkles className="w-3 h-3" />}
                                                         >
-                                                            {isTailoring ? 'Rewriting' : tailoredBullets ? 'Retry' : 'Hyper-Tailor'}
+                                                            {bulkTailoringProgress ? `Tailoring ${bulkTailoringProgress.current}/${bulkTailoringProgress.total}` : 'Tailor All'}
                                                         </Button>
                                                     )}
-                                                </div>
-                                            </div>
-
-                                            <ul className="space-y-3">
-                                                {(tailoredBullets || block.bullets).map((bullet: string, i: number) => (
-                                                    <li
-                                                        key={i}
-                                                        className={`relative pl-6 text-sm leading-relaxed ${tailoredBullets ? 'text-neutral-800 dark:text-neutral-200 font-bold' : 'text-neutral-600 dark:text-neutral-400 font-medium'}`}
+                                                    <Button
+                                                        onClick={handleCopyResume}
+                                                        disabled={generating}
+                                                        variant="secondary"
+                                                        size="xs"
+                                                        className="text-[9px]"
+                                                        icon={generating ? <Loader2 className="w-3 h-3 animate-spin" /> : <Copy className="w-3 h-3" />}
                                                     >
-                                                        <div className={`absolute left-0 top-2 w-1.5 h-1.5 rounded-full ${tailoredBullets ? 'bg-indigo-50 shadow-[0_0_8px_rgba(99,102,241,0.4)]' : 'bg-neutral-300 dark:bg-neutral-700'}`} />
-                                                        {bullet}
-                                                    </li>
-                                                ))}
-                                            </ul>
+                                                        Copy Full
+                                                    </Button>
+                                                </div>
+                                            )}
                                         </div>
-                                    </div>
+                                        <div className="space-y-10">
+                                            {sectionBlocks.map((block: ExperienceBlock) => renderBlock(block, canTailor))}
+                                        </div>
+                                    </section>
                                 );
                             })}
-                    </div>
-                </section>
+                        </>
+                    );
+                })()}
             </div>
         </div>
     );

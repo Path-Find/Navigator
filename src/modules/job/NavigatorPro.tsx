@@ -10,6 +10,7 @@ import type { JobFeedItem, ResumeRow } from '../../types';
 import { SharedPageLayout } from '../../components/common/SharedPageLayout';
 import { PageHeader } from '../../components/ui/PageHeader';
 import { STORAGE_KEYS } from '../../constants';
+import { SCORE_THRESHOLDS } from './utils/jobUtils';
 import { LocalStorage } from '../../utils/localStorage';
 import { StandardSearchBar } from '../../components/common/StandardSearchBar';
 import { StandardFilterGroup } from '../../components/common/StandardFilterGroup';
@@ -213,7 +214,7 @@ export const NavigatorPro: React.FC = () => {
 
         // Apply High Match filter
         if (filterHighMatch) {
-            processed = processed.filter(job => (job.matchScore || 0) >= 85);
+            processed = processed.filter(job => (job.matchScore || 0) >= SCORE_THRESHOLDS.STRONG);
         }
 
         // Apply Search filter
@@ -352,7 +353,7 @@ export const NavigatorPro: React.FC = () => {
                                                 <span>•</span>
                                                 <span>{job.location}</span>
                                                 <span>•</span>
-                                                <span>{new Date(job.postedDate).toLocaleDateString()}</span>
+                                                <span>{new Date(job.postedDate).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}</span>
                                             </div>
                                         </div>
                                         {job.matchScore && (

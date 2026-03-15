@@ -4,20 +4,23 @@ import { Sparkles } from 'lucide-react';
 interface CoverLetterComparisonViewProps {
     versions: { text: string; promptVersion: string }[];
     handleSelectVariant: (variant: { text: string; promptVersion: string }) => void;
+    handleRejectVariants: () => void;
 }
 
 export const CoverLetterComparisonView: React.FC<CoverLetterComparisonViewProps> = ({
     versions,
-    handleSelectVariant
+    handleSelectVariant,
+    handleRejectVariants
 }) => {
     return (
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-10 h-full">
+        <div className="flex flex-col h-full space-y-10">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
             {versions.map((v, i) => (
                 <div key={i} className="flex flex-col space-y-6 p-8 bg-neutral-50 dark:bg-neutral-800/50 rounded-3xl border-2 border-dashed border-neutral-200 dark:border-neutral-700 hover:border-indigo-300 dark:hover:border-indigo-500 transition-all group relative">
                     <div className="absolute -top-4 left-1/2 -translate-x-1/2 px-4 py-1.5 bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-full text-[10px] font-black text-neutral-400 shadow-sm">
                         Style Option {i + 1}
                     </div>
-                    <div className="flex-1 text-sm text-neutral-700 dark:text-neutral-300 font-serif leading-relaxed line-clamp-[18]">
+                    <div className="flex-1 text-sm text-neutral-700 dark:text-neutral-300 leading-relaxed line-clamp-[18]">
                         {v.text}
                     </div>
                     <button
@@ -29,6 +32,16 @@ export const CoverLetterComparisonView: React.FC<CoverLetterComparisonViewProps>
                     </button>
                 </div>
             ))}
+            </div>
+
+            <div className="flex justify-center">
+                <button
+                    onClick={handleRejectVariants}
+                    className="text-[11px] font-bold text-neutral-400 hover:text-neutral-600 transition-colors uppercase tracking-widest px-6 py-3 border border-neutral-100 dark:border-neutral-800 rounded-2xl hover:bg-neutral-50 dark:hover:bg-neutral-800/50"
+                >
+                    None of these work for me
+                </button>
+            </div>
         </div>
     );
 };

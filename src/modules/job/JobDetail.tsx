@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import { Storage } from '../../services/storageService';
 import { useJobAnalysis } from './hooks/useJobAnalysis';
-import { getBestResume, copyResumeToClipboard } from './utils/jobUtils';
+import { getBestResume, copyResumeToClipboard, getDeadlineInfo, getScoreLabel, getScoreColorClasses } from './utils/jobUtils';
 import {
     FileText, PenTool, ExternalLink,
-    BookOpen, MapPin, Hash, Sparkles, Target
+    BookOpen, MapPin, Hash, Sparkles, AlertCircle, ChevronDown
 } from 'lucide-react';
+
 import { Button } from '../../components/ui/Button';
 
 import { useToast } from '../../contexts/ToastContext';
@@ -25,11 +26,9 @@ import { useModal } from '../../contexts/ModalContext';
 // Extracted Components
 import { JobProcessingState } from './components/JobProcessingState';
 import { JobErrorState } from './components/JobErrorState';
-import { MatchSidebar } from './components/MatchSidebar';
 import { ResumeSidebar } from './components/ResumeSidebar';
 import { AnalysisTab } from './components/AnalysisTab';
 import { ResumeTab } from './components/ResumeTab';
-import { InterviewTab } from './components/InterviewTab';
 import { ProhibitionAlert } from './components/ProhibitionAlert';
 import { JobPostTab } from './components/JobPostTab';
 import { CoverLetterSidebar } from './components/CoverLetterSidebar';
@@ -154,31 +153,41 @@ export const JobDetail: React.FC = () => {
         { id: 'analysis', label: 'Analysis', icon: Sparkles },
         { id: 'resume', label: 'Resume', icon: FileText },
         { id: 'cover-letter', label: 'Cover Letter', icon: PenTool },
-        { id: 'interview', label: 'Interview', icon: Target },
-        { id: 'job-post', label: 'Job Posting', icon: BookOpen },
+        { id: 'job-post', label: 'Posting', icon: BookOpen },
     ];
 
     const actionsMenu = (
         <div className="flex items-center gap-3">
-            <select
-                value={job.status}
-                onChange={async (e) => {
-                    const updated = { ...job, status: e.target.value as SavedJob['status'] };
-                    onUpdateJob(updated);
-                    try {
-                        await Storage.updateJob(updated);
-                    } catch {
-                        showError('Failed to save status change');
-                    }
-                }}
-                className="text-xs bg-neutral-50 dark:bg-neutral-800 rounded-xl px-4 py-2 font-black text-neutral-600 dark:text-neutral-400 border-none focus:ring-4 focus:ring-accent-primary/10 transition-all cursor-pointer hover:bg-neutral-100 dark:hover:bg-neutral-700"
-            >
-                <option value="saved">Saved</option>
-                <option value="applied">Applied</option>
-                <option value="interview">Interview</option>
-                <option value="offer">Offer</option>
-                <option value="rejected">Rejected</option>
-            </select>
+            {job.analysis?.compatibilityScore != null && (
+                <div className={`flex items-center gap-2 px-3 py-1.5 rounded-xl text-[10px] font-black border ${getScoreColorClasses(job.analysis.compatibilityScore)}`}>
+                    <span className="opacity-50 tracking-tight">Match</span>
+                    <div className="flex items-center gap-1.5">
+                        {job.analysis.compatibilityScore} <span className="opacity-30">·</span> {getScoreLabel(job.analysis.compatibilityScore)}
+                    </div>
+                </div>
+            )}
+            <div className="relative flex items-center">
+                <select
+                    value={job.status}
+                    onChange={async (e) => {
+                        const updated = { ...job, status: e.target.value as SavedJob['status'] };
+                        onUpdateJob(updated);
+                        try {
+                            await Storage.updateJob(updated);
+                        } catch {
+                            showError('Failed to save status change');
+                        }
+                    }}
+                    className="text-xs bg-neutral-100 dark:bg-white/5 border border-neutral-200 dark:border-white/10 rounded-xl pl-3 pr-7 py-1.5 font-semibold text-neutral-600 dark:text-neutral-300 focus:outline-none cursor-pointer appearance-none transition-all hover:bg-neutral-200 dark:hover:bg-white/10"
+                >
+                    <option value="saved">Saved</option>
+                    <option value="applied">Applied</option>
+                    <option value="interview">Interview</option>
+                    <option value="offer">Offer</option>
+                    <option value="rejected">Rejected</option>
+                </select>
+                <ChevronDown className="absolute right-2 w-3 h-3 text-neutral-400 pointer-events-none" />
+            </div>
             {job.url && (
                 <Button
                     variant="secondary"
@@ -194,13 +203,8 @@ export const JobDetail: React.FC = () => {
         <SharedPageLayout className="theme-job" spacing="none" maxWidth="6xl">
             <div className="bg-white dark:bg-neutral-900 min-h-screen flex flex-col">
                 <DetailHeader
-                    title={
-                        <div className="flex items-center gap-3">
-                            <span className="text-neutral-500 dark:text-neutral-400 font-bold text-sm truncate max-w-[200px] md:max-w-md">
-                                {toTitleCase(job.analysis?.distilledJob?.roleTitle || job.position || 'Job Detail')}
-                            </span>
-                        </div>
-                    }
+                    hideBack
+                    title={toTitleCase(job.analysis?.distilledJob?.roleTitle || job.position || 'Job Detail')}
                     subtitle={
                         <div className="flex items-center flex-wrap gap-2 text-sm text-neutral-500 font-semibold">
                             <span>{toTitleCase(job.analysis?.distilledJob?.companyName || job.company || 'Unknown Company')}</span>
@@ -218,7 +222,7 @@ export const JobDetail: React.FC = () => {
                                     <span className="w-1 h-1 rounded-full bg-neutral-300 dark:bg-neutral-600" />
                                     <div className="flex items-center gap-1">
                                         <Hash className="w-3.5 h-3.5" />
-                                        <span className="font-mono text-[10px] tracking-wider">{job.analysis.distilledJob.referenceCode}</span>
+                                        <span>{job.analysis.distilledJob.referenceCode}</span>
                                     </div>
                                 </>
                             )}
@@ -228,6 +232,18 @@ export const JobDetail: React.FC = () => {
                                     <span className="text-emerald-600 dark:text-emerald-400 font-semibold">{job.analysis.distilledJob.salaryRange}</span>
                                 </>
                             )}
+                            {(() => {
+                                const deadlineInfo = getDeadlineInfo(job.analysis?.distilledJob?.applicationDeadline);
+                                return deadlineInfo ? (
+                                    <>
+                                        <span className="w-1 h-1 rounded-full bg-neutral-300 dark:bg-neutral-600" />
+                                        <div className={`flex items-center gap-1 font-black ${deadlineInfo.style}`}>
+                                            <AlertCircle className="w-3.5 h-3.5" />
+                                            <span>{deadlineInfo.label}</span>
+                                        </div>
+                                    </>
+                                ) : null;
+                            })()}
                         </div>
                     }
                     onBack={onBack}
@@ -241,14 +257,7 @@ export const JobDetail: React.FC = () => {
 
                 <DetailLayout
                     sidebar={
-                        activeTab === 'analysis' ? (
-                            <MatchSidebar
-                                job={job}
-                                analysisProgress={analysisProgress}
-                                userTier={userTier}
-                                openModal={openModal}
-                            />
-                        ) : activeTab === 'resume' ? (
+                        activeTab === 'resume' ? (
                             <ResumeSidebar job={job} analysisProgress={analysisProgress} />
                         ) : activeTab === 'cover-letter' ? (
                             <CoverLetterSidebar job={job} />
@@ -267,14 +276,6 @@ export const JobDetail: React.FC = () => {
                         )}
 
                         {activeTab === 'job-post' && <JobPostTab job={job} />}
-
-                        {activeTab === 'interview' && (
-                            <InterviewTab
-                                job={job}
-                                userTier={userTier}
-                                openModal={openModal}
-                            />
-                        )}
 
                         {activeTab === 'resume' && (
                             <ResumeTab

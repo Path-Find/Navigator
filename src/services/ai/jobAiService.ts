@@ -100,6 +100,33 @@ const preCleanJobText = (text: string): string => {
         .substring(0, 12000);
 };
 
+export const cleanCoverLetterOutput = (text: string): string => {
+    let cleaned = text.trim();
+    
+    // 1. Remove markdown code blocks if present (any type)
+    const codeBlockMatch = cleaned.match(/```(?:json|markdown|text)?\s*([\s\S]*?)\s*```/i);
+    if (codeBlockMatch) {
+        cleaned = codeBlockMatch[1];
+    } else {
+        // Fallback for dangling backticks
+        cleaned = cleaned.replace(/^```[a-z]*\n/i, '').replace(/\n```$/m, '');
+    }
+    
+    // 2. If it looks like JSON, try to parse and extract known keys
+    if (cleaned.startsWith('{') && cleaned.endsWith('}')) {
+        try {
+            const parsed = JSON.parse(cleaned);
+            if (parsed.cover_letter) return parsed.cover_letter.trim();
+            if (parsed.text) return parsed.text.trim();
+            if (parsed.content) return parsed.content.trim();
+        } catch (e) {
+            // Not valid JSON, continue
+        }
+    }
+    
+    return cleaned.trim();
+};
+
 const extractJobInfo = async (
     rawJobText: string,
     onProgress?: RetryProgressCallback
@@ -241,7 +268,7 @@ export const generateCoverLetter = async (
         const model = await getModel({ task: 'analysis', feature: 'cover_letter' });
         const response = await model.generateContent({ contents: [{ role: "user", parts: [{ text: prompt }] }] });
         metadata.token_usage = response.response.usageMetadata;
-        return { text: sanitizeInput(response.response.text()), promptVersion: forceVariant || "v1" };
+        return { text: cleanCoverLetterOutput(sanitizeInput(response.response.text())), promptVersion: forceVariant || "v1" };
     }, { event_type: 'cover_letter', prompt, model: 'dynamic', job_id: jobId });
 };
 
@@ -289,7 +316,7 @@ export const generateCoverLetterWithQuality = async (
 
     while (attempts <= AGENT_LOOP.MAX_RETRIES + 1) { // +1 for initial draft
         // Critique current draft
-        if (onProgress) onProgress(`Critiquing draft (Attempt ${attempts})...`);
+        if (onProgress) onProgress(`Critiquing draft...`);
         const critique = await critiqueCoverLetter(jobDescription, result.text, resumeContext, jobId);
         currentDecision = critique.decision;
 
@@ -304,7 +331,7 @@ export const generateCoverLetterWithQuality = async (
         }
 
         // Regenerate with feedback
-        if (onProgress) onProgress(`Refining based on feedback (Decision: ${currentDecision})...`);
+        if (onProgress) onProgress(`Polishing based on feedback...`);
         const improvementContext = `
             PREVIOUS DECISION: ${currentDecision}
             CRITIQUE FEEDBACK: ${critique.feedback.join('; ')}

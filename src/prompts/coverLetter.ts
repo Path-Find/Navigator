@@ -80,6 +80,8 @@ export const COVER_LETTER_PROMPTS = {
     - REFLECT: Is this a list or a narrative? If it feels like a list, use a functional bridge to connect two thoughts.
     - REFLECT: Did I handle the metrics correctly for this role category?
     - REFLECT: Does this sound like an AI? Remove generic filler like "I am excited to apply."
+    
+    IMPORTANT: Provide the cover letter as RAW TEXT ONLY. Do NOT wrap in JSON, Markdown code blocks, or any other formatting.
   `
   },
 

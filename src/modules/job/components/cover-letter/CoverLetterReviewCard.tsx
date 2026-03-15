@@ -1,5 +1,5 @@
 import React from 'react';
-import { Users, Sparkles, Loader2 } from 'lucide-react';
+import { Loader2 } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
 import { Card } from '../../../../components/ui/Card';
 import type { CoverLetterCritique } from '../../../../types';
@@ -18,10 +18,7 @@ export const CoverLetterReviewCard: React.FC<CoverLetterReviewCardProps> = ({
     return (
         <Card variant="glass" className="p-8 border-neutral-200 dark:border-white/5">
             <div className="flex justify-between items-center mb-8">
-                <h4 className="font-black text-neutral-900 dark:text-white flex items-center gap-3 text-sm tracking-tight">
-                    <Users className="w-5 h-5 text-indigo-500" />
-                    Blind AI Review
-                </h4>
+                <h4 className="font-black text-neutral-900 dark:text-white text-sm tracking-tight">Blind AI Review</h4>
                 {critique && (
                     <button
                         onClick={handleRunCritique}
@@ -52,9 +49,7 @@ export const CoverLetterReviewCard: React.FC<CoverLetterReviewCardProps> = ({
                     </div>
 
                     <div className="space-y-4">
-                        <span className="text-[11px] font-black text-neutral-400 flex items-center gap-2">
-                            <Sparkles className="w-3.5 h-3.5" /> Performance Analysis
-                        </span>
+                        <span className="text-[11px] font-black text-neutral-400">Performance Analysis</span>
                         <div className="grid gap-3">
                             {critique.feedback.map((f: string, i: number) => (
                                 <div key={i} className="text-xs font-bold leading-relaxed text-neutral-700 dark:text-neutral-300 bg-neutral-50 dark:bg-neutral-800/50 p-4 rounded-2xl border border-neutral-100 dark:border-white/5 flex gap-4">

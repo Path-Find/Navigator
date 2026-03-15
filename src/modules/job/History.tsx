@@ -1,13 +1,14 @@
 import { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import type { SavedJob } from '../../types';
-import { Trash2, ArrowRight, Sparkles, Building, Calendar, Filter, Clock, FileText, Zap, ShieldAlert, Layers, Briefcase, Loader2, MapPin } from 'lucide-react';
+import { Trash2, ArrowRight, Sparkles, Building, Calendar, Filter, Clock, FileText, Zap, ShieldAlert, Layers, Briefcase, Loader2, MapPin, AlertCircle, Hash } from 'lucide-react';
 import { SharedPageLayout } from '../../components/common/SharedPageLayout';
 import { StandardSearchBar } from '../../components/common/StandardSearchBar';
 import { PageHeader } from '../../components/ui/PageHeader';
 import { Card } from '../../components/ui/Card';
 import { Button } from '../../components/ui/Button';
 import { ROUTES } from '../../constants';
+import { getScoreLabel, getScoreColorClasses, getDeadlineInfo } from './utils/jobUtils';
 import { StandardFilterGroup } from '../../components/common/StandardFilterGroup';
 
 import { useJobContext } from './context/JobContext';
@@ -144,6 +145,9 @@ export default function History() {
                         const companyName = (rawCompany === 'Analyzing...' || rawCompany === 'Processing...') ? '' : rawCompany;
                         const location = job.analysis?.distilledJob.location || '';
                         const score = job.analysis?.compatibilityScore;
+                        const deadlineInfo = getDeadlineInfo(job.analysis?.distilledJob.applicationDeadline);
+                        const referenceCode = job.analysis?.distilledJob.referenceCode;
+                        const salaryRange = job.analysis?.distilledJob.salaryRange;
 
                         return (
                             <Card
@@ -200,6 +204,23 @@ export default function History() {
                                                         <Calendar className="w-3.5 h-3.5" />
                                                         {new Date(job.dateAdded).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}
                                                     </span>
+                                                    {referenceCode && (
+                                                        <span className="flex items-center gap-1.5">
+                                                            <Hash className="w-3.5 h-3.5" />
+                                                            {referenceCode}
+                                                        </span>
+                                                    )}
+                                                    {salaryRange && (
+                                                        <span className="text-emerald-600 dark:text-emerald-400 font-black">
+                                                            {salaryRange}
+                                                        </span>
+                                                    )}
+                                                    {deadlineInfo && (
+                                                        <span className={`flex items-center gap-1.5 font-black ${deadlineInfo.style}`}>
+                                                            <AlertCircle className="w-3.5 h-3.5" />
+                                                            {deadlineInfo.label}
+                                                        </span>
+                                                    )}
                                                 </div>
                                             </div>
 
@@ -236,17 +257,9 @@ export default function History() {
                                                         Analysis could not be completed
                                                     </div>
                                                 ) : (score !== undefined && score !== null) ? (
-                                                    <div className={`px-4 py-2 rounded-2xl text-[11px] font-black border flex items-center gap-2.5 w-fit ${score >= 80 ? 'bg-emerald-50 text-emerald-700 border-emerald-100' :
-                                                        score >= 60 ? 'bg-indigo-50 text-indigo-700 border-indigo-100' :
-                                                            'bg-neutral-50 text-neutral-600 border-neutral-100'
-                                                        }`}>
-                                                        <Sparkles className="w-3.5 h-3.5" />
-                                                        <span>
-                                                            {score >= 80 ? 'Excellent Match' : 
-                                                             score >= 60 ? 'Strong Fit' : 
-                                                             'Potential Fit'}
-                                                        </span>
-                                                        <span className="opacity-50 font-bold ml-1">{score}%</span>
+                                                    <div className={`px-3 py-1 rounded-full text-[10px] font-black border flex items-center gap-2 w-fit ${getScoreColorClasses(score)}`}>
+                                                        <span>{getScoreLabel(score)}</span>
+                                                        <span className="opacity-60">{score}%</span>
                                                     </div>
                                                 ) : null}
                                             </div>

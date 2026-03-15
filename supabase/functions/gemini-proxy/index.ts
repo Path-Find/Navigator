@@ -34,15 +34,15 @@ export const TIER_MODELS: Record<string, { extraction: string; analysis: string 
     },
     pro: {
         extraction: 'gemini-2.0-flash',
-        analysis: 'gemini-1.5-pro',
+        analysis: 'gemini-2.0-flash',
     },
     admin: {
         extraction: 'gemini-2.0-flash',
-        analysis: 'gemini-1.5-pro',
+        analysis: 'gemini-2.0-flash',
     },
     tester: {
         extraction: 'gemini-2.0-flash',
-        analysis: 'gemini-1.5-pro',
+        analysis: 'gemini-2.0-flash',
     }
 };
 

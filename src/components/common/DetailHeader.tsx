@@ -22,7 +22,7 @@ export const DetailHeader: React.FC<DetailHeaderProps> = ({
 
 
     return (
-        <div className="border-b border-neutral-200 dark:border-neutral-800 bg-white/80 dark:bg-neutral-900/80 backdrop-blur-md">
+        <div className="bg-white/80 dark:bg-neutral-900/80 backdrop-blur-md">
             <div className="mx-auto px-6 py-4 flex items-center justify-between relative">
                 <div className="flex items-center gap-4 relative z-10">
                     {!hideBack && (
@@ -33,7 +33,7 @@ export const DetailHeader: React.FC<DetailHeaderProps> = ({
                             <ArrowLeft className="w-5 h-5 text-neutral-500 group-hover:-translate-x-1 transition-transform" />
                         </button>
                     )}
-                    <div className={hideBack ? 'pl-2' : ''}>
+                    <div>
                         <h2 className="text-xl font-black text-neutral-900 dark:text-white truncate max-w-md tracking-tight" title={typeof title === 'string' ? title : undefined}>
                             {title}
                         </h2>

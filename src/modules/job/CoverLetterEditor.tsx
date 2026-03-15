@@ -2,14 +2,14 @@ import React from 'react';
 import type { SavedJob, ResumeProfile, JobAnalysis, TargetJob } from '../../types';
 import type { UserTier } from '../../types/app';
 import { useCoverLetterEditor } from './hooks/useCoverLetterEditor';
-import { AlertCircle, PenTool } from 'lucide-react';
+import { PenTool } from 'lucide-react';
+import { Alert } from '../../components/ui/Alert';
 
 // Sub-components
 import { CoverLetterHeader } from './components/cover-letter/CoverLetterHeader';
-import { CoverLetterCritiqueInfo } from './components/cover-letter/CoverLetterCritiqueInfo';
+
 import { CoverLetterComparisonView } from './components/cover-letter/CoverLetterComparisonView';
 import { CoverLetterContextSection } from './components/cover-letter/CoverLetterContextSection';
-import { CoverLetterReviewCard } from './components/cover-letter/CoverLetterReviewCard';
 import { CoverLetterEmptyState } from './components/cover-letter/CoverLetterEmptyState';
 
 interface CoverLetterEditorProps {
@@ -35,6 +35,7 @@ export const CoverLetterEditor: React.FC<CoverLetterEditorProps> = (props) => {
         handleUpdateContext,
         handleGenerateCoverLetter,
         handleSelectVariant,
+        handleRejectVariants,
         handleRunCritique,
         handleEditCoverLetter
     } = useCoverLetterEditor(props);
@@ -55,55 +56,41 @@ export const CoverLetterEditor: React.FC<CoverLetterEditorProps> = (props) => {
                     copiedState={copiedState}
                     handleCopy={handleCopy}
                     handleGenerateCoverLetter={handleGenerateCoverLetter}
+                    handleRunCritique={handleRunCritique}
                     setShowContextInput={setShowContextInput}
                 />
 
                 {/* Safety Warning */}
                 {analysis.distilledJob.isAiBanned && (
-                    <div className="px-8 py-6 bg-amber-50 dark:bg-amber-950/20 border-b border-amber-100 dark:border-amber-900/30 flex items-start gap-4 animate-in fade-in slide-in-from-top-2">
-                        <div className="p-2.5 bg-amber-100 dark:bg-amber-900/40 rounded-xl shrink-0">
-                            <AlertCircle className="w-6 h-6 text-amber-700 dark:text-amber-400" />
-                        </div>
-                        <div>
-                            <h4 className="text-sm font-black text-amber-900 dark:text-amber-200 mb-1">Employer AI Prohibition Detected</h4>
-                            <p className="text-xs text-amber-800 dark:text-amber-300 font-medium leading-relaxed">
-                                This job posting explicitly discourages or bans the use of AI/LLMs. Use this draft ONLY as a reference.
-                            </p>
-                        </div>
+                    <div className="px-8 py-6 border-b border-neutral-100 dark:border-neutral-800/50 bg-neutral-50/30 dark:bg-neutral-900/30">
+                        <Alert
+                            variant="warning"
+                            title="Employer AI Prohibition Detected"
+                            message="This job posting explicitly discourages or bans the use of AI/LLMs. Use this draft ONLY as a reference."
+                        />
                     </div>
                 )}
 
-                {/* Quality Badge */}
-                {localJob.coverLetter && localJob.coverLetterCritique && typeof localJob.coverLetterCritique === 'object' && (
-                    <CoverLetterCritiqueInfo critique={localJob.coverLetterCritique} />
-                )}
-
                 {/* Editor Area */}
-                <div className="p-8 min-h-[600px] flex flex-col bg-white dark:bg-neutral-900">
+                <div className="p-6 min-h-[600px] flex flex-col bg-white dark:bg-neutral-900">
                     {comparisonVersions ? (
                         <CoverLetterComparisonView
                             versions={comparisonVersions}
                             handleSelectVariant={handleSelectVariant}
+                            handleRejectVariants={handleRejectVariants}
                         />
                     ) : localJob.coverLetter ? (
-                        <>
-                            <div
-                                className="flex-1 text-neutral-800 dark:text-neutral-200 leading-relaxed font-serif text-base whitespace-pre-wrap selection:bg-indigo-100 dark:selection:bg-indigo-500/30 outline-none transition-colors border-none p-2"
-                                contentEditable
-                                suppressContentEditableWarning
-                                onBlur={(e) => handleEditCoverLetter(e.currentTarget.innerText)}
-                                role="textbox"
-                                aria-label="Cover Letter Content"
-                                spellCheck={false}
-                            >
-                                {localJob.coverLetter}
-                            </div>
-                            <div className="mt-12 pt-8 border-t border-neutral-100 dark:border-white/5 flex justify-between items-center">
-                                <div className="text-[10px] text-neutral-400 font-black">
-                                    Final Draft
-                                </div>
-                            </div>
-                        </>
+                        <div
+                            className="flex-1 text-neutral-800 dark:text-neutral-200 leading-relaxed text-sm whitespace-pre-wrap selection:bg-indigo-100 dark:selection:bg-indigo-500/30 outline-none transition-colors border-none p-2"
+                            contentEditable
+                            suppressContentEditableWarning
+                            onBlur={(e) => handleEditCoverLetter(e.currentTarget.innerText)}
+                            role="textbox"
+                            aria-label="Cover Letter Content"
+                            spellCheck={false}
+                        >
+                            {localJob.coverLetter}
+                        </div>
                     ) : (
                         <div className="flex-1 flex flex-col items-center justify-center text-center space-y-8 py-20">
                             <div className="w-24 h-24 bg-neutral-50 dark:bg-neutral-800 rounded-full flex items-center justify-center animate-pulse">
@@ -132,14 +119,6 @@ export const CoverLetterEditor: React.FC<CoverLetterEditorProps> = (props) => {
                 />
             )}
 
-            {/* Blind Review Section */}
-            {localJob.coverLetter && (
-                <CoverLetterReviewCard
-                    critique={localJob.coverLetterCritique}
-                    generating={generating}
-                    handleRunCritique={handleRunCritique}
-                />
-            )}
         </div>
     );
 };

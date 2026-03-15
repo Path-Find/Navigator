@@ -107,9 +107,9 @@ export const CoverLetters: React.FC = () => {
                             </div>
 
                             <div className="mt-8 pt-6 border-t border-neutral-100 dark:border-neutral-800 flex items-center justify-between">
-                                <div className="flex items-center gap-2 text-[10px] font-black text-neutral-400 uppercase tracking-widest">
+                                <div className="flex items-center gap-2 text-[10px] font-black text-neutral-400 tracking-wide">
                                     <Calendar className="w-3 h-3" />
-                                    {new Date(job.dateAdded).toLocaleDateString()}
+                                    {new Date(job.dateAdded).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}
                                 </div>
                                 <div className="flex items-center gap-2 text-indigo-600 dark:text-indigo-400 text-xs font-black group-hover:translate-x-1 transition-transform">
                                     View Full Draft <ArrowRight className="w-4 h-4" />

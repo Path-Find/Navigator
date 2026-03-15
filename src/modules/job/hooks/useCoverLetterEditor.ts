@@ -111,14 +111,14 @@ export const useCoverLetterEditor = ({
             // Phase 3: Personalized Style Distillation
             let personalizedStyle = undefined;
             if (isNextGen && user) {
-                setAnalysisProgress("Distilling personal style model...");
+                setAnalysisProgress("Generating...");
                 personalizedStyle = await RdStyleService.getPersonalizedStyle(user.id, 'cover_letter') || undefined;
             }
 
             const isComparisonTriggered = !critiqueContext && isPro && Math.random() < 0.1;
 
             if (isComparisonTriggered) {
-                setAnalysisProgress("Generating stylistic variants...");
+                setAnalysisProgress("Generating...");
                 const variants = Object.keys(COVER_LETTER_PROMPTS.COVER_LETTER.VARIANTS).slice(0, 2);
 
                 const results = await Promise.all(variants.map(v =>
@@ -254,6 +254,12 @@ export const useCoverLetterEditor = ({
         }
     }, [isNextGen, user, analysis, comparisonVersions, localJob, onJobUpdate, showError]);
 
+    const handleRejectVariants = useCallback(() => {
+        setComparisonVersions(null);
+        setGenerating(false);
+        setAnalysisProgress(null);
+    }, []);
+
     const handleRunCritique = useCallback(async () => {
         setGenerating(true);
         try {
@@ -316,6 +322,7 @@ export const useCoverLetterEditor = ({
         handleUpdateContext,
         handleGenerateCoverLetter,
         handleSelectVariant,
+        handleRejectVariants,
         handleRunCritique,
         handleEditCoverLetter
     };

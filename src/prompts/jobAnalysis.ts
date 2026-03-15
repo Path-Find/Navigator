@@ -52,7 +52,9 @@ export const JOB_ANALYSIS_PROMPTS = {
         "requiredSkills": [
           { "name": "Skill Name", "level": "learning" | "comfortable" | "expert" }
         ],
-        "coreResponsibilities": ["List of 4-6 primary duties"]
+        "coreResponsibilities": ["List of 4-6 primary duties"],
+        "applicationDeadline": "Application closing date in YYYY-MM-DD format if stated, otherwise null",
+        "salaryRange": "Salary or wage range as stated (e.g. '$55,000–$65,000/yr' or '$22–$28/hr'), otherwise null"
       },
       "resumeTailoringInstructions": ["3-4 bullet points on how to adjust the resume"],
       "coverLetterTailoringInstructions": ["3-4 bullet points for the cover letter strategy"],

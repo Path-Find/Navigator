@@ -1,4 +1,4 @@
-import { supabase } from "../supabase";
+import { supabase, supabaseAnonKey } from "../supabase";
 import { getUserFriendlyError, getRetryMessage } from "../../utils/errorMessages";
 import { API_CONFIG } from "../../constants";
 
@@ -33,26 +33,32 @@ export const getModel = async (params: ModelParams & { signal?: AbortSignal }) =
                 throw new Error("Proxy Error: Authentication required. Please sign in again.");
             }
 
-            const { data, error } = await supabase.functions.invoke('gemini-proxy', {
-                body: {
+            const fnUrl = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/gemini-proxy`;
+            const fnResponse = await fetch(fnUrl, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'apikey': supabaseAnonKey,
+                    'Authorization': `Bearer ${session.access_token}`,
+                },
+                body: JSON.stringify({
                     payload: contentsOnly,
                     task: params.task,
                     generationConfig: payloadGenerationConfig ?? params.generationConfig,
-                    feature: params.feature
-                },
+                    feature: params.feature,
+                }),
                 signal: params.signal,
-                headers: {
-                    Authorization: `Bearer ${session.access_token}`
-                }
             });
 
+            const responseBody = await fnResponse.json().catch(() => ({}));
+            const data = fnResponse.ok ? responseBody : null;
+            const error = fnResponse.ok ? null : { message: `${fnResponse.status} ${fnResponse.statusText}`, status: fnResponse.status, context: responseBody };
+
             if (error) {
-                let details = '';
                 const errObj = error as any;
-                if (errObj.context) {
-                    details = typeof errObj.context === 'string' ? errObj.context : JSON.stringify(errObj.context);
-                }
-                throw new Error(`Proxy Error: ${error.message}${details ? ` - ${details}` : ''}`);
+                const statusCode = errObj.status;
+                const details = errObj.context ? JSON.stringify(errObj.context) : '';
+throw new Error(`Proxy Error: ${statusCode ?? ''} ${errObj.message}${details ? ` - ${details}` : ''}`);
             }
             if (data?.error) {
                 if (data.error === 'upgrade_required') throw new Error(`upgrade_required: ${data.message}`);

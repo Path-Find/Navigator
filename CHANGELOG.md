@@ -2,6 +2,94 @@
 
 All notable changes to this project will be documented in this file.
 
+## [Unreleased]
+
+### UI & UX Refinement
+- **Premium Sidebar Redesign**: Reordered the Resume and Cover Letter sidebars to prioritize tailoring instructions and feedback. Status and quality metrics (Draft Strength, Match Quality) have been moved to the bottom of the sidebar to keep the user focused on actionable content.
+- **Unified Quality Cards**: Introduced high-fidelity card designs for `Match Quality` (Resume) and `Draft Strength` (Cover Letter) that include descriptive labels (Exceptional, Strong, Good, Needs Work) and alignment-based descriptions.
+- **Review Required Alerts**: Redesigned the placeholder warning in the Cover Letter sidebar to match the premium card-based layout of the quality metrics, replacing generic alert banners.
+- **Visual Consistency Pass**: 
+    - Removed redundant "Focus" and "Job Description" headers for a cleaner look.
+    - Syncing sidebar headers to be borderless and mixed-case across the entire job detail view.
+    - Reduced vertical spacing between bullet points in all sidebars to improve information density and readability.
+- **Cover Letter Workflow Enhancements**: 
+    - Added a "None of these work for me" option to the stylistic variants comparison view, allowing users to reject both AI suggestions and return to the main editor.
+    - Replaced purple accent buttons with sleek, neutral black/white designs for "Generate", "Refine", and stylistic choices.
+    - Simplified AI progress messages to a clean "Generating..." status, removing technical jargon during distillation and generation phases.
+
+### Fixed
+- **Cover Letter Format Cleaning**: Hardened the AI service to strictly strip Markdown wrappers (e.g., ` ```markdown `) and accidental JSON artifacts from cover letter outputs, ensuring raw text is always delivered to the editor.
+- **Sidebar Header Borders**: Removed accidental bottom borders from sidebar headers to maintain a minimalist aesthetic.
+- **Placeholder Warnings**: Fixed inconsistent styling of the review required notification to ensure it matches the application's design system.
+
+### Fixed
+- **AI Analysis Restored**: Resolved persistent 401 Unauthorized errors on the `gemini-proxy` Edge Function caused by a JWT configuration mismatch. Redeployed with gateway-level JWT verification disabled — auth is handled internally by the function.
+- **AI Proxy Direct Fetch**: Replaced `supabase.functions.invoke()` with a direct `fetch()` call in `aiCore.ts` for explicit control over auth headers.
+- **Deprecated Gemini Model**: Replaced the retired `gemini-1.5-pro` with `gemini-2.0-flash` for all premium tiers.
+- **Score Threshold Consistency**: Removed hardcoded threshold values (75, 50, 85) scattered across `MatchSidebar` and `NavigatorPro`. All score cutoffs now reference a single `SCORE_THRESHOLDS` constant exported from `jobUtils.ts` — the upgrade messaging thresholds and Feed "High Match" filter now correctly align with the label definitions (Strong ≥ 80, Fair ≥ 60).
+
+### UI Polish
+- **No All-Caps Headings**: Removed `uppercase` from every section heading and label across all job detail tabs and sidebars — Analysis, Resume, Cover Letter, Interview, Posting, Match sidebar, Resume sidebar, and Cover Letter sidebar. Buttons and labels also cleaned up.
+- **Heading Style Unified**: All section headings across the job detail page now use `text-xs font-bold` — up from the previous `text-[10px]` micro-label style. `tracking-widest` reduced to `tracking-wide` where it remained, then removed entirely with the size bump. `indigo-600` on ResumeTab headings normalised to `indigo-500`.
+- **Sidebar Card Titles Normalised**: "Strategic Alignment" (ResumeSidebar), "Refinement Strategy" (CoverLetterSidebar), and "Professional Insight" (MatchSidebar) were using `text-sm font-bold normal-case` — now match the unified heading style.
+- **Match Insights in Card**: Wrapped the Match Insights section in a `Card variant="glass"` to match every other section on the Analysis tab.
+- **SkillPill Component**: Extracted skill chip styling into a shared `SkillPill` component (`src/components/ui/SkillPill.tsx`). Match Insights and Skill Match in `AnalysisTab` now both use it — consistent chip size, font, dot, and border treatment matching `SkillCard` on the Skills page.
+- **Cross-Tab Heading Consistency**: Standardised all card-internal section headings across every tab to `text-[10px] font-black tracking-widest uppercase` with `w-3.5 h-3.5` icons and indigo colour — Match Insights, Skill Match, Core Responsibilities, Professional Summary, Experience & Achievements, Cover Letter Draft, and Job Description were all on different scales and cases.
+- **Interview Tab Title Removed**: Removed the standalone `h2` "Interview Prep" title, subtitle, and Beta badge that only the Interview tab rendered — no other tab had its own in-content title. Tab label is sufficient.
+- **Interview Tab Spacing**: Normalised `space-y-6` to `space-y-8` to match the rest of the page.
+- **"Questions to Ask Them" Heading Colour**: Changed from emerald to indigo to match every other heading in the app. Emerald bullet dots retained for visual distinction between the two question cards.
+- **"Posting" Tab Rename**: Shortened "Job Posting" tab label to "Posting".
+- **Draft Quality Moved to Sidebar**: Removed the "Candidate Match" quality banner from inside the cover letter editor card. The verdict now lives in the Cover Letter sidebar as "Draft Quality" — clearer label, better placement.
+- **MatchSidebar Body Text**: Reduced from `text-sm` to `text-xs` to match ResumeSidebar and CoverLetterSidebar.
+- **Detail Page Background Removed**: Removed the `bg-neutral-50/50` backdrop from `DetailLayout` that was creating a visible tinted background behind job detail content.
+- **Tab Bar Consistency**: Restyled the job detail tab bar (`DetailTabs`) to match the top nav — pill-shaped container, glass background, no colored active borders.
+- **Status Toggle**: Restyled the application status dropdown to match the tab bar pill aesthetic.
+- **Job Detail Header**: Job title now renders as a proper bold heading. Removed redundant back arrow. Removed the double border line between header and tabs. Reference number no longer uses monospace font.
+- **Match Sidebar**: Score now displayed as a large number with a colored progress bar and short label (Good, Strong, etc.) that match in color. Removed redundant divider and "Match Evaluation" label.
+- **Analysis Tab Cards**: Removed colored tinted backgrounds from Core Strengths and Identified Gaps cards. Normalized body text from `font-black`/`font-bold` to `font-medium`. Core Responsibilities changed from individual cards per bullet to a plain list.
+- **Analysis Tab Section Headers**: Skill Match and Core Responsibilities card headers now use the same `text-[10px] tracking-widest` style as Core Strengths and Identified Gaps — consistent inside-card heading treatment across the entire Analysis tab. Removed the divider line below Match Insights; `space-y-8` spacing is sufficient.
+- **Skill Match**: Restyled to match the Skills tab — pill chips with colored proficiency dots (emerald/orange/gray), consistent with `SkillCard`.
+- **Strategic Alignment / Refinement Strategy**: Removed individual card-per-bullet layout in Resume and Cover Letter sidebars; replaced with plain dot lists.
+- **Cover Letter Sidebar**: Removed redundant wrapper div and extra `space-y-6` nesting. Card is now the root element, matching `ResumeSidebar`. Instruction text color, spacing, and empty state copy now match `ResumeSidebar`.
+- **Interview Tab**: Renamed "Interview Mission Control" to "Interview Prep". Removed all-caps headers, military naming ("Eve of Battle"), and individual card-per-question layout. Normalized to match the rest of the page.
+- **Cover Letter**: Removed `font-serif` from draft text to match the app's standard font.
+- **Score Labels Unified**: History page and job detail page now use the same `getScoreLabel` and `getScoreColorClasses` functions. Removed hardcoded "Strong Fit" / "Excellent Match" / "Potential Fit" labels and mismatched indigo colors from History cards.
+- **Score Labels Shortened**: Compatibility score labels simplified to single words — Exceptional, Strong, Good, Fair, Low.
+- **Score Badge Consistency**: History card score badge now matches the status badge style — `text-[10px] font-black`, consistent pill sizing.
+- **Date Formatting**: All job dates now use the same `"Mar 14, 2026"` format (`month: short, day: numeric, year: numeric`) across History, Cover Letters, and the Feed. Previously the Feed and Cover Letters used the browser's raw locale format.
+- **`getDeadlineInfo` Centralised**: Deadline formatting logic extracted from `History.tsx` into `jobUtils.ts` so it can be shared across pages without duplication.
+- **Match Score in Header**: Compatibility score badge (e.g. "82 · Strong") now displayed persistently in the job detail header actions area, visible on every tab — no longer buried inside the Analysis tab sidebar only.
+- **Status Dropdown Affordance**: Application status selector now has a visible background, border, and chevron icon — previously rendered as unstyled plain text with no visual indication it was interactive.
+- **Job Detail Layout Stability**: Locked the main content column to `col-span-8` on all tabs. Content width no longer shifts when switching between tabs with and without sidebars.
+- **Analysis Tab Restructured**: "Professional Insight" (AI reasoning) moved from the MatchSidebar into the Analysis tab as the first card. Skill Match reordered to appear before Core Strengths/Gaps. "Match Insights" renamed to "Key Competencies" and moved to the bottom as supporting context. MatchSidebar removed.
+- **Section Heading Icons Removed**: Stripped all decorative icons from card-internal section headings across every tab and sidebar — headings are now plain text.
+- **Heading Font Fixed**: Professional Insight was inheriting the sidebar's `text-[10px] font-black tracking-wide` style. Now uses `text-xs font-bold` matching all other tab headings.
+- **Cover Letter Font Fixed**: Removed lingering `font-serif text-base` from the cover letter editor body — uses the app's standard font at `text-sm`.
+- **Cover Letter Header Simplified**: Removed the oversized `PenTool` icon container from the cover letter header. Title reduced to "Cover Letter".
+- **Resume Tab Padding**: Reduced outer resume wrapper from `p-8 md:p-12 space-y-12` to `p-6 space-y-8` — consistent with other tabs.
+- **Cover Letter Padding**: Reduced header and editor area padding from `p-8` to `p-6`.
+- **Interview Tab Renamed**: "Predicted Questions" → "Likely Questions". "Questions to Ask Them" → "Your Questions". "Regenerate based on JD" → "Regenerate".
+- **Posting Tab**: Removed redundant "Job Description" heading — the entire tab is the posting.
+- **Resume Tab Sections Unified**: Resume tab now uses the same `SECTIONS` constant as the resume editor — single source of truth for section types, labels, and order. Summary and skill blocks excluded from rendered sections.
+- **Experience / Education Split**: Resume tab now correctly separates Work, Volunteer, Project, and Other blocks from Education blocks into their own labelled sections, matching the resume editor layout.
+- **Phantom Spacing Fixed**: Organization/date line in resume blocks now only renders when at least one of those values is present — blocks without them (e.g. summary-type blocks used as experience) no longer have extra whitespace above bullets.
+- **Summary Block Excluded**: Blocks with `type: 'summary'` (e.g. "Urban Planning Student") no longer appear inside Experience or any other section — they were slipping through the filter.
+- **Professional Summary Not Italic**: Tailored professional summary text on the Resume tab is no longer italicized.
+- **Copy Summary Button Removed**: Removed the "Copy optimized summary" button from the Resume tab — redundant given the full copy action.
+- **Tailor Button Consistent**: Hyper-Tailor button is now always `variant="secondary"` (no longer purple when untailored). Renamed "Hyper-Tailor" → "Tailor" / "Retry".
+- **Section Header Alignment Fixed**: Section header rows across Resume tab and Cover Letter header changed from `items-center` to `items-start` — buttons were causing headings to appear lower than their `p-6` padding due to vertical centering against taller button height.
+- **Copy Full Fixed**: Resume clipboard output now correctly separates Experience and Education into labelled sections. Previously all blocks were dumped under a single "Experience" heading.
+- **Interview Tab Removed**: Interview tab hidden from job detail page — content was hardcoded placeholder text that was worse than nothing. Will be re-introduced when AI-generated.
+- **Skill Pill Dot Position**: Proficiency dot in `SkillPill` moved from left to right, matching the indicator position on `SkillCard` in the Skills profile page.
+- **Analysis Tab Bullet Consistency**: Core Responsibilities bullets changed from `text-sm` with `motion.div` stagger animations to `text-xs font-medium` matching Core Strengths — same size, same spacing, no animation difference.
+- **Posting Tab Card-in-Card Removed**: Job description text was wrapped in a styled div inside a Card, creating a nested card appearance. Inner wrapper removed — text now renders directly inside the Card.
+- **Sidebar Sticky Fixed**: Sidebar now correctly floats while scrolling. Root cause: `overflow-y-auto` on `DetailLayout`'s outer div was trapping `position: sticky` inside a non-scrolling container. Removed the overflow, let the document scroll, set `top: 136px` to clear the sticky tab bar.
+- **Sidebar Grid Fix**: Grid changed from `items-start` (all columns shrink to content height) to default stretch with `self-start` on the main column — sidebar column now stretches to full grid height, giving sticky a parent tall enough to work in.
+- **Resume Sidebar — How We Built This**: Replaced internal tailoring instructions with genuinely useful content: resume-specific tailoring strategy (`resumeTailoringInstructions`) shown as "Focus" bullets — explains what the AI prioritized when building the resume view.
+- **Cover Letter Sidebar — How We Built This**: Cover letter sidebar now shows: Draft Quality badge (inline pill, not full-width banner), placeholder warning (if applicable), cover letter tailoring strategy (`coverLetterTailoringInstructions`) as "Focus" bullets, and critique feedback. Quality badge is a small pill in the heading row, consistent with the score badge in the job header.
+- **Placeholder Warning Moved to Sidebar**: Unfilled placeholder detection (`/\[[^\]]{10,}\]/`) moved from inside the cover letter editor area into the Cover Letter sidebar — less intrusive, better placement.
+- **Cover Letter Critique in Sidebar**: Draft Quality and critique feedback now live exclusively in the Cover Letter sidebar. The duplicate bottom card (`CoverLetterReviewCard`) has been removed.
+
 ## [2.32.2] - 2026-03-13
 
 ### Fixed
