@@ -1,9 +1,13 @@
 import { supabase } from '../supabase';
 import { encryptionService } from '../encryptionService';
 import { Logger } from '../../utils/logger';
+import { OperationQueue } from '../../utils/promiseUtils';
 
 // Helper: Get User ID if logged in — cached for 30s to avoid repeated session reads
 let cachedUserIdPromise: Promise<string | undefined> | null = null;
+
+// Serialization queue for all vault operations to prevent race conditions
+const vaultQueue = new OperationQueue();
 
 export const getUserId = async (): Promise<string | undefined> => {
     if (!cachedUserIdPromise) {
@@ -106,47 +110,60 @@ export const Vault = {
      * - undefined: If the key exists but could NOT be decrypted (error state).
      */
     async getSecure<T = unknown>(key: string): Promise<T | null | undefined> {
-        await this.ensureInit();
-        const raw = localStorage.getItem(key);
-        if (!raw) return null;
+        return vaultQueue.enqueue(async () => {
+            await this.ensureInit();
+            const raw = localStorage.getItem(key);
+            if (!raw) return null;
 
-        // Compatibility/Cleanup migrator for ancient plain-text storage
-        if (raw.startsWith('{') || raw.startsWith('[')) {
-            Logger.log(`[Vault] Migrating legacy content for key: ${key}`);
-            try {
-                const data = JSON.parse(raw);
-                await this.setSecure(key, data);
-                return data;
-            } catch {
-                return undefined;
-            }
-        }
-
-        try {
-            const decrypted = await encryptionService.decrypt(raw);
-            return JSON.parse(decrypted);
-        } catch {
-            // Primary decryption failed. If we have a legacy key available, retry.
-            if (encryptionService.isLegacyAvailable()) {
+            // Compatibility/Cleanup migrator for ancient plain-text storage
+            if (raw.startsWith('{') || raw.startsWith('[')) {
+                Logger.log(`[Vault] Migrating legacy content for key: ${key}`);
                 try {
-                    const decryptedLegacy = await encryptionService.decryptLegacy(raw);
-                    const data = JSON.parse(decryptedLegacy);
-                    
-                    // Lazy Migration: re-encrypt now to prevent future failures
-                    await this.setSecure(key, data);
-                    Logger.log(`[Vault] Lazy-migrated item: ${key}`);
+                    const data = JSON.parse(raw);
+                    // Internal call to setSecure is also queued, but since we are already inside the queue
+                    // loop, we call a private version or just execute the logic.
+                    // Actually, nesting enqueue calls on the same OperationQueue will cause a DEADLOCK.
+                    // We need a non-queued version for internal use.
+                    await this._setSecureInternal(key, data);
                     return data;
                 } catch {
-                    // Even legacy failed
+                    return undefined;
                 }
             }
-            
-            console.error(`[Vault] Decryption failed for ${key}. Data may be corrupted or key mismatch.`);
-            return undefined;
-        }
+
+            try {
+                const decrypted = await encryptionService.decrypt(raw);
+                return JSON.parse(decrypted);
+            } catch {
+                // Primary decryption failed. If we have a legacy key available, retry.
+                if (encryptionService.isLegacyAvailable()) {
+                    try {
+                        const decryptedLegacy = await encryptionService.decryptLegacy(raw);
+                        const data = JSON.parse(decryptedLegacy);
+                        
+                        // Lazy Migration: re-encrypt now to prevent future failures
+                        await this._setSecureInternal(key, data);
+                        Logger.log(`[Vault] Lazy-migrated item: ${key}`);
+                        return data;
+                    } catch {
+                        // Even legacy failed
+                    }
+                }
+                
+                console.error(`[Vault] Decryption failed for ${key}. Data may be corrupted or key mismatch.`);
+                return undefined;
+            }
+        });
     },
 
     async setSecure(key: string, data: unknown) {
+        return vaultQueue.enqueue(async () => {
+            await this._setSecureInternal(key, data);
+        });
+    },
+
+    // Internal non-queued version to avoid deadlocks within getSecure
+    async _setSecureInternal(key: string, data: unknown) {
         await this.ensureInit();
         const serialized = JSON.stringify(data);
         const encrypted = await encryptionService.encrypt(serialized);

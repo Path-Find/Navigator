@@ -33,6 +33,7 @@ import { ProhibitionAlert } from './components/ProhibitionAlert';
 import { JobPostTab } from './components/JobPostTab';
 import { CoverLetterSidebar } from './components/CoverLetterSidebar';
 import { CoverLetterTab } from './components/CoverLetterTab';
+import { LocalizedErrorBoundary } from '../../components/common/LocalizedErrorBoundary';
 
 // Types
 import type { SavedJob } from './types';
@@ -264,42 +265,44 @@ export const JobDetail: React.FC = () => {
                         ) : null
                     }
                 >
-                    <div className="space-y-8">
-                        {(activeTab === 'analysis' || activeTab === 'resume' || activeTab === 'cover-letter') && <ProhibitionAlert job={job} />}
+                    <LocalizedErrorBoundary componentName={`${toTitleCase(activeTab)} Tab`}>
+                        <div className="space-y-8">
+                            {(activeTab === 'analysis' || activeTab === 'resume' || activeTab === 'cover-letter') && <ProhibitionAlert job={job} />}
 
-                        {activeTab === 'analysis' && (
-                            <AnalysisTab
-                                job={job}
-                                userTier={userTier}
-                                openModal={openModal}
-                            />
-                        )}
+                            {activeTab === 'analysis' && (
+                                <AnalysisTab
+                                    job={job}
+                                    userTier={userTier}
+                                    openModal={openModal}
+                                />
+                            )}
 
-                        {activeTab === 'job-post' && <JobPostTab job={job} />}
+                            {activeTab === 'job-post' && <JobPostTab job={job} />}
 
-                        {activeTab === 'resume' && (
-                            <ResumeTab
-                                job={job}
-                                onUpdateJob={onUpdateJob}
-                                userTier={userTier}
-                                openModal={openModal}
-                                showSuccess={showSuccess}
-                                showError={showError}
-                                generating={generating}
-                                handleCopyResume={handleCopyResumeAction}
-                            />
-                        )}
+                            {activeTab === 'resume' && (
+                                <ResumeTab
+                                    job={job}
+                                    onUpdateJob={onUpdateJob}
+                                    userTier={userTier}
+                                    openModal={openModal}
+                                    showSuccess={showSuccess}
+                                    showError={showError}
+                                    generating={generating}
+                                    handleCopyResume={handleCopyResumeAction}
+                                />
+                            )}
 
-                        {activeTab === 'cover-letter' && (
-                            <CoverLetterTab
-                                job={job}
-                                bestResume={bestResume}
-                                userTier={userTier}
-                                targetJobs={targetJobs}
-                                onUpdateJob={onUpdateJob}
-                            />
-                        )}
-                    </div>
+                            {activeTab === 'cover-letter' && (
+                                <CoverLetterTab
+                                    job={job}
+                                    bestResume={bestResume}
+                                    userTier={userTier}
+                                    targetJobs={targetJobs}
+                                    onUpdateJob={onUpdateJob}
+                                />
+                            )}
+                        </div>
+                    </LocalizedErrorBoundary>
                 </DetailLayout>
             </div>
         </SharedPageLayout>

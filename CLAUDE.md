@@ -1,4 +1,4 @@
-# Claude's Thoughts on Navigator
+# Claude
 
 *A running log of observations, instincts, and ideas — not tasks, just thinking.*
 

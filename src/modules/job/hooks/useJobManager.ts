@@ -4,12 +4,16 @@ import type { SavedJob, AppState } from '../../../types';
 import { Storage } from '../../../services/storageService';
 import { analyzeJobFit } from '../../../services/geminiService';
 import { ScraperService } from '../../../services/scraperService';
-import { checkAnalysisLimit, getUsageStats, type UsageStats, type UsageLimitResult } from '../../../services/usageLimits';
+import type { UsageStats, UsageLimitResult } from '../../../services/usageLimits';
 import { useToast } from '../../../contexts/ToastContext';
 import { useUser } from '../../../contexts/UserContext';
-import { ROUTES, TIME_PERIODS } from '../../../constants';
+import { ROUTES } from '../../../constants';
 import { useNextGen } from '../../../hooks/useNextGen';
 import { RdFeedbackService } from '../../../services/ai/rd/feedbackService';
+
+import { useApplicationNudge } from './useApplicationNudge';
+import { useUsageLimits } from './useUsageLimits';
+import { loadInitialJobsAndUsage } from './useJobManagerHelpers';
 
 export interface UseJobManagerReturn {
     jobs: SavedJob[];
@@ -35,110 +39,6 @@ export interface UseJobManagerReturn {
     dismissNudge: () => void;
 }
 
-const useApplicationNudge = (
-    jobs: SavedJob[],
-    isLoading: boolean
-): { nudgeJob: SavedJob | null; dismissNudge: () => void } => {
-    const [nudgeDismissed, setNudgeDismissed] = useState(false);
-    const [nudgeJob, setNudgeJob] = useState<SavedJob | null>(null);
-
-    useEffect(() => {
-        if (isLoading || jobs.length === 0 || nudgeDismissed) return;
-
-        const now = Date.now();
-        const staleJob = jobs.find(j =>
-            j.status === 'applied' &&
-            (now - j.dateAdded) > TIME_PERIODS.APPLIED_NUDGE_THRESHOLD_MS
-        );
-
-        if (staleJob) {
-            setNudgeJob(staleJob);
-        } else if (!staleJob && nudgeJob) {
-            setNudgeJob(null);
-        }
-    }, [jobs, isLoading, nudgeDismissed, nudgeJob]);
-
-    const dismissNudge = useCallback(() => {
-        setNudgeJob(null);
-        setNudgeDismissed(true);
-    }, []);
-
-    return { nudgeJob, dismissNudge };
-};
-
-interface InitialLoadContext {
-    userId: string | null;
-    canSyncToCloud: boolean;
-    onShowError: (msg: string) => void;
-    onShowInfo: (msg: string) => void;
-}
-
-const loadInitialJobsAndUsage = async (
-    context: InitialLoadContext
-): Promise<{ jobs: SavedJob[]; stats: UsageStats | undefined }> => {
-    const { userId, canSyncToCloud, onShowError, onShowInfo } = context;
-
-    try {
-        if (canSyncToCloud) {
-            await Storage.syncLocalToCloud().catch(err => {
-                console.error("Initial sync failed:", err);
-                onShowError("Cloud Sync Error: Some items haven't been backed up. Check your connection.");
-            });
-        }
-
-        const [loadedJobs, stats] = await Promise.all([
-            Storage.getJobs(),
-            userId
-                ? getUsageStats(userId).catch(err => {
-                    console.error("Usage stats fetch failed:", err);
-                    return undefined;
-                })
-                : Promise.resolve<UsageStats | undefined>(undefined)
-        ]);
-
-        if (stats?.isFallback) {
-            onShowInfo("Unable to verify current usage. Using restricted offline mode.");
-        }
-
-        return {
-            jobs: loadedJobs ?? [],
-            stats
-        };
-    } catch (err) {
-        console.error("Fatal error during initial load:", err);
-        onShowError("Failed to load your data. Please check your connection.");
-        return { jobs: [], stats: undefined };
-    }
-};
-
-const useUsageLimits = (
-    userId: string | null,
-    isAdmin: boolean,
-    setUsageStats: Dispatch<SetStateAction<UsageStats>>,
-    setUpgradeModalData: Dispatch<SetStateAction<UsageLimitResult | null>>
-) => {
-    const checkAndConsumeAnalysis = useCallback(async () => {
-        if (!userId || isAdmin) return { allowed: true } as UsageLimitResult;
-
-        const limitCheck = await checkAnalysisLimit(userId);
-        if (!limitCheck.allowed) {
-            setUpgradeModalData(limitCheck);
-        }
-        return limitCheck;
-    }, [userId, isAdmin, setUpgradeModalData]);
-
-    const refreshUsageStats = useCallback(async () => {
-        if (!userId || isAdmin) return;
-        const stats = await getUsageStats(userId);
-        setUsageStats(stats);
-    }, [userId, isAdmin, setUsageStats]);
-
-    return {
-        checkAndConsumeAnalysis,
-        refreshUsageStats
-    };
-};
-
 export const useJobManager = (): UseJobManagerReturn => {
     const { user, isAdmin } = useUser();
     const { showInfo, showError } = useToast();
@@ -152,32 +52,20 @@ export const useJobManager = (): UseJobManagerReturn => {
     const [activeJobId, setActiveJobId] = useState<string | null>(null);
     const [isLoading, setIsLoading] = useState(true);
 
-    // Usage Stats State
-    const [usageStats, setUsageStats] = useState<UsageStats>({
-        tier: isAdmin ? 'admin' : 'free',
-        todayAnalyses: 0,
-        weekAnalyses: 0,
-        lifetimeAnalyses: 0,
-        todayEmails: 0,
-        monthInterviews: 0,
-        roleModelCount: 0,
-        totalAICalls: 0,
-        analysisLimit: isAdmin ? Infinity : 3,
-        analysisPeriod: 'lifetime',
-        emailLimit: 0,
-        roleModelLimit: isAdmin ? Infinity : 0,
-        interviewLimit: isAdmin ? Infinity : 0,
-        isFallback: false
-    });
-    const [upgradeModalData, setUpgradeModalData] = useState<UsageLimitResult | null>(null);
-    const { checkAndConsumeAnalysis, refreshUsageStats } = useUsageLimits(
-        user?.id ?? null,
-        isAdmin,
+    // Usage & Limits
+    const {
+        usageStats,
         setUsageStats,
-        setUpgradeModalData
-    );
+        upgradeModalData,
+        checkAndConsumeAnalysis,
+        refreshUsageStats,
+        closeUpgradeModal
+    } = useUsageLimits(user?.id ?? null, isAdmin);
 
-    // Initial Load — jobs and usage stats fire in parallel
+    // Nudge Logic
+    const { nudgeJob, dismissNudge } = useApplicationNudge(jobs, isLoading);
+
+    // Initial Load Path
     useEffect(() => {
         let mounted = true;
         setIsLoading(true);
@@ -208,7 +96,6 @@ export const useJobManager = (): UseJobManagerReturn => {
     }, [user?.id]);
 
     const activeJob = jobs.find(j => j.id === activeJobId);
-    const { nudgeJob, dismissNudge } = useApplicationNudge(jobs, isLoading);
 
     const handleUpdateJob = useCallback(async (updatedJob: SavedJob) => {
         const oldJob = jobsRef.current.find(j => j.id === updatedJob.id);
@@ -220,7 +107,6 @@ export const useJobManager = (): UseJobManagerReturn => {
         try {
             await Storage.updateJob(updatedJob);
 
-            // Phase 1/2: Feedback Loop & Outcome Triangulation
             if (isNextGen && user && statusChanged) {
                 if (['applied', 'interview', 'offer', 'rejected'].includes(updatedJob.status || '')) {
                     RdFeedbackService.captureOutcome(user.id, updatedJob.id, updatedJob.status!);
@@ -253,14 +139,7 @@ export const useJobManager = (): UseJobManagerReturn => {
                 resumes,
                 skills,
                 async (msg, step, total) => {
-                    // Calculate progress percentage
                     const progress = Math.round((step / total) * 100);
-
-                    // We only update the local state to trigger UI updates, 
-                    // avoiding heavy Storage writes for every progress tick if possible, 
-                    // but for now let's keep it simple and just update the in-memory jobs list via handleUpdateJob
-                    // which does write to storage. If performance is bad, we can optimize.
-                    // Actually, let's just update local state for progress to be smooth.
                     setJobs(prev => prev.map(j => j.id === job.id ? { ...j, progress, progressMessage: msg } : j));
                 },
                 job.id
@@ -276,7 +155,7 @@ export const useJobManager = (): UseJobManagerReturn => {
                 position: roleTitle,
                 company: analysis.distilledJob?.companyName || job.company,
                 roleId: analysis.distilledJob?.canonicalTitle || job.roleId,
-                progress: 100, // Ensure we hit 100%
+                progress: 100,
                 progressMessage: 'Analysis complete!'
             };
 
@@ -384,7 +263,7 @@ export const useJobManager = (): UseJobManagerReturn => {
         handleAnalyzeJob,
         handlePromoteFromFeed,
         handleSaveFromFeed,
-        closeUpgradeModal: useCallback(() => setUpgradeModalData(null), []),
+        closeUpgradeModal,
         checkAndConsumeAnalysis,
         dismissNudge
     };

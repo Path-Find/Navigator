@@ -54,20 +54,30 @@ export const InterviewChat: React.FC<InterviewChatProps> = ({
 }) => {
     const scrollRef = useRef<HTMLDivElement>(null);
 
+    // Robust auto-scroll using ResizeObserver to handle content popping in (e.g. results/images)
+    useEffect(() => {
+        const container = scrollRef.current;
+        if (!container) return;
+
+        const observer = new ResizeObserver(() => {
+            container.scrollTop = container.scrollHeight;
+        });
+
+        // Observe the child area where messages live
+        const messageArea = container.firstElementChild;
+        if (messageArea) {
+            observer.observe(messageArea);
+        }
+
+        return () => observer.disconnect();
+    }, []);
+
+    // Also trigger on manual message changes to be safe
     useEffect(() => {
         if (scrollRef.current) {
-            const scrollContainer = scrollRef.current;
-            // Scroll immediately
-            scrollContainer.scrollTop = scrollContainer.scrollHeight;
-            
-            // Re-scroll after a short delay to account for content/animation height changes
-            const timeoutId = setTimeout(() => {
-                scrollContainer.scrollTop = scrollContainer.scrollHeight;
-            }, 100);
-            
-            return () => clearTimeout(timeoutId);
+            scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
         }
-    }, [messages, isThinking]);
+    }, [messages.length, isThinking]);
 
     const handleKeyDown = (e: React.KeyboardEvent) => {
         if (e.key === 'Enter' && !e.shiftKey) {

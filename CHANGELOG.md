@@ -4,7 +4,22 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## [2.33.0] - 2026-03-16
+
+### Added
+- **OperationQueue for Vault**: Serialized async storage operations to prevent race conditions during encryption/decryption cycles.
+- **ResizeObserver for Interview Chat**: Implemented dynamic scroll-to-bottom logic that reacts to content height changes (e.g., results or pills popping in).
+- **Stable Feed Sorting**: Added secondary date-based sorting for jobs with identical match scores to ensure deterministic list order.
+- **Enhanced Empty State**: Updated the Job Feed empty state with a "Clear All Filters" action and polished glassmorphism aesthetics.
+- **Localized Error Boundaries**: Implemented `LocalizedErrorBoundary` to wrap high-risk components (Job Feed cards, Job Detail tabs, Cover Letter cards), preventing single-component failures from crashing the entire application and providing a "Retry" option.
+
 ### Changed
+- **Architectural Refactor (AI-Legibility)**: Decoupled monolithic components and hooks to meet the 700-line "AI-Legibility" standard.
+    - `useJobManager` refactored into `useUsageLimits`, `useApplicationNudge`, and `useJobManagerHelpers`.
+    - `AuthModal` decomposed into specialized form components (`EmailForm`, `PasswordForm`, etc.) within a new `src/components/auth/` directory.
+    - `NavigatorPro` logic extracted into `useJobFeed` hook and standalone UI components (`JobFeedCard`, `EmptyFeedState`).
+- **Enhanced Error Logging**: Updated error boundaries to utilize the centralized `Logger` utility, ensuring component-level catches are logged with context.
+- **Unused Code Hygiene**: Removed several unused imports and references (`useCallback`, `lastMessageRef`) identified during modularization.
 - **Interview Advisor UX Refinement**: Removed the card-based container from the interview interface, transitioning to a more open and expansive layout (`max-w-4xl`) that fills the viewport height, bringing the chat input to the bottom of the screen.
 - **In-Chat Preparation State**: Replaced the full-screen loading state with an integrated in-chat "preparing session" message, allowing for a more seamless transition from selection to practice.
 - **Redesigned Chat Input**: Streamlined the input area with a circular, indigo-colored send button and refined typography for input hints (standardized lowercase and tighter tracking).
