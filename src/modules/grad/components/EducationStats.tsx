@@ -32,25 +32,33 @@ export const EducationStats: React.FC<EducationStatsProps> = ({
                 id="academic-overview"
                 icon={GraduationCap}
                 title="Academic"
-                description={transcript?.university || (transcript ? "University" : "Academic standing")}
+                description={
+                    transcript 
+                        ? (transcript.credentialType 
+                            ? `${transcript.credentialType} @ ${transcript.university || 'University'}` 
+                            : (transcript.university || "Academic Record"))
+                        : "Academic standing"
+                }
                 color={FEATURE_COLORS.amber}
                 previewContent={
                     transcript ? (
-                        <div className="flex items-end gap-6 px-2">
-                            <div className="flex flex-col">
-                                <div className="text-5xl font-black text-amber-600 dark:text-amber-400 tracking-tighter leading-none hover:scale-110 transition-transform duration-500 drop-shadow-2xl">
-                                    {calculatedGpa}
+                            <div className="flex items-end justify-between w-full gap-4">
+                                <div className="flex flex-col shrink-0">
+                                    <div className="text-4xl font-black text-amber-600 dark:text-amber-400 tracking-tighter leading-none hover:scale-105 transition-transform duration-500">
+                                        {calculatedGpa}
+                                    </div>
+                                    <div className="text-[9px] tracking-[0.2em] font-black text-neutral-400 dark:text-white/40 mt-3 uppercase">GPA</div>
                                 </div>
-                                <div className="text-[9px] tracking-[0.2em] font-black text-neutral-400 dark:text-white/40 mt-3">GPA</div>
+                                
+                                {transcript.program && (
+                                    <div className="flex flex-col items-end text-right min-w-0 flex-1">
+                                        <div className="text-lg font-black text-neutral-900 dark:text-white truncate w-full" title={transcript.program}>
+                                            {transcript.program}
+                                        </div>
+                                        <div className="text-[9px] tracking-[0.2em] font-black text-neutral-400 dark:text-white/40 mt-1 uppercase">Major</div>
+                                    </div>
+                                )}
                             </div>
-                            <div className="w-px h-10 bg-gradient-to-b from-white/0 via-white/20 to-white/0" />
-                            <div className="flex flex-col">
-                                <div className="text-xl font-black text-neutral-900 dark:text-white truncate max-w-[120px]">
-                                    {transcript.program?.split(' ')[0] || 'Major'}
-                                </div>
-                                <div className="text-[9px] tracking-[0.2em] font-black text-neutral-400 dark:text-white/40 mt-1 uppercase">Program</div>
-                            </div>
-                        </div>
                     ) : (
                         <div className="flex items-center gap-3 px-2 text-neutral-300 dark:text-neutral-700 italic">
                             <Info className="w-5 h-5 opacity-50" />
@@ -70,15 +78,15 @@ export const EducationStats: React.FC<EducationStatsProps> = ({
                 description={targetCredits > 0 ? "Credits earned toward degree." : "Set your degree credit target."}
                 color={FEATURE_COLORS.emerald}
                 previewContent={
-                    <div className="flex items-center gap-6 px-2 w-full">
-                        <div className="flex flex-col">
-                            <div className="text-5xl font-black text-emerald-600 dark:text-emerald-400 tracking-tighter leading-none hover:scale-110 transition-transform duration-500 drop-shadow-2xl">
+                    <div className="flex items-center justify-between w-full gap-4">
+                        <div className="flex flex-col shrink-0">
+                            <div className="text-4xl font-black text-emerald-600 dark:text-emerald-400 tracking-tighter leading-none hover:scale-105 transition-transform duration-500">
                                 {totalCredits}
                             </div>
-                            <div className="text-[9px] tracking-[0.2em] font-black text-neutral-400 dark:text-white/40 mt-3">CREDITS</div>
+                            <div className="text-[9px] tracking-[0.2em] font-black text-neutral-400 dark:text-white/40 mt-3 uppercase">Credits</div>
                         </div>
 
-                        <div className="flex-1 flex flex-col justify-end h-full py-1">
+                        <div className="flex-1 min-w-0 flex flex-col justify-end">
                             <div className="flex items-center justify-between mb-2">
                                 <span className="text-[10px] font-black text-emerald-600 tracking-widest">{targetCredits > 0 ? `${Math.round(progressPercentage)}%` : '--'}</span>
                                 <span className="text-[10px] font-bold text-neutral-400">/ {displayTarget}</span>

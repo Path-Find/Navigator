@@ -78,7 +78,7 @@ export const BentoCard: React.FC<BentoCardProps> = ({
                     : `perspective(1000px) rotateX(${tilt.x}deg) rotateY(${tilt.y}deg) translateY(-4px)`,
                 transition: tilt.x === 0 ? 'all 0.6s cubic-bezier(0.23, 1, 0.32, 1)' : 'transform 0.1s ease-out, box-shadow 0.3s ease-out'
             }}
-            className={`group relative bg-white dark:bg-neutral-900/40 backdrop-blur-2xl ${variant === 'compact' ? 'rounded-2xl p-4' : 'rounded-3xl p-6'} border ${borderAccentClass} h-full shadow-xl shadow-black/5 dark:shadow-none hover:shadow-2xl hover:shadow-indigo-500/10 text-left flex flex-col cursor-pointer ${className}`}
+            className={`group relative bg-white dark:bg-neutral-900/40 backdrop-blur-2xl ${variant === 'compact' ? 'rounded-2xl p-4' : 'rounded-3xl p-6'} border ${borderAccentClass} h-full shadow-xl shadow-black/5 dark:shadow-none hover:shadow-2xl hover:shadow-indigo-500/10 text-left flex flex-col cursor-pointer overflow-hidden ${className}`}
             onClick={onAction}
         >
             {/* Dynamic Mouse Shimmer */}
@@ -124,14 +124,14 @@ export const BentoCard: React.FC<BentoCardProps> = ({
                 </div>
             </div>
 
-            <div className={`relative z-10 mb-1 ${variant === 'compact' ? 'h-auto' : 'h-[3rem]'} flex flex-col justify-start`}>
+            <div className={`relative z-10 mb-1 flex flex-col justify-start`}>
                 <h3 className={`${variant === 'compact' ? 'text-lg font-bold' : 'text-lg font-black'} text-neutral-900 dark:text-white tracking-tight leading-tight line-clamp-2`}>
                     {title}
                 </h3>
             </div>
 
-            <div className={`${variant === 'compact' ? 'h-auto mb-4' : 'h-[3.75rem] mb-4'}`}>
-                <p className={`${variant === 'compact' ? 'text-[11px]' : 'text-[12px]'} text-neutral-500 dark:text-neutral-400 leading-relaxed relative z-10 font-medium line-clamp-3`}>
+            <div className={`flex-1 mb-4`}>
+                <p className={`${variant === 'compact' ? 'text-[11px]' : 'text-[12px]'} text-neutral-500 dark:text-neutral-400 leading-relaxed relative z-10 font-medium`}>
                     {description}
                 </p>
             </div>

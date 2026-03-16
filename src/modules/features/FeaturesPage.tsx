@@ -16,8 +16,6 @@ import { useModal } from '../../contexts/ModalContext';
 import { useGlobalUI } from '../../contexts/GlobalUIContext';
 import { ROUTES } from '../../constants';
 
-// ─── Types ────────────────────────────────────────────────────────────
-
 type Tier = 'all' | 'explorer' | 'plus' | 'pro';
 
 // ─── Icon Map ────────────────────────────────────────────────────────
@@ -69,15 +67,15 @@ export const FeaturesPage: React.FC = () => {
 
     const filtered = useMemo(() => {
         if (activeTier === 'all') return allFeatures;
-        const level = TIER_LEVEL[activeTier];
-        return allFeatures.filter(f => TIER_LEVEL[f.tier] <= level);
+        const level = TIER_LEVEL[activeTier as Exclude<Tier, 'all'>];
+        return allFeatures.filter((f: any) => TIER_LEVEL[f.tier as Exclude<Tier, 'all'>] <= level);
     }, [activeTier, allFeatures]);
 
     const counts = useMemo(() => ({
         all: allFeatures.length,
-        explorer: allFeatures.filter(f => TIER_LEVEL[f.tier] <= 0).length,
-        plus: allFeatures.filter(f => TIER_LEVEL[f.tier] <= 1).length,
-        pro: allFeatures.filter(f => TIER_LEVEL[f.tier] <= 2).length,
+        explorer: allFeatures.filter((f: any) => TIER_LEVEL[f.tier as Exclude<Tier, 'all'>] <= 0).length,
+        plus: allFeatures.filter((f: any) => TIER_LEVEL[f.tier as Exclude<Tier, 'all'>] <= 1).length,
+        pro: allFeatures.filter((f: any) => TIER_LEVEL[f.tier as Exclude<Tier, 'all'>] <= 2).length,
     }), [allFeatures]);
 
     return (
@@ -114,24 +112,25 @@ export const FeaturesPage: React.FC = () => {
                 className="max-w-6xl mx-auto mb-12"
             >
                 <div className="flex items-center justify-center">
-                    <div className="relative inline-flex p-1 rounded-full bg-neutral-100 dark:bg-neutral-900 border border-neutral-200/60 dark:border-neutral-800">
+                    <div className="flex items-center bg-white/80 dark:bg-neutral-900/80 p-1 rounded-[2.5rem] border border-neutral-200/60 dark:border-neutral-800/50 backdrop-blur-2xl shadow-[0_4px_24px_rgba(0,0,0,0.06)] dark:shadow-[0_8px_32px_rgba(0,0,0,0.4)]">
                         {filterTabs.map(tab => (
                             <button
                                 key={tab.key}
                                 onClick={() => setActiveTier(tab.key)}
-                                className="relative z-10 px-5 py-2 text-sm font-bold rounded-full transition-colors duration-200"
+                                className={`relative flex items-center gap-1.5 px-4 py-2 rounded-2xl text-[11px] md:text-xs font-bold transition-all duration-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500/50 cursor-pointer ${activeTier === tab.key
+                                    ? 'text-neutral-900 dark:text-white'
+                                    : 'text-neutral-500 hover:text-neutral-800 dark:text-neutral-400 dark:hover:text-neutral-200'
+                                    }`}
                             >
                                 {activeTier === tab.key && (
                                     <motion.div
                                         layoutId="features-filter-pill"
-                                        className="absolute inset-0 bg-white dark:bg-neutral-800 rounded-full shadow-sm"
-                                        transition={{ type: 'spring', bounce: 0.2, duration: 0.4 }}
+                                        className="absolute inset-0 bg-white/90 dark:bg-neutral-800/90 shadow-sm border border-white/50 dark:border-neutral-700/50 rounded-[2rem] z-0"
+                                        style={{ borderRadius: 32 }}
+                                        transition={{ type: "spring", bounce: 0, duration: 0.5 }}
                                     />
                                 )}
-                                <span className={`relative z-10 flex items-center gap-1.5 ${activeTier === tab.key
-                                    ? 'text-neutral-900 dark:text-white'
-                                    : 'text-neutral-400 hover:text-neutral-600 dark:hover:text-neutral-300'
-                                    }`}>
+                                <span className="relative z-10 flex items-center gap-1.5">
                                     {tab.label}
                                     <span className={`text-[10px] tabular-nums ${activeTier === tab.key ? 'text-neutral-400' : 'text-neutral-300 dark:text-neutral-600'}`}>
                                         {counts[tab.key]}

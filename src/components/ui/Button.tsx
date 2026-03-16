@@ -1,7 +1,7 @@
 import React from 'react';
 
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-    variant?: 'premium' | 'accent' | 'secondary' | 'ghost' | 'outline';
+    variant?: 'premium' | 'accent' | 'secondary' | 'ghost' | 'outline' | 'subtle';
     size?: 'xs' | 'sm' | 'md' | 'lg';
     loading?: boolean;
     icon?: React.ReactNode;
@@ -23,15 +23,16 @@ export const Button: React.FC<ButtonProps> = ({
         premium: "btn-premium",
         accent: "bg-indigo-600 text-white shadow-lg shadow-indigo-600/20 hover:shadow-indigo-600/40 hover:-translate-y-0.5",
         secondary: "bg-neutral-100/50 dark:bg-neutral-900/40 backdrop-blur-xl border border-neutral-200/50 dark:border-neutral-800 text-neutral-500 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white hover:bg-neutral-200/50 dark:hover:bg-neutral-800/50 hover:-translate-y-0.5",
+        subtle: "bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 text-neutral-500 hover:text-neutral-900 dark:hover:text-white hover:border-neutral-300 dark:hover:border-neutral-700 shadow-sm hover:shadow-md hover:-translate-y-0.5",
         ghost: "bg-transparent text-neutral-500 hover:text-neutral-900 dark:hover:text-white hover:bg-neutral-100 dark:hover:bg-neutral-800",
         outline: "bg-transparent border-2 border-accent-primary/30 text-accent-primary-hex hover:bg-accent-primary/5"
     };
 
     const sizes = {
-        xs: "px-2 h-7 text-[10px] rounded-lg font-black",
-        sm: "px-4 h-10 text-xs rounded-2xl font-black",
-        md: "px-5 h-12 text-sm rounded-2xl font-black",
-        lg: "px-8 h-16 text-lg rounded-2xl font-black"
+        xs: "px-3 h-7 text-[10px] rounded-full font-bold",
+        sm: "px-4 h-9 text-xs rounded-full font-bold",
+        md: "px-6 h-11 text-sm rounded-2xl font-bold",
+        lg: "px-8 h-14 text-lg rounded-2xl font-bold"
     };
 
     return (

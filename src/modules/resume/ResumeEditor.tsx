@@ -209,27 +209,24 @@ export const ResumeEditor: React.FC = () => {
                         <Button
                             onClick={() => fileInputRef.current?.click()}
                             disabled={isParsing}
-                            variant="secondary"
-                            size="sm"
-                            className="font-black"
+                            variant="subtle"
+                            size="xs"
                             icon={isParsing ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Upload className="w-3.5 h-3.5" />}
                         >
                             {isParsing ? 'Processing' : 'Import'}
                         </Button>
                         <Button
                             onClick={() => setIsPreviewOpen(true)}
-                            variant="secondary"
-                            size="sm"
-                            className="font-black"
+                            variant="subtle"
+                            size="xs"
                             icon={<FileText className="w-3.5 h-3.5" />}
                         >
                             Preview
                         </Button>
                         <Button
                             onClick={handlePrint}
-                            variant="secondary"
-                            size="sm"
-                            className="font-black"
+                            variant="subtle"
+                            size="xs"
                             icon={<Download className="w-3.5 h-3.5" />}
                         >
                             <span className="hidden sm:inline">Download</span>
@@ -312,13 +309,15 @@ export const ResumeEditor: React.FC = () => {
                                                 </h2>
                                             </div>
                                             {(section.type !== 'summary' || sectionBlocks.length === 0) && (
-                                                <button
+                                                <Button
                                                     onClick={() => addBlock(section.type)}
-                                                    className="flex items-center gap-1.5 px-3 py-1.5 bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 hover:border-indigo-200 dark:hover:border-indigo-800 text-neutral-500 hover:text-indigo-600 rounded-xl transition-all group/add shadow-sm hover:shadow-md"
+                                                    variant="subtle"
+                                                    size="xs"
+                                                    className="group/add"
+                                                    icon={<Plus className="w-3.5 h-3.5 group-hover/add:rotate-90 transition-transform duration-300" />}
                                                 >
-                                                    <Plus className="w-3.5 h-3.5 group-hover/add:rotate-90 transition-transform duration-300" />
-                                                    <span className="text-[10px] font-black tracking-tight">Add {section.label === 'Professional Summary' ? 'Summary' : 'Entry'}</span>
-                                                </button>
+                                                    Add {section.label === 'Professional Summary' ? 'Summary' : 'Entry'}
+                                                </Button>
                                             )}
                                         </div>
 
@@ -370,15 +369,16 @@ export const ResumeEditor: React.FC = () => {
                                 <h3 className="font-black text-xl text-neutral-900 dark:text-white">Preview</h3>
                             </div>
                             <div className="flex items-center gap-3">
-                                <Button onClick={handlePrint} variant="secondary" size="sm" icon={<Download className="w-3.5 h-3.5" />}>
+                                <Button onClick={handlePrint} variant="subtle" size="xs" icon={<Download className="w-3.5 h-3.5" />}>
                                     Download PDF
                                 </Button>
-                                <button
+                                <Button
                                     onClick={() => setIsPreviewOpen(false)}
-                                    className="p-2 text-neutral-400 hover:text-neutral-900 dark:hover:text-white hover:bg-neutral-100 dark:hover:bg-neutral-800 rounded-full transition-all"
-                                >
-                                    <X className="w-5 h-5" />
-                                </button>
+                                    variant="ghost"
+                                    size="xs"
+                                    className="p-2 w-9 h-9"
+                                    icon={<X className="w-5 h-5" />}
+                                />
                             </div>
                         </div>
                         <div className="flex-1 overflow-y-auto p-8 md:p-12 scrollbar-none">

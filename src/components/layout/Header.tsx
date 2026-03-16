@@ -1,5 +1,5 @@
 import React from 'react';
-import { TrendingUp, Briefcase, LogOut, Settings, Bookmark, Sparkles, FileText, Users, Target, GraduationCap, ShieldCheck, Sun, Moon, MessageSquare } from 'lucide-react';
+import { TrendingUp, Briefcase, LogOut, Settings, Bookmark, Sparkles, FileText, Users, Target, GraduationCap, ShieldCheck, Sun, Moon, MessageSquare, X } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { useUser } from '../../contexts/UserContext';
@@ -213,9 +213,9 @@ export const Header: React.FC = () => {
                             {isFocusedMode ? (
                                 <button
                                     onClick={handleExit}
-                                    className="group flex items-center gap-1.5 px-2 py-1.5 text-xs font-bold rounded-xl hover:bg-neutral-100 dark:hover:bg-neutral-800/80 transition-all text-neutral-500 dark:text-neutral-400 active:scale-95 cursor-pointer"
+                                    className="group flex items-center gap-1.5 px-2 py-1.5 text-xs font-bold rounded-xl hover:bg-neutral-100 dark:hover:bg-neutral-800/80 transition-all text-neutral-500 dark:text-neutral-400 cursor-pointer active:scale-95"
                                 >
-                                    <LogOut className="w-4 h-4 transition-transform group-hover:rotate-180" />
+                                    <X className="w-3.5 h-3.5 transition-transform group-hover:rotate-90" />
                                     <span className="tracking-wider">Exit</span>
                                 </button>
                             ) : (

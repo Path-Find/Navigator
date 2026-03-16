@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
 import { supabase } from '../../services/supabase';
 import { checkInterviewLimit } from '../../services/usageLimits';
 import { useToast } from '../../contexts/ToastContext';
@@ -9,15 +10,19 @@ import { useInterview } from './hooks/useInterview';
 import { computeSnippets } from './utils/interviewUtils';
 import { InterviewSelection } from './components/InterviewSelection';
 import { InterviewSessionScreen } from './components/InterviewSessionScreen';
+import { ROUTES } from '../../constants';
 
 export const InterviewAdvisor: React.FC = () => {
     const { jobs } = useJobContext();
+    const { type } = useParams<{ type: string }>();
+    const navigate = useNavigate();
     const {
         questions,
         currentQuestionIndex,
         currentQuestion,
         responses,
         isLoading,
+        error,
         loadGeneralQuestions,
         loadTailoredQuestions,
         submitResponse,
@@ -28,12 +33,47 @@ export const InterviewAdvisor: React.FC = () => {
     const { resumes, handleUpdateResume } = useResumeContext();
 
     const [mode, setMode] = useState<'selection' | 'session'>('selection');
+    const [sessionType, setSessionType] = useState<'general' | 'tailored' | null>(null);
     const [selectedJobId, setSelectedJobId] = useState<string | null>(null);
     const [userResponse, setUserResponse] = useState('');
     const [limitError, setLimitError] = useState<string | null>(null);
 
-    const { isFocusedMode, setFocusedMode } = useGlobalUI();
+    const { setFocusedMode } = useGlobalUI();
     const { showError } = useToast();
+
+    // Sync state with URL
+    useEffect(() => {
+        if (type === 'general' || type === 'tailored') {
+            const startSession = async () => {
+                const { data: { user } } = await supabase.auth.getUser();
+                if (!user) {
+                    showError(`Please sign in to start a ${type} session`);
+                    navigate(ROUTES.INTERVIEWS);
+                    return;
+                }
+
+                const limit = await checkInterviewLimit(user.id);
+                if (!limit.allowed) {
+                    setLimitError(`Monthly interview limit reached (${limit.used}/${limit.limit})`);
+                    navigate(ROUTES.INTERVIEWS);
+                    return;
+                }
+
+                setSessionType(type as 'general' | 'tailored');
+                setMode('session');
+                
+                if (type === 'general') {
+                    setResumeSnippets(computeSnippets(resumes));
+                    loadGeneralQuestions(resumes);
+                }
+            };
+            startSession();
+        } else {
+            setMode('selection');
+            setSessionType(null);
+            setSelectedJobId(null);
+        }
+    }, [type, navigate, resumes, loadGeneralQuestions, showError]);
 
     useEffect(() => {
         if (mode === 'session') {
@@ -44,58 +84,64 @@ export const InterviewAdvisor: React.FC = () => {
         return () => setFocusedMode(false);
     }, [mode, setFocusedMode]);
 
-    // Reset mode if focused mode is disabled externally (e.g., from Header 'Exit')
+    // Handle API errors during interview loading
     useEffect(() => {
-        if (mode === 'session' && !isFocusedMode) {
-            setTimeout(() => setMode('selection'), 0);
+        if (error) {
+            showError(error);
+            navigate(ROUTES.INTERVIEWS);
         }
-    }, [mode, isFocusedMode]);
+    }, [error, showError, navigate]);
 
     const [resumeSnippets, setResumeSnippets] = useState<{ text: string; source: string }[]>([]);
 
     const handleStartTailored = async () => {
-        const { data: { user } } = await supabase.auth.getUser();
-        if (!user) return;
-
-        const limit = await checkInterviewLimit(user.id);
-        if (!limit.allowed) {
-            setLimitError(`Monthly interview limit reached (${limit.used}/${limit.limit})`);
-            return;
-        }
-
-        const job = jobs.find(j => j.id === selectedJobId);
-        if (job) {
-            setResumeSnippets(computeSnippets(resumes));
-            loadTailoredQuestions(job, resumes);
-            setMode('session');
-        } else {
-            showError("Please select a target job first");
-        }
+        navigate(`${ROUTES.INTERVIEWS}/tailored`);
     };
 
     const handleStartGeneral = async () => {
-        const { data: { user } } = await supabase.auth.getUser();
-        if (!user) return;
+        navigate(`${ROUTES.INTERVIEWS}/general`);
+    };
 
-        const limit = await checkInterviewLimit(user.id);
-        if (!limit.allowed) {
-            setLimitError(`Monthly interview limit reached (${limit.used}/${limit.limit})`);
-            return;
+    const handleJobSelected = (jobId: string) => {
+        setSelectedJobId(jobId);
+        const job = jobs.find(j => j.id === jobId);
+        if (job) {
+            setResumeSnippets(computeSnippets(resumes));
+            loadTailoredQuestions(job, resumes);
         }
-
-        setResumeSnippets(computeSnippets(resumes));
-        loadGeneralQuestions(resumes);
-        setMode('session');
     };
 
     const handleSubmit = async () => {
         if (!userResponse.trim()) return;
+
+        // If we are in tailored mock but haven't selected a job yet
+        if (sessionType === 'tailored' && !selectedJobId) {
+            const query = userResponse.toLowerCase().trim();
+            const matchedJob = jobs.find(j => 
+                j.analysis && (
+                    j.position.toLowerCase().includes(query) || 
+                    j.company.toLowerCase().includes(query)
+                )
+            );
+
+            if (matchedJob) {
+                handleJobSelected(matchedJob.id);
+                setUserResponse('');
+            } else {
+                showError("I couldn't find a job matching that. Please select from the suggestions or type a position name.");
+            }
+            return;
+        }
+
         const job = jobs.find(j => j.id === selectedJobId);
         await submitResponse(currentQuestion.id, userResponse, job);
         setUserResponse('');
     };
 
-    const isSessionLoading = mode === 'session' && questions.length === 0 && isLoading;
+    const isSessionLoading = mode === 'session' && sessionType && (
+        (sessionType === 'general' && questions.length === 0 && isLoading) ||
+        (sessionType === 'tailored' && selectedJobId && questions.length === 0 && isLoading)
+    );
 
     if (mode === 'session') {
         return <InterviewSessionScreen
@@ -103,9 +149,13 @@ export const InterviewAdvisor: React.FC = () => {
             currentQuestionIndex={currentQuestionIndex}
             responses={responses}
             mode={mode}
+            sessionType={sessionType}
+            jobs={jobs}
+            selectedJobId={selectedJobId}
+            onJobSelected={handleJobSelected}
             resumes={resumes}
             resumeSnippets={resumeSnippets}
-            isSessionLoading={isSessionLoading}
+            isSessionLoading={!!isSessionLoading}
             isLoading={isLoading}
             userResponse={userResponse}
             setUserResponse={setUserResponse}
@@ -120,9 +170,6 @@ export const InterviewAdvisor: React.FC = () => {
         limitError={limitError}
         handleStartGeneral={handleStartGeneral}
         handleStartTailored={handleStartTailored}
-        selectedJobId={selectedJobId}
-        setSelectedJobId={setSelectedJobId}
-        jobs={jobs}
     />;
 };
 

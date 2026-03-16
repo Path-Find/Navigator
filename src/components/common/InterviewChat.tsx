@@ -14,6 +14,13 @@ export interface ChatMessage {
     };
     feedback?: string;
     metadata?: React.ReactNode;
+    suggestionPills?: {
+        id: string;
+        label: string;
+        sublabel?: string;
+        onClick: () => void;
+    }[];
+    isThinking?: boolean;
 }
 
 interface InterviewChatProps {
@@ -28,6 +35,7 @@ interface InterviewChatProps {
     onNext?: () => void;
     inputDisabled?: boolean;
     accentGradient?: string;
+    hideInput?: boolean;
 }
 
 export const InterviewChat: React.FC<InterviewChatProps> = ({
@@ -41,7 +49,8 @@ export const InterviewChat: React.FC<InterviewChatProps> = ({
     showNextButton = false,
     onNext,
     inputDisabled = false,
-    accentGradient = "from-indigo-600 to-violet-600"
+    accentGradient = "from-indigo-600 to-violet-600",
+    hideInput = false
 }) => {
     const scrollRef = useRef<HTMLDivElement>(null);
 
@@ -61,32 +70,16 @@ export const InterviewChat: React.FC<InterviewChatProps> = ({
     };
 
     return (
-        <div className="flex flex-col h-[600px] w-full max-w-4xl mx-auto rounded-[2.5rem] bg-white/40 dark:bg-neutral-900/40 backdrop-blur-xl border border-white/20 dark:border-neutral-800 shadow-2xl overflow-hidden ring-1 ring-black/5 dark:ring-white/5">
-            {/* Header */}
-            <div className="px-8 py-6 border-b border-white/10 dark:border-neutral-800 flex items-center justify-between bg-white/20 dark:bg-neutral-950/20">
-                <div className="flex items-center gap-4">
-                    <div className={`w-12 h-12 rounded-2xl bg-gradient-to-br ${accentGradient} flex items-center justify-center shadow-lg shadow-indigo-500/20 transform -rotate-6`}>
-                        <Sparkles className="w-6 h-6 text-white" />
-                    </div>
-                    <div>
-                        <h3 className="text-lg font-black text-neutral-900 dark:text-white tracking-tight">AI Interview Advisor</h3>
-                        <div className="flex items-center gap-2">
-                            <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                            <span className="text-[10px] uppercase tracking-widest font-black text-emerald-500/80">Active Session</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
+        <div className="flex flex-col h-full w-full max-w-4xl mx-auto overflow-hidden">
             {/* Message Area */}
             <div
                 ref={scrollRef}
-                className="flex-1 overflow-y-auto p-8 space-y-8 scroll-smooth custom-scrollbar"
+                className="flex-1 overflow-y-auto px-4 py-8 space-y-6 scroll-smooth custom-scrollbar"
             >
                 {messages.length === 0 && !isThinking && (
                     <div className="h-full flex flex-col items-center justify-center text-center opacity-40">
                         <MessageSquare className="w-12 h-12 mb-4" />
-                        <p className="font-bold text-sm uppercase tracking-widest text-neutral-400">Waiting for first question...</p>
+                        <p className="font-bold text-sm tracking-widest text-neutral-400">Waiting for first question...</p>
                     </div>
                 )}
 
@@ -98,20 +91,42 @@ export const InterviewChat: React.FC<InterviewChatProps> = ({
                             animate={{ opacity: 1, y: 0, scale: 1 }}
                             className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
                         >
-                            <div className={`flex gap-4 max-w-[85%] ${msg.role === 'user' ? 'flex-row-reverse' : 'flex-row'}`}>
-                                <div className={`w-10 h-10 rounded-xl shrink-0 flex items-center justify-center shadow-md ${msg.role === 'ai'
+                            <div className={`flex gap-3 max-w-[90%] ${msg.role === 'user' ? 'flex-row-reverse' : 'flex-row'}`}>
+                                <div className={`w-8 h-8 rounded-lg shrink-0 flex items-center justify-center shadow-md ${msg.role === 'ai'
                                     ? `bg-gradient-to-br ${accentGradient} text-white`
                                     : 'bg-neutral-100 dark:bg-neutral-800 text-neutral-500 dark:text-neutral-400'
                                     }`}>
-                                    {msg.role === 'ai' ? <Sparkles className="w-5 h-5" /> : <User className="w-5 h-5" />}
+                                    {msg.role === 'ai' ? <Sparkles className="w-4 h-4" /> : <User className="w-4 h-4" />}
                                 </div>
-                                <div className="space-y-2">
-                                    <div className={`rounded-2xl px-6 py-4 shadow-sm relative overflow-hidden ${msg.role === 'ai'
+                                <div className="space-y-3">
+                                    <div className={`rounded-2xl px-4 py-3 shadow-sm relative overflow-hidden ${msg.role === 'ai'
                                         ? 'bg-white dark:bg-neutral-800 text-neutral-900 dark:text-white rounded-tl-none border border-neutral-100 dark:border-neutral-700'
                                         : `bg-gradient-to-br ${accentGradient} text-white rounded-tr-none shadow-lg shadow-indigo-500/10`
                                         }`}>
-                                        <p className="text-[15px] font-medium leading-relaxed whitespace-pre-wrap">{msg.content}</p>
+                                        <p className="text-sm font-medium leading-relaxed whitespace-pre-wrap">{msg.content}</p>
                                     </div>
+
+                                    {/* Suggestion Pills */}
+                                    {msg.suggestionPills && (
+                                        <div className="flex flex-wrap gap-2 pt-2">
+                                            {msg.suggestionPills.map((pill) => (
+                                                <button
+                                                    key={pill.id}
+                                                    onClick={pill.onClick}
+                                                    className="flex flex-col items-start px-3.5 py-1.5 bg-white dark:bg-neutral-900 border border-neutral-100 dark:border-neutral-800 rounded-xl hover:border-indigo-500 dark:hover:border-indigo-500/50 shadow-sm transition-all group"
+                                                >
+                                                    <span className="text-[11px] font-bold text-neutral-700 dark:text-neutral-200 group-hover:text-indigo-600 dark:group-hover:text-indigo-400">
+                                                        {pill.label}
+                                                    </span>
+                                                    {pill.sublabel && (
+                                                        <span className="text-[9px] text-neutral-400 dark:text-neutral-500">
+                                                            {pill.sublabel}
+                                                        </span>
+                                                    )}
+                                                </button>
+                                            ))}
+                                        </div>
+                                    )}
 
                                     {/* Render optional metadata/extra content */}
                                     {msg.metadata}
@@ -125,7 +140,7 @@ export const InterviewChat: React.FC<InterviewChatProps> = ({
                                         >
                                             <div className="flex items-center gap-2 mb-2">
                                                 <Sparkles className="w-3.5 h-3.5 text-orange-500" />
-                                                <span className="text-[10px] uppercase tracking-widest font-black text-orange-500">Coach Insight</span>
+                                                <span className="text-[10px] tracking-widest font-black text-orange-500">Coach Insight</span>
                                             </div>
                                             <p className="text-xs font-bold text-neutral-600 dark:text-neutral-400 leading-relaxed italic">
                                                 "{msg.feedback}"
@@ -138,7 +153,7 @@ export const InterviewChat: React.FC<InterviewChatProps> = ({
                                         <div className="flex gap-2 mt-2">
                                             {Object.entries(msg.metrics).map(([key, val]) => (
                                                 <div key={key} className="px-3 py-1 bg-neutral-100 dark:bg-neutral-800/50 rounded-full flex items-center gap-1.5 border border-neutral-200 dark:border-neutral-700">
-                                                    <span className="text-[9px] uppercase tracking-widest font-black text-neutral-400 dark:text-neutral-500">{key}</span>
+                                                    <span className="text-[9px] tracking-widest font-black text-neutral-400 dark:text-neutral-500">{key}</span>
                                                     <span className="text-[10px] font-black text-neutral-700 dark:text-neutral-200">{val}%</span>
                                                 </div>
                                             ))}
@@ -156,17 +171,16 @@ export const InterviewChat: React.FC<InterviewChatProps> = ({
                         animate={{ opacity: 1, y: 0 }}
                         className="flex justify-start"
                     >
-                        <div className="flex gap-4">
-                            <div className={`w-10 h-10 rounded-xl bg-gradient-to-br ${accentGradient} text-white flex items-center justify-center animate-pulse`}>
-                                <Sparkles className="w-5 h-5" />
+                        <div className="flex gap-3">
+                            <div className={`w-8 h-8 rounded-lg bg-gradient-to-br ${accentGradient} text-white flex items-center justify-center animate-pulse`}>
+                                <Sparkles className="w-4 h-4" />
                             </div>
-                            <div className="bg-white dark:bg-neutral-800 p-4 rounded-2xl rounded-tl-none border border-neutral-100 dark:border-neutral-700 shadow-sm flex items-center gap-2">
-                                <div className="flex gap-1">
-                                    <div className="w-1.5 h-1.5 rounded-full bg-neutral-300 animate-bounce [animation-delay:-0.3s]" />
-                                    <div className="w-1.5 h-1.5 rounded-full bg-neutral-300 animate-bounce [animation-delay:-0.15s]" />
-                                    <div className="w-1.5 h-1.5 rounded-full bg-neutral-300 animate-bounce" />
+                            <div className="bg-white dark:bg-neutral-800 p-3 rounded-xl rounded-tl-none border border-neutral-100 dark:border-neutral-700 shadow-sm flex items-center">
+                                <div className="flex gap-1.5">
+                                    <div className="w-1.5 h-1.5 rounded-full bg-indigo-400 animate-bounce [animation-delay:-0.3s]" />
+                                    <div className="w-1.5 h-1.5 rounded-full bg-indigo-400 animate-bounce [animation-delay:-0.15s]" />
+                                    <div className="w-1.5 h-1.5 rounded-full bg-indigo-400 animate-bounce" />
                                 </div>
-                                <span className="text-[11px] font-black uppercase tracking-widest text-neutral-400 ml-2">Advisor is thinking...</span>
                             </div>
                         </div>
                     </motion.div>
@@ -174,56 +188,53 @@ export const InterviewChat: React.FC<InterviewChatProps> = ({
             </div>
 
             {/* Input Area */}
-            <div className="p-8 bg-white/30 dark:bg-neutral-950/30 border-t border-white/10 dark:border-neutral-800">
-                <div className="relative group">
-                    <div className="absolute inset-0 bg-gradient-to-r from-indigo-500/5 to-violet-500/5 rounded-[2rem] blur-xl opacity-0 group-focus-within:opacity-100 transition-opacity" />
-                    <div className="relative flex flex-col gap-4">
-                        <div className="relative">
-                            <textarea
-                                value={inputValue}
-                                onChange={(e) => onInputChange(e.target.value)}
-                                onKeyDown={handleKeyDown}
-                                disabled={inputDisabled}
-                                placeholder={placeholder}
-                                className="w-full bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-700 rounded-[2rem] p-6 pr-24 text-neutral-900 dark:text-white font-medium placeholder:text-neutral-400 focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500/30 transition-all resize-none shadow-sm min-h-[140px] leading-relaxed"
-                            />
+            {!hideInput && (
+                <div className="p-4 bg-transparent">
+                    <div className="relative group">
+                        <div className="absolute inset-0 bg-gradient-to-r from-indigo-500/5 to-violet-500/5 rounded-[2rem] blur-xl opacity-0 group-focus-within:opacity-100 transition-opacity" />
+                        <div className="relative flex flex-col gap-4">
+                            <div className="relative">
+                                <textarea
+                                    value={inputValue}
+                                    onChange={(e) => onInputChange(e.target.value)}
+                                    onKeyDown={handleKeyDown}
+                                    disabled={inputDisabled}
+                                    placeholder={placeholder}
+                                    className="w-full bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-700 rounded-3xl p-4 pr-20 text-sm text-neutral-900 dark:text-white font-medium placeholder:text-neutral-400 focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500/30 transition-all shadow-sm min-h-[80px] leading-relaxed"
+                                />
 
-                            <div className="absolute right-4 bottom-4 flex items-center gap-3">
-                                {inputValue.length > 0 && (
-                                    <span className="text-[10px] font-black text-neutral-400 uppercase tracking-widest">
-                                        {inputValue.length} characters
-                                    </span>
+                                <div className="absolute right-2.5 bottom-2.5 flex items-center gap-3">
+                                    <button
+                                        onClick={onSubmit}
+                                        disabled={!inputValue.trim() || inputDisabled}
+                                        className="w-9 h-9 rounded-full flex items-center justify-center transition-all disabled:opacity-30 bg-indigo-600 hover:bg-indigo-700 text-white shadow-lg shadow-indigo-500/20 active:scale-95"
+                                    >
+                                        <Send className="w-4 h-4" />
+                                    </button>
+                                </div>
+                            </div>
+
+                            <div className="flex items-center justify-between px-6">
+                                <div className="flex items-center gap-3">
+                                    <span className="text-[10px] font-bold text-neutral-400/80 tracking-tight">{inputHint}</span>
+                                </div>
+
+                                {showNextButton && (
+                                    <motion.button
+                                        initial={{ opacity: 0, x: 20 }}
+                                        animate={{ opacity: 1, x: 0 }}
+                                        onClick={onNext}
+                                        className={`flex items-center gap-2 px-6 py-2 bg-gradient-to-r ${accentGradient} text-white rounded-full text-xs font-black tracking-widest shadow-lg shadow-indigo-500/20 active:scale-95 transition-all`}
+                                    >
+                                        <span>Next Question</span>
+                                        <ArrowRight className="w-3.5 h-3.5" />
+                                    </motion.button>
                                 )}
-                                <button
-                                    onClick={onSubmit}
-                                    disabled={!inputValue.trim() || inputDisabled}
-                                    className={`w-12 h-12 rounded-2xl flex items-center justify-center transition-all shadow-xl disabled:opacity-30 disabled:shadow-none hover:scale-110 active:scale-95 bg-gradient-to-r ${accentGradient} text-white shadow-indigo-500/20`}
-                                >
-                                    <Send className="w-5 h-5" />
-                                </button>
                             </div>
-                        </div>
-
-                        <div className="flex items-center justify-between px-4">
-                            <div className="flex items-center gap-3">
-                                <span className="text-[10px] uppercase font-black tracking-widest text-neutral-400/80">{inputHint}</span>
-                            </div>
-
-                            {showNextButton && (
-                                <motion.button
-                                    initial={{ opacity: 0, x: 20 }}
-                                    animate={{ opacity: 1, x: 0 }}
-                                    onClick={onNext}
-                                    className={`flex items-center gap-2 px-6 py-2 bg-gradient-to-r ${accentGradient} text-white rounded-full text-xs font-black uppercase tracking-widest shadow-lg shadow-indigo-500/20 active:scale-95 transition-all`}
-                                >
-                                    <span>Next Question</span>
-                                    <ArrowRight className="w-3.5 h-3.5" />
-                                </motion.button>
-                            )}
                         </div>
                     </div>
                 </div>
-            </div>
+            )}
         </div>
     );
 };

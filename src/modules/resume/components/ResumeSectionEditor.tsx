@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import type { ExperienceBlock } from '../types';
 import type { SectionType } from '../constants';
 import { Card } from '../../../components/ui/Card';
+import { Button } from '../../../components/ui/Button';
 
 interface ResumeSectionEditorProps {
     block: ExperienceBlock;
@@ -139,33 +140,36 @@ export const ResumeSectionEditor: React.FC<ResumeSectionEditorProps> = ({
                                     <div className="opacity-0 group-hover/line:opacity-100 flex items-center gap-0.5 no-print">
                                         {block.bullets.length > 1 && (
                                             <>
-                                                <button
+                                                <Button
                                                     onClick={() => onMoveBullet(block.id, idx, 'up')}
                                                     disabled={idx === 0}
-                                                    className="p-1 text-neutral-300 hover:text-indigo-600 hover:bg-indigo-50 dark:hover:bg-indigo-900/20 rounded transition-all disabled:opacity-0"
+                                                    variant="ghost"
+                                                    size="xs"
+                                                    className="w-6 h-6 p-0 hover:text-indigo-600 hover:bg-indigo-50 dark:hover:bg-indigo-900/20 disabled:opacity-0"
                                                     title="Move Up"
-                                                >
-                                                    <ChevronUp className="w-3 h-3" />
-                                                </button>
-                                                <button
+                                                    icon={<ChevronUp className="w-3 h-3" />}
+                                                />
+                                                <Button
                                                     onClick={() => onMoveBullet(block.id, idx, 'down')}
                                                     disabled={idx === block.bullets.length - 1}
-                                                    className="p-1 text-neutral-300 hover:text-indigo-600 hover:bg-indigo-50 dark:hover:bg-indigo-900/20 rounded transition-all disabled:opacity-0"
+                                                    variant="ghost"
+                                                    size="xs"
+                                                    className="w-6 h-6 p-0 hover:text-indigo-600 hover:bg-indigo-50 dark:hover:bg-indigo-900/20 disabled:opacity-0"
                                                     title="Move Down"
-                                                >
-                                                    <ChevronDown className="w-3 h-3" />
-                                                </button>
+                                                    icon={<ChevronDown className="w-3 h-3" />}
+                                                />
                                             </>
                                         )}
                                         {block.type !== 'summary' && (
-                                            <button
+                                            <Button
                                                 onClick={() => onRemoveBullet(block.id, idx)}
-                                                className="p-1 text-neutral-200 hover:text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-900/20 rounded transition-all"
+                                                variant="ghost"
+                                                size="xs"
+                                                className="w-6 h-6 p-0 text-neutral-200 hover:text-rose-500 hover:bg-rose-50 dark:hover:bg-rose-900/20"
                                                 title="Remove Line"
                                                 tabIndex={-1}
-                                            >
-                                                <Trash2 className="w-3.5 h-3.5" />
-                                            </button>
+                                                icon={<Trash2 className="w-3.5 h-3.5" />}
+                                            />
                                         )}
                                     </div>
                                 </div>
@@ -174,25 +178,26 @@ export const ResumeSectionEditor: React.FC<ResumeSectionEditorProps> = ({
 
                         {block.type !== 'summary' && (
                             <div className="mt-6 flex items-center gap-3 no-print h-9">
-                                <button
+                                <Button
                                     onClick={() => onAddBullet(block.id)}
-                                    className="px-3 py-1.5 bg-white dark:bg-neutral-900 border border-neutral-100 dark:border-neutral-800 hover:border-indigo-200 dark:hover:border-indigo-900/50 text-neutral-500 hover:text-indigo-600 rounded-xl transition-all shadow-sm hover:shadow-md active:scale-95 group/add flex items-center gap-1.5"
+                                    variant="subtle"
+                                    size="xs"
+                                    className="group/add"
+                                    icon={<Plus className="w-3.5 h-3.5 group-hover/add:rotate-90 transition-transform duration-300" />}
                                 >
-                                    <Plus className="w-3.5 h-3.5 group-hover/add:rotate-90 transition-transform duration-300" />
-                                    <span className="text-[10px] font-black tracking-tight">Add Line</span>
-                                </button>
+                                    Add Line
+                                </Button>
 
                                 <div className="flex items-center gap-1 group/move relative h-full">
-                                    <button
+                                    <Button
                                         onClick={() => onSetMovingBlockId(movingBlockId === block.id ? null : block.id)}
-                                        className={`px-3 py-1.5 rounded-xl transition-all flex items-center gap-2 border shadow-lg relative z-20 active:scale-95 ${movingBlockId === block.id
-                                            ? 'bg-neutral-900 border-neutral-900 dark:bg-white dark:border-white text-white dark:text-neutral-900'
-                                            : 'bg-white dark:bg-neutral-900 border-neutral-100 dark:border-neutral-800 text-neutral-500 hover:text-indigo-600 hover:border-indigo-100 dark:hover:border-indigo-900/50'}`}
-                                        title="Move to Section"
+                                        variant={movingBlockId === block.id ? "accent" : "subtle"}
+                                        size="xs"
+                                        className="relative z-20"
+                                        icon={<ArrowRightLeft className="w-3.5 h-3.5" />}
                                     >
-                                        <ArrowRightLeft className="w-3.5 h-3.5" />
-                                        <span className="text-[10px] font-black tracking-tight">Move</span>
-                                    </button>
+                                        Move
+                                    </Button>
 
                                     <AnimatePresence>
                                         {movingBlockId === block.id && (
@@ -236,13 +241,13 @@ export const ResumeSectionEditor: React.FC<ResumeSectionEditorProps> = ({
                                     </AnimatePresence>
                                 </div>
 
-                                <button
+                                <Button
                                     onClick={() => onRemoveBlock(block.id)}
-                                    className="p-2 bg-white dark:bg-neutral-900 border border-neutral-100 dark:border-neutral-800 hover:border-rose-200 dark:hover:border-rose-900/50 text-neutral-300 hover:text-rose-500 rounded-xl transition-all shadow-sm hover:shadow-md ml-auto active:scale-95"
-                                    title="Delete Block"
-                                >
-                                    <Trash2 className="w-4 h-4" />
-                                </button>
+                                    variant="subtle"
+                                    size="xs"
+                                    className="ml-auto text-rose-500 hover:text-rose-600 hover:border-rose-200 dark:hover:border-rose-800"
+                                    icon={<Trash2 className="w-4 h-4" />}
+                                />
                             </div>
                         )}
                     </div>

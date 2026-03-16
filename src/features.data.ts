@@ -9,7 +9,7 @@ export const FEATURE_REGISTRY: Record<string, FeatureDefinition> = {
         releaseDate: '2024-11-01', // No longer "New"
         description: {
             short: 'Instant 0–100 compatibility rating.',
-            full: 'Paste any job posting and see how you match based on your full profile—including your resume, skills, and academic transcript. Get a 0–100 score plus a detailed breakdown.',
+            full: 'Get an instant 0–100 compatibility score and detailed fit analysis for any job posting based on your resume, skills, and transcript.',
             plan: 'Simple match quality ratings for every role',
         },
         action: { short: 'View Match', full: 'View Match' },
@@ -30,7 +30,7 @@ export const FEATURE_REGISTRY: Record<string, FeatureDefinition> = {
         shortName: 'Safety',
         description: {
             short: 'Flags AI-banned postings automatically.',
-            full: 'Some employers ban AI-assisted applications. Navigator flags those postings automatically so you know before you submit.',
+            full: 'Navigator automatically flags job postings that actively ban AI-assisted applications so you know before you even decide to apply.',
             plan: 'Automatic AI-ban detection on job postings',
         },
         action: { short: 'Scan', full: 'Scan' },
@@ -234,7 +234,7 @@ export const FEATURE_REGISTRY: Record<string, FeatureDefinition> = {
         shortName: 'Mock Interview',
         description: {
             short: 'Realistic mock interviews with scoring.',
-            full: 'Run realistic mock interviews for a specific job or general prep. Get scored in real time with smart, adaptive follow-up questions.',
+            full: 'Practice with realistic mock interviews tailored precisely to any job. Answer adaptive questions and get scored in real time.',
             plan: 'AI-powered mock interviews with scoring',
         },
         action: { short: 'Practice', full: 'Practice' },

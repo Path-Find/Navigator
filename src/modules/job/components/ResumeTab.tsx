@@ -60,12 +60,14 @@ export const ResumeTab: React.FC<ResumeTabProps> = ({
                                 Upgrade to rewrite every bullet for this specific role — this is what the trial was building toward.
                             </p>
                         </div>
-                        <button
+                        <Button
                             onClick={() => openModal('UPGRADE', { initialView: 'upgrade' })}
-                            className="shrink-0 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-xl transition-all shadow-md shadow-indigo-500/20 active:scale-95"
+                            variant="accent"
+                            size="sm"
+                            className="shrink-0 text-xs shadow-md shadow-indigo-500/20"
                         >
                             Upgrade
-                        </button>
+                        </Button>
                     </div>
                 )}
                 {userTier !== 'free' && (
@@ -75,7 +77,7 @@ export const ResumeTab: React.FC<ResumeTabProps> = ({
                             <Button
                                 onClick={handleGenerateSummary}
                                 disabled={generatingSummary}
-                                variant="secondary"
+                                variant="subtle"
                                 size="xs"
                                 className="text-[9px]"
                                 icon={generatingSummary ? <Loader2 className="w-3 h-3 animate-spin" /> : <Sparkles className="w-3 h-3" />}
@@ -118,19 +120,21 @@ export const ResumeTab: React.FC<ResumeTabProps> = ({
                                         {showTailor && (
                                             <div className="flex items-start gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
                                                 {tailoredBullets && (
-                                                    <button
+                                                    <Button
                                                         onClick={() => handleResetBlock(block.id)}
-                                                        className="text-[9px] font-bold text-neutral-400 hover:text-neutral-600 bg-neutral-50 dark:bg-neutral-800 px-2 py-1 rounded-md transition-all"
+                                                        variant="ghost"
+                                                        size="xs"
+                                                        className="h-7 text-[10px] bg-neutral-50 dark:bg-neutral-800"
                                                         title="Reset to original"
                                                     >
                                                         Reset
-                                                    </button>
+                                                    </Button>
                                                 )}
                                                 {userTier !== 'free' && (
                                                     <Button
                                                         onClick={() => handleHyperTailor(block)}
                                                         disabled={isTailoring || !!bulkTailoringProgress || (job.tailorCounts?.[block.id] || 0) >= RESUME_TAILORING.MAX_TAILORS_PER_BLOCK}
-                                                        variant="secondary"
+                                                        variant="subtle"
                                                         size="xs"
                                                         className="text-[9px] h-7"
                                                         icon={isTailoring ? <Loader2 className="w-3 h-3 animate-spin" /> : <Sparkles className="w-3 h-3" />}
@@ -179,7 +183,7 @@ export const ResumeTab: React.FC<ResumeTabProps> = ({
                                                         <Button
                                                             onClick={() => handleBulkTailor(allTailorableBlocks)}
                                                             disabled={!!bulkTailoringProgress || !!tailoringBlockId}
-                                                            variant="secondary"
+                                                            variant="subtle"
                                                             size="xs"
                                                             className="text-[9px]"
                                                             icon={bulkTailoringProgress ? <Loader2 className="w-3 h-3 animate-spin" /> : <Sparkles className="w-3 h-3" />}
@@ -190,7 +194,7 @@ export const ResumeTab: React.FC<ResumeTabProps> = ({
                                                     <Button
                                                         onClick={handleCopyResume}
                                                         disabled={generating}
-                                                        variant="secondary"
+                                                        variant="subtle"
                                                         size="xs"
                                                         className="text-[9px]"
                                                         icon={generating ? <Loader2 className="w-3 h-3 animate-spin" /> : <Copy className="w-3 h-3" />}

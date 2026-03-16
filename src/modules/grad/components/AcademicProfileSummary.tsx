@@ -44,13 +44,10 @@ export const AcademicProfileSummary: React.FC<AcademicProfileSummaryProps> = ({
                 <div className="relative z-10">
                     <div className="flex items-center gap-5 mb-6">
                         <div className="w-16 h-16 bg-amber-500 rounded-2xl flex items-center justify-center text-white shadow-lg shadow-amber-500/20 transform group-hover:scale-110 transition-transform duration-500">
-                            <span className="text-2xl font-black">{transcript.studentName?.charAt(0) || transcript.university?.charAt(0) || 'U'}</span>
+                            <span className="text-2xl font-bold">{transcript.studentName?.charAt(0) || transcript.university?.charAt(0) || 'U'}</span>
                         </div>
                         <div>
-                            <div className="text-[10px] font-black uppercase tracking-[0.2em] text-amber-600 mb-1">Academic Profile</div>
-                            <h2 className="text-2xl font-black tracking-tight text-neutral-900 dark:text-white">
-                                {transcript.studentName || 'Student Name'}
-                            </h2>
+                            <div className="text-xs font-bold text-amber-600 mb-1">Academic Profile</div>
                         </div>
                     </div>
 
@@ -85,13 +82,13 @@ export const AcademicProfileSummary: React.FC<AcademicProfileSummaryProps> = ({
                             <div className="flex gap-2 pt-2">
                                 <button
                                     onClick={handleSave}
-                                    className="flex-1 px-4 py-3 bg-amber-500 text-white rounded-xl text-xs font-black uppercase tracking-widest hover:bg-amber-600 transition-all shadow-md shadow-amber-500/10 active:scale-[0.98]"
+                                    className="flex-1 px-4 py-3 bg-amber-500 text-white rounded-xl text-xs font-black tracking-widest hover:bg-amber-600 transition-all shadow-md shadow-amber-500/10 active:scale-[0.98]"
                                 >
                                     Save Profile
                                 </button>
                                 <button
                                     onClick={() => setIsEditing(false)}
-                                    className="px-4 py-3 bg-neutral-200 dark:bg-neutral-800 text-neutral-600 dark:text-neutral-400 rounded-xl text-xs font-black uppercase tracking-widest hover:bg-neutral-300 dark:hover:bg-neutral-750 transition-colors"
+                                    className="px-4 py-3 bg-neutral-200 dark:bg-neutral-800 text-neutral-600 dark:text-neutral-400 rounded-xl text-xs font-black tracking-widest hover:bg-neutral-300 dark:hover:bg-neutral-750 transition-colors"
                                 >
                                     Cancel
                                 </button>
@@ -110,7 +107,7 @@ export const AcademicProfileSummary: React.FC<AcademicProfileSummaryProps> = ({
                             <div className="flex items-center gap-3">
                                 <span className="text-neutral-900 dark:text-white text-lg font-bold">{transcript.university || 'Add University'}</span>
                                 <div className="opacity-0 group-hover/edit:opacity-100 transition-opacity">
-                                    <div className="bg-amber-100 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400 text-[8px] font-black uppercase px-2 py-0.5 rounded-full">Edit</div>
+                                    <div className="bg-amber-100 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400 text-[8px] font-black px-2 py-0.5 rounded-full">Edit</div>
                                 </div>
                             </div>
                             <span className="text-neutral-500 dark:text-neutral-400 font-medium">
@@ -124,7 +121,7 @@ export const AcademicProfileSummary: React.FC<AcademicProfileSummaryProps> = ({
 
             {/* GPA Card */}
             <div className="md:col-span-6 lg:col-span-3 bg-white dark:bg-neutral-900 rounded-[2rem] p-8 border border-neutral-200 dark:border-white/5 shadow-sm flex flex-col items-center justify-center text-center group hover:shadow-xl hover:border-amber-500/20 transition-all duration-500">
-                <div className="text-[10px] font-black capitalize tracking-wider text-neutral-400 mb-6">Calculated GPA</div>
+                <div className="text-xs font-bold text-neutral-400 mb-6">Calculated GPA</div>
 
                 <div className="relative w-32 h-32 flex items-center justify-center mb-4">
                     <svg className="w-full h-full transform -rotate-90">
@@ -143,21 +140,21 @@ export const AcademicProfileSummary: React.FC<AcademicProfileSummaryProps> = ({
                         />
                     </svg>
                     <div className="absolute inset-0 flex flex-col items-center justify-center">
-                        <div className="text-4xl font-black text-neutral-900 dark:text-white font-mono leading-none tracking-tighter">
+                        <div className="text-4xl font-bold text-neutral-900 dark:text-white font-mono leading-none tracking-tighter">
                             {gpa || transcript.cgpa || '0.00'}
                         </div>
-                        <div className="text-[10px] font-bold text-neutral-400 mt-1 capitalize tracking-wider">/ 4.00</div>
+                        <div className="text-xs font-bold text-neutral-400 mt-1">/ 4.00</div>
                     </div>
                 </div>
             </div>
 
             {/* Progress Card */}
             <div className="md:col-span-6 lg:col-span-4 bg-white dark:bg-neutral-900 rounded-[2rem] p-8 border border-neutral-200 dark:border-white/5 shadow-sm flex flex-col group hover:shadow-xl hover:border-amber-500/20 transition-all duration-500">
-                <div className="text-[10px] font-black capitalize tracking-wider text-neutral-400 mb-8">Degree Completion</div>
+                <div className="text-xs font-bold text-neutral-400 mb-8">Degree Completion</div>
 
                 <div className="flex-1 flex flex-col justify-center">
                     <div className="flex items-baseline gap-2 mb-4">
-                        <span className="text-5xl font-black text-neutral-900 dark:text-white font-mono tracking-tighter tabular-nums">
+                        <span className="text-5xl font-bold text-neutral-900 dark:text-white font-mono tracking-tighter tabular-nums">
                             {Math.round(totalCredits * 10) / 10}
                         </span>
                         <span className="text-xl font-bold text-neutral-300">/</span>
@@ -167,9 +164,9 @@ export const AcademicProfileSummary: React.FC<AcademicProfileSummaryProps> = ({
                                 value={targetCredits === 0 ? '' : targetCredits}
                                 onChange={(e) => setTargetCredits(e.target.value ? parseFloat(e.target.value) : 0)}
                                 placeholder="Edit"
-                                className="w-20 bg-neutral-50 dark:bg-neutral-800/50 text-xl text-neutral-900 dark:text-white font-black border-none focus:ring-0 outline-none p-0 transition-colors font-mono leading-none"
+                                className="w-20 bg-neutral-50 dark:bg-neutral-800/50 text-xl text-neutral-900 dark:text-white font-bold border-none focus:ring-0 outline-none p-0 transition-colors font-mono leading-none"
                             />
-                            <span className="text-[8px] font-black capitalize tracking-wider text-neutral-400 mt-1 ml-0.5">Target Credits</span>
+                            <span className="text-[10px] font-bold text-neutral-400 mt-1 ml-0.5">Target Credits</span>
                         </div>
                     </div>
 
@@ -183,7 +180,7 @@ export const AcademicProfileSummary: React.FC<AcademicProfileSummaryProps> = ({
                         <div className="flex justify-between items-center px-1">
                             <div className="flex items-center gap-2">
                                 <div className={`w-2 h-2 rounded-full ${progressPercentage >= 100 ? 'bg-emerald-500' : 'bg-amber-500 animate-pulse'}`} />
-                                <span className={`text-[10px] font-black uppercase tracking-widest ${progressPercentage >= 100 ? 'text-emerald-600' : 'text-amber-600'}`}>
+                                <span className={`text-xs font-bold ${progressPercentage >= 100 ? 'text-emerald-600' : 'text-amber-600'}`}>
                                     {progressPercentage >= 100 ? 'Degree Completed' : 'Coursework In Progress'}
                                 </span>
                             </div>

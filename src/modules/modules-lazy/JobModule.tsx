@@ -63,6 +63,7 @@ const JobModuleContent: React.FC = () => {
                 <Route path="cover-letters" element={<CoverLetters />} />
                 <Route path="feed" element={<NavigatorPro />} />
                 <Route path="interviews" element={<InterviewAdvisor />} />
+                <Route path="interviews/:type" element={<InterviewAdvisor />} />
                 
                 {/* ID-based routes, absolute-like matching as backup */}
                 <Route path=":id" element={<JobDetail />} />

@@ -5,6 +5,24 @@ All notable changes to this project will be documented in this file.
 ## [Unreleased]
 
 ### Changed
+- **Interview Advisor UX Refinement**: Removed the card-based container from the interview interface, transitioning to a more open and expansive layout (`max-w-4xl`) to reduce artificial visual boundaries.
+- **In-Chat Preparation State**: Replaced the full-screen loading state with an integrated in-chat "preparing session" message, allowing for a more seamless transition from selection to practice.
+- **Redesigned Chat Input**: Streamlined the input area with a circular, indigo-colored send button and refined typography for input hints (standardized lowercase and tighter tracking).
+- **Consolidated Layout**: Removed redundant headers and reduced vertical whitespace (padding/margins) across the Interview Advisor to increase information density and focus on the conversation.
+- **Refined Job Selection Logic**: The "Practice another role" suggestion pill is now contextually hidden when analyzed jobs are available, reducing visual clutter during the initial setup.
+- **Improved Intro Messaging**: Dynamically adjusted the initial AI greeting to handle missing company names more gracefully and removed redundant "simulating an interview" phrasing.
+- **Interview URL Structure**: Implemented distinct relative routes for General Practice (`/jobs/interviews/general`) and Tailored Mock (`/jobs/interviews/tailored`) sessions to improve navigation clarity and support browser history.
+- **Standardized Componentry**: Aligned interview suggestion pills with the site-wide design tokens (11px title / 9px subtitle), matching the aesthetic of the Resume module.
+- **Job Selection Flow**: Refined the initial Tailored Mock job picker conversational flow to hide the text input box by default. Users now select from presented suggestion "Pills" based on analyzed jobs, or click an "Other" option to reveal the manual text input.
+- **Submit Button Aesthetics**: Replaced the previous purple gradient Submit button in the chat interface with a sleek, minimalist neutral option (`bg-neutral-900` or white) to match the global aesthetic updates.
+- **Suggestion Pills Styling**: Updated the generic suggestion pills (used for job selection and feedback) within the Chat interface. The prominent purple/indigo hover effects and borders have been neutralized to match the updated UI styling, and uppercase truncation was removed from the sub-labels for better readability.
+- **Features Page Tiers**: Re-added the "All" features tab to the public Features page and set it as the default. Re-styled the tier switcher pill to match the global navigation bar's frosted glass aesthetic.
+- **Home Page Feature Layout**: Reverted the home page Feature Grid to correctly display a single row of 5 feature cards on large screens, resolving a cluttered 8-card display issue.
+- **Academic Transcript Polish**: Significantly tightened the layout of the `CourseRegistry` component. Removed large decorative icons, reduced term padding, shrunk font sizes and badges, and compacted the course rows to display much more information simultaneously without scrolling.
+- **Button Component Standardization**: Refined global `Button` component to use `font-bold` instead of `font-black`, updated small sizes to use a `rounded-full` pill shape (except for the `xs` size which now uses `rounded-xl` and `h-7` for tight UI spaces), added a defined `subtle` variant (white/dark base, bordered, subtle hover effects), and neutralized hover states for a cleaner aesthetic.
+- **Unified Button Heights and Variants**: Standardized all secondary action buttons across the Resume Editor (Import, Preview, Download) and Academic Course Registry (Add Term, Add Course) to use the new `subtle` variant and uniform `xs` height.
+- **Centralized Button Component**: Replaced all remaining raw HTML `<button>` elements in the Resume Section Editor (Move Up, Move Down, Remove), Resume Job Tailoring Tab (Upgrade, Reset), and Resume Preview Modal with the core `<Button>` component for a fully unified design system.
+- **Education Module Polish**: Removed redundant text (e.g., student name) from Academic Profile cards, disabled automatic term mapping, and standardized section headings to match the professional `text-xs font-bold` analysis style.
 - **Premium Sidebar Redesign**: Reordered the Resume and Cover Letter sidebars to prioritize tailoring instructions and feedback. Status and quality metrics (Draft Strength, Match Quality) have been moved to the bottom of the sidebar to keep the user focused on actionable content.
 - **Unified Quality Cards**: Introduced high-fidelity card designs for `Match Quality` (Resume) and `Draft Strength` (Cover Letter) that include descriptive labels (Exceptional, Strong, Good, Needs Work) and alignment-based descriptions.
 - **Review Required Alerts**: Redesigned the placeholder warning in the Cover Letter sidebar to match the premium card-based layout of the quality metrics, replacing generic alert banners.
@@ -22,10 +40,22 @@ All notable changes to this project will be documented in this file.
 - **Analysis Tab Restructured**: "Professional Insight" (AI reasoning) moved from the MatchSidebar into the Analysis tab as the first card. Skill Match reordered to appear before Core Strengths/Gaps.
 - **Sidebar Integration**: Sidebar now correctly floats while scrolling by fixing inner `overflow-y-auto` traps and grid height stretching.
 - **Resume & Cover Letter Insights**: Sidebar now shows genuinely useful tailoring strategy ("Focus" bullets) explaining AI prioritization and critique feedback.
+- **Input Hint Polish**: Optimized the typography of the interview chat input hint ("Press Enter to...") by removing excessive letter spacing (`tracking-widest`) and ensuring consistency with the site-wide standard font sizing and casing.
+- **Precision Pill Matching**: Redesigned interview suggestion pills to perfectly match the site-wide design tokens found on the resume page, including `rounded-xl` styling and matching font sizes (11px name / 9px sublabel).
+- **Navigation Clarity**: Standardized the Exit button in focused mode to match the primary Sign Out button aesthetic (ghost style with hover interaction) and updated its icon to a clearer "X".
 - **Score Labels Simplified**: Compatibility score labels simplified to single words: Exceptional, Strong, Good, Fair, Low.
 - **Layout Stability**: Locked the main content column to `col-span-8` on all tabs to prevent width shifts during tab switching.
+- **Interview Flow Enhancement**: Transitioned the Tailored Mock job selection process from an external screen to an in-chat conversational flow, displaying the user's 5 most recent analyzed jobs as clickable suggestion pills.
 
 ### Fixed
+- **Interview Session Launch**: Resolved a race condition where the interview session would immediately exit back to the selection screen upon launch due to a conflict between the focused mode state and the initial rendering cycle.
+- **Interview Card Button Interactivity**: Fixed an issue where the "Practice Now" and "Launch Mock" buttons on the `InterviewSelection` screen correctly triggered state handlers but appeared unresponsive to users due to an immediate fallback UI rendering condition.
+- **Session Auto-Exit Bug**: Fixed a race condition where the `InterviewSessionScreen` would immediately exit the chat interface and return to the selection screen upon starting, resolving the illusion that the launch buttons were broken.
+- **Mock Interview Initialization**: Fixed an infinite loading spinner that occurred during the initial job context selection phase of tailored Mock Interviews.
+- **Interview Error Handling**: Added error state handling and user-facing toast notifications for failed AI requests during Mock Interviews, preventing silent failures and timeouts.
+- **Interview Input Key Handler**: Fixed a form submission bug in `InterviewChat` where hitting `<Enter>` passed a newline carriage return into the chat input field alongside submitting the form.
+- **Feature Card Layout**: Removed rigid height constraints and line clamping from `BentoCard` to prevent description text truncation. Relaxed the grid layout on the Features page to 4 columns to provide cards with more horizontal space on larger screens.
+- **Education Dashboard Labels**: Resolved redundant "Major / Program" text on the Academic card. It now gracefully hides the major section entirely if no program is specified in the transcript rather than showing confusing placeholder text.
 - **Cover Letter Format Cleaning**: Hardened the AI service to strictly strip Markdown wrappers and accidental JSON artifacts from outputs.
 - **AI Infrastructure**: Resolved persistent 401 Unauthorized errors on `gemini-proxy`; replaced retired `gemini-1.5-pro` with `gemini-2.0-flash`.
 - **Score Threshold Consistency**: All score cutoffs now reference a single `SCORE_THRESHOLDS` constant to correctly align labels and filters.
@@ -33,6 +63,7 @@ All notable changes to this project will be documented in this file.
 - **Phantom Spacing**: Organization/date lines in resume blocks now only render when values are present, removing extra whitespace for summary-type blocks.
 - **Placeholder Warnings**: Moved unfilled placeholder detection (e.g. `[TITLE]`) from the editor area into the Cover Letter sidebar for a cleaner experience.
 - **Skill Pill Dot Position**: Proficiency dot in `SkillPill` moved from left to right to match the indicator position on the main Skills page.
+- **Interview Advisor Card Visuals**: Resolved a double-border issue on selection cards by removing redundant internal separators from preview content.
 
 ### Removed
 - **Interview Tab Content**: Hidden the Interview tab temporarily until AI-generated content is ready, replacing the hardcoded placeholder text.

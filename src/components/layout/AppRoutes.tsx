@@ -30,7 +30,7 @@ export const AppRoutes: React.FC = () => {
         <ErrorBoundary>
             <Routes>
                 {/* ─── Public / Marketing ───────────────────────────────────── */}
-                <Route path="/" element={
+                <Route path="/*" element={
                     <Suspense fallback={<LoadingState message="Loading Home..." />}>
                         <JobModule />
                     </Suspense>
@@ -108,12 +108,12 @@ export const AppRoutes: React.FC = () => {
                             <JobModule />
                         </Suspense>
                     } />
-                    <Route path="/cover-letters" element={
+                    <Route path="/cover-letters/*" element={
                         <Suspense fallback={<LoadingState message="Opening Cover Letters..." />}>
                             <JobModule />
                         </Suspense>
                     } />
-                    <Route path="/interviews" element={
+                    <Route path="/interviews/*" element={
                         <Suspense fallback={<LoadingState message="Prepping Advisor..." />}>
                             <JobModule />
                         </Suspense>

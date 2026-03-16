@@ -14,7 +14,6 @@ import { GlobalDragOverlay } from '../../components/common/GlobalDragOverlay';
 export const AcademicHQ: React.FC = () => {
     const {
         transcript,
-        setTranscript,
         targetCredits,
         setTargetCredits,
         tempTranscript,
@@ -81,7 +80,6 @@ export const AcademicHQ: React.FC = () => {
                         <div className="space-y-8">
                             <CourseRegistry
                                 transcript={transcript}
-                                setTranscript={setTranscript}
                                 setEditingCourse={setEditingCourse}
                                 addSemester={addSemester}
                                 deleteSemester={deleteSemester}

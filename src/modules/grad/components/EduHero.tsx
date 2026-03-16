@@ -71,16 +71,16 @@ export const EduHero: React.FC<EduHeroProps> = ({
                                         <GraduationCap className="w-6 h-6" />
                                     </div>
                                     <div className="flex-1 min-w-0">
-                                        <h3 className="text-lg font-black text-neutral-900 dark:text-white truncate">{transcript.university}</h3>
-                                        <p className="text-[10px] font-bold text-neutral-400 uppercase tracking-widest truncate">{transcript.program}</p>
+                                        <h3 className="text-sm font-bold text-neutral-900 dark:text-white truncate">{transcript.university}</h3>
+                                        <p className="text-xs font-medium text-neutral-400 truncate">{transcript.program}</p>
                                     </div>
                                 </div>
 
                                 <div className="flex items-end justify-between mt-auto">
                                     <div className="flex flex-col">
-                                        <span className="text-[10px] font-black text-neutral-400 uppercase tracking-widest mb-1">Cumulative GPA</span>
+                                        <span className="text-xs font-bold text-neutral-400 mb-1">Cumulative GPA</span>
                                         <div className="flex items-baseline gap-2">
-                                            <span className="text-4xl font-black text-neutral-900 dark:text-white font-mono tracking-tighter">{calculatedGpa}</span>
+                                            <span className="text-4xl font-bold text-neutral-900 dark:text-white font-mono tracking-tighter">{calculatedGpa}</span>
                                             <span className="text-sm font-bold text-neutral-300">/ 4.00</span>
                                         </div>
                                     </div>
@@ -104,9 +104,9 @@ export const EduHero: React.FC<EduHeroProps> = ({
                             <div className="relative z-10 flex flex-col h-full">
                                 <div className="flex items-center justify-between mb-8">
                                     <div className="flex flex-col">
-                                        <span className="text-[10px] font-black text-neutral-400 uppercase tracking-widest mb-1">Degree Completion</span>
+                                        <span className="text-xs font-bold text-neutral-400 mb-1">Degree Completion</span>
                                         <div className="flex items-baseline gap-2">
-                                            <span className="text-4xl font-black text-neutral-900 dark:text-white font-mono tracking-tighter">{totalCredits}</span>
+                                            <span className="text-4xl font-bold text-neutral-900 dark:text-white font-mono tracking-tighter">{totalCredits}</span>
                                             <span className="text-sm font-bold text-neutral-300">/ {targetCredits} credits</span>
                                         </div>
                                     </div>
@@ -139,7 +139,7 @@ export const EduHero: React.FC<EduHeroProps> = ({
                                     </div>
                                     <div className="flex items-center gap-2">
                                         <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-                                        <span className="text-[10px] font-black text-emerald-600 uppercase tracking-[0.2em]">
+                                        <span className="text-xs font-bold text-emerald-600">
                                             {totalCredits >= targetCredits ? 'Requirements Met' : 'Coursework Active'}
                                         </span>
                                     </div>
