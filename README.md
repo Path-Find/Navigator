@@ -14,12 +14,7 @@ The modern career path is fragmented. Job seekers juggle siloed resumes, navigat
 - **Smart Capture**: Single-click job saving and AI-powered inbox triage.
 
 
-## Recent Updates (v2.33.0)
 
-- **Logic Hardening**: Serialized vault operations and robust auto-scrolling for rock-solid stability.
-- **Resilient UI**: Localized error boundaries in Job Feed and Detail modules to prevent total application crashes.
-- **Scalable Architecture**: Decomposed monolithic hooks and modals into specialized, AI-legible modules.
-- **Enhanced Observability**: Integrated centralized logging across all high-risk component catch-clauses.
 
 
 ## Stack

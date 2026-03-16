@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Mail, Lock, Loader2, ArrowRight, AlertCircle } from 'lucide-react';
 
 interface PasswordFormProps {

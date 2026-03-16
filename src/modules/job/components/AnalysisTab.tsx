@@ -1,5 +1,4 @@
 import React from 'react';
-import { motion } from 'framer-motion';
 import { Sparkles } from 'lucide-react';
 import { Card } from '../../../components/ui/Card';
 import { SkillPill } from '../../../components/ui/SkillPill';
