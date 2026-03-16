@@ -68,7 +68,7 @@ All notable changes to this project will be documented in this file.
 - **Interview Advisor Card Visuals**: Resolved a double-border issue on selection cards by removing redundant internal separators from preview content.
 
 ### Removed
-- **Interview Tab Content**: Hidden the Interview tab temporarily until AI-generated content is ready, replacing the hardcoded placeholder text.
+- **Interview Tab (Job Page)**: Hidden the Interview tab on the job details page temporarily until AI-generated content is ready, replacing the hardcoded placeholder text.
 - **Redundant Actions**: Removed "Copy optimized summary" from the Resume tab and oversized icon containers from the Cover Letter header.
 - **sidebar decorative elements**: Stripped all decorative icons from card-internal section headings across every tab and sidebar.
 
