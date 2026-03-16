@@ -36,7 +36,6 @@ export const InterviewSessionScreen = ({
     nextQuestion, isLastQuestion, handleUpdateResume
 }: SessionProps) => {
     const [copiedText, setCopiedText] = useState<string | null>(null);
-    const [showJobInput, setShowJobInput] = useState(false);
 
     const onBankSuggestion = React.useCallback(async (suggestion: ResumeSuggestionItem) => {
         await handleBankSuggestion(suggestion, resumes, handleUpdateResume);
@@ -69,15 +68,10 @@ export const InterviewSessionScreen = ({
                 onClick: () => onJobSelected(job.id)
             }));
 
-            // Only show "Other" if there are NO analyzed jobs
-            if (analyzedJobs.length === 0 && !showJobInput) {
-                pills.push({
-                    id: 'other',
-                    label: 'Practice another role',
-                    onClick: () => setShowJobInput(true)
-                });
-            }
-
+            // We don't show an "Other" pill anymore. 
+            // If jobs exist, the user picks from the pills. 
+            // If no jobs exist, the input box is shown automatically.
+            
             msgs.push({
                 id: 'initial-job-selection',
                 role: 'ai',
@@ -97,8 +91,8 @@ export const InterviewSessionScreen = ({
             id: 'intro-msg',
             role: 'ai',
             content: sessionType === 'tailored' && job
-                ? `Welcome! Let's practice for the ${positionName} role${companyName ? ` at ${companyName}` : ''}. Take your time, and remember to use the STAR method in your responses. Here is your first question:`
-                : "Welcome! Let's get started with your general behavioral interview practice. Remember to use the STAR method (Situation, Task, Action, Result). Here is your first question:"
+                ? `Great pick! Let's practice for your ${positionName} role${companyName ? ` at ${companyName}` : ''}. We'll focus on behavioral questions—remember to use the STAR method in your answers. Here's your first one:`
+                : "Welcome! Let's get started with some general behavioral practice. Remember to use the STAR method (Situation, Task, Action, Result) for the best results. Here is your first question:"
         });
 
         const conversationHistory = questions.slice(0, currentQuestionIndex + 1);
@@ -225,13 +219,12 @@ export const InterviewSessionScreen = ({
         });
 
         return msgs;
-    }, [questions, currentQuestionIndex, responses, mode, resumes, copiedText, resumeSnippets, onBankSuggestion, sessionType, selectedJobId, jobs, onJobSelected, showJobInput]);
-
+    }, [questions, currentQuestionIndex, responses, mode, resumes, copiedText, resumeSnippets, onBankSuggestion, sessionType, selectedJobId, jobs, onJobSelected]);
 
     if (mode === 'session') {
         const isInitialJobSelection = sessionType === 'tailored' && !selectedJobId;
         const hasAnalyzedJobs = jobs.some(j => j.status !== 'feed' && j.analysis);
-        const shouldHideInput = isInitialJobSelection && hasAnalyzedJobs && !showJobInput;
+        const shouldHideInput = isInitialJobSelection && hasAnalyzedJobs;
 
         // Safety check: ensure questions exist, unless we're in the initial job selection phase
         if (!isInitialJobSelection && (!questions || questions.length === 0)) {
