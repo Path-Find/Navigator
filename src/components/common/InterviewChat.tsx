@@ -56,7 +56,16 @@ export const InterviewChat: React.FC<InterviewChatProps> = ({
 
     useEffect(() => {
         if (scrollRef.current) {
-            scrollRef.current.scrollTop = scrollRef.current.scrollHeight;
+            const scrollContainer = scrollRef.current;
+            // Scroll immediately
+            scrollContainer.scrollTop = scrollContainer.scrollHeight;
+            
+            // Re-scroll after a short delay to account for content/animation height changes
+            const timeoutId = setTimeout(() => {
+                scrollContainer.scrollTop = scrollContainer.scrollHeight;
+            }, 100);
+            
+            return () => clearTimeout(timeoutId);
         }
     }, [messages, isThinking]);
 
@@ -70,7 +79,7 @@ export const InterviewChat: React.FC<InterviewChatProps> = ({
     };
 
     return (
-        <div className="flex flex-col h-full w-full max-w-4xl mx-auto overflow-hidden">
+        <div className="flex flex-col flex-1 min-h-0 w-full max-w-4xl mx-auto overflow-hidden">
             {/* Message Area */}
             <div
                 ref={scrollRef}
