@@ -5,14 +5,14 @@ All notable changes to this project will be documented in this file.
 ## [Unreleased]
 
 ### Changed
-- **Interview Advisor UX Refinement**: Removed the card-based container from the interview interface, transitioning to a more open and expansive layout (`max-w-4xl`) to reduce artificial visual boundaries.
+- **Interview Advisor UX Refinement**: Removed the card-based container from the interview interface, transitioning to a more open and expansive layout (`max-w-4xl`) that fills the viewport height, bringing the chat input to the bottom of the screen.
 - **In-Chat Preparation State**: Replaced the full-screen loading state with an integrated in-chat "preparing session" message, allowing for a more seamless transition from selection to practice.
 - **Redesigned Chat Input**: Streamlined the input area with a circular, indigo-colored send button and refined typography for input hints (standardized lowercase and tighter tracking).
 - **Consolidated Layout**: Removed redundant headers and reduced vertical whitespace (padding/margins) across the Interview Advisor to increase information density and focus on the conversation.
 - **Eliminated Selection Redundancy**: Removed the "Other" job suggestion pill entirely when analyzed roles are present. The interface now contextually toggles between interactive selection pills (when roles are available) and a direct text input (when no roles exist), ensuring a clutter-free onboarding.
 - **Naturalized Conversational Intro**: Replaced robotic "simulating an interview" templates with direct, coaching-oriented greetings like "Great pick! Let's practice for your [Role] role at [Company]..."
-- **Interview URL Structure**: Implemented distinct relative routes for General Practice (`/jobs/interviews/general`) and Tailored Mock (`/jobs/interviews/tailored`) sessions to improve navigation clarity and support browser history.
-- **Standardized Componentry**: Aligned interview suggestion pills with the site-wide design tokens (11px title / 9px subtitle), matching the aesthetic of the Resume module.
+- **Standardized Typography**: Realigned the Interview Advisor's body text weight to the application-wide standard, removing excess `font-medium` weights to ensure 1:1 consistency with the Resume and Cover Letter modules.
+- **Comparison Logic Fix**: Corrected the URL structure for general and tailored interviews to support seamless browser navigation and session state management.
 - **Job Selection Flow**: Refined the initial Tailored Mock job picker conversational flow to hide the text input box by default. Users now select from presented suggestion "Pills" based on analyzed jobs, or click an "Other" option to reveal the manual text input.
 - **Submit Button Aesthetics**: Replaced the previous purple gradient Submit button in the chat interface with a sleek, minimalist neutral option (`bg-neutral-900` or white) to match the global aesthetic updates.
 - **Suggestion Pills Styling**: Updated the generic suggestion pills (used for job selection and feedback) within the Chat interface. The prominent purple/indigo hover effects and borders have been neutralized to match the updated UI styling, and uppercase truncation was removed from the sub-labels for better readability.

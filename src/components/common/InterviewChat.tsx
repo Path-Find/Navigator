@@ -103,7 +103,7 @@ export const InterviewChat: React.FC<InterviewChatProps> = ({
                                         ? 'bg-white dark:bg-neutral-800 text-neutral-900 dark:text-white rounded-tl-none border border-neutral-100 dark:border-neutral-700'
                                         : `bg-gradient-to-br ${accentGradient} text-white rounded-tr-none shadow-lg shadow-indigo-500/10`
                                         }`}>
-                                        <p className="text-sm font-medium leading-relaxed whitespace-pre-wrap">{msg.content}</p>
+                                        <p className="text-sm leading-relaxed whitespace-pre-wrap">{msg.content}</p>
                                     </div>
 
                                     {/* Suggestion Pills */}
