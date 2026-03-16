@@ -168,6 +168,41 @@ export const Vault = {
         const serialized = JSON.stringify(data);
         const encrypted = await encryptionService.encrypt(serialized);
         localStorage.setItem(key, encrypted);
+    },
+
+    /**
+     * Atomically modifies a vault entry. 
+     * Reads the current value, passes it to the callback, and writes the returned value back.
+     * The entire operation is queued on vaultQueue to prevent race conditions.
+     */
+    async modifySecure<T = unknown>(key: string, modifier: (current: T | null) => T | Promise<T>): Promise<T> {
+        return vaultQueue.enqueue(async () => {
+            await this.ensureInit();
+            const raw = localStorage.getItem(key);
+            let current: T | null = null;
+
+            if (raw) {
+                try {
+                    // Try standard decryption first
+                    const decrypted = await encryptionService.decrypt(raw);
+                    current = JSON.parse(decrypted);
+                } catch {
+                    // Fallback to legacy if available (mirrors getSecure logic)
+                    if (encryptionService.isLegacyAvailable()) {
+                        try {
+                            const decryptedLegacy = await encryptionService.decryptLegacy(raw);
+                            current = JSON.parse(decryptedLegacy);
+                        } catch {
+                            // Silently fail to null if double-corrupted
+                        }
+                    }
+                }
+            }
+
+            const updated = await modifier(current);
+            await this._setSecureInternal(key, updated);
+            return updated;
+        });
     }
 };
 

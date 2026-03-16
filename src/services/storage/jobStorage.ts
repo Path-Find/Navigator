@@ -143,81 +143,71 @@ export const JobStorage = {
     },
 
     async addJob(job: SavedJob) {
-        const localResult = await Vault.getSecure<SavedJob[]>(STORAGE_KEYS.JOBS_HISTORY);
-        if (localResult === undefined) {
-             console.error("[JobStorage] Decryption error. Aborting addJob.");
-             throw new Error("Storage unavailable");
-        }
-        const localJobs: SavedJob[] = localResult || [];
-        const updated = [job, ...localJobs];
         const userId = await getUserId();
+        
+        // Use atomic modify to prevent race conditions during concurrent additions
+        const updated = await Vault.modifySecure<SavedJob[]>(STORAGE_KEYS.JOBS_HISTORY, (current) => {
+            const localJobs = current || [];
+            return [job, ...localJobs];
+        });
 
-        await Promise.all([
-            Vault.setSecure(STORAGE_KEYS.JOBS_HISTORY, updated),
-            (async () => {
-                if (!userId) return;
-                const { error } = await withTimeout(
-                    supabase.from('jobs').insert({
-                        user_id: userId,
-                        id: job.id,
-                        job_title: job.analysis?.distilledJob?.roleTitle || job.position || 'Untitled Role',
-                        company: job.analysis?.distilledJob?.companyName || job.company || 'Unknown Company',
-                        original_text: job.description,
-                        location: job.analysis?.distilledJob?.location || job.location,
-                        url: job.url,
-                        analysis: job.analysis,
-                        canonical_role: job.analysis?.distilledJob?.canonicalTitle,
-                        status: (job.status === 'analyzing' || !job.status) ? 'saved' : job.status,
-                        resume_id: job.resumeId,
-                        cover_letter: job.coverLetter,
-                        cover_letter_critique: job.coverLetterCritique,
-                        fit_score: job.analysis?.compatibilityScore,
-                        date_added: new Date(job.dateAdded).toISOString(),
-                        updated_at: new Date(job.updatedAt || job.dateAdded).toISOString()
-                    })
-                );
-                if (error) console.error('Cloud Sync Error (Add Job):', error);
-            })()
-        ]);
+        // Cloud sync happens in background after local persistence
+        if (userId) {
+            withTimeout(
+                supabase.from('jobs').insert({
+                    user_id: userId,
+                    id: job.id,
+                    job_title: job.analysis?.distilledJob?.roleTitle || job.position || 'Untitled Role',
+                    company: job.analysis?.distilledJob?.companyName || job.company || 'Unknown Company',
+                    original_text: job.description,
+                    location: job.analysis?.distilledJob?.location || job.location,
+                    url: job.url,
+                    analysis: job.analysis,
+                    canonical_role: job.analysis?.distilledJob?.canonicalTitle,
+                    status: (job.status === 'analyzing' || !job.status) ? 'saved' : job.status,
+                    resume_id: job.resumeId,
+                    cover_letter: job.coverLetter,
+                    cover_letter_critique: job.coverLetterCritique,
+                    fit_score: job.analysis?.compatibilityScore,
+                    date_added: new Date(job.dateAdded).toISOString(),
+                    updated_at: new Date(job.updatedAt || job.dateAdded).toISOString()
+                })
+            ).catch(err => console.error('Cloud Sync Error (Add Job):', err));
+        }
 
         return updated;
     },
 
     async updateJob(updatedJob: SavedJob) {
-        const localResult = await Vault.getSecure<SavedJob[]>(STORAGE_KEYS.JOBS_HISTORY);
-        if (localResult === undefined) {
-             console.error("[JobStorage] Decryption error. Aborting updateJob.");
-             throw new Error("Storage unavailable");
-        }
-        const localJobs: SavedJob[] = localResult || [];
-        const updated = localJobs.map(j => j.id === updatedJob.id ? updatedJob : j);
         const userId = await getUserId();
+        
+        // Use atomic modify to prevent race conditions during concurrent updates (e.g. analysis finish vs user edit)
+        const updated = await Vault.modifySecure<SavedJob[]>(STORAGE_KEYS.JOBS_HISTORY, (current) => {
+            const localJobs = current || [];
+            return localJobs.map(j => j.id === updatedJob.id ? updatedJob : j);
+        });
 
-        await Promise.all([
-            Vault.setSecure(STORAGE_KEYS.JOBS_HISTORY, updated),
-            (async () => {
-                if (!userId) return;
-                const { error } = await withTimeout(
-                    supabase.from('jobs').update({
-                        job_title: updatedJob.analysis?.distilledJob?.roleTitle || updatedJob.position,
-                        company: updatedJob.analysis?.distilledJob?.companyName || updatedJob.company,
-                        original_text: updatedJob.description,
-                        location: updatedJob.analysis?.distilledJob?.location || updatedJob.location,
-                        url: updatedJob.url,
-                        status: updatedJob.status || 'saved',
-                        analysis: updatedJob.analysis,
-                        canonical_role: updatedJob.analysis?.distilledJob?.canonicalTitle,
-                        resume_id: updatedJob.resumeId,
-                        cover_letter: updatedJob.coverLetter,
-                        cover_letter_critique: updatedJob.coverLetterCritique,
-                        fit_score: updatedJob.analysis?.compatibilityScore,
-                        updated_at: new Date().toISOString()
-                    }).eq('id', updatedJob.id)
-                        .eq('user_id', userId)
-                );
-                if (error) console.error('Cloud Sync Error (Update Job):', error);
-            })()
-        ]);
+        // Cloud sync happens in background after local persistence
+        if (userId) {
+            withTimeout(
+                supabase.from('jobs').update({
+                    job_title: updatedJob.analysis?.distilledJob?.roleTitle || updatedJob.position,
+                    company: updatedJob.analysis?.distilledJob?.companyName || updatedJob.company,
+                    original_text: updatedJob.description,
+                    location: updatedJob.analysis?.distilledJob?.location || updatedJob.location,
+                    url: updatedJob.url,
+                    status: updatedJob.status || 'saved',
+                    analysis: updatedJob.analysis,
+                    canonical_role: updatedJob.analysis?.distilledJob?.canonicalTitle,
+                    resume_id: updatedJob.resumeId,
+                    cover_letter: updatedJob.coverLetter,
+                    cover_letter_critique: updatedJob.coverLetterCritique,
+                    fit_score: updatedJob.analysis?.compatibilityScore,
+                    updated_at: new Date().toISOString()
+                }).eq('id', updatedJob.id)
+                    .eq('user_id', userId)
+            ).catch(err => console.error('Cloud Sync Error (Update Job):', err));
+        }
 
         return updated;
     },
@@ -278,18 +268,24 @@ export const JobStorage = {
     },
 
     async deleteJob(id: string) {
-        const localJobs: SavedJob[] = await Vault.getSecure(STORAGE_KEYS.JOBS_HISTORY) || [];
-        const updated = localJobs.filter(j => j.id !== id);
         const userId = await getUserId();
+        
+        // Use atomic modify to prevent race conditions during deletion
+        const updated = await Vault.modifySecure<SavedJob[]>(STORAGE_KEYS.JOBS_HISTORY, (current) => {
+            const localJobs = current || [];
+            return localJobs.filter(j => j.id !== id);
+        });
 
-        await Promise.all([
-            Vault.setSecure(STORAGE_KEYS.JOBS_HISTORY, updated),
+        if (userId) {
             (async () => {
-                if (!userId) return;
-                const { error } = await supabase.from('jobs').delete().eq('id', id);
-                if (error) console.error('Cloud Sync Error (Delete Job):', error);
-            })()
-        ]);
+                try {
+                    const { error } = await supabase.from('jobs').delete().eq('id', id);
+                    if (error) throw error;
+                } catch (err) {
+                    console.error('Cloud Sync Error (Delete Job):', err);
+                }
+            })();
+        }
 
         return updated;
     }
