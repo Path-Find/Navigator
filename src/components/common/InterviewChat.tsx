@@ -189,7 +189,7 @@ export const InterviewChat: React.FC<InterviewChatProps> = ({
 
             {/* Input Area */}
             {!hideInput && (
-                <div className="p-4 bg-transparent">
+                <div className="px-4 pb-6 pt-2 bg-transparent">
                     <div className="relative group">
                         <div className="absolute inset-0 bg-gradient-to-r from-indigo-500/5 to-violet-500/5 rounded-[2rem] blur-xl opacity-0 group-focus-within:opacity-100 transition-opacity" />
                         <div className="relative flex flex-col gap-4">
@@ -214,7 +214,7 @@ export const InterviewChat: React.FC<InterviewChatProps> = ({
                                 </div>
                             </div>
 
-                            <div className="flex items-center justify-between px-6">
+                            <div className="flex items-center justify-between px-6 mt-1">
                                 <div className="flex items-center gap-3">
                                     <span className="text-[10px] font-bold text-neutral-400/80 tracking-tight">{inputHint}</span>
                                 </div>

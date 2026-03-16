@@ -250,8 +250,8 @@ export const InterviewSessionScreen = ({
         }
 
         return (
-            <div className="min-h-screen w-full flex flex-col items-center pt-12 pb-4 px-4 sm:px-6 bg-neutral-50/50 dark:bg-black">
-                <div className="w-full max-w-4xl h-[calc(100vh-8rem)] flex flex-col">
+            <div className="h-screen w-full flex flex-col items-center bg-neutral-50/50 dark:bg-black overflow-hidden">
+                <div className="w-full max-w-4xl flex-1 flex flex-col pt-16">
                     <InterviewChat
                         messages={chatMessages}
                         inputValue={userResponse}
