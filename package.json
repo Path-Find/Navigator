@@ -2,7 +2,7 @@
   "name": "navigator",
   "description": "A minimalist tool to analyze job compatibility, suggest resume tailoring, and generate cover letters using Gemini.",
   "private": true,
-  "version": "2.33.0",
+  "version": "2.33.1",
   "type": "module",
   "scripts": {
     "dev": "vite",

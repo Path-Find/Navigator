@@ -4,6 +4,8 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+## [2.33.1] - 2026-03-17
+
 ### Security
 - **Undici Vulnerability Patch**: Updated `undici` to `7.24.4` and enforced it via `overrides` in both the main application and browser extension to mitigate critical vulnerabilities (WebSocket length overflows, HTTP Request/Response Smuggling, and CRLF Injection).
 - **CodeQL Remediation**:
