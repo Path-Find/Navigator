@@ -10,7 +10,13 @@ function stripHtml(html: string): string {
         return (doc.body.textContent || '').trim();
     } catch {
         // Fallback for environments where DOMParser is unavailable or fails (e.g. background service worker context)
-        return html.replace(/<[^>]+>/g, '').trim();
+        let previous: string;
+        let current = html;
+        do {
+            previous = current;
+            current = current.replace(/<[^>]+>/g, '');
+        } while (current !== previous);
+        return current.trim();
     }
 }
 

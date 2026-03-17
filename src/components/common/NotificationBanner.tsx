@@ -30,14 +30,14 @@ export const NotificationBanner: React.FC<NotificationBannerProps> = ({
 }) => {
     const linkRef = React.useRef<HTMLAnchorElement>(null);
 
-    React.useEffect(() => {
-        const isDangerousProtocol = (url: string) => {
-            const normalized = url.trim().toLowerCase();
-            return normalized.startsWith('javascript:') ||
-                normalized.startsWith('data:') ||
-                normalized.startsWith('vbscript:');
-        };
+    const isDangerousProtocol = (url: string) => {
+        const normalized = url.trim().toLowerCase();
+        return normalized.startsWith('javascript:') ||
+            normalized.startsWith('data:') ||
+            normalized.startsWith('vbscript:');
+    };
 
+    React.useEffect(() => {
         if (linkRef.current && action?.href && isDangerousProtocol(action.href)) {
             linkRef.current.setAttribute('href', action.href);
         }
@@ -120,12 +120,10 @@ export const NotificationBanner: React.FC<NotificationBannerProps> = ({
                         action.href ? (
                             <a
                                 ref={linkRef}
-                                href={action.href.startsWith('javascript:') ? '#' : action.href}
+                                href={(action.href && isDangerousProtocol(action.href)) ? '#' : action.href}
                                 onClick={(e) => {
-                                    if (action.href?.startsWith('javascript:')) {
-                                        if (action.href?.startsWith('javascript:')) {
-                                            // Legacy bookmarklet support
-                                        }
+                                    if (action.href && isDangerousProtocol(action.href)) {
+                                        // Legacy bookmarklet support or security block
                                     }
                                     action.onClick?.(e);
                                 }}

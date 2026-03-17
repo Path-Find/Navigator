@@ -87,7 +87,11 @@ Deno.serve(async (req) => {
             const tagsToRemove = ['script', 'style', 'iframe', 'noscript', 'canvas', 'svg'];
             for (const tag of tagsToRemove) {
                 const regex = new RegExp(`<${tag}\\b[^>]*>([\\s\\S]*?)<\\/${tag}>`, 'gim');
-                text = text.replace(regex, "");
+                let prevText;
+                do {
+                    prevText = text;
+                    text = text.replace(regex, "");
+                } while (text !== prevText);
             }
 
             // 2. Convert common block tags to newlines to preserve separation
@@ -164,11 +168,20 @@ Deno.serve(async (req) => {
             const tagsToRemove = ['script', 'style', 'svg', 'iframe', 'noscript'];
             for (const tag of tagsToRemove) {
                 const regex = new RegExp(`<${tag}\\b[^>]*>([\\s\\S]*?)<\\/${tag}>`, 'gim');
-                cleanHtml = cleanHtml.replace(regex, "");
+                let prevHtml;
+                do {
+                    prevHtml = cleanHtml;
+                    cleanHtml = cleanHtml.replace(regex, "");
+                } while (cleanHtml !== prevHtml);
             }
 
+            let prevHtml;
+            do {
+                prevHtml = cleanHtml;
+                cleanHtml = cleanHtml.replace(/<!--[\s\S]*?-->/g, "");
+            } while (cleanHtml !== prevHtml);
+
             cleanHtml = cleanHtml
-                .replace(/<!--[\s\S]*?-->/g, "")
                 .replace(/\s+/g, " ")
                 .substring(0, 30000);
 

@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+### Security
+- **Undici Vulnerability Patch**: Updated `undici` to `7.24.4` and enforced it via `overrides` in both the main application and browser extension to mitigate critical vulnerabilities (WebSocket length overflows, HTTP Request/Response Smuggling, and CRLF Injection).
+- **CodeQL Remediation**:
+    - Implemented recursive sanitization for HTML tags and comments in Supabase Edge Functions and the extension's `extractor.ts` to prevent filter bypasses via nested malicious sequences.
+    - Hardened URL scheme validation in `NotificationBanner` components to explicitly reject `data:` and `vbscript:` protocols, preventing potential XSS vectors via notification actions.
+
 ## [2.33.0] - 2026-03-16
 
 ### Added
