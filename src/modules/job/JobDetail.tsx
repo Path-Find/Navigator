@@ -4,7 +4,7 @@ import { useJobAnalysis } from './hooks/useJobAnalysis';
 import { getBestResume, copyResumeToClipboard, getDeadlineInfo, getScoreLabel, getScoreColorClasses } from './utils/jobUtils';
 import {
     FileText, PenTool, ExternalLink,
-    BookOpen, MapPin, Hash, Sparkles, AlertCircle, ChevronDown
+    BookOpen, Sparkles, ChevronDown
 } from 'lucide-react';
 
 import { Button } from '../../components/ui/Button';
@@ -212,19 +212,13 @@ export const JobDetail: React.FC = () => {
                             {job.analysis?.distilledJob?.location && (
                                 <>
                                     <span className="w-1 h-1 rounded-full bg-neutral-300 dark:bg-neutral-600" />
-                                    <div className="flex items-center gap-1">
-                                        <MapPin className="w-3.5 h-3.5" />
-                                        <span>{job.analysis.distilledJob.location}</span>
-                                    </div>
+                                    <span>{job.analysis.distilledJob.location}</span>
                                 </>
                             )}
                             {job.analysis?.distilledJob?.referenceCode && (
                                 <>
                                     <span className="w-1 h-1 rounded-full bg-neutral-300 dark:bg-neutral-600" />
-                                    <div className="flex items-center gap-1">
-                                        <Hash className="w-3.5 h-3.5" />
-                                        <span>{job.analysis.distilledJob.referenceCode}</span>
-                                    </div>
+                                    <span>#{job.analysis.distilledJob.referenceCode}</span>
                                 </>
                             )}
                             {job.analysis?.distilledJob?.salaryRange && (
@@ -238,8 +232,7 @@ export const JobDetail: React.FC = () => {
                                 return deadlineInfo ? (
                                     <>
                                         <span className="w-1 h-1 rounded-full bg-neutral-300 dark:bg-neutral-600" />
-                                        <div className={`flex items-center gap-1 font-black ${deadlineInfo.style}`}>
-                                            <AlertCircle className="w-3.5 h-3.5" />
+                                        <div className={`font-black ${deadlineInfo.style}`}>
                                             <span>{deadlineInfo.label}</span>
                                         </div>
                                     </>

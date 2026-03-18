@@ -9,7 +9,7 @@ export const FEATURE_REGISTRY: Record<string, FeatureDefinition> = {
         releaseDate: '2024-11-01', // No longer "New"
         description: {
             short: 'Instant 0–100 compatibility rating.',
-            full: 'Get an instant 0–100 compatibility score and detailed fit analysis for any job posting based on your resume, skills, and transcript.',
+            full: 'Instant 0–100 compatibility rating. Get a detailed analysis of how your profile fits any job posting.',
             plan: 'Simple match quality ratings for every role',
         },
         action: { short: 'View Match', full: 'View Match' },
@@ -70,7 +70,7 @@ export const FEATURE_REGISTRY: Record<string, FeatureDefinition> = {
         shortName: 'Skills',
         description: {
             short: 'Identify missing skills to beat the ATS.',
-            full: 'Find out which keywords and skills your profile is missing for a specific role, so you can close the gap before you apply.',
+            full: "Identify exactly which skills you're missing for a specific role and close the gap before you apply.",
             plan: 'Identify and bridge missing keywords',
         },
         action: { short: 'Audit gaps', full: 'Audit' },
@@ -91,7 +91,7 @@ export const FEATURE_REGISTRY: Record<string, FeatureDefinition> = {
         shortName: 'Resume',
         description: {
             short: 'Tailored summaries for every application.',
-            full: 'Manage multiple versions of your resume, each tailored to a different role or industry. Switch between them whenever you need.',
+            full: 'Manage multiple resume versions tailored to different roles. Switch between them instantly as you apply.',
             plan: 'Multiple resume versions for different roles',
         },
         action: { short: 'Manage', full: 'Manage' },
@@ -111,7 +111,7 @@ export const FEATURE_REGISTRY: Record<string, FeatureDefinition> = {
         shortName: 'Cover Letters',
         description: {
             short: 'Generate persuasive cover letters instantly.',
-            full: 'Generate a polished cover letter for any role, built from your actual experience and what the job is asking for.',
+            full: 'Generate polished cover letters built from your real experience and the specific requirements of the job.',
             plan: 'AI-generated cover letters from your experience',
         },
         action: { short: 'Create', full: 'Write' },
@@ -152,7 +152,7 @@ export const FEATURE_REGISTRY: Record<string, FeatureDefinition> = {
         shortName: 'History',
         description: {
             short: 'Save jobs from any site with one click.',
-            full: "Keep tabs on every job you've analyzed. Track your application status, review past results, and watch your scores over time.",
+            full: 'Keep tabs on every job you saves. Track your application status and review past results effortlessly.',
             plan: 'Unlimited saving & tracking of roles',
         },
         action: { short: 'View all', full: 'View all' },
@@ -173,7 +173,7 @@ export const FEATURE_REGISTRY: Record<string, FeatureDefinition> = {
         shortName: 'Feed',
         description: {
             short: 'Pre-scored matches from your alerts.',
-            full: 'A live feed of pre-scored job matches, automatically triaged from the alerts you forward. Your best opportunities, ranked and ready.',
+            full: 'A live feed of pre-scored job matches automatically triaged from your alerts. Your best opportunities, ranked.',
             plan: 'Live feed of ranked job matches',
         },
         action: { short: 'View feed', full: 'Open Feed' },
@@ -254,7 +254,7 @@ export const FEATURE_REGISTRY: Record<string, FeatureDefinition> = {
         shortName: 'Roadmap',
         description: {
             short: 'Analyze skill gaps for any role.',
-            full: "See exactly what's between where you are now and where you want to be. Get a concrete, step-by-step plan to close the gap.",
+            full: 'Map your path to any role. Get a concrete, step-by-step plan to bridge the gap and land the job.',
             plan: 'Step-by-step navigation to your goal role',
         },
         action: { short: 'Scale up', full: 'Learn more' },
@@ -314,7 +314,7 @@ export const FEATURE_REGISTRY: Record<string, FeatureDefinition> = {
         shortName: 'Edu',
         description: {
             short: 'High-fidelity academic management.',
-            full: 'Access your central dashboard for degree tracking, GPA scenarios, and program discovery.',
+            full: 'Your central hub for degree tracking and program discovery. Manage your academic journey with AI.',
             plan: 'AI-powered tools for degree & program planning',
         },
         action: { short: 'Open', full: 'Open Hub' },

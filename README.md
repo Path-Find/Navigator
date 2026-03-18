@@ -13,10 +13,6 @@ The modern career path is fragmented. Job seekers juggle siloed resumes, navigat
 - **Strategic Roadmaps**: Automated 12-month career pathing and academic benchmarking.
 - **Smart Capture**: Single-click job saving and AI-powered inbox triage.
 
-
-
-
-
 ## Stack
 
 - **AI**: Google Gemini (Flash & Pro)

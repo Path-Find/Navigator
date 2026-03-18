@@ -194,7 +194,12 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, featureCo
     };
 
     return (
-        <div className="fixed inset-0 bg-neutral-900/60 backdrop-blur-md z-[100] flex items-center justify-center p-4">
+        <div 
+            className="fixed inset-0 bg-neutral-900/60 backdrop-blur-md z-[100] flex items-center justify-center p-4"
+            onClick={(e) => {
+                if (e.target === e.currentTarget) onClose();
+            }}
+        >
             <div className={`bg-white/90 dark:bg-neutral-900/90 backdrop-blur-xl rounded-3xl shadow-2xl w-full overflow-hidden animate-in fade-in zoom-in-95 duration-300 border border-white/20 ring-1 ring-neutral-900/5 dark:ring-white/10 ${featureContext ? 'max-w-3xl' : 'max-w-md'}`}>
                 <div className="flex items-stretch">
                     {featureContext && (

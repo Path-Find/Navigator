@@ -43,7 +43,7 @@ export const AnalysisTab: React.FC<AnalysisTabProps> = ({
         <div className="space-y-8 pb-8">
             {analysis?.reasoning && (
                 <Card variant="premium" className="p-6 border-accent-primary/10 shadow-indigo-500/10">
-                    <h4 className="text-xs font-bold text-indigo-500 dark:text-indigo-400 mb-4">Professional Insight</h4>
+                    <h4 className="text-xs font-bold text-indigo-500 dark:text-indigo-400 mb-4">Insight</h4>
                     <p className="text-xs text-neutral-600 dark:text-neutral-300 leading-relaxed font-medium">
                         {toSentenceCase(analysis.reasoning)}
                     </p>
@@ -81,7 +81,7 @@ export const AnalysisTab: React.FC<AnalysisTabProps> = ({
             ) : (
                 analysis?.distilledJob?.requiredSkills && analysis.distilledJob.requiredSkills.length > 0 && (
                     <Card variant="premium" className="p-6 border-indigo-500/10 shadow-indigo-500/5">
-                        <h4 className="text-xs font-bold text-indigo-500 dark:text-indigo-400 mb-4">Skill Match</h4>
+                        <h4 className="text-xs font-bold text-indigo-500 dark:text-indigo-400 mb-4">Skills</h4>
                         <div className="flex flex-wrap gap-2">
                             {analysis.distilledJob.requiredSkills.map((req: { name: string; level: 'learning' | 'comfortable' | 'expert' }, i: number) => {
                                 const mySkill = userSkills.find(s => s.name.toLowerCase().includes(req.name.toLowerCase()));
@@ -101,7 +101,7 @@ export const AnalysisTab: React.FC<AnalysisTabProps> = ({
             {(analysis?.strengths?.length || 0) > 0 || (analysis?.weaknesses?.length || 0) > 0 ? (
                 <div className="grid md:grid-cols-2 gap-6">
                     <Card variant="glass" className="p-6">
-                        <h4 className="text-xs font-bold text-emerald-600 dark:text-emerald-400 mb-4">Core Strengths</h4>
+                        <h4 className="text-xs font-bold text-emerald-600 dark:text-emerald-400 mb-4">Strengths</h4>
                         <div className="space-y-3">
                             {analysis?.strengths?.map((s, i) => (
                                 <div key={i} className="flex gap-3 text-xs font-medium text-neutral-700 dark:text-neutral-300">
@@ -113,7 +113,7 @@ export const AnalysisTab: React.FC<AnalysisTabProps> = ({
                     </Card>
 
                     <Card variant="glass" className="p-6">
-                        <h4 className="text-xs font-bold text-rose-600 dark:text-rose-400 mb-4">Identified Gaps</h4>
+                        <h4 className="text-xs font-bold text-rose-600 dark:text-rose-400 mb-4">Gaps</h4>
                         {(() => {
                             const weaknesses = analysis?.weaknesses ?? [];
                             const isGated = userTier === 'free' && weaknesses.length > 1;
@@ -155,7 +155,7 @@ export const AnalysisTab: React.FC<AnalysisTabProps> = ({
             ) : null}
 
             <Card variant="glass" className="p-6">
-                <h4 className="text-xs font-bold text-indigo-500 dark:text-indigo-400 mb-6">Key Competencies</h4>
+                <h4 className="text-xs font-bold text-indigo-500 dark:text-indigo-400 mb-6">Competencies</h4>
                 <div className="flex flex-wrap gap-2">
                     {(analysis?.distilledJob?.keySkills || []).map((skill: string, i: number) => (
                         <SkillPill key={i} name={toTitleCase(skill)} variant="indigo" />
@@ -167,7 +167,7 @@ export const AnalysisTab: React.FC<AnalysisTabProps> = ({
             </Card>
 
             <Card variant="glass" className="p-6 border-neutral-200/50 dark:border-white/5">
-                <h4 className="text-xs font-bold text-indigo-500 dark:text-indigo-400 mb-4">Core Responsibilities</h4>
+                <h4 className="text-xs font-bold text-indigo-500 dark:text-indigo-400 mb-4">Responsibilities</h4>
                 <div className="space-y-3">
                     {(analysis?.distilledJob?.coreResponsibilities || []).map((resp: string, i: number) => (
                         <div key={i} className="flex gap-3 text-xs font-medium text-neutral-700 dark:text-neutral-300">

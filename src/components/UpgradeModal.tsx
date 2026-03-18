@@ -105,7 +105,12 @@ export const UpgradeModal: React.FC<UpgradeModalProps> = ({ limitInfo, onClose, 
     ];
 
     return (
-        <div className="fixed inset-0 bg-neutral-900/60 backdrop-blur-sm flex items-center justify-center z-[200] p-4 sm:p-6">
+        <div 
+            className="fixed inset-0 bg-neutral-900/60 backdrop-blur-sm flex items-center justify-center z-[200] p-4 sm:p-6"
+            onClick={(e) => {
+                if (e.target === e.currentTarget) onClose();
+            }}
+        >
             <div className={`bg-white dark:bg-[#0a0a0a] rounded-[2.5rem] shadow-2xl ${view === 'compare' ? 'max-w-5xl' : 'max-w-md'} w-full relative animate-in zoom-in-95 fade-in duration-300 border border-neutral-200 dark:border-neutral-800 flex flex-col max-h-[90vh]`}>
 
                 {/* Close Button */}

@@ -2,7 +2,15 @@
 
 All notable changes to this project will be documented in this file.
 
-## [Unreleased]
+## [2.34.0] - 2026-03-17
+
+### Changed
+- **UI Metadata Polish**: Stripped all decorative icons from job metadata (Location, Company, Date, Reference Code, Salary, Deadline) across both Job History and Job Detail views to reduce visual clutter and achieve a more premium, modern aesthetic.
+- **Simplified Status Filters**: Removed icons from the status filter options in Job History for a cleaner interface.
+- **Improved Header Proportions**: Reduced the font size and weight of job titles in the History view and Job Detail header for better visual hierarchy and balance.
+- **Concise Analysis Tabs**: Renamed section headers in the Analysis tab (Insight, Skills, Strengths, Gaps, Competencies, Responsibilities) to single-word labels for maximum brevity and clarity.
+- **Improved Modal UX**: Added backdrop-click-to-close functionality to `AuthModal` and `UpgradeModal`, allowing users to dismiss them by clicking outside the modal content area for a more natural interaction pattern.
+- **Landing Page Clarity**: Shortened feature descriptions on the landing page feature grid to ensure visual consistency and a "punchy" 4-5 line maximum across all components.
 
 ## [2.33.1] - 2026-03-17
 

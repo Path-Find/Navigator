@@ -1,7 +1,7 @@
 import { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import type { SavedJob } from '../../types';
-import { Trash2, ArrowRight, Sparkles, Building, Calendar, Filter, Clock, FileText, Zap, ShieldAlert, Layers, Briefcase, Loader2, MapPin, AlertCircle, Hash } from 'lucide-react';
+import { Trash2, ArrowRight, Filter, Clock, ShieldAlert, Briefcase, Loader2 } from 'lucide-react';
 import { SharedPageLayout } from '../../components/common/SharedPageLayout';
 import { StandardSearchBar } from '../../components/common/StandardSearchBar';
 import { PageHeader } from '../../components/ui/PageHeader';
@@ -14,12 +14,12 @@ import { StandardFilterGroup } from '../../components/common/StandardFilterGroup
 import { useJobContext } from './context/JobContext';
 
 const FILTER_OPTIONS = [
-    { id: 'all', label: 'All', icon: <Layers className="w-3.5 h-3.5" /> },
-    { id: 'saved', label: 'Saved', icon: <Building className="w-3.5 h-3.5" /> },
-    { id: 'applied', label: 'Applied', icon: <FileText className="w-3.5 h-3.5" /> },
-    { id: 'interview', label: 'Interview', icon: <Sparkles className="w-3.5 h-3.5" /> },
-    { id: 'offer', icon: <Zap className="w-3.5 h-3.5" />, label: 'Offer' },
-    { id: 'rejected', label: 'Rejected', icon: <Trash2 className="w-3.5 h-3.5" /> },
+    { id: 'all', label: 'All' },
+    { id: 'saved', label: 'Saved' },
+    { id: 'applied', label: 'Applied' },
+    { id: 'interview', label: 'Interview' },
+    { id: 'offer', label: 'Offer' },
+    { id: 'rejected', label: 'Rejected' },
 ] as const;
 
 type StatusFilter = typeof FILTER_OPTIONS[number]['id'];
@@ -183,31 +183,27 @@ export default function History() {
                                         {/* Header Row */}
                                         <div className="flex flex-col md:flex-row md:items-start justify-between gap-4 mb-3">
                                             <div className="space-y-1.5 min-w-0">
-                                                <h3 className={`text-xl sm:text-2xl font-black transition-colors truncate pr-4 tracking-tight leading-tight ${isError ? 'text-rose-950 dark:text-rose-400/90' : 'text-neutral-900 dark:text-white group-hover:text-accent-primary-hex'}`}>
+                                                <h3 className={`text-lg sm:text-xl font-extrabold transition-colors truncate pr-4 tracking-tight leading-tight ${isError ? 'text-rose-950 dark:text-rose-400/90' : 'text-neutral-900 dark:text-white group-hover:text-accent-primary-hex'}`}>
                                                     {isAnalyzing && !job.analysis?.distilledJob.roleTitle ? 'Analyzing New Job...' : roleTitle}
                                                 </h3>
                                                 
                                                 <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs sm:text-sm font-bold text-neutral-500 dark:text-neutral-400">
                                                     {companyName && (
-                                                        <span className="text-neutral-700 dark:text-neutral-300 flex items-center gap-1.5">
-                                                            <Building className="w-3.5 h-3.5" />
+                                                        <span className="text-neutral-700 dark:text-neutral-300">
                                                             {companyName}
                                                         </span>
                                                     )}
                                                     {location && (
-                                                        <span className="flex items-center gap-1.5 underline decoration-neutral-200 dark:decoration-neutral-800 underline-offset-4">
-                                                            <MapPin className="w-3.5 h-3.5" />
+                                                        <span className="underline decoration-neutral-200 dark:decoration-neutral-800 underline-offset-4">
                                                             {location}
                                                         </span>
                                                     )}
-                                                    <span className="flex items-center gap-1.5">
-                                                        <Calendar className="w-3.5 h-3.5" />
+                                                    <span>
                                                         {new Date(job.dateAdded).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' })}
                                                     </span>
                                                     {referenceCode && (
-                                                        <span className="flex items-center gap-1.5">
-                                                            <Hash className="w-3.5 h-3.5" />
-                                                            {referenceCode}
+                                                        <span>
+                                                            #{referenceCode}
                                                         </span>
                                                     )}
                                                     {salaryRange && (
@@ -216,8 +212,7 @@ export default function History() {
                                                         </span>
                                                     )}
                                                     {deadlineInfo && (
-                                                        <span className={`flex items-center gap-1.5 font-black ${deadlineInfo.style}`}>
-                                                            <AlertCircle className="w-3.5 h-3.5" />
+                                                        <span className={`font-black ${deadlineInfo.style}`}>
                                                             {deadlineInfo.label}
                                                         </span>
                                                     )}
