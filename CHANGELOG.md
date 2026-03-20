@@ -96,10 +96,13 @@ All notable changes to this project will be documented in this file.
 - **Layout Stability**: Locked the main content column to `col-span-8` on all tabs to prevent width shifts during tab switching.
 - **Interview Flow Enhancement**: Transitioned the Tailored Mock job selection process from an external screen to an in-chat conversational flow, displaying the user's 5 most recent analyzed jobs as clickable suggestion pills.
 
+### Removed
+- **Interview Tab (Job Page)**: Hidden the Interview tab on the job details page temporarily until AI-generated content is ready, replacing the hardcoded placeholder text.
+- **Redundant Actions**: Removed "Copy optimized summary" from the Resume tab and oversized icon containers from the Cover Letter header.
+- **Sidebar Decorative Elements**: Stripped all decorative icons from card-internal section headings across every tab and sidebar.
+
 ### Fixed
-- **Interview Session Launch**: Resolved a race condition where the interview session would immediately exit back to the selection screen upon launch due to a conflict between the focused mode state and the initial rendering cycle.
-- **Interview Card Button Interactivity**: Fixed an issue where the "Practice Now" and "Launch Mock" buttons on the `InterviewSelection` screen correctly triggered state handlers but appeared unresponsive to users due to an immediate fallback UI rendering condition.
-- **Session Auto-Exit Bug**: Fixed a race condition where the `InterviewSessionScreen` would immediately exit the chat interface and return to the selection screen upon starting, resolving the illusion that the launch buttons were broken.
+- **Interview Session Launch**: Resolved a race condition where the `InterviewSessionScreen` would immediately exit back to the selection screen upon launch, causing "Practice Now" and "Launch Mock" buttons to appear unresponsive. Root cause was a conflict between focused mode state and the initial rendering cycle.
 - **Mock Interview Initialization**: Fixed an infinite loading spinner that occurred during the initial job context selection phase of tailored Mock Interviews.
 - **Interview Error Handling**: Added error state handling and user-facing toast notifications for failed AI requests during Mock Interviews, preventing silent failures and timeouts.
 - **Interview Input Key Handler**: Fixed a form submission bug in `InterviewChat` where hitting `<Enter>` passed a newline carriage return into the chat input field alongside submitting the form.
@@ -113,11 +116,6 @@ All notable changes to this project will be documented in this file.
 - **Placeholder Warnings**: Moved unfilled placeholder detection (e.g. `[TITLE]`) from the editor area into the Cover Letter sidebar for a cleaner experience.
 - **Skill Pill Dot Position**: Proficiency dot in `SkillPill` moved from left to right to match the indicator position on the main Skills page.
 - **Interview Advisor Card Visuals**: Resolved a double-border issue on selection cards by removing redundant internal separators from preview content.
-
-### Removed
-- **Interview Tab (Job Page)**: Hidden the Interview tab on the job details page temporarily until AI-generated content is ready, replacing the hardcoded placeholder text.
-- **Redundant Actions**: Removed "Copy optimized summary" from the Resume tab and oversized icon containers from the Cover Letter header.
-- **sidebar decorative elements**: Stripped all decorative icons from card-internal section headings across every tab and sidebar.
 
 ## [2.32.2] - 2026-03-13
 
@@ -242,6 +240,7 @@ All notable changes to this project will be documented in this file.
 ## [2.31.7] - 2026-03-08
 
 ### Added
+- **The Distiller**: Implemented LLM-powered style distillation for personalized voice adjustments.
 - **Style Transformer**: Implemented `RdStyleService` to distill user feedback into active tailored instructions.
 - **Semantic Trajectory Mapping**: Established `RdEmbeddingService` to map professional experience into latent space.
 - **High-Fidelity Feedback Logs**: Integrated `RdFeedbackService` to capture picks and edits for model calibration.
@@ -263,29 +262,23 @@ All notable changes to this project will be documented in this file.
 - **Safe Analysis Fallbacks**: Standardized return signatures to provide safe defaults when resumes are missing.
 - **Cloud Sync Resilience**: Ensured background sync failures are correctly surfaced via toasts.
 
-### Performance
-- **The Distiller**: Implemented LLM-powered style distillation for personalized voice adjustments.
 
 ## [2.31.6] - 2026-03-08
-
-### Fixed
-- **Timeout Misdiagnosis**: Updated error states to correctly signal service interruptions vs. data errors.
-- **Scraping UX**: URL field automatically cleared on scraping failure for easier manual paste.
-
-### Performance
-- **Job Analysis Pipeline**: Consolidated into a single AI pass to cut network overhead by 50%.
-- **High-Efficiency Junk Filtering**: Aggressively strips website noise, reducing average character counts by ~70%.
-
-## [2.31.5] - 2026-03-08
 
 ### Changed
 - **Roadmap Reorganization**: Cleaned up duplication and cross-linked dependent items across product and platform roadmaps.
 - **Maintenance**: Deleted 12 stale remote branches and pruned local refs.
 
 ### Fixed
+- **Timeout Misdiagnosis**: Updated error states to correctly signal service interruptions vs. data errors.
+- **Scraping UX**: URL field automatically cleared on scraping failure for easier manual paste.
 - **N+1 Sync Status**: Noted progress on sync optimization branch and resolved merge conflicts.
+
+### Performance
+- **Job Analysis Pipeline**: Consolidated into a single AI pass to cut network overhead by 50%.
+- **High-Efficiency Junk Filtering**: Aggressively strips website noise, reducing average character counts by ~70%.
 
 ---
 
 ## Older Releases
-Historical changes prior to version 2.31.5 can be found in the [Changelog Archive](./CHANGELOG_ARCHIVE.md).
+Earlier release history is available in the [Changelog Archive](./CHANGELOG_ARCHIVE.md).

@@ -1,21 +1,9 @@
 # Changelog Archive
 
-All notable changes to this project prior to version 2.31.5 are documented in this file.
+Earlier release history is archived in this file.
 For recent changes, see [CHANGELOG.md](./CHANGELOG.md).
 
 ## [2.31.4] - 2026-03-08
-
-### Security
-- **Transitive Dependency Governance**: Enforced secure versions for high-risk transitive dependencies across the root project and browser extension via `overrides`:
-  - **Rollup Path Traversal**: Patched CVE-2026-27606 by forcing `rollup@>=4.59.0` in both root and extension.
-  - **Minimatch ReDoS**: Resolved CVE-2026-27903 by forcing `minimatch@>=3.1.5` in the root project.
-  - **esbuild Development Safety**: Resolved a moderate severity CORS vulnerability by forcing `esbuild@>=0.25.0` in the extension.
-- **Improved HTML/URL Sanitization**: Addressed 18 high-priority code scanning alerts by implementing robust sanitization:
-  - **Extension Security**: Refactored `stripHtml` to use `DOMParser` instead of `innerHTML` to prevent XSS.
-  - **Edge Functions**: Upgraded HTML extraction in `scrape-jobs` with recursive tag removal to prevent filter bypasses.
-  - **Banner Logic**: Hardened URL scheme checks in `NotificationBanner` to handle case-insensitivity and dangerous protocols (`data:`, `vbscript:`).
-  - **Information Privacy**: Removed raw stack traces and internal error details from checkout session responses.
-  - **Supply Chain Integrity**: Added Subresource Integrity (SRI) hashes to third-party scripts in `index.html`.
 
 ### Changed
 - **Background Analysis Hardening**: Added error handling and `try-catch` blocks to the background analysis loop in `NavigatorPro` to prevent silent failures during scraping or analysis.
@@ -36,6 +24,18 @@ For recent changes, see [CHANGELOG.md](./CHANGELOG.md).
 - **Interview Advisor Stability**: Resolved a duplicate variable declaration and fixed missing dependencies in the `chatMessages` hook.
 - **AI Core Errors**: Fixed `preserve-caught-error` violations in `aiCore.ts` to ensure original error context is preserved during re-throws.
 - **Usage Stats Reliability**: Refactored `getUsageStats` to return errors instead of throwing, ensuring `Promise.allSettled` can properly collect all resolved stats even if one query fails.
+
+### Security
+- **Transitive Dependency Governance**: Enforced secure versions for high-risk transitive dependencies across the root project and browser extension via `overrides`:
+  - **Rollup Path Traversal**: Patched CVE-2026-27606 by forcing `rollup@>=4.59.0` in both root and extension.
+  - **Minimatch ReDoS**: Resolved CVE-2026-27903 by forcing `minimatch@>=3.1.5` in the root project.
+  - **esbuild Development Safety**: Resolved a moderate severity CORS vulnerability by forcing `esbuild@>=0.25.0` in the extension.
+- **Improved HTML/URL Sanitization**: Addressed 18 high-priority code scanning alerts by implementing robust sanitization:
+  - **Extension Security**: Refactored `stripHtml` to use `DOMParser` instead of `innerHTML` to prevent XSS.
+  - **Edge Functions**: Upgraded HTML extraction in `scrape-jobs` with recursive tag removal to prevent filter bypasses.
+  - **Banner Logic**: Hardened URL scheme checks in `NotificationBanner` to handle case-insensitivity and dangerous protocols (`data:`, `vbscript:`).
+  - **Information Privacy**: Removed raw stack traces and internal error details from checkout session responses.
+  - **Supply Chain Integrity**: Added Subresource Integrity (SRI) hashes to third-party scripts in `index.html`.
 
 ## [2.31.3] - 2026-03-07
 
@@ -86,7 +86,7 @@ For recent changes, see [CHANGELOG.md](./CHANGELOG.md).
 
 ## [2.30.1] - 2026-03-06
 
-### Refactored
+### Changed
 - **Cover Letter Editor Modularization**: Decoupled state and logic into a dedicated `useCoverLetterEditor` hook and extracted UI into modular sub-components (`CoverLetterHeader`, `ReviewCard`, etc.), significantly improving maintainability.
 - **Job Detail Decoupling**: Fully refactored `JobDetail.tsx` to remove monolithic logic, replaced with specialized hooks (`useJobAnalysis`, `useResumeTailoring`, `useSummaryGeneration`).
 
@@ -132,6 +132,34 @@ For recent changes, see [CHANGELOG.md](./CHANGELOG.md).
 - **`Logger` Utility**: New `src/utils/logger.ts` provides a production-safe console wrapper. `Logger.log` and `Logger.debug` are no-ops in production builds; `Logger.warn` and `Logger.error` always pass through.
 - **`STORAGE_KEYS` — New Keys**: Added `DEVICE_ID` (`nav_device_id`) and `ONBOARDING_STATE` (`onboarding_state`) to `STORAGE_KEYS`. Fixed a duplicate `PRIVACY_ACCEPTED` entry.
 
+### Changed
+- **Gated Gaps List (`JobDetail`)**: Free-tier users now see only the first identified gap in full; remaining gaps are blurred with a "+N more — Unlock" button overlaid on top, opening the plans comparison. Paid users see the full list unchanged. Only activates when there are 2+ gaps — if there's just one, it's shown in full regardless of tier.
+- **Score-Aware Upgrade Nudge (`JobDetail`)**: Added a contextual conversion prompt inside the match sidebar for free-tier users, shown after analysis completes. The message adapts to their score — strong matches (≥75%) are nudged toward resume tailoring, mid-range (50–74%) toward gap analysis, and low matches (<50%) toward skills gap closure. Tapping opens the plans comparison view. Does not render during analysis or for paid users.
+- **Trial Counter (`UsageIndicator`)**: Rewrote the free-tier usage indicator on the job input page. Fixed a bug where it displayed `weekAnalyses` against a lifetime limit — now correctly uses `lifetimeAnalyses`. Copy updated from "N/3 weekly analyses used" to "Trial: N of 3 analyses used". At 2 of 3 used, the pill shifts to amber and copy flips to countdown framing: "1 trial analysis remaining."
+- **Paywall Screen (`UpgradeModal`)**: Redesigned the upgrade view shown when the free trial limit is hit. "Limit Reached" replaced with "Trial Complete" to frame the moment as a milestone rather than a wall. Added a personalized stats card showing jobs analyzed and average match score, computed from the user's actual analyses and only shown when score data is available. Replaced the amber warning box with calm forward-facing copy. Average score is computed in `GlobalModals` from the `jobs` array and passed in via a new `averageScore` prop.
+- **`interviewAiService` Added to AI Barrel**: Added `export * from './ai/interviewAiService'` to `geminiService.ts`. Updated `SkillInterviewPage.tsx` and `useInterview.ts` to import from `geminiService` instead of the direct path, consistent with all other AI services.
+- **StorageService Migration**: Migrated all 25+ direct `localStorage.getItem/setItem/removeItem` calls in consumer files to go through `LocalStorage`. Affected files: `UserContext`, `GlobalUIContext`, `NavigatorPro`, `JobMatchInput`, `OnboardingPage`, `eventService`, `fingerprint`, `skillQuestionsService`, `useJobDetailLogic`, `storageService`.
+- **Log Sanitation**: Removed the bare `console.log` in `aiCore.ts` (proxy debug noise). Replaced `console.log` in `storageCore.ts` (Vault migration trace), `resumeStorage.ts` (cloud sync debug), and `CoverLetterEditor.tsx` (AI decision trace) with `Logger.log` — dev-only, silent in production.
+- **Removed Redundant Suspense**: `AppRoutes` had an outer `<Suspense>` wrapping all routes that was never triggered, since each individual route has its own `<Suspense>`. Removed the unused wrapper.
+- **Storage Key Constants**: Added `USER_JOURNEY`, `LAST_ARCHETYPE_UPDATE`, `ACCEPTED_TOS_VERSION`, `DISMISSED_NOTICES`, and `PRIVACY_ACCEPTED` to `STORAGE_KEYS` in `constants.ts`. `UserContext` now references these instead of raw strings.
+- **Nudge Threshold Constant**: Extracted `7 * 24 * 60 * 60 * 1000` magic number in nudge logic to `TIME_PERIODS.APPLIED_NUDGE_THRESHOLD_MS`.
+- **`PlanLimitValues` Type**: Replaced `(limits as any).WEEKLY_ANALYSES` casts in `usageLimits.ts` with a proper `PlanLimitValues` intersection type. `||` fallbacks for nullish limit values replaced with `??`.
+- **`encryptionService.decrypt`**: Replaced `split('').map(c => c.charCodeAt(0))` with `Uint8Array.from()` for consistency with the `encrypt` method.
+- **`handleImportResume` Deps**: Removed unused `showSuccess` from the `useCallback` dependency array in `ResumeContext`.
+
+### Removed
+- **BENTO Compat Layer**: Removed the deprecated `BENTO_CARDS_COMPAT`, `BENTO_CATEGORIES_COMPAT`, and `BENTO_RANKINGS_COMPAT` exports from `featureRegistry.ts`, and their corresponding re-exports (`BENTO_CARDS`, `BENTO_CATEGORIES`, `BENTO_RANKINGS`, `BentoCardConfig`) from `constants.ts`. Migration to `FEATURE_REGISTRY` is complete; no active code consumed these aliases. Removed the now-dead `BENTO_CATEGORIES` test from `constants.test.ts`.
+- **Duplicate `adminService.ts`**: Deleted `src/modules/admin/services/adminService.ts`, which was byte-for-byte identical to `src/services/adminService.ts` and was never imported anywhere. Its empty parent directory was also removed.
+- **`isTargetMode` removed from `JobMatchInput`**: Target/dream job mode belonged to the Career section, not the Job section. The job input page is for applying to jobs. Removed the mode state, all conditional logic branching on it, the `useCoachContext` import, the `TrendingUp` icon, and the hardcoded `mode` constant. The Career Coach section manages target jobs independently.
+- **`showResumePrompt` dead code**: Removed unreachable resume upload modal from `JobMatchInput`. The state and JSX block existed but `setShowResumePrompt(true)` was never called anywhere. Also cleaned up the imports (`X`, `DropZone`) and destructured context values (`onImportResume`, `isParsing`, `importError`) that were only used by this modal.
+- **`WelcomeScreen` component**: Deleted unused modal-based onboarding flow (`WelcomeScreen.tsx`). This was the original overlay version of onboarding and has been superseded by the route-based `OnboardingPage`. It was not imported anywhere in the codebase.
+
+### Fixed
+- **`JobMatchInput` input type**: Changed `type="url"` to `type="text"` on the primary job input. The field accepts both URLs and raw pasted job descriptions, making `url` incorrect and causing browser validation errors on plain-text input.
+- **Vault Init Race Condition**: Concurrent `Vault.getSecure` calls on mount could each independently call `encryptionService.init()` before the first completed. Initialization is now guarded by a shared promise so concurrent callers await the same work.
+- **`submitFeedback` Fire-and-Forget**: `supabase.from('feedback').insert()` was not awaited, silently swallowing errors. Now properly awaited.
+- **`callWithRetry` Backoff Ignored Constant**: Retry delay multiplier was hardcoded as `* 2` instead of using `API_CONFIG.RETRY_BACKOFF_MULTIPLIER`. Now consistent with the constant.
+
 ### Security
 - **`check_analysis_limit` — Undeclared variable fix**: Added missing `v_email_verified BOOLEAN` declaration to the `DECLARE` block in `check_analysis_limit`. The variable was selected into but never declared, causing the function to fail at runtime. Because the client-side caller fails open on DB errors, this meant quota limits were not being enforced. ⚠️ *Requires Supabase SQL migration to take effect.*
 - **`protect_sensitive_profile_fields` — Correct role check**: Replaced `current_setting('role')` with `current_user` in the trigger that guards `subscription_tier`, `is_admin`, and `is_tester` from user self-modification. `current_setting('role')` reads a GUC config parameter and does not reliably return the active session role; `current_user` is the correct PostgreSQL function. The previous check was effectively always false, meaning the Stripe webhook (service role) could not update subscription tiers. ⚠️ *Requires Supabase SQL migration to take effect.*
@@ -150,34 +178,6 @@ For recent changes, see [CHANGELOG.md](./CHANGELOG.md).
 - **Compact AI Prompt JSON**: `resumeAiService.stringifyProfile` no longer pretty-prints JSON with 2-space indentation when building prompts, reducing wasted tokens on every resume AI call.
 - **Reduced Callback Re-creation**: `handleSaveFromFeed`, `handlePromoteFromFeed`, and `handleDeleteJob` in `useJobManager` no longer depend on the full `jobs` array. Introduced a `jobsRef` to read current jobs without triggering re-creation on every job state change.
 
-### Changed
-- **Gated Gaps List (`JobDetail`)**: Free-tier users now see only the first identified gap in full; remaining gaps are blurred with a "+N more — Unlock" button overlaid on top, opening the plans comparison. Paid users see the full list unchanged. Only activates when there are 2+ gaps — if there's just one, it's shown in full regardless of tier.
-- **Score-Aware Upgrade Nudge (`JobDetail`)**: Added a contextual conversion prompt inside the match sidebar for free-tier users, shown after analysis completes. The message adapts to their score — strong matches (≥75%) are nudged toward resume tailoring, mid-range (50–74%) toward gap analysis, and low matches (<50%) toward skills gap closure. Tapping opens the plans comparison view. Does not render during analysis or for paid users.
-- **Trial Counter (`UsageIndicator`)**: Rewrote the free-tier usage indicator on the job input page. Fixed a bug where it displayed `weekAnalyses` against a lifetime limit — now correctly uses `lifetimeAnalyses`. Copy updated from "N/3 weekly analyses used" to "Trial: N of 3 analyses used". At 2 of 3 used, the pill shifts to amber and copy flips to countdown framing: "1 trial analysis remaining."
-- **Paywall Screen (`UpgradeModal`)**: Redesigned the upgrade view shown when the free trial limit is hit. "Limit Reached" replaced with "Trial Complete" to frame the moment as a milestone rather than a wall. Added a personalized stats card showing jobs analyzed and average match score, computed from the user's actual analyses and only shown when score data is available. Replaced the amber warning box with calm forward-facing copy. Average score is computed in `GlobalModals` from the `jobs` array and passed in via a new `averageScore` prop.
-- **`interviewAiService` Added to AI Barrel**: Added `export * from './ai/interviewAiService'` to `geminiService.ts`. Updated `SkillInterviewPage.tsx` and `useInterview.ts` to import from `geminiService` instead of the direct path, consistent with all other AI services.
-- **StorageService Migration**: Migrated all 25+ direct `localStorage.getItem/setItem/removeItem` calls in consumer files to go through `LocalStorage`. Affected files: `UserContext`, `GlobalUIContext`, `NavigatorPro`, `JobMatchInput`, `OnboardingPage`, `eventService`, `fingerprint`, `skillQuestionsService`, `useJobDetailLogic`, `storageService`.
-- **Log Sanitation**: Removed the bare `console.log` in `aiCore.ts` (proxy debug noise). Replaced `console.log` in `storageCore.ts` (Vault migration trace), `resumeStorage.ts` (cloud sync debug), and `CoverLetterEditor.tsx` (AI decision trace) with `Logger.log` — dev-only, silent in production.
-- **Removed Redundant Suspense**: `AppRoutes` had an outer `<Suspense>` wrapping all routes that was never triggered, since each individual route has its own `<Suspense>`. Removed the unused wrapper.
-- **Storage Key Constants**: Added `USER_JOURNEY`, `LAST_ARCHETYPE_UPDATE`, `ACCEPTED_TOS_VERSION`, `DISMISSED_NOTICES`, and `PRIVACY_ACCEPTED` to `STORAGE_KEYS` in `constants.ts`. `UserContext` now references these instead of raw strings.
-- **Nudge Threshold Constant**: Extracted `7 * 24 * 60 * 60 * 1000` magic number in nudge logic to `TIME_PERIODS.APPLIED_NUDGE_THRESHOLD_MS`.
-- **`PlanLimitValues` Type**: Replaced `(limits as any).WEEKLY_ANALYSES` casts in `usageLimits.ts` with a proper `PlanLimitValues` intersection type. `||` fallbacks for nullish limit values replaced with `??`.
-- **`encryptionService.decrypt`**: Replaced `split('').map(c => c.charCodeAt(0))` with `Uint8Array.from()` for consistency with the `encrypt` method.
-- **`handleImportResume` Deps**: Removed unused `showSuccess` from the `useCallback` dependency array in `ResumeContext`.
-
-### Fixed
-- **`JobMatchInput` input type**: Changed `type="url"` to `type="text"` on the primary job input. The field accepts both URLs and raw pasted job descriptions, making `url` incorrect and causing browser validation errors on plain-text input.
-- **Vault Init Race Condition**: Concurrent `Vault.getSecure` calls on mount could each independently call `encryptionService.init()` before the first completed. Initialization is now guarded by a shared promise so concurrent callers await the same work.
-- **`submitFeedback` Fire-and-Forget**: `supabase.from('feedback').insert()` was not awaited, silently swallowing errors. Now properly awaited.
-- **`callWithRetry` Backoff Ignored Constant**: Retry delay multiplier was hardcoded as `* 2` instead of using `API_CONFIG.RETRY_BACKOFF_MULTIPLIER`. Now consistent with the constant.
-
-### Removed
-- **BENTO Compat Layer**: Removed the deprecated `BENTO_CARDS_COMPAT`, `BENTO_CATEGORIES_COMPAT`, and `BENTO_RANKINGS_COMPAT` exports from `featureRegistry.ts`, and their corresponding re-exports (`BENTO_CARDS`, `BENTO_CATEGORIES`, `BENTO_RANKINGS`, `BentoCardConfig`) from `constants.ts`. Migration to `FEATURE_REGISTRY` is complete; no active code consumed these aliases. Removed the now-dead `BENTO_CATEGORIES` test from `constants.test.ts`.
-- **Duplicate `adminService.ts`**: Deleted `src/modules/admin/services/adminService.ts`, which was byte-for-byte identical to `src/services/adminService.ts` and was never imported anywhere. Its empty parent directory was also removed.
-- **`isTargetMode` removed from `JobMatchInput`**: Target/dream job mode belonged to the Career section, not the Job section. The job input page is for applying to jobs. Removed the mode state, all conditional logic branching on it, the `useCoachContext` import, the `TrendingUp` icon, and the hardcoded `mode` constant. The Career Coach section manages target jobs independently.
-- **`showResumePrompt` dead code**: Removed unreachable resume upload modal from `JobMatchInput`. The state and JSX block existed but `setShowResumePrompt(true)` was never called anywhere. Also cleaned up the imports (`X`, `DropZone`) and destructured context values (`onImportResume`, `isParsing`, `importError`) that were only used by this modal.
-- **`WelcomeScreen` component**: Deleted unused modal-based onboarding flow (`WelcomeScreen.tsx`). This was the original overlay version of onboarding and has been superseded by the route-based `OnboardingPage`. It was not imported anywhere in the codebase.
-
 ## [2.28.0] - 2026-03-05
 
 ### Added
@@ -190,9 +190,6 @@ For recent changes, see [CHANGELOG.md](./CHANGELOG.md).
 - **Navigation**: Added `career-orgs` to `ViewId` and `VIEW_TO_PATH` in `navigation.ts`.
 
 ## [2.27.0] - 2026-03-05
-
-### Fixed
-- **Job Detail Evaluation Retry**: Resolved an issue where manually editing an incomplete job description and clicking "Evaluate Match" failed to trigger the analysis state transition due to a missing state update (`onUpdateJob`).
 
 ### Changed
 - **Honest UI Statuses**: Replaced misleading "Analyzing" and "Processing" status labels across the application (Application History, Job Detail, Feed) with precise terms like "Saving...", or removed them entirely when the system is actually just blocked waiting for user input. This prevents the UI from falsely claiming deep AI work is happening.
@@ -208,6 +205,9 @@ For recent changes, see [CHANGELOG.md](./CHANGELOG.md).
   - `ProgramExplorerPage.onSelect` callback typed with `{ institution: string; name: string }`.
 - **Error Handling Standardization**: Replaced all `catch (err: any)` / `catch (error: any)` clauses with `catch (err: unknown)` + `instanceof Error` narrowing across `useInterview.ts`, `useAcademicLogic.ts`, `MAEligibility.tsx`, `PlansOnboardingStep.tsx`, and `PlansPage.tsx`.
 - **FeatureRegistry Navigation Fix**: Corrected `targetView` for COACH and ROLE_MODELS features from invalid `'career-home'` to the correct `'coach-home'` ViewId.
+
+### Fixed
+- **Job Detail Evaluation Retry**: Resolved an issue where manually editing an incomplete job description and clicking "Evaluate Match" failed to trigger the analysis state transition due to a missing state update (`onUpdateJob`).
 
 ## [2.26.0] - 2026-03-04
 
@@ -467,6 +467,13 @@ For recent changes, see [CHANGELOG.md](./CHANGELOG.md).
 - **Premium Toast Notifications**: Redesigned notification system with a compact glassmorphism aesthetic and reduced dismissal timeout.
 - **Bookmarklet UI**: Integrated persistent installation tips into Application History and Job Match pages.
 
+### Removed
+- **Settings Modal**: Removed the legacy modal-based settings interface to provide more breathing room for account management.
+- **Resume Editor Empty States**: Removed redundant "No items found" placeholders and "Initialize Section" buttons.
+- **History Page Bookmarklet Tip**: Removed the "Save from anywhere" banner from the Application History page.
+- **All-Caps UI Transformation**: Removed `uppercase` text transformation across the entire application for a cleaner aesthetic.
+- **Resume Editor Pro Tip**: Removed the "Pro Tip" sidebar card to reduce visual noise and documentation clutter.
+
 ### Fixed
 - **Navigation Consistency**: Resolved a long-standing navigation bug where the "Jobs" menu item remained active while viewing the Admin page.
 - **Resume Export Reliability**: Fixed the "Download PDF" feature by implementing a dedicated high-fidelity printable preview component.
@@ -492,14 +499,7 @@ For recent changes, see [CHANGELOG.md](./CHANGELOG.md).
 - **Resume Editor**: Fixed a critical text wrapping bug where long professional summaries and achievement bullets were being cut off.
 - **Resume Editor Labeling**: Restored descriptive section labels across the editor for better clarity.
 - **Improved Sync Feedback**: Refined the "Synced" status indicator by removing the unnecessary timestamp.
-
-### Removed
-- **Settings Modal**: Removed the legacy modal-based settings interface to provide more breathing room for account management.
-- **Resume Editor Empty States**: Removed redundant "No items found" placeholders and "Initialize Section" buttons.
-- **History Page Bookmarklet Tip**: Removed the "Save from anywhere" banner from the Application History page.
-- **All-Caps UI Transformation**: Removed `uppercase` text transformation across the entire application for a cleaner aesthetic.
 - **Visual High-Intensity Styling**: Softened the visual profile of technical labels to improve readability and user empathy.
-- **Resume Editor Pro Tip**: Removed the "Pro Tip" sidebar card to reduce visual noise and documentation clutter.
 
 ## [2.18.0] - 2026-02-21
 
@@ -533,25 +533,6 @@ For recent changes, see [CHANGELOG.md](./CHANGELOG.md).
   - Upgraded all analysis and result cards to the `premium` variant, utilizing glassmorphism and refined drop-shadows.
   - Implemented smooth entry animations for Experience Blocks with indigo pulse indicators.
   - Added a "Copy Full Resume" action with immediate visual feedback.
-
-### Changed
-- **UI Architecture**: 
-  - Restored main header navigation to the Job Match page for better site-wide consistency.
-  - Standardized `JobDetail` layout using `SharedPageLayout`, resolving inconsistent padding and width issues.
-  - Refined the `JobDetail` layout to use the `premium` design system consistently across all tabs (Analysis, Job Post, Resume).
-
-### Fixed
-- **AI Analysis Robustness**:
-  - Improved skill and responsibility extraction logic to prioritize high-fidelity analysis over basic extraction.
-  - Refined AI prompts to intelligently infer competencies for brief job descriptions, preventing "empty" result states.
-- **Build & Stability**:
-  - Fixed corrupted JSX structure and missing `SharedPageLayout` imports in `JobDetail.tsx`.
-  - Resolved implicit `any` type and missing `SavedJob` import in `AppRoutes.tsx`.
-  - Implemented a `process.env` shim in `vite.config.ts` to resolve the "process is not defined" error encountered during Vercel deployments.
-  - Fixed corrupted JSX structure in the Job Detail module to ensure stable rendering across all application states.
-  - Resolved missing icon imports for `Search` and `ShieldCheck` in `JobDetail.tsx`.
-
-### Added
 - **Education Module: Grad School Discovery**:
   - Introduced **Program Explorer** to search and filter curated Master's programs with seamless integration into the Program Fit Analyzer.
   - Added **Application Launchpad**, providing a structured, interactive roadmap for core admission requirements (GRE/GMAT, SOP, LORs).
@@ -574,6 +555,10 @@ For recent changes, see [CHANGELOG.md](./CHANGELOG.md).
   - Improved **Background Feedback**: Updated `JobDetail` UI to robustly handle auto-refresh states with skeleton loaders and synchronized progress messages.
 
 ### Changed
+- **UI Architecture**:
+  - Restored main header navigation to the Job Match page for better site-wide consistency.
+  - Standardized `JobDetail` layout using `SharedPageLayout`, resolving inconsistent padding and width issues.
+  - Refined the `JobDetail` layout to use the `premium` design system consistently across all tabs (Analysis, Job Post, Resume).
 - **UI Consistency**:
   - Unified the "Interview Advisor" page header to use the standard `<PageHeader>` component, resolving alignment and font scale discrepancies with "Application History" and "Resume Editor".
   - Removed lingering focus outlines (blue pills) from navigation sub-items (e.g., "Interviews", "History") that remained stuck after a mouse click, while preserving standard `:focus-visible` accessibility rings for keyboard navigation.
@@ -597,6 +582,7 @@ For recent changes, see [CHANGELOG.md](./CHANGELOG.md).
 - **Security & Safety**:
   - **Improved Log Sanitization**: Hardened the `gemini-proxy` log sanitization to strip a broader range of control characters (tabs, null bytes, backspaces) and fixed missing sanitization in error/warning paths to prevent potential log injection.
   - **Sensitive Data Exposure**: Prevented accidental exposure of sensitive user profile data (subscription tier, admin/tester status) in client-side debug logs.
+
 ### Fixed
 - **AI Feedback**:
   - Fixed an issue in the Skills Assessment where the AI interviewer referred to the candidate in the third person instead of addressing them directly ("you").
@@ -604,6 +590,12 @@ For recent changes, see [CHANGELOG.md](./CHANGELOG.md).
   - Fixed a critical bug where a new user's initial resume upload would fail to persist to the cloud due to a missing `insert` clause in `resumeStorage`.
   - Added robust stringified JSON parsing for incoming cloud resume payloads to prevent data drops caused by schema type mismatches.
 - **Match Calculations**: Fixed a UI bug where a literal **0% Match Score** was treated as "missing data", causing jobs to display "Analysis Needed" instead of their correct score.
+- **Build & Stability**:
+  - Fixed corrupted JSX structure and missing `SharedPageLayout` imports in `JobDetail.tsx`.
+  - Resolved implicit `any` type and missing `SavedJob` import in `AppRoutes.tsx`.
+  - Implemented a `process.env` shim in `vite.config.ts` to resolve the "process is not defined" error encountered during Vercel deployments.
+  - Fixed corrupted JSX structure in the Job Detail module to ensure stable rendering across all application states.
+  - Resolved missing icon imports for `Search` and `ShieldCheck` in `JobDetail.tsx`.
 
 
 ## [2.16.0] - 2026-02-20
@@ -629,6 +621,10 @@ For recent changes, see [CHANGELOG.md](./CHANGELOG.md).
   - Standardized diverse CTA labels across features into clearer, action-oriented verbs (e.g., "Enter Navigator", "Open Feed", "Quick Start").
   - Implemented a "premium empathetic error UI" in Job Details that distinguishes between scraping failures and AI service errors.
 
+### Removed
+- **Education**: Removed redundant "Back to Education" headers to streamline screen architecture.
+- **Privacy**: Removed outdated policy update badges from the home screen layout.
+
 ### Fixed
 - **Critical Stability & Storage**:
   - Resolved a severe "destructive sync" race condition in `JobStorage` that could mistakenly clear local data before merging with the cloud.
@@ -641,10 +637,6 @@ For recent changes, see [CHANGELOG.md](./CHANGELOG.md).
   - Corrected multiple visual discrepancies including clipped hero gradients, broken dark mode toggles in Tailwind v4, and invisible button text on stark glass backdrops.
   - Corrected overlap issues with the fixed app headers across the History framework.
   - Fixed inconsistent hero header alignment on the Upgrade (`/plans`) page by adopting the standard `SharedPageLayout` component.
-
-### Removed
-- **Education**: Removed redundant "Back to Education" headers to streamline screen architecture.
-- **Privacy**: Removed outdated policy update badges from the home screen layout.
 
 ## [2.15.2] - 2026-02-19
 
@@ -708,6 +700,11 @@ For recent changes, see [CHANGELOG.md](./CHANGELOG.md).
   - Implemented build-time **code splitting** (Vite `manualChunks`) and `esbuild` minification.
   - Added `preconnect` and `dns-prefetch` hints for Google Fonts and deferred `pdf.js` loading.
 
+### Removed
+- **Redundancy**: Removed "Admin Beta" tags, "Beta Feature" notices, and "Resume parsed successfully" toasts.
+- **Legacy Components**: Deleted deprecated `SkillInterviewModal.tsx` and removed redundant Education dashboard cards.
+- **Design Clutter**: Removed footer taglines and "Added" dates from skill cards to simplify the interface.
+
 ### Fixed
 - **UI & Navigation**:
   - Resolved invisible headline text and fixed vertical alignment in Settings and Home sections.
@@ -725,11 +722,6 @@ For recent changes, see [CHANGELOG.md](./CHANGELOG.md).
   - Resolved session start bugs in the Interview Advisor.
 - **Code Quality**:
   - Cleaned up TypeScript linting errors and removed unused imports/variables across the codebase.
-
-### Removed
-- **Redundancy**: Removed "Admin Beta" tags, "Beta Feature" notices, and "Resume parsed successfully" toasts.
-- **Legacy Components**: Deleted deprecated `SkillInterviewModal.tsx` and removed redundant Education dashboard cards.
-- **Design Clutter**: Removed footer taglines and "Added" dates from skill cards to simplify the interface.
 
 
 ## [2.14.0] - 2026-02-18
@@ -762,11 +754,11 @@ For recent changes, see [CHANGELOG.md](./CHANGELOG.md).
 - **UX Feedback**: Added immediate "Copied!" feedback for tokens/emails and granular rating loops for cover letters.
 - **Policies**: Updated transparency disclosures to include **AI Quality Logging** and **PII Redaction** policies.
 
-### Fixed
-- **Tests**: Added comprehensive unit tests for architectural constants, upload flows, and usage limits.
-
 ### Removed
 - **Self-Service Deletion**: Removed to prevent abuse.
+
+### Fixed
+- **Tests**: Added comprehensive unit tests for architectural constants, upload flows, and usage limits.
 
 
 ## [2.13.0] - 2026-02-17
@@ -849,13 +841,13 @@ For recent changes, see [CHANGELOG.md](./CHANGELOG.md).
 
 ## [2.11.1] - 2026-02-15
 
-### Fixed
-- **Navigation**: Resolved a layout issue where the navigation pill appeared below the header elements. Aligned it vertically to the center.
-- **Stability**: Resolved a merge conflict in `Header.tsx` to ensure type safety.
-
 ### Added
 - **Quality Assurance**: Added automated tests for `Header` layout integrity to prevent regressions.
 - **Workflow**: Introduced a UI Quality Checklist for future interface updates.
+
+### Fixed
+- **Navigation**: Resolved a layout issue where the navigation pill appeared below the header elements. Aligned it vertically to the center.
+- **Stability**: Resolved a merge conflict in `Header.tsx` to ensure type safety.
 
 
 ## [2.11.0] - 2026-02-15
@@ -882,13 +874,6 @@ For recent changes, see [CHANGELOG.md](./CHANGELOG.md).
 
 ## [2.9.0] - 2026-02-15
 
-### Changed
-- **Architecture**: Completed a major 3-phase refactor to improve modularity and maintainability.
-  - **App Shell**: Extracted routing into `AppRoutes.tsx` and layout into `AppLayout.tsx`, reducing `App.tsx` from 400+ lines to 35.
-  - **Context Logic**: Extracted heavy business logic from `JobContext` and `CoachContext` into dedicated "Manager" hooks (`useJobManager`, `useCoachManager`).
-  - **Global Modal System**: Implemented a centralized `ModalContext` to eliminate prop-drilling for all global modals (Auth, Settings, etc.).
-- **Visuals**: Cleaned up the application shell and improved background transitions.
-
 ### Added
 - **Job Alert Email Feed**: Implemented an AI-powered system that captures job alerts from inbound emails (Postmark) and triages them automatically in a new "Job Feed" view.
 - **Inbound Email Tokens**: Unique Navigator email addresses generated per user for private job alert redirection.
@@ -896,6 +881,13 @@ For recent changes, see [CHANGELOG.md](./CHANGELOG.md).
 - **Auto-Cleanup**: Automated 7-day TTL (Time-To-Live) for feed items to keep the stream fresh and self-cleaning.
 - **Monetization**: Restrictive access to Job Automation features for Pro-tier users with integrated upgrade nudges.
 - **Save to History**: One-click bookmarking to move jobs from the transient Feed to permanent application History.
+
+### Changed
+- **Architecture**: Completed a major 3-phase refactor to improve modularity and maintainability.
+  - **App Shell**: Extracted routing into `AppRoutes.tsx` and layout into `AppLayout.tsx`, reducing `App.tsx` from 400+ lines to 35.
+  - **Context Logic**: Extracted heavy business logic from `JobContext` and `CoachContext` into dedicated "Manager" hooks (`useJobManager`, `useCoachManager`).
+  - **Global Modal System**: Implemented a centralized `ModalContext` to eliminate prop-drilling for all global modals (Auth, Settings, etc.).
+- **Visuals**: Cleaned up the application shell and improved background transitions.
 
 
 ## [2.8.3] - 2026-02-14
@@ -946,6 +938,14 @@ For recent changes, see [CHANGELOG.md](./CHANGELOG.md).
 - **Career Module**: Added **Evidence Quick-Copy** feature to Gap Analysis, providing AI-tailored resume bullets ready for one-click use.
 - **AI Infrastructure**: Upgraded `analyzeMAEligibility` prompt to act as a "Program Architect," reverse-engineering school-specific admission requirements.
 
+### Changed
+- **Coach Dashboard**: Refactored `CoachDashboard.tsx` by extracting logic into atomic components (`CoachHero`, `RoleModelSection`, `GapAnalysisSection`) to improve maintainability.
+- **Edu Module**: Refactored `AcademicHQ.tsx` by extracting logic into atomic components (`AcademicHero`, `AcademicProfileSummary`, etc.).
+- **Testing & Stability**: Implemented a comprehensive test suite (23 new tests) for Career and Edu modules.
+- **Code Quality**: Refined type definitions in `storageCore.ts` and improved error handling in Edge Functions.
+- **State Management**: Resolved a nested state mutation bug in `useAcademicLogic` that affected credit calculations.
+- **Test Infrastructure**: Fixed global state leakage in `localStorage` by ensuring mock stores are cleared.
+
 ### Fixed
 - **History**: Resolved a bug where jobs in "Analyzing" or "Failed" states were hidden from the "Saved" filter view.
 - **History**: Added distinct status labels and visual styles (including pulse animations) for "Analyzing" and "Failed" job states.
@@ -955,14 +955,6 @@ For recent changes, see [CHANGELOG.md](./CHANGELOG.md).
 - **Tests**: Resolved failing tests in `jobStorage.test.ts` by correcting the Supabase mock path and updating test data to use valid UUIDs.
 - **Tests**: Updated `History.test.tsx` to align with the current empty-state UI text.
 - **Code Quality**: Fixed a critical "access before declaration" error in `ToastContext.tsx` and resolved over 30 linting errors across `App.tsx`, `AuthModal.tsx`, `JobDetail.tsx`, and AI service files.
-
-### Changed
-- **Coach Dashboard**: Refactored `CoachDashboard.tsx` by extracting logic into atomic components (`CoachHero`, `RoleModelSection`, `GapAnalysisSection`) to improve maintainability.
-- **Edu Module**: Refactored `AcademicHQ.tsx` by extracting logic into atomic components (`AcademicHero`, `AcademicProfileSummary`, etc.).
-- **Testing & Stability**: Implemented a comprehensive test suite (23 new tests) for Career and Edu modules.
-- **Code Quality**: Refined type definitions in `storageCore.ts` and improved error handling in Edge Functions.
-- **State Management**: Resolved a nested state mutation bug in `useAcademicLogic` that affected credit calculations.
-- **Test Infrastructure**: Fixed global state leakage in `localStorage` by ensuring mock stores are cleared.
 
 
 ## [2.6.0] - 2026-02-12
@@ -1041,14 +1033,14 @@ For recent changes, see [CHANGELOG.md](./CHANGELOG.md).
 
 ## [2.3.1] - 2026-02-11
 
+### Removed
+- **Marketing**: Removed the "ATS Comparison" and "Analyzing JD" preview graphics based on feedback.
+
 ### Fixed
 - **Design System**: Restored clean `neutral` palette, removing the inadvertent blue tint from both theme modes.
 - **Dark Mode**: Refined dark mode back to core black (`#0a0a0a`).
 - **Layout**: Corrected the `History` view width to match the standard site container (`max-w-7xl`).
 - **Visibility**: Fixed legibility of animated headlines ("Ace the...") that was impacted by theme changes.
-
-### Removed
-- **Marketing**: Removed the "ATS Comparison" and "Analyzing JD" preview graphics based on feedback.
 
 
 ## [2.3.0] - 2026-02-07
@@ -1143,15 +1135,15 @@ For recent changes, see [CHANGELOG.md](./CHANGELOG.md).
 
 ## [1.1.0] - 2026-01-25
 
+### Added
+- Standardized documentation format including `SECURITY.md` and `LICENSE`.
+- Secure storage utility for client-side encryption.
+
 ### Fixed
 - **Security**: Removed hardcoded admin email from client code; admin status is now checked server-side via Supabase profiles.
 - **Security**: Removed hardcoded invite code bypass; invite codes are now validated exclusively via server-side RPC.
 - **Security**: Implemented AES-GCM encryption for API keys stored in `localStorage` using the Web Crypto API.
 - **Security**: Eliminated third-party proxy dependency (`corsproxy.io`) for web scraping; all scraping is now handled via Supabase Edge Functions.
-
-### Added
-- Standardized documentation format including `SECURITY.md` and `LICENSE`.
-- Secure storage utility for client-side encryption.
 
 ## [1.0.0] - 2026-01-24
 
