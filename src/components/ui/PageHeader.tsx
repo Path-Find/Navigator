@@ -4,7 +4,7 @@ import { ArrowLeft } from 'lucide-react';
 interface PageHeaderProps {
     variant?: 'hero' | 'detail' | 'simple';
     title: string;
-    highlight?: string;
+    highlight?: string | React.ReactNode;
     subtitle?: string | React.ReactNode;
     onBack?: () => void;
     actions?: React.ReactNode;
@@ -88,7 +88,11 @@ export const PageHeader: React.FC<PageHeaderProps> = ({
 
                 <div>
                     <h1 className="text-2xl font-black text-neutral-900 dark:text-white tracking-tight">
-                        {title}
+                        {title} {highlight && (
+                            <span className="text-transparent bg-clip-text animate-gradient-x" style={{ backgroundImage: 'var(--background-image-accent-gradient)', backgroundSize: '200% auto' }}>
+                                {highlight}
+                            </span>
+                        )}
                     </h1>
                     {subtitle && (
                         <p className="text-neutral-500 dark:text-neutral-400 font-medium">

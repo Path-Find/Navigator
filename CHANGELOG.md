@@ -2,6 +2,22 @@
 
 All notable changes to this project will be documented in this file.
 
+## [2.35.0] - 2026-03-20
+
+### Changed
+- **Duplicate File Purge**: Removed 46 redundant duplicate files (e.g., `filename 2.tsx`) across the codebase to resolve workspace clutter and improve project hygiene.
+- **Homepage Layout Alignment**: Synchronized the `FeatureGrid` and `PageHeader` with the global navigation bar width (`6xl`) to ensure a perfectly aligned, edge-to-edge visual experience.
+- **Improved Visual Spacing**: Increased vertical gutters between hero sections and feature grids for a more breathable, premium layout.
+- **Container Cleanup**: Removed redundant `max-width` wrappers and internal padding from `HomePage` and `FeatureGrid` to prevent layout nesting issues.
+- **Settings & NextGen Refinement**: Refined the NextGen Calibration panel and Settings cards to a solid, minimalist tactile design, moving away from glassmorphism to align with the rest of the application.
+- **Header Standardization**: Reverted account settings header flair to a clean, text-only highlight.
+- **PageHeader Enhancements**: Updated the `PageHeader` component to support `React.ReactNode` in the highlight prop for future flexibility.
+
+### Fixed
+- **Unused Asset Cleanup**: Cleaned up unused Lucide icons (`Zap`, `Sparkles`, `Shield`) and redundant imports.
+- **Versioning Reversion**: Reverted premature version bump to 2.34.0.
+
+
 ## [2.34.0] - 2026-03-17
 
 ### Changed

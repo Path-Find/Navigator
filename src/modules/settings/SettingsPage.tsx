@@ -73,7 +73,7 @@ export const SettingsPage: React.FC = () => {
                                 <div className="p-2 bg-indigo-500/10 rounded-xl">
                                     <UserIcon className="w-5 h-5 text-indigo-500" />
                                 </div>
-                                <h4 className="font-bold text-neutral-900 dark:text-white">Account</h4>
+                                <h4 className="font-bold text-neutral-900 dark:text-white uppercase tracking-tight">Account</h4>
                             </div>
 
                             <div className="flex flex-col gap-1 mb-6">
@@ -143,7 +143,7 @@ export const SettingsPage: React.FC = () => {
                                 <div className="p-2 bg-amber-500/10 rounded-xl">
                                     <Star className="w-5 h-5 text-amber-500" />
                                 </div>
-                                <h4 className="font-bold text-neutral-900 dark:text-white">Plan</h4>
+                                <h4 className="font-bold text-neutral-900 dark:text-white uppercase tracking-tight">Plan</h4>
                             </div>
 
                             <div className="flex flex-col">
@@ -230,7 +230,7 @@ export const SettingsPage: React.FC = () => {
                                 <div className="p-2 bg-blue-500/10 rounded-xl">
                                     <Puzzle className="w-5 h-5 text-blue-500" />
                                 </div>
-                                <h4 className="font-bold text-neutral-900 dark:text-white">Integrations</h4>
+                                <h4 className="font-bold text-neutral-900 dark:text-white uppercase tracking-tight">Integrations</h4>
                             </div>
 
                             {/* Row 1: Extension */}

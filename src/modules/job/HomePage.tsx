@@ -24,13 +24,13 @@ const HomePage: React.FC = () => {
 
     return (
         <SharedPageLayout
-            maxWidth="full"
+            maxWidth="6xl"
             className="relative theme-job"
             spacing="hero"
             animate={false}
         >
             {/* Hero Background Elements */}
-            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-6xl h-[600px] pointer-events-none z-0">
+            <div className="absolute top-0 left-0 w-full h-[600px] pointer-events-none z-0">
                 <div className="absolute top-[-100px] left-1/4 w-[400px] h-[400px] bg-indigo-500/10 dark:bg-indigo-500/5 blur-[80px] rounded-full animate-[pulse_4s_ease-in-out_infinite]" />
                 <div className="absolute top-[100px] right-1/4 w-[400px] h-[400px] bg-emerald-500/10 dark:bg-emerald-500/5 blur-[80px] rounded-full animate-[pulse_5s_ease-in-out_infinite_1s]" />
             </div>
@@ -39,31 +39,29 @@ const HomePage: React.FC = () => {
                 variant="hero"
                 title={activeHeadline.text}
                 highlight={activeHeadline.highlight}
-                className="mb-8"
+                className="mb-16"
                 subtitle=""
             />
 
-            <div className="w-full max-w-6xl mx-auto px-4 sm:px-6">
-                <FeatureGrid
-                    user={user}
-                    onNavigate={onNavigate}
-                    onShowAuth={onShowAuth}
-                    isAdmin={isAdmin}
-                    isTester={isTester}
-                    userTier={userTier}
-                    journey={journey}
-                    className="mb-4"
-                />
+            <FeatureGrid
+                user={user}
+                onNavigate={onNavigate}
+                onShowAuth={onShowAuth}
+                isAdmin={isAdmin}
+                isTester={isTester}
+                userTier={userTier}
+                journey={journey}
+                className="mb-12"
+            />
 
-                <div className="flex justify-center mb-8 animate-in fade-in duration-700 delay-300">
-                    <a
-                        href="/features"
-                        className="group flex items-center gap-2 text-sm font-bold text-neutral-400 hover:text-indigo-500 dark:hover:text-indigo-400 transition-colors"
-                    >
-                        Explore all features
-                        <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-                    </a>
-                </div>
+            <div className="flex justify-center mb-8 animate-in fade-in duration-700 delay-300">
+                <a
+                    href="/features"
+                    className="group flex items-center gap-2 text-sm font-bold text-neutral-400 hover:text-indigo-500 dark:hover:text-indigo-400 transition-colors"
+                >
+                    Explore all features
+                    <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                </a>
             </div>
         </SharedPageLayout>
     );
