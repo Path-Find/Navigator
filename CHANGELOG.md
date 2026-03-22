@@ -2,19 +2,19 @@
 
 All notable changes to this project will be documented in this file.
 
-## [2.35.1] - 2026-03-22
+## [2.36.0] - 2026-03-22
+
+### Changed
+- **Major Dependency Refresh**: Upgraded the core stack to modern standards across the root and extension:
+    - **React 19**: Updated extension and root to React 19.2.4.
+    - **Tailwind CSS 4**: Bumped to Tailwind CSS 4.2.2 for the extension.
+    - **Build Infrastructure**: Upgraded to Vite 8.0.1 and Vitest 4.1.0.
+    - **SDKs**: Updated `@supabase/supabase-js` to 2.99.3 and `@stripe/stripe-js` to 8.11.0.
 
 ### Tests
-- **promiseUtils**: Added tests for `withTimeout` (resolve, timeout, custom message, default timeout, rejection propagation) and `OperationQueue` (sequential execution, error isolation, result propagation).
-- **resumeStorage**: Added tests for `getResumes` (null vault, decryption failure, local-only), `saveResumes` (timestamp stamping, no-cloud when logged out), and `addResume` (empty vault, block merging, bullet deduplication, decryption failure).
-- **skillStorage**: Added tests for `getSkills` (null, decryption failure, local-only), `saveSkill` and `saveSkills` for anonymous users (insert, update-in-place, decryption failure), and `deleteSkill` (exists, does not exist).
-- **useJobAnalysis**: Added tests covering auto-trigger on `analyzing` status, auto-trigger on hollow jobs, no-trigger when analysis is complete, `onAnalyzeJob` delegation, `showError` on failure, silent abort handling, progress reset, and no-retrigger guard.
-- **stringUtils**: Added tests for `toTitleCase` and `toSentenceCase` (uppercase, lowercase, mixed-case passthrough, single word, empty string).
-- **salaryParser**: Added tests for `parseSalary` (ranges, K notation, em-dash, hourly→annual conversion, single value, inverted range, no match) and `formatSalary` (K formatting, sub-thousand, decimal K).
-- **navigation**: Added tests for `getViewIdFromPath` (static routes, dynamic `/jobs/match/`, unknown paths), `getPathFromViewId`, and `getModeFromViewId` (coach/edu/job/system page classification).
-- **jobAiService**: Added tests for `cleanCoverLetterOutput` covering all input shapes (code blocks with json/text/generic tags, dangling backticks, JSON key extraction, plain text, whitespace trimming).
-- **useJobManagerHelpers**: Added tests for `loadInitialJobsAndUsage` (logged in/out, sync failure, fatal error, fallback stats info banner, stats fetch failure).
-- **coachStorage**: Added tests for all role model and target job CRUD operations including decryption failure paths.
+- **Utilities & Storage**: Added comprehensive test suites for `promiseUtils`, `resumeStorage`, `skillStorage`, `stringUtils`, `salaryParser`, and `navigation`.
+- **Hooks & Services**: Implemented tests for `useJobAnalysis`, `jobAiService`, `useJobManagerHelpers`, and `coachStorage`.
+
 
 ## [2.35.0] - 2026-03-20
 
