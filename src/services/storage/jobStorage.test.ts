@@ -7,7 +7,8 @@ import type { SavedJob } from '../../types';
 vi.mock('./storageCore', () => ({
     Vault: {
         getSecure: vi.fn(),
-        setSecure: vi.fn()
+        setSecure: vi.fn(),
+        modifySecure: vi.fn(),
     },
     getUserId: vi.fn()
 }));
@@ -63,32 +64,38 @@ describe('JobStorage', () => {
 
     it('should add a job to local storage', async () => {
         const mockJob = createMockJob(VALID_UUID);
-        vi.mocked(Vault.getSecure).mockResolvedValue([]);
         vi.mocked(getUserId).mockResolvedValue('test-user');
+        vi.mocked(Vault.modifySecure).mockImplementation(async (_key, transform) => transform([]));
 
         await JobStorage.addJob(mockJob);
 
-        expect(Vault.setSecure).toHaveBeenCalledWith(STORAGE_KEYS.JOBS_HISTORY, [mockJob]);
+        expect(Vault.modifySecure).toHaveBeenCalledWith(STORAGE_KEYS.JOBS_HISTORY, expect.any(Function));
+        const transform = vi.mocked(Vault.modifySecure).mock.calls[0][1];
+        expect(transform([])).toEqual([mockJob]);
     });
 
     it('should update a job in local storage', async () => {
         const oldJob = createMockJob(VALID_UUID);
         const updatedJob: SavedJob = { ...oldJob, status: 'applied' };
-        vi.mocked(Vault.getSecure).mockResolvedValue([oldJob]);
         vi.mocked(getUserId).mockResolvedValue('test-user');
+        vi.mocked(Vault.modifySecure).mockImplementation(async (_key, transform) => transform([oldJob]));
 
         await JobStorage.updateJob(updatedJob);
 
-        expect(Vault.setSecure).toHaveBeenCalledWith(STORAGE_KEYS.JOBS_HISTORY, [updatedJob]);
+        expect(Vault.modifySecure).toHaveBeenCalledWith(STORAGE_KEYS.JOBS_HISTORY, expect.any(Function));
+        const transform = vi.mocked(Vault.modifySecure).mock.calls[0][1];
+        expect(transform([oldJob])).toEqual([updatedJob]);
     });
 
     it('should delete a job from local storage', async () => {
         const mockJob = createMockJob(VALID_UUID);
-        vi.mocked(Vault.getSecure).mockResolvedValue([mockJob]);
         vi.mocked(getUserId).mockResolvedValue('test-user');
+        vi.mocked(Vault.modifySecure).mockImplementation(async (_key, transform) => transform([mockJob]));
 
         await JobStorage.deleteJob(VALID_UUID);
 
-        expect(Vault.setSecure).toHaveBeenCalledWith(STORAGE_KEYS.JOBS_HISTORY, []);
+        expect(Vault.modifySecure).toHaveBeenCalledWith(STORAGE_KEYS.JOBS_HISTORY, expect.any(Function));
+        const transform = vi.mocked(Vault.modifySecure).mock.calls[0][1];
+        expect(transform([mockJob])).toEqual([]);
     });
 });

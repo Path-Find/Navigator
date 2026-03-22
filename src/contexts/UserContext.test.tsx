@@ -4,6 +4,27 @@ import React from 'react';
 import { UserProvider } from './UserContext';
 import { supabase } from '../services/supabase';
 
+// Mock UserPreferencesContext — UserProvider calls useUserPreferences() at the top level
+vi.mock('./UserPreferencesContext', () => ({
+    useUserPreferences: vi.fn(() => ({
+        journey: 'job-hunter',
+        lastArchetypeUpdate: 0,
+        acceptedTosVersion: 0,
+        dismissedNotices: {},
+        dismissNotice: vi.fn(),
+        setJourney: vi.fn(),
+        setLastArchetypeUpdate: vi.fn(),
+        setAcceptedTosVersion: vi.fn(),
+        applyFromProfile: vi.fn(),
+    })),
+    UserPreferencesProvider: ({ children }: { children: React.ReactNode }) => children,
+}));
+
+// Mock fingerprint — called non-blockingly on sign-in
+vi.mock('../utils/fingerprint', () => ({
+    getDeviceFingerprint: vi.fn(() => Promise.resolve('test-fingerprint')),
+}));
+
 // Mock Supabase
 vi.mock('../services/supabase', () => ({
     supabase: {

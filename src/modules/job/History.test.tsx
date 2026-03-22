@@ -173,8 +173,12 @@ describe('History', () => {
   it('should display fit scores', () => {
     renderHistory(mockJobs);
 
-    expect(screen.getByText('85% Match')).toBeInTheDocument();
-    expect(screen.getByText('70% Match')).toBeInTheDocument();
+    // Score 85 → "Strong" label + "85%" shown in separate spans
+    expect(screen.getByText('Strong')).toBeInTheDocument();
+    expect(screen.getByText('85%')).toBeInTheDocument();
+    // Score 70 → "Good" label (right at the Good threshold) + "70%"
+    expect(screen.getByText('Good')).toBeInTheDocument();
+    expect(screen.getByText('70%')).toBeInTheDocument();
   });
 
   it('should show analyzing and error states in saved filter', () => {
@@ -185,16 +189,14 @@ describe('History', () => {
 
     renderHistory(statusJobs);
 
-    // Should be in 'Saved' filter by default (or when selected)
-    // Count for 'Saved' and 'All' should be 2
-    expect(screen.getAllByText('2').length).toBeGreaterThanOrEqual(2);
-    expect(screen.getByText('Analyzing Role')).toBeInTheDocument();
-    expect(screen.getByText('Analysis could not be completed')).toBeInTheDocument();
-
-    // Check for status labels
+    // When status is 'analyzing' with no analysis, component renders 'Analyzing New Job...' not the position
+    expect(screen.getByText('Analyzing New Job...')).toBeInTheDocument();
+    // Progress bar shows default message and 0%
     expect(screen.getByText('Finding your fit...')).toBeInTheDocument();
     expect(screen.getByText('0%')).toBeInTheDocument();
+    // Error state shows the error message and the job's position
     expect(screen.getByText('Failed Role')).toBeInTheDocument();
+    expect(screen.getByText('Analysis could not be completed')).toBeInTheDocument();
   });
 
   it('should display progress bar with custom message', () => {
@@ -275,8 +277,8 @@ describe('History', () => {
 
     renderHistory([analyzingJob]);
 
-    // Click card should not select
-    const card = screen.getByText('Processing Role').closest('div');
+    // When analyzing without a distilled role title, component renders 'Analyzing New Job...'
+    const card = screen.getByText('Analyzing New Job...').closest('div');
     if (card) {
       fireEvent.click(card);
     }

@@ -281,8 +281,13 @@ describe('ResumeEditor — block editing', () => {
 
         expect(screen.getByDisplayValue('Engineer')).toBeInTheDocument();
 
-        const deleteBtn = screen.getByTitle('Delete Block');
-        fireEvent.click(deleteBtn);
+        // Button component has no title attr; identify by text-rose-500 as a standalone class token
+        // (not hover:text-rose-500 which appears on bullet Remove-Line buttons)
+        const deleteBtn = screen.getAllByRole('button').find(btn =>
+            btn.className.split(' ').includes('text-rose-500')
+        );
+        expect(deleteBtn).toBeDefined();
+        fireEvent.click(deleteBtn!);
 
         expect(screen.queryByDisplayValue('Engineer')).not.toBeInTheDocument();
     });
@@ -414,9 +419,10 @@ describe('ResumeEditor — preview modal', () => {
         fireEvent.click(screen.getByText('Preview'));
         expect(screen.getByText('Download PDF')).toBeInTheDocument();
 
-        // Find and click the close button (X icon button in modal header)
+        // X close button has w-9 h-9 classes (unique to it); "Download PDF" has text content
         const closeButtons = screen.getAllByRole('button');
-        const xBtn = closeButtons.find(btn => btn.querySelector('svg') && btn.className.includes('rounded-full'));
+        const xBtn = closeButtons.find(btn => btn.className.includes('w-9') && btn.className.includes('h-9'));
+        expect(xBtn).toBeDefined();
         if (xBtn) fireEvent.click(xBtn);
 
         expect(screen.queryByText('Download PDF')).not.toBeInTheDocument();
