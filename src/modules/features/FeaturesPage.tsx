@@ -5,7 +5,7 @@ import {
     Sparkles, PenTool, RefreshCw, Zap, Shield, Bookmark,
     TrendingUp, Users, FileText, Mail, Rss, Globe,
     GraduationCap, Search, Calculator, MessageSquare,
-    Activity, School, Building2,
+    Activity, School, Building2, BookOpen,
     type LucideIcon,
 } from 'lucide-react';
 import { BentoCard } from '../../components/ui/BentoCard';
@@ -23,7 +23,7 @@ type Tier = 'all' | 'explorer' | 'plus' | 'pro';
 const ICON_MAP: Record<string, LucideIcon> = {
     Sparkles, TrendingUp, Zap, FileText, GraduationCap, Bookmark,
     PenTool, Mail, RefreshCw, Shield, Users, Globe,
-    Search, Calculator, MessageSquare, Rss, Activity, School, Building2,
+    Search, Calculator, MessageSquare, Rss, Activity, School, Building2, BookOpen,
 };
 
 // ─── Filter Tabs ──────────────────────────────────────────────────────
