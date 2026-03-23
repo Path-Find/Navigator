@@ -1,5 +1,5 @@
 import React, { useState, useCallback } from 'react';
-import { X, CheckCircle2, Loader2, BookOpen } from 'lucide-react';
+import { X, CheckCircle2, Loader2, BookOpen, Sparkles } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { InterviewChat } from '../../../components/common/InterviewChat';
 import type { ChatMessage } from '../../../components/common/InterviewChat';
@@ -8,6 +8,8 @@ import {
     summarizeResumeInterview,
     type ResumeInterviewQA
 } from '../../../services/ai/interviewAiService';
+import { checkInterviewLimit } from '../../../services/usageLimits';
+import { supabase } from '../../../services/supabase';
 import type { ExperienceBlock } from '../types';
 
 interface ResumeInterviewModalProps {
@@ -16,7 +18,7 @@ interface ResumeInterviewModalProps {
     onClose: () => void;
 }
 
-type Phase = 'loading' | 'interviewing' | 'saving' | 'done';
+type Phase = 'loading' | 'blocked' | 'interviewing' | 'saving' | 'done';
 
 export const ResumeInterviewModal: React.FC<ResumeInterviewModalProps> = ({ block, onSave, onClose }) => {
     const [phase, setPhase] = useState<Phase>('loading');
@@ -33,6 +35,15 @@ export const ResumeInterviewModal: React.FC<ResumeInterviewModalProps> = ({ bloc
     React.useEffect(() => {
         const load = async () => {
             try {
+                const { data: { user } } = await supabase.auth.getUser();
+                if (user) {
+                    const limit = await checkInterviewLimit(user.id);
+                    if (!limit.allowed) {
+                        setPhase('blocked');
+                        return;
+                    }
+                }
+
                 const qs = await generateResumeInterviewQuestions(
                     block.title,
                     block.organization,
@@ -174,6 +185,30 @@ export const ResumeInterviewModal: React.FC<ResumeInterviewModalProps> = ({ bloc
                             >
                                 <Loader2 className="w-5 h-5 animate-spin" />
                                 <span className="text-sm font-bold">Preparing your questions...</span>
+                            </motion.div>
+                        )}
+
+                        {phase === 'blocked' && (
+                            <motion.div
+                                key="blocked"
+                                initial={{ opacity: 0 }}
+                                animate={{ opacity: 1 }}
+                                exit={{ opacity: 0 }}
+                                className="flex-1 flex flex-col items-center justify-center gap-5 px-8 text-center"
+                            >
+                                <div className="w-12 h-12 bg-indigo-100 dark:bg-indigo-900/40 rounded-2xl flex items-center justify-center">
+                                    <Sparkles className="w-6 h-6 text-indigo-600 dark:text-indigo-400" />
+                                </div>
+                                <div>
+                                    <p className="text-sm font-black text-neutral-900 dark:text-white mb-1">Resume Interview is a Pro feature</p>
+                                    <p className="text-xs text-neutral-500 dark:text-neutral-400 leading-relaxed">Upgrade to capture the story behind your experience and get stronger cover letters.</p>
+                                </div>
+                                <button
+                                    onClick={onClose}
+                                    className="px-6 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-2xl text-xs font-black transition-all"
+                                >
+                                    Upgrade to Pro
+                                </button>
                             </motion.div>
                         )}
 

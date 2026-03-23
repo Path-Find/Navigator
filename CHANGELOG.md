@@ -7,7 +7,7 @@ All notable changes to this project will be documented in this file.
 ## [2.37.0] - 2026-03-23
 
 ### Added
-- **Resume Interview**: Each work, project, volunteer, or other experience block now has a "Tell Your Story" button that opens a focused interview modal. The AI generates 3 targeted questions about the experience, the user answers conversationally, and the answers are synthesized into `narrativeContext` saved to the block. This context is automatically included in cover letter generation, surfacing detail that never makes it into resume bullets. Button relabels to "Edit Story" if context already exists.
+- **Resume Interview**: Each work, project, volunteer, or other experience block now has a "Tell Your Story" button that opens a focused interview modal. The AI generates 3 targeted questions about the experience, the user answers conversationally, and the answers are synthesized into `narrativeContext` saved to the block. This context is automatically included in cover letter generation, surfacing detail that never makes it into resume bullets. Button relabels to "Edit Story" if context already exists. Gated behind the interview limit — free users see an upgrade prompt.
 
 ### Fixed
 - **JS-Only Domain Detection**: Added a static blocklist of known JavaScript-rendered job portals (Oracle Cloud, Workday, Taleo, iCIMS, Lever, etc.) that skip scraping immediately with a clear "paste manually" message, instead of attempting a doomed fetch and showing a confusing "Connection issue" error.
