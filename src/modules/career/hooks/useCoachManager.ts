@@ -179,7 +179,13 @@ export const useCoachManager = () => {
             const fallback = url.startsWith('http')
                 ? new URL(url).hostname.replace(/^www\./, '')
                 : 'New Dream Job';
-            const title = (firstLine.slice(0, 60) || fallback);
+            const baseTitle = firstLine.slice(0, 60) || fallback;
+            const existingTitles = new Set(targetJobs.map(j => j.title));
+            let title = baseTitle;
+            let counter = 2;
+            while (existingTitles.has(title)) {
+                title = `${baseTitle} (${counter++})`;
+            }
 
             const newGoal: TargetJob = {
                 id: crypto.randomUUID(),

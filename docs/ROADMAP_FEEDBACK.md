@@ -47,7 +47,7 @@ Three distinct moments, designed separately.
 
 The NudgeCard exists but needs fixes and expansion:
 
-- [ ] **Persist dismissal** — currently session-only. Should survive a page reload.
+- [x] **Persist dismissal** — dismissed job IDs stored in localStorage per job (Mar 2026).
 - [ ] **Decouple from `applied` status** — nudge should fire for any job with a cover letter past N days, regardless of whether the user ever set a status.
 - [ ] **Surface in JobDetail** — not just the home page. A subtle banner on the Analysis tab after a few weeks gives context-aware prompting.
 - [ ] **Two nudge tiers** — first nudge asks "did you apply?", second (if interview) asks "did you use the Navigator cover letter?"

@@ -9,7 +9,9 @@ const ALLOWED_ORIGINS = [
 
 const getCorsHeaders = (req: Request) => {
     const origin = req.headers.get('Origin') ?? '';
-    const allowedOrigin = ALLOWED_ORIGINS.includes(origin) ? origin : '';
+    const isVercel = origin.endsWith('.vercel.app');
+    const allowedOrigin = (ALLOWED_ORIGINS.includes(origin) || isVercel) ? origin : '';
+    
     return {
         'Access-Control-Allow-Origin': allowedOrigin,
         'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',

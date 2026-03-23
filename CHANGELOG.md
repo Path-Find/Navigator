@@ -2,6 +2,24 @@
 
 All notable changes to this project will be documented in this file.
 
+## [Unreleased]
+
+## [2.37.0] - 2026-03-23
+
+### Added
+- **Resume Interview**: Each work, project, volunteer, or other experience block now has a "Tell Your Story" button that opens a focused interview modal. The AI generates 3 targeted questions about the experience, the user answers conversationally, and the answers are synthesized into `narrativeContext` saved to the block. This context is automatically included in cover letter generation, surfacing detail that never makes it into resume bullets. Button relabels to "Edit Story" if context already exists.
+
+### Fixed
+- **JS-Only Domain Detection**: Added a static blocklist of known JavaScript-rendered job portals (Oracle Cloud, Workday, Taleo, iCIMS, Lever, etc.) that skip scraping immediately with a clear "paste manually" message, instead of attempting a doomed fetch and showing a confusing "Connection issue" error.
+- **gemini-proxy CORS**: Redeployed the `gemini-proxy` edge function to fix a CORS error blocking job fit evaluation on the production Vercel deployment.
+- **Deadline "Closed" false positive**: Date-only deadline strings (e.g. `2026-03-22`) were parsed as midnight UTC, making jobs appear Closed prematurely in negative-offset timezones. Now treated as end of day in local time.
+- **NudgeCard dismissal persistence**: Dismissed nudge cards now survive page reloads — dismissed job IDs are stored in localStorage per job so the same card doesn't reappear next session.
+- **Duplicate target job names**: Dream Job entries with colliding titles now get a `(2)`, `(3)` suffix instead of silently accumulating identical names.
+- **Supabase fail-fast**: Missing env vars now throw immediately on startup in production instead of silently creating a placeholder client that fails all DB calls at runtime.
+
+### Deployed
+- **`create-portal-session` edge function**: Stripe billing portal is now live — subscribers can manage their subscription, update payment methods, and view invoices from Settings.
+
 ## [2.36.0] - 2026-03-22
 
 ### Changed

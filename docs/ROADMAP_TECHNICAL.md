@@ -32,7 +32,7 @@ Technical foundation and scaling initiatives to support growth and long-term sta
 - [x] **Rapid job navigation race** (`AppRoutes.tsx:59`): Integrated `AbortController` across AI services and analysis hook (Mar 2026).
 - [x] **Vault migration blocks UI** (`storageCore.ts:73`): Added time-budgeted migration guard (Mar 2026).
 - [x] **Missing error state in analysis progress** (`useJobAnalysis.ts:54`): Standardized error propagation to the caller and UI (Mar 2026).
-- [ ] **Deploy `create-portal-session` edge function**: Function is built and ready at `supabase/functions/create-portal-session/`. Must be deployed via the Supabase dashboard (Functions tab → Deploy) since CLI is not in use.
+- [x] **Deploy `create-portal-session` edge function**: Deployed Mar 2026 via CLI with `--no-verify-jwt`.
 - [ ] **Resume update without rollback** (`ResumeContext.tsx:98`): State is committed before confirming storage write. On failure, UI and storage are out of sync.
 
 ### Performance
@@ -41,7 +41,7 @@ Technical foundation and scaling initiatives to support growth and long-term sta
 
 ### Code Quality
 - [x] **PDF parse silent failure** (`resumeAiService.ts`): Descriptve errors thrown and logged (Mar 2026).
-- [ ] **Placeholder Supabase client** (`supabase.ts`): Missing env vars create a silent placeholder client. Should fail fast on startup.
+- [x] **Placeholder Supabase client** (`supabase.ts`): Throws on startup in production if env vars are missing. Dev still warns and uses placeholder to avoid import crashes (Mar 2026).
 - [x] **Incomplete `JobAnalysis` return** (`jobAiService.ts:110`): Initializing defaults for all object fields on partial return (Mar 2026).
 - [x] **Toast ID collision** (`ToastContext.tsx:40`): Replaced `Date.now()` with `crypto.randomUUID()` (Mar 2026).
 - [x] **Case-sensitive bullet deduplication** (`resumeStorage.ts:92`): Normalized to lowercase before dedup, preserving original casing (Mar 2026).
@@ -51,7 +51,7 @@ Technical foundation and scaling initiatives to support growth and long-term sta
 - [x] **Suppressed linter in `useResumeEditor.ts:31`**: Fixed dep array with `onSaveRef` pattern to avoid stale closure without over-triggering (Mar 2026).
 - [ ] **Inconsistent error message localization**: Raw API/Supabase error strings shown to users in some flows. Route all user-facing errors through the `errorMessages` utility.
 - [ ] **Missing transcript data validation** (`useAcademicLogic.ts:70`): No required-field validation before persisting transcript verification — empty/partial course data can be saved.
-- [ ] **Target job name not validated** (`useCoachManager.ts:162`): New targets default to `"New Dream Job"` with no prompt or length check — duplicates accumulate.
+- [x] **Target job name not validated** (`useCoachManager.ts:162`): Dedup via title collision check — appends `(2)`, `(3)` etc. on conflict (Mar 2026).
 
 ---
 

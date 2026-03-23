@@ -67,7 +67,7 @@ export function getUserFriendlyError(error: Error | string): string {
   }
 
   // Network errors
-  if (message.includes('network') || message.includes('fetch')) {
+  if (message.includes('network') || message.includes('fetch') || message.includes('failed to fetch')) {
     return ERROR_MESSAGES.NETWORK_ERROR;
   }
 

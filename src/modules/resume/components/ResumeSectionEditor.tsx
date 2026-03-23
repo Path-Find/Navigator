@@ -1,10 +1,11 @@
-import React from 'react';
-import { Plus, Trash2, Calendar, ArrowRightLeft, ChevronUp, ChevronDown } from 'lucide-react';
+import React, { useState } from 'react';
+import { Plus, Trash2, Calendar, ArrowRightLeft, ChevronUp, ChevronDown, BookOpen } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import type { ExperienceBlock } from '../types';
 import type { SectionType } from '../constants';
 import { Card } from '../../../components/ui/Card';
 import { Button } from '../../../components/ui/Button';
+import { ResumeInterviewModal } from './ResumeInterviewModal';
 
 interface ResumeSectionEditorProps {
     block: ExperienceBlock;
@@ -20,6 +21,8 @@ interface ResumeSectionEditorProps {
     onSetMovingBlockId: (id: string | null) => void;
 }
 
+const INTERVIEW_ELIGIBLE_TYPES: ExperienceBlock['type'][] = ['work', 'project', 'volunteer', 'other'];
+
 export const ResumeSectionEditor: React.FC<ResumeSectionEditorProps> = ({
     block,
     movingBlockId,
@@ -33,6 +36,9 @@ export const ResumeSectionEditor: React.FC<ResumeSectionEditorProps> = ({
     onRemoveBlock,
     onSetMovingBlockId,
 }) => {
+    const [showInterview, setShowInterview] = useState(false);
+    const isInterviewEligible = INTERVIEW_ELIGIBLE_TYPES.includes(block.type);
+
     return (
         <Card
             variant="premium"
@@ -188,6 +194,18 @@ export const ResumeSectionEditor: React.FC<ResumeSectionEditorProps> = ({
                                     Add Line
                                 </Button>
 
+                                {isInterviewEligible && (
+                                    <Button
+                                        onClick={() => setShowInterview(true)}
+                                        variant="subtle"
+                                        size="xs"
+                                        className={block.narrativeContext ? 'text-indigo-500 border-indigo-200 dark:border-indigo-800/50' : ''}
+                                        icon={<BookOpen className="w-3.5 h-3.5" />}
+                                    >
+                                        {block.narrativeContext ? 'Edit Story' : 'Tell Your Story'}
+                                    </Button>
+                                )}
+
                                 <div className="flex items-center gap-1 group/move relative h-full">
                                     <Button
                                         onClick={() => onSetMovingBlockId(movingBlockId === block.id ? null : block.id)}
@@ -254,5 +272,17 @@ export const ResumeSectionEditor: React.FC<ResumeSectionEditorProps> = ({
                 </div>
             </div>
         </Card>
+
+        <AnimatePresence>
+            {showInterview && (
+                <ResumeInterviewModal
+                    block={block}
+                    onSave={(narrativeContext) => {
+                        onUpdateBlock(block.id, 'narrativeContext', narrativeContext);
+                    }}
+                    onClose={() => setShowInterview(false)}
+                />
+            )}
+        </AnimatePresence>
     );
 };

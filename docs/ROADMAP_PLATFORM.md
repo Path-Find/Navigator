@@ -14,6 +14,7 @@ Evolution from a career utility into an intelligence layer for professional grow
 - [ ] **Networking Graph**: Tracking alumni and internal contacts during application phases.
 - [ ] **Job Alert Inbox**: Deep integration with the standalone triage service. *(Requires backend: standalone service for high-scale email parsing — see [Technical Roadmap](./ROADMAP_TECHNICAL.md))*
 - [ ] **Proactive Nudges**: Chrome notifications (opt-in) for high-priority job matches. *(Depends on Job Alert Inbox above.)*
+- [ ] **Telegram Bot Companion**: Async companion channel for users already in Telegram. Job alerts with inline Save/Skip/Analyze buttons, resume interview Q&A spread across days (syncs back as `narrativeContext`), interview prep, and deadline nudges. Leverages the same AI functions as the web app — no duplicate logic.
 
 ---
 

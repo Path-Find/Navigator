@@ -6,6 +6,7 @@ export interface ExperienceBlock {
     dateRange: string;   // e.g. "Jan 2023 - Present"
     bullets: string[];   // The specific points
     isVisible: boolean;  // toggle to include/exclude in analysis
+    narrativeContext?: string; // Story behind the bullets, captured via resume interview
 }
 
 export interface ResumeSuggestion {

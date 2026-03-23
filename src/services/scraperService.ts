@@ -3,6 +3,21 @@ import type { JobFeedItem } from '../types';
 import { LocalStorage } from '../utils/localStorage';
 import { CONTENT_VALIDATION, STORAGE_KEYS } from '../constants';
 
+// Domains that render entirely via JavaScript — server-side scraping always returns an empty shell
+const KNOWN_JS_ONLY_DOMAINS = [
+    'oraclecloud.com',
+    'myworkday.com',
+    'workday.com',
+    'taleo.net',
+    'icims.com',
+    'lever.co',
+    'jobvite.com',
+    'ultipro.com',
+    'adp.com',
+    'bamboohr.com',
+    'smartrecruiters.com',
+];
+
 export const ScraperService = {
     async getFeed(): Promise<JobFeedItem[]> {
         // Feed discovery source required
@@ -48,6 +63,15 @@ export const ScraperService = {
     },
 
     async scrapeJobContent(targetUrl: string): Promise<string> {
+        try {
+            const hostname = new URL(targetUrl).hostname.replace('www.', '').toLowerCase();
+            if (KNOWN_JS_ONLY_DOMAINS.some(d => hostname.endsWith(d))) {
+                throw new Error("This site uses JavaScript to load job details and can't be read automatically. Please paste the job description below.");
+            }
+        } catch (e) {
+            if (e instanceof Error && e.message.includes("can't be read")) throw e;
+        }
+
         if (!this.isUrlScrapable(targetUrl)) {
             throw new Error("DOMAIN_BLOCKED");
         }

@@ -30,7 +30,10 @@ export const getScoreColorClasses = (score?: number | null): string => {
 
 export const getDeadlineInfo = (deadline: string | null | undefined) => {
     if (!deadline) return null;
-    const date = new Date(deadline);
+    // Date-only strings (e.g. "2026-03-22") parse as midnight UTC, which is already
+    // "past" in negative-offset timezones. Treat them as end of day in local time instead.
+    const normalized = /^\d{4}-\d{2}-\d{2}$/.test(deadline) ? `${deadline}T23:59:59` : deadline;
+    const date = new Date(normalized);
     if (isNaN(date.getTime())) return null;
     const now = new Date();
     const daysUntil = Math.ceil((date.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));

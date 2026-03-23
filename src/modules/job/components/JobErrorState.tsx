@@ -31,7 +31,10 @@ export const JobErrorState: React.FC<JobErrorStateProps> = ({
         job.progressMessage.includes("quota") ||
         job.progressMessage.includes("Too many") ||
         job.progressMessage.includes("timed out") ||
-        job.progressMessage.includes("service busy")
+        job.progressMessage.includes("service busy") ||
+        job.progressMessage.includes("limit") ||
+        job.progressMessage.includes("internet") ||
+        job.progressMessage.includes("Connection")
     );
 
     return (
