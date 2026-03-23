@@ -2,8 +2,6 @@
 
 All notable changes to this project will be documented in this file.
 
-## [Unreleased]
-
 ## [2.37.0] - 2026-03-23
 
 ### Added
@@ -48,7 +46,6 @@ All notable changes to this project will be documented in this file.
 ### Fixed
 - **Unused Asset Cleanup**: Cleaned up unused Lucide icons (`Zap`, `Sparkles`, `Shield`) and redundant imports.
 - **Versioning Reversion**: Reverted premature version bump to 2.34.0.
-
 
 ## [2.34.0] - 2026-03-17
 
