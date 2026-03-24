@@ -176,7 +176,7 @@ export const analyzeJobFit = async (
     trajectoryContext?: string,
     abortSignal?: AbortSignal
 ): Promise<JobAnalysis> => {
-    if (onProgress) onProgress("Cleaning and Analyzing", 1, 1);
+    if (onProgress) onProgress("Researching", 1, 6);
 
     // 1. Basic cleanup to prevent AI confusion
     const cleanedDescription = preCleanJobText(jobDescription);
@@ -200,6 +200,8 @@ export const analyzeJobFit = async (
         } as JobAnalysis;
     }
 
+    if (onProgress) onProgress("Contextualizing", 2, 6);
+
     const resumeContext = resumes.map(stringifyProfile).join('\n---\n');
     const skillsContext = userSkills.length > 0
         ? `\nADDITIONAL SKILLS:\n${userSkills.map(s => `- ${s.name}: ${s.proficiency}`).join('\n')}`
@@ -209,10 +211,14 @@ export const analyzeJobFit = async (
         ? `\nACADEMIC BACKGROUND (Transcript):\nProgram: ${transcript.program} at ${transcript.university}\nCourses:\n${transcript.semesters.flatMap((s: Semester) => s.courses).map((c: Course) => `- ${c.title} (${c.code}): ${c.grade}`).join('\n')}`
         : '';
 
+    if (onProgress) onProgress("Mapping", 3, 6);
+
     // 2. Fetch Bucket Guidelines - Skipping for now to keep performance high
     // We can re-integrate this if it's critical, but we'd want to do it inside the main prompt or via parallel fetch.
 
     const analysisPrompt = JOB_ANALYSIS_PROMPTS.JOB_FIT_ANALYSIS.DEFAULT(cleanedDescription, (resumeContext + skillsContext + educationContext), undefined, trajectoryContext);
+
+    if (onProgress) onProgress("Benchmarking", 4, 6);
 
     const analysis = await callWithRetry(async (metadata) => {
         const model = await getModel({ task: 'analysis', generationConfig: { responseMimeType: "application/json" }, signal: abortSignal });
@@ -221,10 +227,14 @@ export const analyzeJobFit = async (
         return JSON.parse(sanitizeInput(cleanJsonOutput(response.response.text())));
     }, { event_type: 'analysis', prompt: analysisPrompt, model: 'dynamic', job_id: jobId }, undefined, undefined, onProgress, abortSignal);
 
+    if (onProgress) onProgress("Synthesizing", 5, 6);
+
     // Validation: If we have no score and no skills, something went wrong
     if (!analysis.compatibilityScore && (!analysis.distilledJob?.keySkills?.length)) {
         throw new Error("NOT_A_JOB: Analysis failed to generate meaningful insights. Please check if the source content is a valid job description.");
     }
+
+    if (onProgress) onProgress("Finalizing", 6, 6);
 
     return {
         ...analysis,
@@ -298,10 +308,23 @@ export const generateCoverLetterWithQuality = async (
     jobId?: string,
     canonicalTitle?: string,
     personalizedStyle?: string
-): Promise<{ text: string; promptVersion: string; decision: string; attempts: number }> => {
+): Promise<{ 
+    text: string; 
+    promptVersion: string; 
+    decision: string; 
+    attempts: number;
+    critique?: { feedback: string[]; strengths: string[]; hallucinationAlerts: string[] }
+}> => {
 
     // 1. Initial Draft
-    if (onProgress) onProgress("Drafting initial cover letter...");
+    if (onProgress) onProgress("Researching");
+    // Simul-Research and Contextualize
+    if (onProgress) onProgress("Contextualizing");
+    
+    // Resume/Job alignment
+    if (onProgress) onProgress("Mapping");
+
+    if (onProgress) onProgress("Drafting");
     let result = await generateCoverLetter(jobDescription, selectedResume, tailoringInstructions, additionalContext, undefined, trajectoryContext, jobId, canonicalTitle, personalizedStyle);
     let attempts = 1;
 
@@ -309,15 +332,17 @@ export const generateCoverLetterWithQuality = async (
     if (userTier === USER_TIERS.FREE || userTier === USER_TIERS.PLUS) {
         return { ...result, decision: 'Average', attempts };
     }
-
+ 
     // 2. The Agent Loop (Pro/Admin only)
+    let finalCritique: any = null;
     let currentDecision: 'Reject' | 'Weak' | 'Average' | 'Strong' | 'Exceptional' = 'Average';
     const resumeContext = stringifyProfile(selectedResume);
 
     while (attempts <= AGENT_LOOP.MAX_RETRIES + 1) { // +1 for initial draft
         // Critique current draft
-        if (onProgress) onProgress(`Critiquing draft...`);
+        if (onProgress) onProgress(`Critiquing`);
         const critique = await critiqueCoverLetter(jobDescription, result.text, resumeContext, jobId);
+        finalCritique = critique;
         currentDecision = critique.decision;
 
         // Success condition: High confidence on spectrum
@@ -331,7 +356,7 @@ export const generateCoverLetterWithQuality = async (
         }
 
         // Regenerate with feedback
-        if (onProgress) onProgress(`Polishing based on feedback...`);
+        if (onProgress) onProgress(`Polishing`);
         const improvementContext = `
             PREVIOUS DECISION: ${currentDecision}
             CRITIQUE FEEDBACK: ${critique.feedback.join('; ')}
@@ -346,7 +371,7 @@ export const generateCoverLetterWithQuality = async (
         attempts++;
     }
 
-    return { ...result, decision: currentDecision, attempts };
+    return { ...result, decision: currentDecision, attempts, critique: finalCritique };
 };
 
 export const generateTailoredSummary = async (

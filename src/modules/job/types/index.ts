@@ -36,6 +36,7 @@ export interface JobAnalysis {
     resumeTailoringInstructions?: string[];
     coverLetterTailoringInstructions?: string[];
     recommendedBlockIds?: string[]; // New: AI tells us exactly which blocks to keep
+    internalAnalysis?: string; // New: Private scratchpad for AI "thinking" & logic checks
 }
 
 export interface SavedJob {

@@ -646,7 +646,7 @@ select
 from daily_usage u
 join profiles p on u.user_id = p.id
 join daily_stats ds on u.date = ds.date and p.subscription_tier = ds.subscription_tier
-where u.token_count > (ds.avg_tokens * 3) -- Compare apple-to-apples (User vs User's Tier Avg)
+where u.token_count >= 0 -- Inclusive of all active users, UI handles outlier highlighting
 order by x_times_normal desc;
 
 -- 6. INITIAL SEEDING

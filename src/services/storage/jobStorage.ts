@@ -148,7 +148,8 @@ export const JobStorage = {
         // Use atomic modify to prevent race conditions during concurrent additions
         const updated = await Vault.modifySecure<SavedJob[]>(STORAGE_KEYS.JOBS_HISTORY, (current) => {
             const localJobs = current || [];
-            return [job, ...localJobs];
+            const timestampedJob = { ...job, updatedAt: Date.now() };
+            return [timestampedJob, ...localJobs];
         });
 
         // Cloud sync happens in background after local persistence
@@ -184,7 +185,7 @@ export const JobStorage = {
         // Use atomic modify to prevent race conditions during concurrent updates (e.g. analysis finish vs user edit)
         const updated = await Vault.modifySecure<SavedJob[]>(STORAGE_KEYS.JOBS_HISTORY, (current) => {
             const localJobs = current || [];
-            return localJobs.map(j => j.id === updatedJob.id ? updatedJob : j);
+            return localJobs.map(j => j.id === updatedJob.id ? { ...updatedJob, updatedAt: Date.now() } : j);
         });
 
         // Cloud sync happens in background after local persistence
@@ -202,7 +203,7 @@ export const JobStorage = {
                     resume_id: updatedJob.resumeId,
                     cover_letter: updatedJob.coverLetter,
                     cover_letter_critique: updatedJob.coverLetterCritique,
-                    fit_score: updatedJob.analysis?.compatibilityScore,
+                    fit_score: updatedJob.fitScore || updatedJob.analysis?.compatibilityScore,
                     updated_at: new Date().toISOString()
                 }).eq('id', updatedJob.id)
                     .eq('user_id', userId)

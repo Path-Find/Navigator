@@ -4,7 +4,7 @@ import { Logger } from '../../../utils/logger';
 import { Storage } from '../../../services/storageService';
 import { JobStorage } from '../../../services/storage/jobStorage';
 import type { UserTier } from '../../../types/app';
-import { generateCoverLetter, generateCoverLetterWithQuality, critiqueCoverLetter } from '../../../services/geminiService';
+import { generateCoverLetter, generateCoverLetterWithQuality } from '../../../services/geminiService';
 import { COVER_LETTER_PROMPTS } from '../../../prompts/coverLetter';
 import { ArchetypeUtils } from '../../../utils/archetypeUtils';
 import { TRACKING_EVENTS } from '../../../constants';
@@ -39,6 +39,9 @@ export const useCoverLetterEditor = ({
     const [analysisProgress, setAnalysisProgress] = useState<string | null>(null);
     const [comparisonVersions, setComparisonVersions] = useState<{ text: string; promptVersion: string }[] | null>(null);
     const [localJob, setLocalJob] = useState(job);
+    const [generationStatus, setGenerationStatus] = useState<string | null>(null);
+    const [generationProgress, setGenerationProgress] = useState(0);
+    const isGenerating = generating;
     const { showError } = useToast();
     const isNextGen = useNextGen();
     const { user } = useUser();
@@ -136,7 +139,13 @@ export const useCoverLetterEditor = ({
                     instructions,
                     userTier,
                     finalContext,
-                    (msg: string) => setAnalysisProgress(msg),
+                    (msg: string, step?: number, total?: number) => {
+                        setAnalysisProgress(msg);
+                        setGenerationStatus(msg);
+                        if (step && total) {
+                            setGenerationProgress(Math.round((step / total) * 100));
+                        }
+                    },
                     trajectoryContext,
                     localJob.id,
                     canonicalTitle,
@@ -148,7 +157,11 @@ export const useCoverLetterEditor = ({
                     coverLetter: result.text,
                     initialCoverLetter: result.text,
                     promptVersion: result.promptVersion,
-                    coverLetterCritique: {
+                    coverLetterCritique: result.critique ? {
+                        decision: result.decision as CoverLetterCritique['decision'],
+                        feedback: result.critique.feedback,
+                        strengths: result.critique.strengths
+                    } : {
                         decision: result.decision as CoverLetterCritique['decision'],
                         feedback: [],
                         strengths: []
@@ -202,6 +215,8 @@ export const useCoverLetterEditor = ({
         } finally {
             setGenerating(false);
             setAnalysisProgress(null);
+            setGenerationStatus(null);
+            setGenerationProgress(0);
         }
     }, [bestResume, analysis, localJob, targetJobs, userTier, onJobUpdate, showError, isNextGen, user]);
 
@@ -260,23 +275,6 @@ export const useCoverLetterEditor = ({
         setAnalysisProgress(null);
     }, []);
 
-    const handleRunCritique = useCallback(async () => {
-        setGenerating(true);
-        try {
-            const textToUse = analysis.cleanedDescription || localJob.description || `Role: ${toTitleCase(analysis.distilledJob.roleTitle)} at ${toTitleCase(analysis.distilledJob.companyName)}`;
-            const critique = await critiqueCoverLetter(textToUse, localJob.coverLetter!, localJob.id);
-
-            const updated = { ...localJob, coverLetterCritique: critique };
-            await Storage.updateJob(updated);
-            setLocalJob(updated);
-            onJobUpdate(updated);
-        } catch (e) {
-            showError("Failed to critique letter: " + (e as Error).message);
-        } finally {
-            setGenerating(false);
-        }
-    }, [analysis, localJob, onJobUpdate, showError]);
-
     const handleEditCoverLetter = useCallback(async (newText: string) => {
         if (newText !== localJob.coverLetter) {
             const updated = { ...localJob, coverLetter: newText };
@@ -323,7 +321,9 @@ export const useCoverLetterEditor = ({
         handleGenerateCoverLetter,
         handleSelectVariant,
         handleRejectVariants,
-        handleRunCritique,
-        handleEditCoverLetter
+        handleEditCoverLetter,
+        generationStatus,
+        generationProgress,
+        isGenerating
     };
 };

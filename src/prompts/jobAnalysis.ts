@@ -58,8 +58,15 @@ export const JOB_ANALYSIS_PROMPTS = {
       },
       "resumeTailoringInstructions": ["3-4 bullet points on how to adjust the resume"],
       "coverLetterTailoringInstructions": ["3-4 bullet points for the cover letter strategy"],
-      "recommendedBlockIds": ["List of IDs from the candidate resume blocks that are most relevant to this job"]
+      "recommendedBlockIds": ["List of IDs from the candidate resume blocks that are most relevant to this job"],
+      "internalAnalysis": "DEDICATED SCRATCHPAD: Record your logical checks, self-reminders (e.g. 'check date logic', 'missing Pro experience'), and meta-commentary here. Do NOT leak these into user-facing fields."
     }
+
+    TONE & STYLE RULES:
+    1. EXCLUSIVITY: All 'thinking', 'checks', or shouting (ALL CAPS) must happen ONLY in 'internalAnalysis'.
+    2. USER-FACING: 'reasoning', 'strengths', and 'weaknesses' must be professional, supportive, and in Sentence Case.
+    3. NO META: Do not say 'I think', 'I will', or 'Based on my analysis' in user-facing fields. Just provide the insight.
+    4. ACTIONABLE: Frame 'weaknesses' as gaps that can be addressed, not as static failures.
   `
   },
 

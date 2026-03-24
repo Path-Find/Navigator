@@ -139,7 +139,7 @@ export const useJobManager = (): UseJobManagerReturn => {
                 resumes,
                 skills,
                 async (msg, step, total) => {
-                    const progress = Math.min(99, Math.round((step / total) * 100));
+                    const progress = Math.round((step / total) * 100);
                     setJobs(prev => prev.map(j => j.id === job.id ? { ...j, progress, progressMessage: msg } : j));
                 },
                 job.id

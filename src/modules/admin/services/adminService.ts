@@ -6,6 +6,7 @@ export interface UsageOutlier {
     total_input_tokens: number;
     total_output_tokens: number;
     total_operations: number;
+    subscription_tier: string;
     last_active: string;
 }
 

@@ -2,6 +2,35 @@
 
 All notable changes to this project will be documented in this file.
 
+## [Unreleased]
+
+### Added
+- **Automated AI Critique**: Cover letters now undergo an immediate architectural and stylistic review upon generation, providing instant feedback without manual triggers.
+- **Admin User Matrix**: A new high-fidelity management console for oversight of all registered accounts, subscription statuses, and aggregate activity.
+- **Network Pulse Heatmap**: Integrated a real-time behavioral monitoring tool that tracks system-wide activity pulses across the last 28 days, using dynamic indigo-intensity scaling to highlight usage spikes.
+- **AI Internal Scratchpad**: Implemented a private deliberation field in the job analysis schema for Gemini to record logical checks and self-reminders, preventing internal "thinking" from leaking into user-facing professional advice.
+- **Cohort Filtering**: Granular analytics support for Admin, Tester, Free, and Pro tiers to ensure visibility for all user types.
+- **PDF Export Service**: Integrated a shared, high-fidelity print utility for resumes and cover letters. It uses an isolated window with optimized CSS to ensure documents are exported exactly as they appear in the live preview.
+- **Improved Cover Letter UX**: Replaced the static "refining" state with a live, high-fidelity `GenerationProgress` UI in the editor area, providing clear stage-based messaging.
+- **6-Stage Agentic Sequence**: Implemented a comprehensive progress pipeline for cover letter generation (**Researching**, **Contextualizing**, **Mapping**, **Drafting**, **Critiquing**, **Polishing**) to increase transparency during the AI's "thinking" phase.
+- **Typewriter Reveal Animation**: Added dynamic character-by-character reveal for stage labels, creating an immersive "active writer" feel during the drafting and refinement stages.
+
+### Changed
+- **Admin Dashboard Aesthetics**: Completely overhauled the Management Portal with a premium glassmorphic design language, depth-based cards, and refined typography.
+
+### Removed
+- **Manual Critique Trigger**: The redundant 'Review' and 'Critique' actions in the cover letter editor have been removed in favor of a seamless, automated workflow.
+- **Premature Analytics Integration**: Reverted the unfinished system statistics fetching and Recharts integration to prioritize strategic discussion and design refinement.
+
+### Fixed
+- **Admin Visibility Gap**: Resolved a query logic issue where Admin and Tester activity was excluded from the behavioral analytics views.
+- **Job Title Truncation**: Removed the restrictive `max-w-md` and `truncate` classes in the Job Detail header and History list.
+- **Analysis Progress Honesty**: Removed the 99% progress cap in `useJobManager` and injected granular steps into `jobAiService` for a more dynamic matching process.
+- **Skill Gap Visibility**: Enhanced the "Match Quality" card to display specific weaknesses and skill gaps when scores are low.
+- **Job Analysis UI Fix**: Removed a redundant container background behind the analysis buttons in the landing view.
+- **AI Tone Normalization**: Enforced standard Sentence Case through both prompt guardrails and UI-level sanitization to eliminate "shouting" in bullet points and match quality cards.
+- **Empty Feed State UI**: Refined the "No matches found" and Admin "Feed" empty states, replacing outdated dashed-border containers with modern, premium glassmorphic cards and subtle indigo accents.
+
 ## [2.37.0] - 2026-03-23
 
 ### Added

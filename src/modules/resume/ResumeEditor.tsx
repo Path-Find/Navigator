@@ -1,3 +1,4 @@
+```javascript
 import React, { useState, useEffect, useRef } from 'react';
 import { Upload, Loader2, Plus, Briefcase, Code, Zap, Sparkles, Heart, FileText, Download, X } from 'lucide-react';
 import { SharedPageLayout } from '../../components/common/SharedPageLayout';
@@ -14,6 +15,7 @@ import { ResumeSectionEditor } from './components/ResumeSectionEditor';
 import { ResumeDiscoverySidebar } from './components/ResumeDiscoverySidebar';
 import { SECTIONS, getSortDate, getTypeColor } from './constants';
 import { useSkillContext } from '../skills/context/SkillContext';
+import { printElement } from '../../utils/printService';
 
 export const ResumeEditor: React.FC = () => {
     const {
@@ -84,7 +86,7 @@ export const ResumeEditor: React.FC = () => {
     };
 
     const handlePrint = () => {
-        window.print();
+        printElement('resume-preview-print-target', 'Resume - Primary Experience');
     };
 
     const showEmptyState = blocks.length === 0 && !hasStartedManually && !isParsing;
@@ -180,7 +182,7 @@ export const ResumeEditor: React.FC = () => {
                 `}
             </style>
 
-            <div id="resume-preview" className="hidden print-only bg-white">
+            <div id="resume-preview-print-target" className="hidden print-only bg-white">
                 <ResumePreview blocks={blocks} />
             </div>
             <GlobalDragOverlay onDrop={(files) => onImport(files[0])} />

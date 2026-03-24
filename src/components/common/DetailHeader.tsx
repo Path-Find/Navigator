@@ -1,5 +1,7 @@
 import React from 'react';
 import { ArrowLeft } from 'lucide-react';
+import { Button } from '../../components/ui/Button';
+import { useJobAnalysis } from '../../modules/job/hooks/useJobAnalysis';
 
 
 interface DetailHeaderProps {
@@ -33,8 +35,8 @@ export const DetailHeader: React.FC<DetailHeaderProps> = ({
                             <ArrowLeft className="w-5 h-5 text-neutral-500 group-hover:-translate-x-1 transition-transform" />
                         </button>
                     )}
-                    <div>
-                        <h2 className="text-xl font-black text-neutral-900 dark:text-white truncate max-w-md tracking-tight" title={typeof title === 'string' ? title : undefined}>
+                    <div className="flex flex-col gap-1.5 min-w-0">
+                        <h2 className="text-2xl sm:text-3xl font-extrabold text-neutral-900 dark:text-white tracking-tight leading-tight">
                             {title}
                         </h2>
                         {subtitle && (

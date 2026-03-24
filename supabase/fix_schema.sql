@@ -83,5 +83,5 @@ select
 from daily_usage u
 join profiles p on u.user_id = p.id
 join daily_stats ds on u.date = ds.date and p.subscription_tier = ds.subscription_tier
-where u.token_count > (ds.avg_tokens * 3)
+  where u.token_count >= 0
 order by x_times_normal desc;

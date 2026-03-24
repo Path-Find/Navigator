@@ -10,10 +10,14 @@ import { ResumeStorage } from '../../../services/storage/resumeStorage';
 import { CoachStorage } from '../../../services/storage/coachStorage';
 import type { GrowthTrajectory } from '../../../services/ai/rd/types';
 import { useUser } from '../../../contexts/UserContext';
+import { JobStorage } from '../../../services/storage/jobStorage';
+import { useToast } from '../../../contexts/ToastContext';
+import type { SavedJob } from '../../../types';
 import { Button } from '../../../components/ui/Button';
 
 export const NextGenCalibration: React.FC = () => {
     const { user, isNextGenEnabled, updateProfile } = useUser();
+    const { showError, showInfo } = useToast();
     const [stats, setStats] = useState<{ total: number; breakdown: Record<string, number> } | null>(null);
     const [style, setStyle] = useState<string | null>(null);
     const [trajectory, setTrajectory] = useState<GrowthTrajectory | null>(null);
@@ -23,6 +27,39 @@ export const NextGenCalibration: React.FC = () => {
     const [isTrajectoryLoading, setIsTrajectoryLoading] = useState(false);
     const [isVectorizing, setIsVectorizing] = useState(false);
     const [isSimilarityLoading, setIsSimilarityLoading] = useState(false);
+    const [isBootstrapping, setIsBootstrapping] = useState(false);
+
+    const handleBootstrapEcho = async () => {
+        if (!user) return;
+        setIsBootstrapping(true);
+        try {
+            const jobs = await JobStorage.getJobs();
+            const analyzedJobs = jobs.filter((j: SavedJob) => j.status !== 'analyzing' && j.status !== 'error' && j.analysis);
+            
+            if (analyzedJobs.length === 0) {
+                showError("No analyzed jobs found to bootstrap from.");
+                return;
+            }
+
+            // Create initial implicit signals from existing analyses
+            const promises = analyzedJobs.slice(0, 10).map((j: SavedJob) => 
+                RdFeedbackService.captureSignal(user.id, {
+                    roleModelId: j.roleId || j.position,
+                    signalType: 'implicit_usage',
+                    context: 'match_logic',
+                    outputContent: { score: j.fitScore, title: j.position },
+                    impactScore: 1,
+                    metadata: { bootstrapped: true, job_id: j.id }
+                })
+            );
+
+            await Promise.all(promises);
+            await loadModelData();
+            showInfo("Modeling echo initialized from historical activity.");
+        } finally {
+            setIsBootstrapping(false);
+        }
+    };
 
     const loadModelData = async () => {
         if (!user) return;
@@ -150,18 +187,25 @@ export const NextGenCalibration: React.FC = () => {
                                 <div className="p-2 bg-indigo-500/10 rounded-xl">
                                     <Cpu className="w-4 h-4 text-indigo-500" />
                                 </div>
-                                <span className="text-[10px] font-bold text-neutral-400 dark:text-neutral-500 uppercase tracking-widest">Latent Model</span>
+                                <span className="text-[10px] font-bold text-neutral-400 dark:text-neutral-500 uppercase tracking-widest">Style Signature <span className="text-[8px] opacity-50 ml-1">(Latent Model)</span></span>
                             </div>
-                            <Button
-                                variant="ghost"
-                                size="sm"
-                                className="!text-[9px] !h-7 !px-3 font-bold bg-neutral-100 dark:bg-neutral-800/50 uppercase tracking-tighter"
-                                onClick={loadModelData}
-                                loading={isLoading}
-                                icon={<RefreshCw className="w-3 h-3" />}
-                            >
-                                Re-sync
-                            </Button>
+                            <div className="flex gap-2">
+                                <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    className="!text-[9px] !h-7 !px-3 font-bold bg-neutral-100 dark:bg-neutral-800/50 uppercase tracking-tighter"
+                                    onClick={loadModelData}
+                                    loading={isLoading}
+                                    icon={<RefreshCw className="w-3 h-3" />}
+                                >
+                                    Re-sync
+                                </Button>
+                            </div>
+                        </div>
+                        <div className="mb-4">
+                            <p className="text-[9px] font-medium text-neutral-500 leading-normal">
+                                The distilled stylistic signature extracted from your writing patterns and past successes. It guides the AI to sound like you in cover letters and summaries.
+                            </p>
                         </div>
                         <div className="flex-1 flex flex-col justify-center min-h-[140px] relative">
                             {style ? (
@@ -203,18 +247,36 @@ export const NextGenCalibration: React.FC = () => {
                                 <div className="p-2 bg-emerald-500/10 rounded-xl">
                                     <Gauge className="w-4 h-4 text-emerald-500" />
                                 </div>
-                                <span className="text-[10px] font-bold text-neutral-400 dark:text-neutral-500 uppercase tracking-widest">Signal Intelligence</span>
+                                <span className="text-[10px] font-bold text-neutral-400 dark:text-neutral-500 uppercase tracking-widest">Feedback Signals <span className="text-[8px] opacity-50 ml-1">(Intelligence)</span></span>
                             </div>
-                            <Button
-                                variant="ghost"
-                                size="sm"
-                                className="!text-[9px] !h-7 !px-3 font-bold bg-neutral-100 dark:bg-neutral-800/50 uppercase tracking-tighter"
-                                onClick={handleSyncLatentSpace}
-                                loading={isVectorizing}
-                                icon={<Share2 className="w-3 h-3 text-emerald-500" />}
-                            >
-                                Mapping
-                            </Button>
+                            <div className="flex gap-2">
+                                {!stats?.total && (
+                                    <Button
+                                        variant="ghost"
+                                        size="sm"
+                                        className="!text-[9px] !h-7 !px-3 font-bold bg-emerald-500/10 text-emerald-600 dark:text-emerald-400 uppercase tracking-tighter"
+                                        onClick={handleBootstrapEcho}
+                                        loading={isBootstrapping}
+                                    >
+                                        Initialize
+                                    </Button>
+                                )}
+                                <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    className="!text-[9px] !h-7 !px-3 font-bold bg-neutral-100 dark:bg-neutral-800/50 uppercase tracking-tighter"
+                                    onClick={handleSyncLatentSpace}
+                                    loading={isVectorizing}
+                                    icon={<Share2 className="w-3 h-3 text-emerald-500" />}
+                                >
+                                    Mapping
+                                </Button>
+                            </div>
+                        </div>
+                        <div className="mb-4">
+                            <p className="text-[9px] font-medium text-neutral-500 leading-normal">
+                                Real-time feedback loops from your activity (approvals, edits, successes). This data fine-tunes the modeling engine against your specific career outcomes.
+                            </p>
                         </div>
                         <div className="space-y-4 flex-1">
                             {stats ? (

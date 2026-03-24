@@ -183,7 +183,7 @@ export default function History() {
                                         {/* Header Row */}
                                         <div className="flex flex-col md:flex-row md:items-start justify-between gap-4 mb-3">
                                             <div className="space-y-1.5 min-w-0">
-                                                <h3 className={`text-lg sm:text-xl font-extrabold transition-colors truncate pr-4 tracking-tight leading-tight ${isError ? 'text-rose-950 dark:text-rose-400/90' : 'text-neutral-900 dark:text-white group-hover:text-accent-primary-hex'}`}>
+                                                <h3 className={`text-lg sm:text-xl font-extrabold transition-colors pr-4 tracking-tight leading-tight ${isError ? 'text-rose-950 dark:text-rose-400/90' : 'text-neutral-900 dark:text-white group-hover:text-accent-primary-hex'}`}>
                                                     {isAnalyzing && !job.analysis?.distilledJob.roleTitle ? 'Analyzing New Job...' : roleTitle}
                                                 </h3>
                                                 

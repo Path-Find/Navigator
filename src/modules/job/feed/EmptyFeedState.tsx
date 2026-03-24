@@ -17,7 +17,7 @@ export const EmptyFeedState: React.FC<EmptyFeedStateProps> = ({
     const hasActiveFilters = searchTerm || filterHighMatch || filterClosingSoon;
 
     return (
-        <div className="card-premium p-12 text-center space-y-8 max-w-2xl mx-auto border-dashed">
+        <div className="card-premium p-12 text-center space-y-8 max-w-2xl mx-auto shadow-2xl shadow-indigo-500/5 border-neutral-100 dark:border-white/5">
             <div className="w-20 h-20 bg-gradient-to-br from-neutral-50 to-neutral-100 dark:from-neutral-800 dark:to-neutral-900 rounded-[2rem] flex items-center justify-center mx-auto mb-4 shadow-inner">
                 <Sparkles className="w-10 h-10 text-neutral-300 dark:text-neutral-600 animate-pulse" />
             </div>

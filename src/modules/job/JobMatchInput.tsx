@@ -293,11 +293,25 @@ const JobMatchInput: React.FC = () => {
                         />
                         <div className="absolute bottom-4 right-4 text-xs text-neutral-400">Press Enter to analyze • Shift+Enter for new line</div>
                     </div>
-                    <div className="flex justify-between items-center bg-neutral-50 dark:bg-neutral-900 p-3 rounded-2xl border border-neutral-100 dark:border-neutral-800">
-                        <button onClick={() => { setIsManualMode(false); setError(null); }} className="text-sm text-neutral-500 font-bold px-4 py-2">Back to URL</button>
-                        <button onClick={() => manualDescription.trim() && handleJobSubmission({ type: 'text', content: manualDescription })} disabled={!manualDescription.trim()} className="flex items-center gap-2 px-6 py-2 bg-indigo-600 text-white rounded-xl font-bold shadow-lg shadow-indigo-500/20">
-                            <Sparkles className="w-4 h-4" /> Analyze Job
-                        </button>
+                    <div className="flex justify-between items-center bg-transparent p-1 rounded-2xl border-none">
+                        <Button 
+                            variant="subtle" 
+                            onClick={() => { setIsManualMode(false); setError(null); }}
+                            className="text-neutral-500 font-bold"
+                        >
+                            Back to URL
+                        </Button>
+                        <Button 
+                            variant="accent"
+                            size="lg"
+                            disabled={!manualDescription.trim() || isAnalyzing}
+                            loading={isAnalyzing}
+                            onClick={() => manualDescription.trim() && handleJobSubmission({ type: 'text', content: manualDescription })}
+                            icon={<Sparkles className="w-4 h-4" />}
+                            className="px-8 shadow-lg shadow-accent-primary/20"
+                        >
+                            Analyze Job
+                        </Button>
                     </div>
                 </div>
             )}
