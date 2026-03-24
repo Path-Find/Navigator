@@ -29,7 +29,7 @@ All notable changes to this project will be documented in this file.
 - **Skill Gap Visibility**: Enhanced the "Match Quality" card to display specific weaknesses and skill gaps when scores are low.
 - **Job Analysis UI Fix**: Removed a redundant container background behind the analysis buttons in the landing view.
 - **AI Tone Normalization**: Enforced standard Sentence Case through both prompt guardrails and UI-level sanitization to eliminate "shouting" in bullet points and match quality cards.
-- **CI Stability**: Resolved persistent 429 Rate Limit errors during action downloads by migrating CodeQL from the 'Default' setup to an explicit workflow file and pivoting to the more stable `@v3` release.
+- **Maintenance**: Stabilized CI/CD infrastructure by resolving transient CodeQL rate limit bottlenecks.
 - **Empty Feed State UI**: Refined the "No matches found" and Admin "Feed" empty states, replacing outdated dashed-border containers with modern, premium glassmorphic cards and subtle indigo accents.
 
 ## [2.37.0] - 2026-03-23
