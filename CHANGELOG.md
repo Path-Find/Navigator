@@ -2,7 +2,7 @@
 
 All notable changes to this project will be documented in this file.
 
-## [Unreleased]
+## [2.38.0] - 2026-03-24
 
 ### Added
 - **Automated AI Critique**: Cover letters now undergo an immediate architectural and stylistic review upon generation, providing instant feedback without manual triggers.
