@@ -1,7 +1,6 @@
 import React from 'react';
 import { ArrowLeft } from 'lucide-react';
-import { Button } from '../../components/ui/Button';
-import { useJobAnalysis } from '../../modules/job/hooks/useJobAnalysis';
+
 
 
 interface DetailHeaderProps {
