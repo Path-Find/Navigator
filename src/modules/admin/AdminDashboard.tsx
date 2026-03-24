@@ -103,6 +103,40 @@ export const AdminDashboard: React.FC = () => {
         };
     }, [outliers]);
 
+    const pulseHeatmap = useMemo(() => {
+        const pulseCounts = dailyPulse.map(p => p.count);
+        const maxOps = pulseCounts.length > 0 ? Math.max(...pulseCounts, 1) : 100;
+        const today = new Date();
+        
+        return Array.from({ length: 28 }).map((_, i) => {
+            const dateObj = new Date(today);
+            dateObj.setDate(today.getDate() - (27 - i));
+            const dateStr = dateObj.toISOString().split('T')[0];
+            const entry = dailyPulse.find(p => p.date === dateStr);
+            const count = entry?.count || 0;
+            
+            // Calculate intensity (0.1 for empty, up to 1 for max)
+            const intensity = count > 0 ? (0.3 + (count / maxOps) * 0.7) : 0.05;
+            
+            return (
+                <div 
+                    key={`${dateStr}-${i}`} 
+                    className="aspect-square rounded-[3px] relative group border border-neutral-100/10 dark:border-white/5 transition-all duration-500 hover:ring-2 hover:ring-indigo-500/30"
+                    style={{ 
+                        backgroundColor: count > 0 
+                            ? `rgba(99, 102, 241, ${intensity})` 
+                            : 'rgba(99, 102, 241, 0.05)'
+                    }}
+                >
+                    <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-neutral-900 dark:bg-neutral-800 text-[8px] text-white rounded-[4px] hidden group-hover:block whitespace-nowrap z-50 shadow-2xl border border-white/10">
+                        <div className="font-black mb-0.5">{dateStr}</div>
+                        <div className="text-indigo-400">{count} operations</div>
+                    </div>
+                </div>
+            );
+        });
+    }, [dailyPulse]);
+
     const activeStats = stats[cohortFilter];
 
     return (
@@ -319,41 +353,8 @@ export const AdminDashboard: React.FC = () => {
                                     </div>
                                 </div>
                                 <div className="flex-1 flex flex-col justify-center gap-8">
-                                    <div className="grid grid-cols-7 gap-2">
-                                        {useMemo(() => {
-                                            const pulseCounts = dailyPulse.map(p => p.count);
-                                            const maxOps = pulseCounts.length > 0 ? Math.max(...pulseCounts, 1) : 100;
-                                            const today = new Date();
-                                            
-                                            return Array.from({ length: 28 }).map((_, i) => {
-                                                const dateObj = new Date(today);
-                                                dateObj.setDate(today.getDate() - (27 - i));
-                                                const dateStr = dateObj.toISOString().split('T')[0];
-                                                const entry = dailyPulse.find(p => p.date === dateStr);
-                                                const count = entry?.count || 0;
-                                                
-                                                // Calculate intensity (0.1 for empty, up to 1 for max)
-                                                // Use a slight curve for better visual separation of low/med/high
-                                                const intensity = count > 0 ? (0.3 + (count / maxOps) * 0.7) : 0.05;
-                                                
-                                                return (
-                                                    <div 
-                                                        key={`${dateStr}-${i}`} 
-                                                        className="aspect-square rounded-[3px] relative group border border-neutral-100/10 dark:border-white/5 transition-all duration-500 hover:ring-2 hover:ring-indigo-500/30"
-                                                        style={{ 
-                                                            backgroundColor: count > 0 
-                                                                ? `rgba(99, 102, 241, ${intensity})` 
-                                                                : 'rgba(99, 102, 241, 0.05)'
-                                                        }}
-                                                    >
-                                                        <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 px-2 py-1 bg-neutral-900 dark:bg-neutral-800 text-[8px] text-white rounded-[4px] hidden group-hover:block whitespace-nowrap z-50 shadow-2xl border border-white/10">
-                                                            <div className="font-black mb-0.5">{dateStr}</div>
-                                                            <div className="text-indigo-400">{count} operations</div>
-                                                        </div>
-                                                    </div>
-                                                );
-                                            });
-                                        }, [dailyPulse])}
+                                     <div className="grid grid-cols-7 gap-2">
+                                        {pulseHeatmap}
                                     </div>
                                     <div className="flex justify-between items-end border-t border-neutral-100 dark:border-neutral-800 pt-8">
                                         <div>

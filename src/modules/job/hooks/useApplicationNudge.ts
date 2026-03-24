@@ -40,7 +40,10 @@ export const useApplicationNudge = (
             !dismissedIds.has(j.id)
         );
 
-        setNudgeJob(staleJob ?? null);
+        const currentNudge = staleJob ?? null;
+        queueMicrotask(() => {
+            setNudgeJob(prev => prev?.id === currentNudge?.id ? prev : currentNudge);
+        });
     }, [jobs, isLoading]);
 
     const dismissNudge = useCallback(() => {

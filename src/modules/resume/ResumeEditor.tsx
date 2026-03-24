@@ -1,4 +1,3 @@
-```javascript
 import React, { useState, useEffect, useRef } from 'react';
 import { Upload, Loader2, Plus, Briefcase, Code, Zap, Sparkles, Heart, FileText, Download, X } from 'lucide-react';
 import { SharedPageLayout } from '../../components/common/SharedPageLayout';

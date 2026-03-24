@@ -219,7 +219,7 @@ export const InterviewSessionScreen = ({
         });
 
         return msgs;
-    }, [questions, currentQuestionIndex, responses, mode, resumes, copiedText, resumeSnippets, onBankSuggestion, sessionType, selectedJobId, jobs, onJobSelected]);
+    }, [questions, currentQuestionIndex, responses, mode, resumes, copiedText, resumeSnippets, onBankSuggestion, sessionType, selectedJobId, jobs, onJobSelected, isSessionLoading]);
 
     if (mode === 'session') {
         const isInitialJobSelection = sessionType === 'tailored' && !selectedJobId;

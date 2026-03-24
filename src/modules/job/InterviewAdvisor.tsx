@@ -40,6 +40,7 @@ export const InterviewAdvisor: React.FC = () => {
 
     const { setFocusedMode } = useGlobalUI();
     const { showError } = useToast();
+    const [resumeSnippets, setResumeSnippets] = useState<{ text: string; source: string }[]>([]);
 
     // Sync state with URL
     useEffect(() => {
@@ -69,9 +70,11 @@ export const InterviewAdvisor: React.FC = () => {
             };
             startSession();
         } else {
-            setMode('selection');
-            setSessionType(null);
-            setSelectedJobId(null);
+            queueMicrotask(() => {
+                setMode('selection');
+                setSessionType(null);
+                setSelectedJobId(null);
+            });
         }
     }, [type, navigate, resumes, loadGeneralQuestions, showError]);
 
@@ -92,7 +95,6 @@ export const InterviewAdvisor: React.FC = () => {
         }
     }, [error, showError, navigate]);
 
-    const [resumeSnippets, setResumeSnippets] = useState<{ text: string; source: string }[]>([]);
 
     const handleStartTailored = async () => {
         navigate(`${ROUTES.INTERVIEWS}/tailored`);

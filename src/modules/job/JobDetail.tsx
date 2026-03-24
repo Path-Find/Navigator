@@ -40,7 +40,15 @@ import type { SavedJob } from './types';
 import type { TargetJob } from '../../types/target';
 
 export const JobDetail: React.FC = () => {
-    const { activeJob: job, handleUpdateJob: onUpdateJob, handleAnalyzeJob, checkAndConsumeAnalysis } = useJobContext();
+    const { 
+        activeJob: job, 
+        handleUpdateJob: onUpdateJob, 
+        handleAnalyzeJob, 
+        checkAndConsumeAnalysis,
+        isLoading,
+        activeJobId,
+        jobs
+    } = useJobContext();
     const { userTier } = useUser();
     const { skills: userSkills } = useSkillContext();
     const { resumes } = useResumeContext();
@@ -78,15 +86,14 @@ export const JobDetail: React.FC = () => {
     );
 
     // If we have an active ID but the job isn't in the list yet, we're likely still loading from storage
-    const { isLoading } = useJobContext();
-    console.log("JobDetail render:", { job, isLoading, activeJobId: useJobContext().activeJobId, urlId: window.location.pathname });
+    console.log("JobDetail render:", { job, isLoading, activeJobId, urlId: window.location.pathname });
     if (!job && isLoading) {
         return <JobProcessingState job={null as any} analysisProgress="Loading your data..." onBack={onBack} />;
     }
 
     if (!job) {
         // Only return null if we're definitively done loading and still have no job
-        return <div style={{ fontSize: '24px', padding: '100px' }}>Job not found for ID: {useJobContext().activeJobId}. Total jobs: {useJobContext().jobs.length}</div>; 
+        return <div style={{ fontSize: '24px', padding: '100px' }}>Job not found for ID: {activeJobId}. Total jobs: {jobs.length}</div>; 
     }
 
     const bestResume = getBestResume(resumes, job.analysis);
