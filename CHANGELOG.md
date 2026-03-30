@@ -16,6 +16,7 @@ All notable changes to this project will be documented in this file.
 - **Component Source-of-Truth**: Refined `BentoCard` and `UnifiedUploadHero` to act as the primary layout engines, eliminating visual drift across platform modules.
 
 ### Fixed
+- **Build Infrastructure**: Resolved a critical TypeScript regression in `CoachHero` where missing `userSkills` and `orgCount` props were causing build failures, restoring CI/CD deployment stability.
 - **Typography Rendering**: Resolved an issue where labels failed to render correctly following the typography refactor in `GapAnalysisSection`.
 - **UI Layout Glitches**: Fixed z-index layering in `JobfitPreview`, header positioning in the Job "Posting" tab, and resume upload flickering.
 

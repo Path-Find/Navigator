@@ -27,6 +27,8 @@ interface CoachHeroProps {
     setError: (error: string | null) => void;
     roleModels: RoleModelProfile[];
     targetJobs: TargetJob[];
+    userSkills: any[];
+    orgCount: number;
     onViewChange: (view: CoachViewType) => void;
 }
 
