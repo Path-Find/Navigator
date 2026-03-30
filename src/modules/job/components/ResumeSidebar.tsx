@@ -36,7 +36,7 @@ export const ResumeSidebar: React.FC<ResumeSidebarProps> = ({ job, analysisProgr
     return (
         <Card variant="premium" className="p-8 border-indigo-500/10 shadow-indigo-500/10">
             <div className="mb-8">
-                <h4 className="text-xs font-bold text-indigo-500 dark:text-indigo-400">How We Built This</h4>
+                <h4 className="text-xs font-bold text-indigo-500 dark:text-indigo-400">Tailoring Strategy</h4>
             </div>
 
             {tailoringFocus.length > 0 ? (

@@ -11,6 +11,7 @@ import type {
 } from "../../types";
 import { AI_MODELS, AI_TEMPERATURE } from "../../constants";
 import { EDUCATION_PROMPTS, CAREER_PROMPTS, PARSING_PROMPTS } from "../../prompts/index";
+import { extractPdfText } from "../../utils/pdfExtractor";
 
 export const analyzeMAEligibility = async (
     transcript: Transcript,
@@ -109,7 +110,19 @@ export const parseTranscript = async (
     fileBase64: string,
     mimeType: string
 ): Promise<Transcript> => {
-    const prompt = PARSING_PROMPTS.TRANSCRIPT_PARSE("");
+    let promptParts: ({ text: string } | { inlineData: { mimeType: string; data: string } })[] = [];
+    let extractedText = "";
+
+    if (mimeType === 'application/pdf') {
+        extractedText = await extractPdfText(fileBase64);
+        promptParts = [{ text: `TRANSCRIPT CONTENT:\n${extractedText}` }];
+    } else {
+        promptParts = [{ inlineData: { mimeType, data: fileBase64 } }];
+    }
+
+    const prompt = PARSING_PROMPTS.TRANSCRIPT_PARSE(extractedText);
+    promptParts.push({ text: prompt });
+
     return callWithRetry(async (metadata) => {
         const model = await getModel({
             task: 'extraction',
@@ -118,10 +131,7 @@ export const parseTranscript = async (
         const response = await model.generateContent({
             contents: [{
                 role: "user",
-                parts: [
-                    { inlineData: { data: fileBase64, mimeType } },
-                    { text: prompt }
-                ]
+                parts: promptParts
             }]
         });
         metadata.token_usage = response.response.usageMetadata;

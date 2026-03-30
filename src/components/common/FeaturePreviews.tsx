@@ -39,6 +39,8 @@ const EduGpaPreview = lazy(() => import('./previews/EduGpaPreview'));
 const ExtensionPreview = lazy(() => import('./previews/ExtensionPreview'));
 const ArchetypeUpdatePreview = lazy(() => import('./previews/ArchetypeUpdatePreview'));
 const PolicyUpdatePreview = lazy(() => import('./previews/PolicyUpdatePreview'));
+const ResumeInterviewPreview = lazy(() => import('./previews/ResumeInterviewPreview'));
+const OrgsPreview = lazy(() => import('./previews/OrgsPreview'));
 
 // ─── Preview Map ───────────────────────────────────────────────────────
 
@@ -62,6 +64,8 @@ const PREVIEW_MAP: Record<string, React.LazyExoticComponent<React.ComponentType<
     'edu-explorer': EduExplorerPreview,
     'edu-gpa': EduGpaPreview,
     'extension': ExtensionPreview,
+    'resume-interview': ResumeInterviewPreview,
+    'orgs': OrgsPreview,
     '_notice_archetype': ArchetypeUpdatePreview,
     '_notice_tos': PolicyUpdatePreview,
 };

@@ -1,7 +1,15 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { Scale, CheckCircle2, ShieldAlert, FileText, Ban, AlertTriangle } from 'lucide-react';
+import { useUser } from '../../contexts/UserContext';
+import { LATEST_TOS_VERSION } from '../../constants';
 
 export const Terms: React.FC = () => {
+    const { setAcceptedTosVersion } = useUser();
+
+    useEffect(() => {
+        // Automatically mark as seen/accepted when user arrives at this page
+        setAcceptedTosVersion(LATEST_TOS_VERSION);
+    }, [setAcceptedTosVersion]);
 
     const SimpleCard = ({ icon: Icon, title, description, color }: { icon: React.ElementType; title: string; description: string; color: { bg: string; text: string; accent: string; iconBg: string } }) => (
         <div className={`group relative h-full flex flex-col p-6 rounded-3xl border transition-all duration-300 ${color.bg} ${color.accent} hover:shadow-xl hover:-translate-y-1`}>

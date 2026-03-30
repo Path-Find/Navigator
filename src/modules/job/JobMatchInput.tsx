@@ -3,11 +3,12 @@ import { useNavigate } from 'react-router-dom';
 import {
     Link as LinkIcon,
     FileText,
-    Bookmark,
     Loader2,
     Sparkles,
+    Target,
+    Zap,
+    FileSearch,
 } from 'lucide-react';
-import { NotificationBanner } from '../../components/common/NotificationBanner';
 import { SharedPageLayout } from '../../components/common/SharedPageLayout';
 import { EventService } from '../../services/eventService';
 import { UsageIndicator } from './UsageIndicator';
@@ -16,6 +17,8 @@ import { useHeadlines } from '../../hooks/useHeadlines';
 import { PageHeader } from '../../components/ui/PageHeader';
 import { Button } from '../../components/ui/Button';
 import { Card } from '../../components/ui/Card';
+import { BentoCard } from '../../components/ui/BentoCard';
+import { FEATURE_COLORS } from '../../featureRegistry';
 import { Storage } from '../../services/storageService';
 
 import type { SavedJob } from '../../types';
@@ -51,10 +54,6 @@ const JobMatchInput: React.FC = () => {
 
     const activeHeadline = useHeadlines('apply');
     const lastUrlRef = useRef<string>('');
-
-    const [showExtensionTip, setShowExtensionTip] = useState(() => {
-        return !LocalStorage.get(STORAGE_KEYS.EXTENSION_TIP_DISMISSED);
-    });
 
     const [initialJobUrl, setInitialJobUrl] = useState<string | null>(null);
 
@@ -138,14 +137,13 @@ const JobMatchInput: React.FC = () => {
         const isLikelyUrl = trimmedUrl.startsWith('http') || (trimmedUrl.includes('.') && !trimmedUrl.includes(' '));
         if (!isLikelyUrl && trimmedUrl.length > 50) {
             setManualDescription(trimmedUrl);
-            setIsManualMode(true); // Switch to manual mode if a long string is pasted instead of URL
+            setIsManualMode(true);
             setError(null);
             return;
         }
 
         setError(null);
 
-        // Pre-flight check for known-difficult domains to save time and tokens
         try {
             const { ScraperService } = await import('../../services/scraperService');
             if (!ScraperService.isUrlScrapable(trimmedUrl)) {
@@ -166,11 +164,7 @@ const JobMatchInput: React.FC = () => {
             handleJobSubmission({ type: 'text', content: text });
         } catch (err: any) {
             const msg = err instanceof Error ? err.message : String(err);
-            // DO NOT clear URL or manualDescription here, let the user see what happened
-            // setUrl(''); 
-            // lastUrlRef.current = ''; 
-            // setManualDescription(''); 
-            setIsManualMode(true); // Switch to manual mode so they can fix/paste
+            setIsManualMode(true);
 
             if (msg === "DOMAIN_BLOCKED") {
                 setError("This domain has a high failure rate for automatic scraping. Please paste the job description below:");
@@ -213,7 +207,7 @@ const JobMatchInput: React.FC = () => {
             />
 
             {!isManualMode ? (
-                <div className="w-full max-w-3xl mx-auto mb-16 animate-in zoom-in-95 fade-in duration-500">
+                <div className="w-full max-w-3xl mx-auto mb-12 animate-in zoom-in-95 fade-in duration-500">
                     <form onSubmit={error ? (e) => { e.preventDefault(); handleJobSubmission({ type: 'text', content: manualDescription }); } : handleUrlSubmit}>
                         <Card variant="glass" className={`p-4 border-accent-primary/20 ${isAnalyzing ? 'border-accent-primary/50 shadow-accent-primary/20' : 'hover:border-accent-primary/30'}`} glow>
                             <div className="flex flex-col md:flex-row items-center gap-6">
@@ -253,7 +247,7 @@ const JobMatchInput: React.FC = () => {
                                     )}
                                 </div>
 
-                                 <Button
+                                <Button
                                     type="submit"
                                     disabled={isScrapingUrl || isAnalyzing || (error ? !manualDescription.trim() : !url.trim())}
                                     variant="accent"
@@ -281,7 +275,7 @@ const JobMatchInput: React.FC = () => {
                     {user && !isAdmin && <UsageIndicator usageStats={usageStats} />}
                 </div>
             ) : (
-                <div className="space-y-4 animate-in fade-in slide-in-from-bottom-4">
+                <div className="space-y-4 animate-in fade-in slide-in-from-bottom-4 mb-12">
                     <div className="relative">
                         <textarea
                             className={`w-full h-64 p-4 text-sm bg-white dark:bg-neutral-900 border-2 rounded-2xl focus:outline-none focus:ring-4 focus:ring-indigo-50/50 dark:focus:ring-indigo-900/30 transition-all resize-none text-neutral-900 dark:text-neutral-100 placeholder:text-neutral-400 ${error ? 'border-red-300 focus:border-red-500' : 'border-neutral-200 dark:border-neutral-700 focus:border-indigo-500'}`}
@@ -294,14 +288,14 @@ const JobMatchInput: React.FC = () => {
                         <div className="absolute bottom-4 right-4 text-xs text-neutral-400">Press Enter to analyze • Shift+Enter for new line</div>
                     </div>
                     <div className="flex justify-between items-center bg-transparent p-1 rounded-2xl border-none">
-                        <Button 
-                            variant="subtle" 
+                        <Button
+                            variant="subtle"
                             onClick={() => { setIsManualMode(false); setError(null); }}
                             className="text-neutral-500 font-bold"
                         >
                             Back to URL
                         </Button>
-                        <Button 
+                        <Button
                             variant="accent"
                             size="lg"
                             disabled={!manualDescription.trim() || isAnalyzing}
@@ -316,19 +310,75 @@ const JobMatchInput: React.FC = () => {
                 </div>
             )}
 
-            {user && showExtensionTip && (
-                <NotificationBanner
-                    icon={Bookmark}
-                    theme="sky"
-                    title="Browser extension coming soon"
-                    description="Save jobs from any website with one click. We'll notify you when it's available."
-                    className="max-w-xl mx-auto mt-8"
-                    onDismiss={() => {
-                        setShowExtensionTip(false);
-                        LocalStorage.set(STORAGE_KEYS.EXTENSION_TIP_DISMISSED, 'true');
-                    }}
-                />
-            )}
+            {/* Feature BentoCards — same pattern as Home and Career */}
+            <div className="w-full max-w-5xl mx-auto pb-24 animate-in fade-in slide-in-from-bottom-4 duration-700 delay-300">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-8 items-stretch">
+                    <div className="animate-in slide-in-from-bottom-8 fade-in duration-700 delay-100 fill-mode-both">
+                        <BentoCard
+                            id="jobs-match"
+                            icon={Target}
+                            title="Instant Match Score"
+                            description="Paste any job URL and get a 0–100 compatibility rating against your resume in seconds."
+                            color={FEATURE_COLORS.indigo}
+                            actionLabel="Try it now"
+                            onAction={() => {}}
+                            previewContent={
+                                <ul className="space-y-3 pt-4">
+                                    {['Fit Score Breakdown', 'Missing Keywords', 'Red Flag Detection'].map(item => (
+                                        <li key={item} className="flex items-center gap-3 text-xs font-bold text-neutral-400">
+                                            <div className="w-1 h-1 rounded-full bg-indigo-500" />
+                                            {item}
+                                        </li>
+                                    ))}
+                                </ul>
+                            }
+                        />
+                    </div>
+                    <div className="animate-in slide-in-from-bottom-8 fade-in duration-700 delay-200 fill-mode-both">
+                        <BentoCard
+                            id="jobs-extract"
+                            icon={Zap}
+                            title="AI Role Extraction"
+                            description="We surface the real requirements — skills, keywords, and hidden criteria buried in every job post."
+                            color={FEATURE_COLORS.violet}
+                            actionLabel="See how"
+                            onAction={() => {}}
+                            previewContent={
+                                <ul className="space-y-3 pt-4">
+                                    {['Skill Pattern Analysis', 'Seniority Detection', 'Culture Signals'].map(item => (
+                                        <li key={item} className="flex items-center gap-3 text-xs font-bold text-neutral-400">
+                                            <div className="w-1 h-1 rounded-full bg-violet-500" />
+                                            {item}
+                                        </li>
+                                    ))}
+                                </ul>
+                            }
+                        />
+                    </div>
+                    <div className="animate-in slide-in-from-bottom-8 fade-in duration-700 delay-300 fill-mode-both">
+                        <BentoCard
+                            id="jobs-tailor"
+                            icon={FileSearch}
+                            title="Tailored to You"
+                            description="Get a resume rewrite, targeted bullet points, and a cover letter that beats the ATS automatically."
+                            color={FEATURE_COLORS.sky}
+                            actionLabel="Get tailored"
+                            onAction={() => {}}
+                            previewContent={
+                                <ul className="space-y-3 pt-4">
+                                    {['Resume Rewrite', 'ATS Optimization', 'Cover Letter Draft'].map(item => (
+                                        <li key={item} className="flex items-center gap-3 text-xs font-bold text-neutral-400">
+                                            <div className="w-1 h-1 rounded-full bg-sky-500" />
+                                            {item}
+                                        </li>
+                                    ))}
+                                </ul>
+                            }
+                        />
+                    </div>
+                </div>
+            </div>
+
         </SharedPageLayout>
     );
 };

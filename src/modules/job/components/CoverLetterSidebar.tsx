@@ -1,6 +1,7 @@
 import { Card } from '../../../components/ui/Card';
 
 import { getCritiqueLabel, getCritiqueColorClasses } from '../utils/jobUtils';
+import { toSentenceCase } from '../../../utils/stringUtils';
 import type { SavedJob, CoverLetterCritique } from '../types';
 
 interface CoverLetterSidebarProps {
@@ -16,16 +17,15 @@ export const CoverLetterSidebar: React.FC<CoverLetterSidebarProps> = ({ job }) =
     return (
         <Card variant="premium" className="p-8 border-indigo-500/10 shadow-indigo-500/10">
             <div className="mb-6">
-                <h4 className="text-xs font-bold text-indigo-500 dark:text-indigo-400 uppercase tracking-widest">Strategy & Analysis</h4>
+                <h4 className="text-xs font-bold text-indigo-500 dark:text-indigo-400">Tailoring Strategy</h4>
             </div>
 
             {critique?.feedback && critique.feedback.length > 0 && (
                 <div className="mb-8 space-y-4">
-                    <span className="text-[10px] font-black text-neutral-400 tracking-tight block ml-1 mb-2 uppercase">Architectural Review</span>
                     {critique.feedback.slice(0, 5).map((f: string, idx: number) => (
                         <div key={idx} className="flex gap-3 text-xs font-medium text-neutral-700 dark:text-neutral-300">
                             <div className="w-1.5 h-1.5 rounded-full bg-indigo-400/50 mt-1.5 shrink-0" />
-                            <span className="leading-relaxed">{f}</span>
+                            <span className="leading-relaxed">{toSentenceCase(f)}</span>
                         </div>
                     ))}
                 </div>
@@ -33,11 +33,10 @@ export const CoverLetterSidebar: React.FC<CoverLetterSidebarProps> = ({ job }) =
 
             {tailoringFocus.length > 0 && (!critique?.feedback || critique.feedback.length === 0) && (
                 <div className="mb-8 space-y-4">
-                    <span className="text-[10px] font-black text-neutral-400 tracking-tight block ml-1 mb-2 uppercase">Design Strategy</span>
                     {tailoringFocus.slice(0, 4).map((item: string, idx: number) => (
-                        <div key={idx} className="flex gap-3 text-xs font-medium text-neutral-500 dark:text-neutral-400 italic">
-                            <div className="w-1.5 h-1.5 rounded-full bg-neutral-300/50 mt-1.5 shrink-0" />
-                            <span className="leading-relaxed">{item}</span>
+                        <div key={idx} className="flex gap-3 text-xs font-medium text-neutral-700 dark:text-neutral-300">
+                            <div className="w-1.5 h-1.5 rounded-full bg-indigo-400/50 mt-1.5 shrink-0" />
+                            <span className="leading-relaxed">{toSentenceCase(item)}</span>
                         </div>
                     ))}
                 </div>

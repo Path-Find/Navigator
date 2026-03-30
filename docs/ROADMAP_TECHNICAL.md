@@ -35,6 +35,10 @@ Technical foundation and scaling initiatives to support growth and long-term sta
 - [x] **Deploy `create-portal-session` edge function**: Deployed Mar 2026 via CLI with `--no-verify-jwt`.
 - [ ] **Resume update without rollback** (`ResumeContext.tsx:98`): State is committed before confirming storage write. On failure, UI and storage are out of sync.
 
+### Data Retention
+- [ ] **Job record tiering**: Active jobs store full record (description, AI analysis, screening scores). Expired jobs are tombstoned — title, company, status, notes only. Reduces storage as pipeline grows.
+- [ ] **Expired + applied exception**: Jobs past submission date where status is Applied or further keep full record (needed for interview prep, follow-up, reference).
+
 ### Performance
 - [x] **Unbounded bucket cache** (`bucketStorage.ts:14`): `bucketCache` Map grows indefinitely across a session with no eviction. Add LRU eviction or TTL clearing. (Considered, can do later or assume session-level is fine for now, but roadmap marked)
 - [x] **Large PDF memory spike** (`resumeAiService.ts`): PDF extraction refactored to sequential processing (Mar 2026).

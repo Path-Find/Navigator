@@ -49,7 +49,7 @@ export const WaitlistForm: React.FC<WaitlistFormProps> = ({
             </div>
 
             <div>
-                <label className="block text-xs font-bold text-neutral-500 dark:text-neutral-400 uppercase tracking-wider mb-2 ml-1">Email</label>
+                <label className="block text-xs font-bold text-neutral-500 dark:text-neutral-400 mb-2 ml-1">Email</label>
                 <div className="p-3 bg-neutral-50 dark:bg-neutral-800/50 rounded-xl flex items-center justify-between border border-neutral-100 dark:border-neutral-700 mb-6">
                     <div className="flex items-center gap-2">
                         <Mail className="w-4 h-4 text-neutral-400" />

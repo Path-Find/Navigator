@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Upload, Loader2, Plus, Briefcase, Code, Zap, Sparkles, Heart, FileText, Download, X } from 'lucide-react';
 import { SharedPageLayout } from '../../components/common/SharedPageLayout';
+import { LoadingState } from '../../components/common/LoadingState';
 import { PageHeader } from '../../components/ui/PageHeader';
 import { Card } from '../../components/ui/Card';
 import { Button } from '../../components/ui/Button';
@@ -23,7 +24,8 @@ export const ResumeEditor: React.FC = () => {
         handleImportResume: onImport,
         isParsingResume: isParsing,
         importError,
-        clearImportError
+        clearImportError,
+        isLoading
     } = useResumeContext();
 
     const {
@@ -87,6 +89,16 @@ export const ResumeEditor: React.FC = () => {
     const handlePrint = () => {
         printElement('resume-preview-print-target', 'Resume - Primary Experience');
     };
+
+    if (isLoading) {
+        return (
+            <SharedPageLayout className="theme-resume" spacing="hero" maxWidth="6xl">
+                 <div className="flex flex-col items-center justify-center min-h-[60vh]">
+                    <LoadingState message="Restoring history..." />
+                </div>
+            </SharedPageLayout>
+        );
+    }
 
     const showEmptyState = blocks.length === 0 && !hasStartedManually && !isParsing;
 

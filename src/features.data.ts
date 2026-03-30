@@ -334,7 +334,7 @@ export const FEATURE_REGISTRY: Record<string, FeatureDefinition> = {
         name: 'Education',
         shortName: 'Edu',
         description: {
-            short: 'High-fidelity academic management.',
+            short: 'Smart degree and credit tracking.',
             full: 'Your central hub for degree tracking and program discovery. Manage your academic journey with AI.',
             plan: 'AI-powered tools for degree & program planning',
         },

@@ -44,7 +44,7 @@ export const PasswordForm: React.FC<PasswordFormProps> = ({
 
             <div>
                 <div className="flex justify-between items-center mb-2 ml-1">
-                    <label className="block text-xs font-bold text-neutral-500 dark:text-neutral-400 uppercase tracking-wider">Password</label>
+                    <label className="block text-xs font-bold text-neutral-500 dark:text-neutral-400">Password</label>
                     {!isSignUp && (
                         <button
                             type="button"

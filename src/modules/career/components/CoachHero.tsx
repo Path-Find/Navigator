@@ -1,23 +1,19 @@
-import React, { useMemo } from 'react';
+import React from 'react';
 import {
     Users,
     Plus,
     Target,
     Loader2,
-    CheckCircle2,
+    Map,
     Link as LinkIcon,
     Sparkles,
-    ArrowRight,
-    Map,
-    Building2,
-    TrendingUp
 } from 'lucide-react';
-import type { CustomSkill, RoleModelProfile, TargetJob } from '../../../types';
+import type { RoleModelProfile, TargetJob } from '../../../types';
 import { Card } from '../../../components/ui/Card';
 import { Button } from '../../../components/ui/Button';
+import { BentoCard } from '../../../components/ui/BentoCard';
+import { FEATURE_COLORS } from '../../../featureRegistry';
 import type { CoachViewType } from '../types';
-import { useJobContext } from '../../job/context/JobContext';
-import { useUser } from '../../../contexts/UserContext';
 
 interface CoachHeroProps {
     isUploading: boolean;
@@ -31,8 +27,6 @@ interface CoachHeroProps {
     setError: (error: string | null) => void;
     roleModels: RoleModelProfile[];
     targetJobs: TargetJob[];
-    userSkills: CustomSkill[];
-    orgCount: number;
     onViewChange: (view: CoachViewType) => void;
 }
 
@@ -46,23 +40,9 @@ export const CoachHero: React.FC<CoachHeroProps> = ({
     isScrapingUrl,
     error,
     setError,
-    roleModels,
-    targetJobs,
-    userSkills,
-    orgCount,
     onViewChange
 }) => {
     const isTargetMode = false;
-    const { isAdmin } = useUser();
-    const { jobs } = useJobContext();
-    const canonicalRoleCount = useMemo(() => {
-        const titles = new Set(
-            jobs
-                .filter(j => j.status !== 'feed' && j.analysis?.distilledJob?.canonicalTitle)
-                .map(j => j.analysis!.distilledJob!.canonicalTitle!)
-        );
-        return titles.size;
-    }, [jobs]);
 
     return (
         <>
@@ -109,7 +89,7 @@ export const CoachHero: React.FC<CoachHeroProps> = ({
                                 </div>
 
                                 <div className="flex-1 w-full text-center md:text-left">
-                                    <div className="text-sm font-bold text-neutral-400 tracking-widest mb-1">
+                                    <div className="text-sm font-bold text-neutral-400 mb-1">
                                         Dream Job
                                     </div>
                                     <input
@@ -143,140 +123,74 @@ export const CoachHero: React.FC<CoachHeroProps> = ({
                     </form>
                 )}
 
-                {/* Stats Summary */}
-                <div className="mt-12 flex flex-wrap items-center justify-center gap-8 animate-in fade-in duration-1000 delay-500">
-                    <div
-                        onClick={() => onViewChange('coach-role-models')}
-                        className="flex items-center gap-3 cursor-pointer group transition-all hover:scale-105"
-                    >
-                        <div className="w-10 h-10 bg-white dark:bg-neutral-900 rounded-xl border border-neutral-200 dark:border-neutral-800 flex items-center justify-center text-neutral-600 dark:text-neutral-400 shadow-sm group-hover:border-accent-primary/50 group-hover:text-accent-primary-hex transition-colors">
-                            <Users className="w-5 h-5" />
+                {/* Feature Cards — same BentoCard grid as Education */}
+                <div className="mt-10 animate-in fade-in slide-in-from-bottom-4 duration-700 delay-500">
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-8 items-stretch">
+                        <div className="animate-in slide-in-from-bottom-8 fade-in duration-700 delay-100 fill-mode-both">
+                            <BentoCard
+                                id="career-mentors"
+                                icon={Users}
+                                title="Role Models"
+                                description="Upload LinkedIn profiles of people whose careers you admire. We extract their path and distill it into your roadmap."
+                                color={FEATURE_COLORS.emerald}
+                                actionLabel="Add mentor"
+                                onAction={() => onViewChange('coach-role-models')}
+                                previewContent={
+                                    <ul className="space-y-3 pt-4">
+                                        {['Career Path Extraction', 'Skill Gap Mapping', 'Pattern Recognition'].map(item => (
+                                            <li key={item} className="flex items-center gap-3 text-xs font-bold text-neutral-400">
+                                                <div className="w-1 h-1 rounded-full bg-emerald-500" />
+                                                {item}
+                                            </li>
+                                        ))}
+                                    </ul>
+                                }
+                            />
                         </div>
-                        <div>
-                            <div className="text-lg font-black text-neutral-900 dark:text-white leading-none">{roleModels.length}</div>
-                            <div className="text-[10px] tracking-widest font-bold text-neutral-400 group-hover:text-accent-primary-hex transition-colors">Profiles</div>
+                        <div className="animate-in slide-in-from-bottom-8 fade-in duration-700 delay-200 fill-mode-both">
+                            <BentoCard
+                                id="career-goals"
+                                icon={Target}
+                                title="Gap Analysis"
+                                description="Define your target role and get a clear breakdown of the skills you have, the skills you need, and exactly how to close the gap."
+                                color={FEATURE_COLORS.sky}
+                                actionLabel="Set a goal"
+                                onAction={() => onViewChange('coach-gap-analysis')}
+                                previewContent={
+                                    <ul className="space-y-3 pt-4">
+                                        {['Skill Gap Scoring', 'Priority Ranking', 'Action Plan'].map(item => (
+                                            <li key={item} className="flex items-center gap-3 text-xs font-bold text-neutral-400">
+                                                <div className="w-1 h-1 rounded-full bg-sky-500" />
+                                                {item}
+                                            </li>
+                                        ))}
+                                    </ul>
+                                }
+                            />
+                        </div>
+                        <div className="animate-in slide-in-from-bottom-8 fade-in duration-700 delay-300 fill-mode-both">
+                            <BentoCard
+                                id="career-growth"
+                                icon={Map}
+                                title="Growth Roadmap"
+                                description="Generate a personalized 12-month roadmap with milestones, learning resources, and weekly actions to reach your target role."
+                                color={FEATURE_COLORS.violet}
+                                actionLabel="View roadmap"
+                                onAction={() => onViewChange('career-growth')}
+                                previewContent={
+                                    <ul className="space-y-3 pt-4">
+                                        {['12-Month Plan', 'Weekly Milestones', 'Progress Tracking'].map(item => (
+                                            <li key={item} className="flex items-center gap-3 text-xs font-bold text-neutral-400">
+                                                <div className="w-1 h-1 rounded-full bg-violet-500" />
+                                                {item}
+                                            </li>
+                                        ))}
+                                    </ul>
+                                }
+                            />
                         </div>
                     </div>
-
-                    <div className="w-px h-8 bg-neutral-200 dark:bg-neutral-800" />
-
-                    <div
-                        onClick={() => onViewChange('coach-gap-analysis')}
-                        className="flex items-center gap-3 cursor-pointer group transition-all hover:scale-105"
-                    >
-                        <div className="w-10 h-10 bg-white dark:bg-neutral-900 rounded-xl border border-neutral-200 dark:border-neutral-800 flex items-center justify-center text-neutral-600 dark:text-neutral-400 shadow-sm group-hover:border-accent-primary/50 group-hover:text-accent-primary-hex transition-colors">
-                            <Target className="w-5 h-5" />
-                        </div>
-                        <div>
-                            <div className="text-lg font-black text-neutral-900 dark:text-white leading-none">{targetJobs.length}</div>
-                            <div className="text-[10px] tracking-widest font-bold text-neutral-400 group-hover:text-accent-primary-hex transition-colors">Goals</div>
-                        </div>
-                    </div>
-
-                    <div className="w-px h-8 bg-neutral-200 dark:bg-neutral-800" />
-
-                    <div
-                        onClick={() => onViewChange('skills')}
-                        className="flex items-center gap-3 cursor-pointer group transition-all hover:scale-105"
-                    >
-                        <div className="w-10 h-10 bg-white dark:bg-neutral-900 rounded-xl border border-neutral-200 dark:border-neutral-800 flex items-center justify-center text-neutral-600 dark:text-neutral-400 shadow-sm group-hover:border-accent-primary/50 group-hover:text-accent-primary-hex transition-colors">
-                            <CheckCircle2 className="w-5 h-5" />
-                        </div>
-                        <div>
-                            <div className="text-lg font-black text-neutral-900 dark:text-white leading-none">{userSkills.length}</div>
-                            <div className="text-[10px] tracking-widest font-bold text-neutral-400 group-hover:text-accent-primary-hex transition-colors">Skills</div>
-                        </div>
-                    </div>
-
-                    <div className="w-px h-8 bg-neutral-200 dark:bg-neutral-800" />
-
-                    <div
-                        onClick={() => onViewChange('career-orgs')}
-                        className="flex items-center gap-3 cursor-pointer group transition-all hover:scale-105"
-                    >
-                        <div className="w-10 h-10 bg-white dark:bg-neutral-900 rounded-xl border border-neutral-200 dark:border-neutral-800 flex items-center justify-center text-neutral-600 dark:text-neutral-400 shadow-sm group-hover:border-accent-primary/50 group-hover:text-accent-primary-hex transition-colors">
-                            <Building2 className="w-5 h-5" />
-                        </div>
-                        <div>
-                            <div className="text-lg font-black text-neutral-900 dark:text-white leading-none">{orgCount}</div>
-                            <div className="text-[10px] tracking-widest font-bold text-neutral-400 group-hover:text-accent-primary-hex transition-colors">Orgs</div>
-                        </div>
-                    </div>
-
-                    {isAdmin && (
-                        <>
-                            <div className="w-px h-8 bg-neutral-200 dark:bg-neutral-800" />
-
-                            <div
-                                onClick={() => onViewChange('career-salary')}
-                                className="flex items-center gap-3 cursor-pointer group transition-all hover:scale-105"
-                            >
-                                <div className="w-10 h-10 bg-white dark:bg-neutral-900 rounded-xl border border-neutral-200 dark:border-neutral-800 flex items-center justify-center text-neutral-600 dark:text-neutral-400 shadow-sm group-hover:border-accent-primary/50 group-hover:text-accent-primary-hex transition-colors">
-                                    <TrendingUp className="w-5 h-5" />
-                                </div>
-                                <div>
-                                    <div className="text-lg font-black text-neutral-900 dark:text-white leading-none">{canonicalRoleCount}</div>
-                                    <div className="text-[10px] tracking-widest font-bold text-neutral-400 group-hover:text-accent-primary-hex transition-colors">Roles</div>
-                                </div>
-                            </div>
-                        </>
-                    )}
                 </div>
-
-                {/* Quick-Start Guide (only when empty) */}
-                {roleModels.length === 0 && targetJobs.length === 0 && (
-                    <div className="mt-14 max-w-7xl mx-auto animate-in fade-in slide-in-from-bottom-4 duration-700 delay-700">
-                        <div className="text-center mb-6">
-                            <div className="text-[10px] tracking-widest font-black text-neutral-400">Quick Start</div>
-                        </div>
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                            <div
-                                onClick={() => onViewChange('coach-role-models')}
-                                className="p-6 bg-white dark:bg-neutral-900 rounded-3xl border border-neutral-200 dark:border-neutral-800 cursor-pointer group hover:border-accent-primary/30 hover:shadow-lg hover:shadow-accent-primary/5 transition-all hover:-translate-y-1"
-                            >
-                                <div className="w-12 h-12 bg-accent-primary/10 rounded-2xl flex items-center justify-center text-accent-primary-hex mb-4 group-hover:scale-110 transition-transform">
-                                    <Users className="w-6 h-6" />
-                                </div>
-                                <div className="text-[10px] tracking-widest font-black text-accent-primary-hex mb-1">Step 1</div>
-                                <h4 className="font-bold text-neutral-900 dark:text-white mb-1">Add Mentors</h4>
-                                <p className="text-xs text-neutral-400 leading-relaxed">Upload LinkedIn profiles of people whose careers you admire.</p>
-                                <div className="flex items-center gap-1 mt-3 text-xs font-bold text-accent-primary-hex opacity-0 group-hover:opacity-100 transition-opacity">
-                                    Start here <ArrowRight className="w-3 h-3" />
-                                </div>
-                            </div>
-
-                            <div
-                                onClick={() => onViewChange('coach-gap-analysis')}
-                                className="p-6 bg-white dark:bg-neutral-900 rounded-3xl border border-neutral-200 dark:border-neutral-800 cursor-pointer group hover:border-accent-primary/30 hover:shadow-lg hover:shadow-accent-primary/5 transition-all hover:-translate-y-1"
-                            >
-                                <div className="w-12 h-12 bg-accent-primary/10 rounded-2xl flex items-center justify-center text-accent-primary-hex mb-4 group-hover:scale-110 transition-transform">
-                                    <Target className="w-6 h-6" />
-                                </div>
-                                <div className="text-[10px] tracking-widest font-black text-accent-primary-hex mb-1">Step 2</div>
-                                <h4 className="font-bold text-neutral-900 dark:text-white mb-1">Set Goals</h4>
-                                <p className="text-xs text-neutral-400 leading-relaxed">Define your dream role and run a gap analysis against your profile.</p>
-                                <div className="flex items-center gap-1 mt-3 text-xs font-bold text-accent-primary-hex opacity-0 group-hover:opacity-100 transition-opacity">
-                                    Set a goal <ArrowRight className="w-3 h-3" />
-                                </div>
-                            </div>
-
-                            <div
-                                onClick={() => onViewChange('career-growth')}
-                                className="p-6 bg-white dark:bg-neutral-900 rounded-3xl border border-neutral-200 dark:border-neutral-800 cursor-pointer group hover:border-accent-primary/30 hover:shadow-lg hover:shadow-accent-primary/5 transition-all hover:-translate-y-1"
-                            >
-                                <div className="w-12 h-12 bg-accent-primary/10 rounded-2xl flex items-center justify-center text-accent-primary-hex mb-4 group-hover:scale-110 transition-transform">
-                                    <Map className="w-6 h-6" />
-                                </div>
-                                <div className="text-[10px] tracking-widest font-black text-accent-primary-hex mb-1">Step 3</div>
-                                <h4 className="font-bold text-neutral-900 dark:text-white mb-1">Track Growth</h4>
-                                <p className="text-xs text-neutral-400 leading-relaxed">Generate a 12-month roadmap and track milestones as you progress.</p>
-                                <div className="flex items-center gap-1 mt-3 text-xs font-bold text-accent-primary-hex opacity-0 group-hover:opacity-100 transition-opacity">
-                                    View roadmap <ArrowRight className="w-3 h-3" />
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                )}
             </div>
         </>
     );

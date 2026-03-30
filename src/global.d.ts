@@ -1,6 +1,6 @@
 interface PdfjsLib {
     GlobalWorkerOptions: { workerSrc: string };
-    getDocument(params: { data: string }): { promise: Promise<PDFDocumentProxy> };
+    getDocument(params: { data: string | Uint8Array }): { promise: Promise<PDFDocumentProxy> };
 }
 
 interface PDFDocumentProxy {

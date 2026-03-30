@@ -118,11 +118,11 @@ export const Footer: React.FC = () => {
                     ))}
                 </div>
 
-                <div className="pt-8 border-t border-neutral-100 dark:border-neutral-900 flex flex-col md:flex-row justify-between items-center gap-6 text-xs font-bold text-neutral-400 dark:text-neutral-600">
+                <div className="pt-8 border-t border-neutral-100 dark:border-neutral-900 flex flex-col md:flex-row justify-between items-center gap-6 text-xs font-bold text-neutral-400 dark:text-neutral-600 pointer-events-none select-none">
                     <div className="flex items-center gap-6">
-                        <span className="hover:text-neutral-900 dark:hover:text-neutral-200 transition-colors cursor-default">Building For Your Career</span>
+                        <span>Building For Your Career</span>
                         <div className="w-1 h-1 rounded-full bg-neutral-200 dark:bg-neutral-800" />
-                        <span className="hover:text-neutral-900 dark:hover:text-neutral-200 transition-colors cursor-default">Privacy-First AI</span>
+                        <span>Privacy-First AI</span>
                     </div>
                     <div className="flex items-center gap-6">
                         <p>© {new Date().getFullYear()} Navigator. All Rights Reserved.</p>

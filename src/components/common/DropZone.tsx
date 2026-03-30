@@ -104,13 +104,13 @@ export const DropZone: React.FC<DropZoneProps> = ({
                 <div className={`flex flex-col items-center text-center flex-1 h-full w-full`}>
                     <div className={`flex-1 flex flex-col items-center justify-center w-full ${isCompact ? 'space-y-4' : 'space-y-6'} mb-6`}>
                         {isLoading ? (
-                            <div className={`${isCompact ? 'w-12 h-12 rounded-2xl' : 'w-20 h-20 rounded-3xl'} ${iconColors[themeColor]} flex items-center justify-center animate-pulse`}>
-                                <Loader2 className={`${isCompact ? 'w-6 h-6' : 'w-10 h-10'} animate-spin`} />
+                            <div className={`${isCompact ? 'w-12 h-12 rounded-2xl' : variant === 'card' ? 'w-10 h-10 rounded-xl' : 'w-20 h-20 rounded-3xl'} ${iconColors[themeColor]} flex items-center justify-center animate-pulse`}>
+                                <Loader2 className={`${isCompact ? 'w-6 h-6' : variant === 'card' ? 'w-5 h-5' : 'w-10 h-10'} animate-spin`} />
                             </div>
                         ) : (
                             <div className={`
-                                ${isCompact ? 'w-12 h-12 rounded-2xl' : 'w-20 h-20 rounded-3xl'} 
-                                transition-all duration-500 flex items-center justify-center 
+                                ${isCompact ? 'w-12 h-12 rounded-2xl' : variant === 'card' ? 'w-10 h-10 rounded-xl' : 'w-20 h-20 rounded-3xl'}
+                                transition-all duration-500 flex items-center justify-center
                                 ${isDragging
                                     ? iconColors[themeColor]
                                     : variant === 'card'
@@ -118,7 +118,7 @@ export const DropZone: React.FC<DropZoneProps> = ({
                                         : 'bg-neutral-100 dark:bg-neutral-800 text-neutral-400 group-hover:scale-110 group-hover:rotate-3 group-hover:bg-white dark:group-hover:bg-neutral-700 shadow-sm'
                                 }
                             `}>
-                                <Upload className={isCompact ? 'w-6 h-6' : 'w-10 h-10'} />
+                                <Upload className={isCompact ? 'w-6 h-6' : variant === 'card' ? 'w-5 h-5' : 'w-10 h-10'} />
                             </div>
                         )}
 

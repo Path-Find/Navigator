@@ -20,7 +20,7 @@ export const EmailForm: React.FC<EmailFormProps> = ({
     return (
         <form onSubmit={onSubmit} className="space-y-6 animate-in fade-in slide-in-from-right-4 duration-300">
             <div>
-                <label className="block text-xs font-bold text-neutral-500 dark:text-neutral-400 uppercase tracking-wider mb-2 ml-1">Email</label>
+                <label className="block text-xs font-bold text-neutral-500 dark:text-neutral-400 mb-2 ml-1">Email</label>
                 <div className="relative group">
                     <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
                         <div className="bg-neutral-100 dark:bg-neutral-800 p-1.5 rounded-md text-neutral-500 dark:text-neutral-400 group-focus-within:bg-neutral-800 dark:group-focus-within:bg-neutral-200 group-focus-within:text-white dark:group-focus-within:text-neutral-900 transition-colors">

@@ -1,6 +1,23 @@
 # Changelog
 
 All notable changes to this project will be documented in this file.
+ 
+## [2.39.0] - 2026-03-30
+
+### Added
+- **High-Fidelity Feature Previews**: Completed the visual design system by implementing custom graphics for **'Resume Interview'** (Story Mode) and **'Professional Organizations'**, ensuring 100% high-fidelity coverage across the platform features page.
+
+### Changed
+- **Unified "Midnight Aurora" Design System**: Performed a platform-wide visual synchronization, standardizing all modules (Jobs, Career, Education) under a unified BentoCard architecture with consistent 32px/24px spacing tokens.
+- **Premium Typography & Casing**: Systematically replaced all-caps and wide-tracking utilities with polished Title Case and Sentence Case formatting across all status chips, labels, and headers.
+- **Hardened PDF & Transcript Infrastructure**: Implemented a triple-CDN fallback for `pdf.js` and local client-side text extraction to resolve "Connection issue" errors and increase reliability for large academic documents.
+- **Streamlined Sidebar & Navigation**: Consolidated Resume and Cover Letter sidebars with a focus on 'Tailoring Strategy', removed redundant headers, and unified icon/bullet styling.
+- **UX & Logic Refinements**: Permanent dismissal for legal notices, conditional rendering of empty state modules, and improved nomenclature (e.g., "Behavioral Training").
+- **Component Source-of-Truth**: Refined `BentoCard` and `UnifiedUploadHero` to act as the primary layout engines, eliminating visual drift across platform modules.
+
+### Fixed
+- **Typography Rendering**: Resolved an issue where labels failed to render correctly following the typography refactor in `GapAnalysisSection`.
+- **UI Layout Glitches**: Fixed z-index layering in `JobfitPreview`, header positioning in the Job "Posting" tab, and resume upload flickering.
 
 ## [2.38.0] - 2026-03-24
 

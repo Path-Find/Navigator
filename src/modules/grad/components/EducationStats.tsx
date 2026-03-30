@@ -47,7 +47,7 @@ export const EducationStats: React.FC<EducationStatsProps> = ({
                                     <div className="text-4xl font-black text-amber-600 dark:text-amber-400 tracking-tighter leading-none hover:scale-105 transition-transform duration-500">
                                         {calculatedGpa}
                                     </div>
-                                    <div className="text-[9px] tracking-[0.2em] font-black text-neutral-400 dark:text-white/40 mt-3 uppercase">GPA</div>
+                                    <div className="text-[10px] font-black text-neutral-400 dark:text-white/40 mt-3">GPA</div>
                                 </div>
                                 
                                 {transcript.program && (
@@ -55,7 +55,7 @@ export const EducationStats: React.FC<EducationStatsProps> = ({
                                         <div className="text-lg font-black text-neutral-900 dark:text-white truncate w-full" title={transcript.program}>
                                             {transcript.program}
                                         </div>
-                                        <div className="text-[9px] tracking-[0.2em] font-black text-neutral-400 dark:text-white/40 mt-1 uppercase">Major</div>
+                                        <div className="text-[10px] font-black text-neutral-400 dark:text-white/40 mt-1">Major</div>
                                     </div>
                                 )}
                             </div>
@@ -83,12 +83,12 @@ export const EducationStats: React.FC<EducationStatsProps> = ({
                             <div className="text-4xl font-black text-emerald-600 dark:text-emerald-400 tracking-tighter leading-none hover:scale-105 transition-transform duration-500">
                                 {totalCredits}
                             </div>
-                            <div className="text-[9px] tracking-[0.2em] font-black text-neutral-400 dark:text-white/40 mt-3 uppercase">Credits</div>
+                            <div className="text-[10px] font-black text-neutral-400 dark:text-white/40 mt-3">Credits</div>
                         </div>
 
                         <div className="flex-1 min-w-0 flex flex-col justify-end">
                             <div className="flex items-center justify-between mb-2">
-                                <span className="text-[10px] font-black text-emerald-600 tracking-widest">{targetCredits > 0 ? `${Math.round(progressPercentage)}%` : '--'}</span>
+                                <span className="text-[10px] font-black text-emerald-600">{targetCredits > 0 ? `${Math.round(progressPercentage)}%` : '--'}</span>
                                 <span className="text-[10px] font-bold text-neutral-400">/ {displayTarget}</span>
                             </div>
                             <div className="h-2 w-full bg-neutral-100 dark:bg-neutral-800 rounded-full overflow-hidden">

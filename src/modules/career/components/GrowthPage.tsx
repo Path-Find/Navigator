@@ -138,7 +138,7 @@ export const GrowthPage: React.FC<GrowthPageProps> = ({
                             {/* Goal Header */}
                             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
                                 <div>
-                                    <div className={`text-[10px] uppercase tracking-widest font-bold mb-1 ${tj.type === 'role_model' ? 'text-indigo-500' : 'text-emerald-600'}`}>
+                                    <div className={`text-[10px] font-bold mb-1 ${tj.type === 'role_model' ? 'text-indigo-500' : 'text-emerald-600'}`}>
                                         {tj.type === 'role_model' ? 'Emulation Path' : 'Target Goal'}
                                     </div>
                                     <h3 className="text-xl font-black text-neutral-900 dark:text-white flex items-center gap-2">
@@ -148,7 +148,7 @@ export const GrowthPage: React.FC<GrowthPageProps> = ({
                                 </div>
                                 <div className="flex items-center gap-3">
                                     <span className="text-sm font-black text-emerald-500">{percent}%</span>
-                                    <div className="text-xs font-bold text-neutral-400 uppercase tracking-widest bg-neutral-100 dark:bg-neutral-800 px-3 py-1 rounded-full">
+                                    <div className="text-xs font-bold text-neutral-400 bg-neutral-100 dark:bg-neutral-800 px-3 py-1 rounded-full">
                                         Month {Math.max(...tj.roadmap!.map(m => m.month))} Projected
                                     </div>
                                 </div>
@@ -183,7 +183,7 @@ export const GrowthPage: React.FC<GrowthPageProps> = ({
 
                                     return (
                                         <div key={month} className="p-4 rounded-3xl border border-emerald-500/30 bg-emerald-50/10">
-                                            <div className="text-[10px] font-black uppercase tracking-widest text-neutral-400 mb-3 ml-1">Month {month}</div>
+                                            <div className="text-[10px] font-black text-neutral-400 mb-3 ml-1">Month {month}</div>
                                             <div className="space-y-2">
                                                 {monthMilestones.map(m => (
                                                     <div

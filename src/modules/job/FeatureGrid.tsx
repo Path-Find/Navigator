@@ -177,8 +177,8 @@ export const FeatureGrid: React.FC<FeatureGridProps> = ({
                             previewContent={getPreviewComponent(config.id, color)}
                             onAction={() => handleAction(config)}
                             onDismiss={isSystemNotice ? () => {
-                                // TOS notices snooze for 1 day, Archetype for 7 days
-                                const snoozeDays = key === '_NOTICE_TOS' ? 1 : 7;
+                                // TOS notices are permanent once dismissed
+                                const snoozeDays = key === '_NOTICE_TOS' ? 0 : 7;
                                 dismissNotice(key, snoozeDays);
                             } : undefined}
                         />

@@ -22,7 +22,7 @@ export const SkillsStats: React.FC<SkillsStatsProps> = ({
     unverifiedCount = 0
 }) => {
     return (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-10">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 mb-10">
             {/* Stat: Skill Analytics (Adjusted) */}
             <BentoCard
                 id="skill-stats"
@@ -35,7 +35,7 @@ export const SkillsStats: React.FC<SkillsStatsProps> = ({
                         <div className="flex flex-col items-center relative">
                             <div className="absolute -inset-4 bg-indigo-500/10 blur-xl rounded-full scale-150 group-hover:bg-indigo-500/20 transition-all duration-700" />
                             <div className="text-4xl font-black text-indigo-600 dark:text-indigo-400 tracking-tighter leading-none hover:scale-110 transition-transform duration-500 drop-shadow-2xl relative z-10">{skills.length}</div>
-                            <div className="text-[9px] tracking-[0.2em] font-black text-neutral-400 dark:text-white/40 mt-2 relative z-10">ACTIVE</div>
+                            <div className="text-[10px] font-black text-neutral-400 dark:text-white/40 mt-2 relative z-10">Active</div>
                         </div>
 
                         <div className="w-px h-10 bg-gradient-to-b from-transparent via-neutral-200 dark:via-white/20 to-transparent shadow-[0_0_8px_rgba(0,0,0,0.05)]" />
@@ -45,7 +45,7 @@ export const SkillsStats: React.FC<SkillsStatsProps> = ({
                             <div className="text-4xl font-black text-amber-500 tracking-tighter leading-none hover:scale-110 transition-transform duration-500 drop-shadow-2xl relative z-10">
                                 {skills.filter(s => s.proficiency === 'expert').length}
                             </div>
-                            <div className="text-[9px] tracking-[0.2em] font-black text-neutral-400 dark:text-white/40 mt-2 relative z-10">EXPERT</div>
+                            <div className="text-[10px] font-black text-neutral-400 dark:text-white/40 mt-2 relative z-10">Expert</div>
                         </div>
                     </div>
                 }

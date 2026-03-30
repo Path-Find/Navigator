@@ -126,20 +126,18 @@ export const PlansPage: React.FC = () => {
                     subtitle="Choose the plan that fits your pace — from exploring to all-in."
                 />
 
-                <div className="flex justify-center -mt-4 mb-12">
-                    <div className="inline-flex items-center gap-2 px-4 py-2 bg-indigo-50 dark:bg-indigo-900/40 border border-indigo-100 dark:border-indigo-800 rounded-2xl text-indigo-600 dark:text-indigo-400 text-xs font-bold animate-in fade-in slide-in-from-top-2">
+                <div className="flex flex-wrap justify-center items-center gap-8 mb-16 -mt-4 animate-in fade-in slide-in-from-top-4 duration-700">
+                    <div className="inline-flex items-center gap-2 px-4 py-2 bg-indigo-50 dark:bg-indigo-900/40 border border-indigo-100 dark:border-indigo-800 rounded-2xl text-indigo-600 dark:text-indigo-400 text-xs font-bold">
                         <Zap className="w-4 h-4" />
                         Navigator is currently invite-only
                     </div>
-                </div>
 
-                <div className="text-center mb-16 flex flex-col items-center -mt-8">
                     {/* Monthly / Annual Toggle */}
                     <motion.div
                         layout
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: 0.3, duration: 0.4 }}
+                        initial={{ opacity: 0, scale: 0.9 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        transition={{ delay: 0.2 }}
                         className="flex items-center justify-center gap-6"
                     >
                         <div className="flex items-center">
@@ -162,7 +160,7 @@ export const PlansPage: React.FC = () => {
                                 </button>
                             </div>
 
-                            <AnimatePresence>
+                            <AnimatePresence mode="wait">
                                 {isAnnual && (
                                     <motion.div
                                         key="savings-badge-container"
@@ -184,7 +182,7 @@ export const PlansPage: React.FC = () => {
                             </AnimatePresence>
                         </div>
 
-                        <motion.div layout transition={{ duration: 0.2, ease: "easeInOut" }} className="flex items-center shrink-0">
+                        <div className="flex items-center shrink-0">
                             <Link
                                 to={ROUTES.FEATURES}
                                 className="group flex items-center gap-2 text-sm font-bold text-neutral-400 hover:text-indigo-500 dark:hover:text-indigo-400 transition-colors"
@@ -192,7 +190,7 @@ export const PlansPage: React.FC = () => {
                                 Explore all features
                                 <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                             </Link>
-                        </motion.div>
+                        </div>
                     </motion.div>
                 </div>
             </div>

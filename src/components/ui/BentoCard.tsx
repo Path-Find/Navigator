@@ -112,12 +112,12 @@ export const BentoCard: React.FC<BentoCardProps> = ({
 
                 <div className="flex gap-1 pt-1.5">
                     {badge && (
-                        <span className="px-1.5 py-0.5 bg-emerald-500/10 text-[8px] font-black tracking-widest text-emerald-600 dark:text-emerald-400 rounded-md border border-emerald-500/10">
+                        <span className="px-1.5 py-0.5 bg-emerald-500/10 text-[8px] font-black text-emerald-600 dark:text-emerald-400 rounded-md border border-emerald-500/10">
                             {badge}
                         </span>
                     )}
                     {isComingSoon && (
-                        <span className="px-1.5 py-0.5 bg-neutral-100 dark:bg-white/5 text-[8px] font-black tracking-widest text-neutral-400 dark:text-neutral-500 rounded-md border border-neutral-200/50 dark:border-white/5">
+                        <span className="px-1.5 py-0.5 bg-neutral-100 dark:bg-white/5 text-[8px] font-black text-neutral-400 dark:text-neutral-500 rounded-md border border-neutral-200/50 dark:border-white/5">
                             Soon
                         </span>
                     )}
@@ -148,7 +148,7 @@ export const BentoCard: React.FC<BentoCardProps> = ({
                 <div className="h-6 flex items-center justify-end relative z-10">
                     {actionLabel && !isComingSoon && (
                         <div
-                            className={`flex items-center gap-2 ${actionTextClass} font-black text-[10px] tracking-[0.1em] transition-all cursor-pointer group/btn`}
+                            className={`flex items-center gap-2 ${actionTextClass} font-black text-[10px] transition-all cursor-pointer group/btn`}
                             onClick={(e) => {
                                 e.stopPropagation();
                                 onAction?.();

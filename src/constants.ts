@@ -293,10 +293,10 @@ export const HEADLINES = {
     { text: "Command Your", highlight: "Future" }
   ],
   apply: [
-    { text: "Secure The", highlight: "Offer" },
-    { text: "Crush The", highlight: "Application" },
+    { text: "Land Your Next", highlight: "Role" },
+    { text: "Perfect Your", highlight: "Match" },
     { text: "Own Your", highlight: "Narrative" },
-    { text: "Land The", highlight: "Role" }
+    { text: "Refine Your", highlight: "Fit" }
   ],
   goal: [
     { text: "Chart Your", highlight: "Course" },

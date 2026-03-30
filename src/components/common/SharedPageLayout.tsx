@@ -6,6 +6,7 @@ interface SharedPageLayoutProps {
     spacing?: 'hero' | 'compact' | 'none';
     animate?: boolean;
     className?: string;
+    heroBackground?: boolean;
 }
 
 export const SharedPageLayout: React.FC<SharedPageLayoutProps> = ({
@@ -13,7 +14,8 @@ export const SharedPageLayout: React.FC<SharedPageLayoutProps> = ({
     maxWidth = '4xl',
     spacing = 'compact',
     animate = true,
-    className = ""
+    className = "",
+    heroBackground = true,
 }) => {
     const maxWidthClass = {
         '3xl': 'max-w-3xl',
@@ -31,8 +33,33 @@ export const SharedPageLayout: React.FC<SharedPageLayoutProps> = ({
     }[spacing];
 
     return (
-        <div className={`mx-auto px-4 sm:px-6 w-full ${maxWidthClass} ${paddingTopClass} ${animate ? 'animate-in fade-in slide-in-from-bottom-2 duration-700' : ''} ${className}`}>
-            {children}
+        <div className="relative overflow-hidden">
+            {/* Page-wide aurora gradient — picks up current theme accent via CSS var */}
+            {heroBackground && (
+                <div className="pointer-events-none fixed inset-0 -z-10 overflow-hidden" aria-hidden>
+                    {/* Top-left blob */}
+                    <div
+                        className="absolute -top-32 -left-32 w-[600px] h-[600px] rounded-full opacity-[0.07] dark:opacity-[0.04] blur-[120px]"
+                        style={{ background: 'radial-gradient(circle, rgba(var(--accent-primary), 1) 0%, transparent 70%)' }}
+                    />
+                    {/* Top-right blob */}
+                    <div
+                        className="absolute -top-16 right-0 w-[500px] h-[500px] rounded-full opacity-[0.05] dark:opacity-[0.03] blur-[100px]"
+                        style={{ background: 'radial-gradient(circle, rgba(var(--accent-primary), 1) 0%, transparent 70%)' }}
+                    />
+                    {/* Subtle mesh grid overlay */}
+                    <div
+                        className="absolute inset-0 opacity-[0.015] dark:opacity-[0.025]"
+                        style={{
+                            backgroundImage: 'linear-gradient(rgba(var(--accent-primary),1) 1px, transparent 1px), linear-gradient(90deg, rgba(var(--accent-primary),1) 1px, transparent 1px)',
+                            backgroundSize: '64px 64px'
+                        }}
+                    />
+                </div>
+            )}
+            <div className={`mx-auto px-4 sm:px-6 w-full ${maxWidthClass} ${paddingTopClass} ${animate ? 'animate-in fade-in slide-in-from-bottom-2 duration-700' : ''} ${className}`}>
+                {children}
+            </div>
         </div>
     );
 };

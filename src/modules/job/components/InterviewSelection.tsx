@@ -48,8 +48,8 @@ export const InterviewSelection = ({ limitError, handleStartGeneral, handleStart
                         <BentoCard
                             id="general"
                             icon={MessageSquare}
-                            title="General Prep"
-                            description="Broad behavioral questions applicable across roles. Master the STAR method."
+                            title="Behavioral Training"
+                            description="Master common behavioral questions and the STAR method for any interview context."
                             color={FEATURE_COLORS.indigo}
                             actionLabel="Practice Now"
                             onAction={handleStartGeneral}
@@ -75,8 +75,8 @@ export const InterviewSelection = ({ limitError, handleStartGeneral, handleStart
                         <BentoCard
                             id="tailored"
                             icon={Target}
-                            title="Tailored Mock"
-                            description="Generated based on a specific role you've analyzed. High-stakes precision."
+                            title="Role-Specific Mock"
+                            description="Practice with high-precision questions generated for a specific job you've analyzed."
                             color={FEATURE_COLORS.violet}
                             actionLabel="Launch Mock"
                             onAction={handleStartTailored}

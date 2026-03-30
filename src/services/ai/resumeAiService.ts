@@ -6,7 +6,7 @@ import type {
 } from "../../types";
 import { PARSING_PROMPTS, JOB_ANALYSIS_PROMPTS, CAREER_PROMPTS } from "../../prompts/index";
 import { AI_MODELS } from "../../constants";
-import { loadPdfJS } from "../../utils/pdfLoader";
+import { extractPdfText } from "../../utils/pdfExtractor";
 
 const stringifyProfile = (profile: ResumeProfile): string => {
     const blocks = profile.blocks
@@ -14,48 +14,6 @@ const stringifyProfile = (profile: ResumeProfile): string => {
         .map(({ type, title, organization, dateRange, bullets }) => ({ type, title, organization, dateRange, bullets }));
     return JSON.stringify(blocks);
 };
-
-export const extractPdfText = async (base64: string): Promise<string> => {
-    try {
-        const pdfjsLib = await loadPdfJS();
-        if (!pdfjsLib) throw new Error("PDF library not loaded");
-
-        const loadingTask = pdfjsLib.getDocument({ data: atob(base64) });
-        const pdf = await loadingTask.promise;
-        const pagesContent: string[] = [];
-
-        // Sequential processing to prevent memory spikes on large PDFs
-        for (let i = 1; i <= pdf.numPages; i++) {
-            const page = await pdf.getPage(i);
-            const textContent = await page.getTextContent();
-            const pageText = textContent.items.map((item: any) => item.str).join(' ');
-            pagesContent.push(pageText);
-        }
-
-        const rawContent = pagesContent.join('\n');
-
-        // Clean common PDF extraction artifacts (ligatures etc)
-        const cleaned = rawContent
-            .replace(/f\s+i/g, 'fi')
-            .replace(/f\s+l/g, 'fl')
-            .replace(/fi\s+/g, 'fi')
-            .replace(/fl\s+/g, 'fl')
-            .replace(/ti\s+/g, 'ti')
-            .replace(/ff\s+/g, 'ff')
-            .replace(/ft\s+/g, 'ft')
-            .replace(/\s+/g, ' ')
-            .trim();
-
-        if (cleaned.length < 10) {
-            throw new Error("PDF appears empty or contains no readable text.");
-        }
-
-        return cleaned + '\n';
-    } catch (err) {
-        console.error("[PdfService] Extraction failed:", err);
-        throw err;
-    }
-}
 
 export const parseResumeFile = async (
     fileBase64: string,

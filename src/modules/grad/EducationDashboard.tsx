@@ -42,25 +42,19 @@ export const EducationDashboard: React.FC = () => {
                     subtitle="Manage your academic records, track progress, and explore degree opportunities."
                 />
 
-                {/* Main Stats Grid */}
-                <EducationStats
-                    transcript={transcript}
-                    calculatedGpa={calculatedGpa}
-                    totalCredits={totalCredits}
-                    targetCredits={targetCredits}
-                    progressPercentage={progressPercentage}
-                    onViewChange={setView}
-                />
-
-                {!transcript && (
+                {/* Conditionally render Stats or Hero based on data presence */}
+                {transcript ? (
+                    <EducationStats
+                        transcript={transcript}
+                        calculatedGpa={calculatedGpa}
+                        totalCredits={totalCredits}
+                        targetCredits={targetCredits}
+                        progressPercentage={progressPercentage}
+                        onViewChange={setView}
+                    />
+                ) : (
                     <div className="max-w-4xl mx-auto mt-8">
                         <EduHero
-                            transcript={null}
-                            calculatedGpa={calculatedGpa}
-                            totalCredits={totalCredits}
-                            targetCredits={targetCredits}
-                            progressPercentage={progressPercentage}
-                            onViewChange={setView}
                             handleFileUpload={handleFileUpload}
                             isParsing={isParsing}
                             parseError={parseError}

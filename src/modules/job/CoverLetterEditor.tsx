@@ -96,7 +96,7 @@ export const CoverLetterEditor: React.FC<CoverLetterEditorProps> = (props) => {
                         />
                     ) : localJob.coverLetter ? (
                         <div
-                            className="flex-1 text-neutral-800 dark:text-neutral-200 leading-relaxed text-sm whitespace-pre-wrap selection:bg-indigo-100 dark:selection:bg-indigo-500/30 outline-none transition-colors border-none p-2 font-serif min-h-[500px]"
+                            className="flex-1 text-neutral-800 dark:text-neutral-200 leading-relaxed text-sm whitespace-pre-wrap selection:bg-indigo-100 dark:selection:bg-indigo-500/30 outline-none transition-colors border-none p-2 min-h-[500px]"
                             contentEditable
                             suppressContentEditableWarning
                             onBlur={(e) => handleEditCoverLetter(e.currentTarget.innerText)}

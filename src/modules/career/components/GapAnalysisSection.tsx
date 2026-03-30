@@ -59,7 +59,7 @@ export const GapAnalysisSection: React.FC<GapAnalysisSectionProps> = ({
                     {transcript && (
                         <div className="flex items-center gap-1.5 px-3 py-1 bg-violet-50 dark:bg-violet-900/20 text-violet-600 dark:text-violet-300 rounded-lg border border-violet-100 dark:border-violet-800/30">
                             <GraduationCap className="w-3 h-3" />
-                            <span className="text-[10px] uppercase tracking-widest font-bold">Academic Context Active</span>
+                            <span className="text-[10px] font-bold">Academic Context Active</span>
                         </div>
                     )}
 
@@ -84,11 +84,11 @@ export const GapAnalysisSection: React.FC<GapAnalysisSectionProps> = ({
                                 }`}
                         />
 
-                        <div className={`relative z-10 px-4 py-1.5 text-[10px] uppercase tracking-widest font-black transition-colors duration-300 flex items-center justify-center min-w-[80px] ${targetJobs.every(t => t.strictMode !== false) ? 'text-neutral-400 dark:text-neutral-500' : 'text-white'
+                        <div className={`relative z-10 px-4 py-1.5 text-[10px] font-black transition-colors duration-300 flex items-center justify-center min-w-[80px] ${targetJobs.every(t => t.strictMode !== false) ? 'text-neutral-400 dark:text-neutral-500' : 'text-white'
                             }`}>
                             General
                         </div>
-                        <div className={`relative z-10 px-4 py-1.5 text-[10px] uppercase tracking-widest font-black transition-colors duration-300 flex items-center justify-center min-w-[80px] ${targetJobs.every(t => t.strictMode !== false) ? 'text-white' : 'text-neutral-400 dark:text-neutral-500'
+                        <div className={`relative z-10 px-4 py-1.5 text-[10px] font-black transition-colors duration-300 flex items-center justify-center min-w-[80px] ${targetJobs.every(t => t.strictMode !== false) ? 'text-white' : 'text-neutral-400 dark:text-neutral-500'
                             }`}>
                             Technical
                         </div>
@@ -102,7 +102,7 @@ export const GapAnalysisSection: React.FC<GapAnalysisSectionProps> = ({
                         <div key={tj.id} className="bg-white dark:bg-neutral-900 rounded-[2.5rem] p-8 border border-neutral-200 dark:border-neutral-800 shadow-sm">
                             <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-10">
                                 <div>
-                                    <div className={`text-[10px] uppercase tracking-widest font-bold mb-1 ${tj.type === 'role_model' ? 'text-indigo-500' : 'text-emerald-600'}`}>
+                                    <div className={`text-[10px] font-bold mb-1 ${tj.type === 'role_model' ? 'text-indigo-500' : 'text-emerald-600'}`}>
                                         {tj.type === 'role_model' ? 'Emulation Path' : 'Target Goal'}
                                     </div>
                                     <h3 className="text-2xl font-black text-neutral-900 dark:text-white flex items-center gap-2">
@@ -160,7 +160,7 @@ export const GapAnalysisSection: React.FC<GapAnalysisSectionProps> = ({
                                                 {tj.gapAnalysis.strategicPathPatterns.map((pattern, pidx) => (
                                                     <div key={pidx} className="p-5 bg-white dark:bg-neutral-900 border border-emerald-500/10 dark:border-emerald-500/5 rounded-3xl shadow-sm hover:border-emerald-500/30 transition-all group">
                                                         <div className="flex items-center justify-between mb-3">
-                                                            <div className="text-[10px] font-black uppercase tracking-widest text-emerald-600 bg-emerald-50 dark:bg-emerald-900/30 px-2 py-1 rounded-lg">
+                                                            <div className="text-[10px] font-black text-emerald-600 bg-emerald-50 dark:bg-emerald-900/30 px-2 py-1 rounded-lg">
                                                                 {pattern.prevalence}
                                                             </div>
                                                             <div className="text-[10px] font-bold text-neutral-400">
@@ -203,7 +203,7 @@ export const GapAnalysisSection: React.FC<GapAnalysisSectionProps> = ({
                                                     <p className="text-xs text-neutral-500 mb-6">{gap.gapDescription}</p>
 
                                                     <div className="mt-auto space-y-3">
-                                                        <div className="text-[9px] uppercase tracking-widest font-black text-neutral-400">Actionable Evidence</div>
+                                                        <div className="text-[9px] font-black text-neutral-400">Actionable Evidence</div>
                                                         {gap.actionableEvidence.map((action, aidx) => (
                                                             <div key={aidx} className="p-3 bg-emerald-50/50 dark:bg-emerald-900/10 rounded-xl border border-emerald-100/50 dark:border-emerald-800/30 group/action relative">
                                                                 <div className="text-[11px] font-bold text-emerald-700 dark:text-emerald-400 mb-1 flex items-center gap-1.5">
@@ -266,14 +266,14 @@ export const GapAnalysisSection: React.FC<GapAnalysisSectionProps> = ({
                                                     <Calendar className="w-6 h-6 text-emerald-500" />
                                                     12-Month Trajectory
                                                 </h4>
-                                                <div className="text-xs font-bold text-neutral-400 uppercase tracking-widest bg-neutral-100 dark:bg-neutral-800 px-3 py-1 rounded-full">
+                                                <div className="text-xs font-bold text-neutral-400 bg-neutral-100 dark:bg-neutral-800 px-3 py-1 rounded-full">
                                                     Month {Math.max(...tj.roadmap.map(m => m.month))} Projected
                                                 </div>
                                             </div>
 
                                             <div className="bg-neutral-100 dark:bg-neutral-800/50 p-4 rounded-3xl border border-neutral-200/50 dark:border-neutral-700/30">
                                                 <div className="flex items-center justify-between mb-2">
-                                                    <span className="text-xs font-bold text-neutral-500 uppercase tracking-wider">Overall Progress</span>
+                                                    <span className="text-xs font-bold text-neutral-500">Overall Progress</span>
                                                     <span className="text-sm font-black text-emerald-500">
                                                         {Math.round((tj.roadmap.filter(m => m.status === 'completed').length / tj.roadmap.length) * 100)}%
                                                     </span>
@@ -304,7 +304,7 @@ export const GapAnalysisSection: React.FC<GapAnalysisSectionProps> = ({
 
                                                     return (
                                                         <div key={month} className="p-4 rounded-3xl border border-emerald-500/30 bg-emerald-50/10">
-                                                            <div className="text-[10px] font-black uppercase tracking-widest text-neutral-400 mb-3 ml-1">Month {month}</div>
+                                                            <div className="text-[10px] font-black text-neutral-400 mb-3 ml-1">Month {month}</div>
                                                             <div className="space-y-2">
                                                                 {monthMilestones.map(m => (
                                                                     <div

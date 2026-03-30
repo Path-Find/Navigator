@@ -30,7 +30,7 @@ export const CoverLetterPreview: React.FC<CoverLetterPreviewProps> = ({
     return (
         <div 
             id={id} 
-            className="bg-white p-12 shadow-sm border border-neutral-100 min-h-[11in] text-neutral-900 font-serif leading-relaxed"
+            className="bg-white p-12 shadow-sm border border-neutral-100 min-h-[11in] text-neutral-900 leading-relaxed"
         >
             <PrintHeader 
                 name={userProfile.name}
@@ -51,7 +51,7 @@ export const CoverLetterPreview: React.FC<CoverLetterPreviewProps> = ({
                     {companyName && <p className="text-neutral-700">{companyName}</p>}
                 </div>
 
-                <div className="text-base text-neutral-800 leading-[1.65] font-serif space-y-5 whitespace-pre-wrap">
+                <div className="text-base text-neutral-800 leading-[1.65] space-y-5 whitespace-pre-wrap">
                     {content}
                 </div>
 

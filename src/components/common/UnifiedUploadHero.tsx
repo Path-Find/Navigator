@@ -73,7 +73,7 @@ export const UnifiedUploadHero: React.FC<UnifiedUploadHeroProps> = ({
     return (
         <div className="animate-in zoom-in-95 duration-700 relative flex flex-col items-center justify-center py-12">
             <div className="relative z-10 w-full mx-auto">
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-12 items-stretch">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-8 items-stretch">
                     {/* Card 1: Foundation */}
                     <div className="animate-in slide-in-from-bottom-8 fade-in duration-700 delay-100 fill-mode-both">
                         <BentoCard
