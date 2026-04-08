@@ -2,6 +2,17 @@
 
 All notable changes to this project will be documented in this file.
  
+## [2.39.1] - 2026-04-08
+
+### Changed
+- **PDF Infrastructure Hardening**: Resolved CDN loading failures by migrating the PDF loader to modern ESM dynamic imports and upgrading to `pdf.js` v4.3.136. This improves reliability across various network environments and addresses known security vulnerabilities in older versions.
+- **Streamlined Generation UI**: Overhauled the cover letter generation progress screen to eliminate conflicting status labels and resolve the "card-in-card" nesting issue. Unified the display into a single high-fidelity animated title with a minimalist icon and progress indicator.
+- **Information Conciseness Pass**: Restructured tailoring strategy and critique feedback prompts to enforce extremely concise, 1-sentence bullet points. Added UI-level capping to sidebars, restricting visible strategy and feedback items to a maximum of 3 to prevent information overload.
+- **Responsive Grid Architecture**: Optimized the homepage `FeatureGrid` for standard laptop viewports (1280px-1440px) by adjusting breakpoints to a 4-column layout and implementing `max-w-md` constraints to prevent card stretching on sparsely populated rows.
+- **Contextual Nudge Placement**: Relocated the `NudgeCard` from the top of the page to a focused area between the `PageHeader` and `FeatureGrid`, improving the visual hierarchy and preventing dashboard "push-down."
+- **Nudge Card Aesthetic Overhaul**: Stripped aggressive tilt and glow animations from the `NudgeCard` in favor of the platform-standard `.card-premium` glassmorphism. Simplified the action workflow to focus on primary status updates (Interview, Rejected, Ghosted).
+- **Refined Hero Scaling**: Compacted the `PageHeader` typography and vertical margins for the `hero` variant to better utilize vertical space on smaller desktop screens.
+
 ## [2.39.0] - 2026-03-30
 
 ### Added
