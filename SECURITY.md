@@ -1,4 +1,4 @@
-# Security Model
+# Security
 
 Navigator is built with privacy and security as its foundation.
 
