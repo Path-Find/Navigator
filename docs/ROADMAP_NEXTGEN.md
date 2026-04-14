@@ -1,4 +1,4 @@
-# Professional Modeling Engine (NextGen)
+# NextGen
 
 R&D initiatives to transition Navigator from a utility application into a high-fidelity professional modeling engine.
 
