@@ -2,12 +2,7 @@
 
 All notable changes to this project will be documented in this file.
  
-## [2.39.2] - 2026-05-11
-
-### Security
-- **Dependency Patches**: Upgraded `vite` to 8.0.5 (arbitrary file read via WebSocket, `server.fs.deny` bypass, `.map` path traversal), `happy-dom` to 20.8.9 (fetch credential cookie leak, ECMAScript module code injection), and enforced `picomatch ≥4.0.4` via overrides (POSIX character class method injection) — applies to both root and extension packages.
-
-## [2.39.1] - 2026-04-08
+## [Unreleased]
 
 ### Changed
 - **PDF Infrastructure Hardening**: Resolved CDN loading failures by migrating the PDF loader to modern ESM dynamic imports and upgrading to `pdf.js` v4.3.136. This improves reliability across various network environments and addresses known security vulnerabilities in older versions.
@@ -17,6 +12,17 @@ All notable changes to this project will be documented in this file.
 - **Contextual Nudge Placement**: Relocated the `NudgeCard` from the top of the page to a focused area between the `PageHeader` and `FeatureGrid`, improving the visual hierarchy and preventing dashboard "push-down."
 - **Nudge Card Aesthetic Overhaul**: Stripped aggressive tilt and glow animations from the `NudgeCard` in favor of the platform-standard `.card-premium` glassmorphism. Simplified the action workflow to focus on primary status updates (Interview, Rejected, Ghosted).
 - **Refined Hero Scaling**: Compacted the `PageHeader` typography and vertical margins for the `hero` variant to better utilize vertical space on smaller desktop screens.
+- **Transcript Cloud Sync**: Migrated transcript storage from `LocalStorage` to the unified `Storage` service with full Supabase sync, versioning, and bidirectional conflict resolution.
+
+## [2.39.2] - 2026-05-11
+
+### Security
+- **Dependency Patches**: Upgraded `vite` to 8.0.5 (arbitrary file read via WebSocket, `server.fs.deny` bypass, `.map` path traversal), `happy-dom` to 20.8.9 (fetch credential cookie leak, ECMAScript module code injection), and enforced `picomatch ≥4.0.4` via overrides (POSIX character class method injection) — applies to both root and extension packages.
+
+## [2.39.1] - 2026-04-08
+
+### Fixed
+- **Build Stability**: Resolved a TypeScript regression in `CoachHero` where missing `userSkills` and `orgCount` props were causing deployment failures.
 
 ## [2.39.0] - 2026-03-30
 
