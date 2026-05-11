@@ -36,9 +36,9 @@ export const JOB_ANALYSIS_PROMPTS = {
     CRITICAL: You MUST populate 'keySkills' and 'coreResponsibilities' even for brief job descriptions. Use your expertise to infer them if not explicitly stated.
     {
       "compatibilityScore": number (0-100),
-      "reasoning": "Extremely concise professional insight (max 2 sentences). Avoid filler.",
-      "strengths": ["list of 3-4 specific match points"],
-      "weaknesses": ["list of 2-3 specific gaps or missing qualifications"],
+      "reasoning": "Ultra-concise professional insight (max 1 sentence).",
+      "strengths": ["3 specific match points"],
+      "weaknesses": ["3 specific gaps or missing qualifications"],
       "distilledJob": {
         "roleTitle": "Official title",
         "companyName": "Company name",
@@ -56,8 +56,8 @@ export const JOB_ANALYSIS_PROMPTS = {
         "applicationDeadline": "Application closing date in YYYY-MM-DD format if stated, otherwise null",
         "salaryRange": "Salary or wage range as stated (e.g. '$55,000–$65,000/yr' or '$22–$28/hr'), otherwise null"
       },
-      "resumeTailoringInstructions": ["3-4 bullet points on how to adjust the resume"],
-      "coverLetterTailoringInstructions": ["3-4 bullet points for the cover letter strategy"],
+      "resumeTailoringInstructions": ["3 extremely concise, 1-sentence bullet points on how to adjust the resume"],
+      "coverLetterTailoringInstructions": ["3 extremely concise, 1-sentence bullet points for the cover letter strategy"],
       "recommendedBlockIds": ["List of IDs from the candidate resume blocks that are most relevant to this job"],
       "internalAnalysis": "DEDICATED SCRATCHPAD: Record your logical checks, self-reminders (e.g. 'check date logic', 'missing Pro experience'), and meta-commentary here. Do NOT leak these into user-facing fields."
     }

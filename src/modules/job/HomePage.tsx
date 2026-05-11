@@ -4,6 +4,8 @@ import { SharedPageLayout } from '../../components/common/SharedPageLayout';
 import { FeatureGrid } from './FeatureGrid';
 import { useHeadlines } from '../../hooks/useHeadlines';
 import { PageHeader } from '../../components/ui/PageHeader';
+import { NudgeCard } from '../../components/NudgeCard';
+import { useJobContext } from './context/JobContext';
 import type { ViewId } from '../../utils/navigation';
 import type { FeatureDefinition } from '../../featureRegistry';
 
@@ -39,9 +41,12 @@ const HomePage: React.FC = () => {
                 variant="hero"
                 title={activeHeadline.text}
                 highlight={activeHeadline.highlight}
-                className="mb-16"
+                className="mb-12"
                 subtitle=""
             />
+
+            {/* Contextual Nudge */}
+            <NudgeSection />
 
             <FeatureGrid
                 user={user}
@@ -64,6 +69,24 @@ const HomePage: React.FC = () => {
                 </a>
             </div>
         </SharedPageLayout>
+    );
+};
+
+const NudgeSection: React.FC = () => {
+    const { nudgeJob, handleUpdateJob, dismissNudge } = useJobContext();
+    if (!nudgeJob) return null;
+
+    return (
+        <div className="mb-12 animate-in fade-in slide-in-from-bottom-4 duration-700 delay-200">
+            <NudgeCard
+                job={nudgeJob}
+                onUpdateStatus={(status) => {
+                    handleUpdateJob({ ...nudgeJob, status });
+                    dismissNudge();
+                }}
+                onDismiss={dismissNudge}
+            />
+        </div>
     );
 };
 

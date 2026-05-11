@@ -8,7 +8,6 @@ import JobDetail from '../job/JobDetail';
 import { CoverLetters } from '../job/CoverLetters';
 import { NavigatorPro } from '../job/NavigatorPro';
 import { InterviewAdvisor } from '../job/InterviewAdvisor';
-import { NudgeCard } from '../../components/NudgeCard';
 
 const JobSyncEffect: React.FC = () => {
     const { activeJobId, setActiveJobId } = useJobContext();
@@ -28,36 +27,12 @@ const JobSyncEffect: React.FC = () => {
     return null;
 };
 
-const HomePageWithNudge: React.FC = () => {
-    const { nudgeJob, handleUpdateJob, dismissNudge } = useJobContext();
-    return (
-        <>
-            {nudgeJob && (
-                <div className="max-w-6xl mx-auto px-4 sm:px-6 mt-24">
-                    <NudgeCard
-                        job={nudgeJob}
-                        onUpdateStatus={(status) => {
-                            handleUpdateJob({ ...nudgeJob, status });
-                            dismissNudge();
-                        }}
-                        onDismiss={dismissNudge}
-                    />
-                </div>
-            )}
-            <HomePage />
-        </>
-    );
-};
-
 const JobModuleContent: React.FC = () => {
-    const location = useLocation();
-    const isRoot = location.pathname === '/';
-
     return (
         <>
             <JobSyncEffect />
             <Routes>
-                <Route path="/" element={isRoot ? <HomePageWithNudge /> : <JobMatchInput />} />
+                <Route path="/" element={<HomePage />} />
                 <Route path="match" element={<JobMatchInput />} />
                 <Route path="history" element={<History />} />
                 <Route path="cover-letters" element={<CoverLetters />} />

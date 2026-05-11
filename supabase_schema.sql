@@ -144,6 +144,18 @@ create table target_jobs (
   date_added timestamp with time zone default timezone('utc'::text, now()) not null
 );
 
+-- TRANSCRIPTS: Stores parsed academic transcripts
+create table transcripts (
+  id uuid default uuid_generate_v4() primary key,
+  user_id uuid references profiles(id) not null,
+  university text,
+  program text,
+  content jsonb not null, -- Stores the Transcript object
+  created_at timestamp with time zone default timezone('utc'::text, now()) not null,
+  updated_at timestamp with time zone default timezone('utc'::text, now()) not null
+);
+
+
 -- 3. SECURITY (Row Level Security)
 
 alter table profiles enable row level security;
@@ -155,6 +167,8 @@ alter table daily_usage enable row level security;
 alter table user_skills enable row level security;
 alter table role_models enable row level security;
 alter table target_jobs enable row level security;
+alter table transcripts enable row level security;
+
 
 -- Profile Policies
 create policy "Users can view their own profile" on profiles for select using (auth.uid() = id);
@@ -182,6 +196,10 @@ create policy "Users can manage own role models" on role_models for all using (a
 
 -- Target Jobs Policies
 create policy "Users can manage own target jobs" on target_jobs for all using (auth.uid() = user_id);
+
+-- Transcript Policies
+create policy "Users can manage own transcripts" on transcripts for all using (auth.uid() = user_id);
+
 
 -- Canonical Roles Policies
 create policy "Anyone can view canonical roles" on canonical_roles for select using (true);
@@ -306,6 +324,11 @@ CREATE INDEX IF NOT EXISTS idx_jobs_status ON jobs(status);
 CREATE INDEX IF NOT EXISTS idx_user_skills_user_id ON user_skills(user_id);
 CREATE INDEX IF NOT EXISTS idx_user_skills_name ON user_skills(name);
 CREATE INDEX IF NOT EXISTS idx_user_skills_proficiency ON user_skills(proficiency);
+
+-- Transcripts
+CREATE INDEX IF NOT EXISTS idx_transcripts_user_id ON transcripts(user_id);
+CREATE INDEX IF NOT EXISTS idx_transcripts_updated_at ON transcripts(updated_at DESC);
+
 
 -- Function to check if user can create a new analysis
 -- Supports both active (browser/manual) and passive (email) limiting

@@ -1,5 +1,5 @@
 /**
- * Dynamically loads pdf.js from CDN when needed.
+ * Dynamically loads pdf.js from CDN using ESM dynamic imports.
  * Returns the pdfjsLib instance.
  */
 export const loadPdfJS = async (): Promise<PdfjsLib> => {
@@ -7,50 +7,31 @@ export const loadPdfJS = async (): Promise<PdfjsLib> => {
         return window.pdfjsLib;
     }
 
-    const loadScript = (src: string, integrity?: string): Promise<PdfjsLib> => {
-        return new Promise((resolve, reject) => {
-            const script = document.createElement('script');
-            script.src = src;
-            if (integrity) {
-                script.integrity = integrity;
-                script.crossOrigin = 'anonymous';
-            }
-            script.referrerPolicy = 'no-referrer';
+    const version = '4.3.136';
+    const urls = [
+        `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${version}/pdf.min.mjs`,
+        `https://cdn.jsdelivr.net/npm/pdfjs-dist@${version}/build/pdf.min.mjs`,
+        `https://unpkg.com/pdfjs-dist@${version}/build/pdf.min.mjs`
+    ];
 
-            script.onload = () => {
-                const pdfjsLib = window.pdfjsLib;
-                if (pdfjsLib) {
-                    pdfjsLib.GlobalWorkerOptions.workerSrc = src.replace('pdf.min.js', 'pdf.worker.min.js');
-                    resolve(pdfjsLib);
-                } else {
-                    reject(new Error('pdf.js loaded but pdfjsLib not found on window'));
-                }
-            };
-            
-            script.onerror = () => {
-                if (document.head.contains(script)) {
-                    document.head.removeChild(script);
-                }
-                reject(new Error(`Failed to load pdf.js script from ${src}`));
-            };
-
-            document.head.appendChild(script);
-        });
-    };
-
-    try {
-        // Primary: cdnjs
-        return await loadScript(
-            'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js',
-            'sha512-6WnuP6eYfC27zSAnRL2oK12L7Q79oR1jL9PajE+6N386Ino7Yp95YRE1Q1QYqGCS/zW64B9M3T1oV7E+V2N2lA=='
-        );
-    } catch (err) {
-        console.warn("Primary PDF CDN failed, trying secondary (unpkg)...", err);
+    for (const url of urls) {
         try {
-            return await loadScript('https://unpkg.com/pdfjs-dist@3.11.174/build/pdf.min.js');
-        } catch (err2) {
-            console.warn("Secondary PDF CDN failed, trying tertiary (jsdelivr)...", err2);
-            return await loadScript('https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.min.js');
+            // Using dynamic import for ESM support in modern browsers
+            const pdfjsLib = await import(/* @vite-ignore */ url);
+            
+            if (pdfjsLib) {
+                // Set the worker source to the matching version
+                const workerUrl = url.replace('pdf.min.mjs', 'pdf.worker.min.mjs');
+                pdfjsLib.GlobalWorkerOptions.workerSrc = workerUrl;
+                
+                // Also attach to window for any legacy/global checks
+                window.pdfjsLib = pdfjsLib;
+                return pdfjsLib;
+            }
+        } catch (err) {
+            console.warn(`Failed to load pdf.js from ${url}, trying next...`, err);
         }
     }
+
+    throw new Error('All PDF.js CDN locations failed to load. Please check your internet connection.');
 };

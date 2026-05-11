@@ -104,7 +104,7 @@ export const COVER_LETTER_PROMPTS = {
     Return JSON:
     {
       "decision": "Reject" | "Weak" | "Average" | "Strong" | "Exceptional",
-      "feedback": ["string"],
+      "feedback": ["3 extremely concise, 1-sentence feedback points"],
       "hallucinationAlerts": ["string"]
     }
     `,

@@ -22,7 +22,7 @@ export const CoverLetterSidebar: React.FC<CoverLetterSidebarProps> = ({ job }) =
 
             {critique?.feedback && critique.feedback.length > 0 && (
                 <div className="mb-8 space-y-4">
-                    {critique.feedback.slice(0, 5).map((f: string, idx: number) => (
+                    {critique.feedback.slice(0, 3).map((f: string, idx: number) => (
                         <div key={idx} className="flex gap-3 text-xs font-medium text-neutral-700 dark:text-neutral-300">
                             <div className="w-1.5 h-1.5 rounded-full bg-indigo-400/50 mt-1.5 shrink-0" />
                             <span className="leading-relaxed">{toSentenceCase(f)}</span>
@@ -33,7 +33,7 @@ export const CoverLetterSidebar: React.FC<CoverLetterSidebarProps> = ({ job }) =
 
             {tailoringFocus.length > 0 && (!critique?.feedback || critique.feedback.length === 0) && (
                 <div className="mb-8 space-y-4">
-                    {tailoringFocus.slice(0, 4).map((item: string, idx: number) => (
+                    {tailoringFocus.slice(0, 3).map((item: string, idx: number) => (
                         <div key={idx} className="flex gap-3 text-xs font-medium text-neutral-700 dark:text-neutral-300">
                             <div className="w-1.5 h-1.5 rounded-full bg-indigo-400/50 mt-1.5 shrink-0" />
                             <span className="leading-relaxed">{toSentenceCase(item)}</span>

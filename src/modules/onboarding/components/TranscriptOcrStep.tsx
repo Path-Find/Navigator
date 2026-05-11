@@ -1,11 +1,17 @@
 import { motion } from 'framer-motion';
 import { ArrowRight, GraduationCap } from 'lucide-react';
 import { TranscriptUpload } from '../../grad/TranscriptUpload';
-import { LocalStorage } from '../../../utils/localStorage';
-import { STORAGE_KEYS } from '../../../constants';
+import { Storage } from '../../../services/storageService';
 
 
-export const TranscriptOcrStep = ({ setTranscriptUploaded, setStep }: any) => {
+
+interface TranscriptOcrStepProps {
+    setTranscriptUploaded: (uploaded: boolean) => void;
+    setStep: (step: number) => void;
+}
+
+export const TranscriptOcrStep = ({ setTranscriptUploaded, setStep }: TranscriptOcrStepProps) => {
+
     return (
         <motion.div
             key="step-5.5"
@@ -29,13 +35,14 @@ export const TranscriptOcrStep = ({ setTranscriptUploaded, setStep }: any) => {
 
                 <div className="flex-1 flex flex-col items-center justify-center mb-10">
                     <TranscriptUpload
-                        onUploadComplete={(parsed) => {
-                            LocalStorage.set(STORAGE_KEYS.TRANSCRIPT_CACHE, JSON.stringify(parsed));
+                        onUploadComplete={async (parsed) => {
+                            await Storage.saveTranscript(parsed);
                             setTranscriptUploaded(true);
                             setStep(6);
                         }}
                     />
                 </div>
+
 
                 <button
                     onClick={() => setStep(6)}

@@ -41,7 +41,7 @@ export const ResumeSidebar: React.FC<ResumeSidebarProps> = ({ job, analysisProgr
 
             {tailoringFocus.length > 0 ? (
                 <div className="mb-8 space-y-3">
-                    {tailoringFocus.map((item: string, idx: number) => (
+                    {tailoringFocus.slice(0, 3).map((item: string, idx: number) => (
                         <div key={idx} className="flex gap-3 text-xs font-medium text-neutral-700 dark:text-neutral-300">
                             <div className="w-1.5 h-1.5 rounded-full bg-indigo-400/50 mt-1.5 shrink-0" />
                             <span className="leading-relaxed">{toSentenceCase(item)}</span>

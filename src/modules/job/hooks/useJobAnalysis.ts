@@ -1,8 +1,7 @@
 import { useState, useCallback, useEffect, useRef } from 'react';
 import { analyzeJobFit } from '../../../services/geminiService';
 import { Storage } from '../../../services/storageService';
-import { LocalStorage } from '../../../utils/localStorage';
-import { STORAGE_KEYS } from '../../../constants';
+
 import type { SavedJob } from '../types';
 import type { ResumeProfile } from '../../resume/types';
 import type { CustomSkill } from '../../skills/types';
@@ -18,17 +17,8 @@ const createAbortController = (existing: AbortController | null): AbortControlle
     return new AbortController();
 };
 
-const loadTranscriptFromCache = (): Transcript | null => {
-    const savedTranscript = LocalStorage.get(STORAGE_KEYS.TRANSCRIPT_CACHE);
-    if (!savedTranscript) return null;
+// Removed loadTranscriptFromCache as it's replaced by Storage.getTranscript()
 
-    try {
-        return JSON.parse(savedTranscript) as Transcript;
-    } catch (e) {
-        console.error("Failed to parse cached transcript:", e);
-        return null;
-    }
-};
 
 const buildTrajectoryContext = async (
     userId: string,
@@ -74,7 +64,8 @@ export const useJobAnalysis = (
             if (onAnalyzeJob) {
                 await onAnalyzeJob(job);
             } else {
-                const transcript = loadTranscriptFromCache();
+                const transcript = await Storage.getTranscript();
+
 
                 let trajectoryContext = '';
                 if (isNextGen && user) {

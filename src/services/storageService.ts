@@ -4,7 +4,9 @@ import { JobStorage } from './storage/jobStorage';
 import { ResumeStorage } from './storage/resumeStorage';
 import { SkillStorage } from './storage/skillStorage';
 import { CoachStorage } from './storage/coachStorage';
+import { TranscriptStorage } from './storage/transcriptStorage';
 import { STORAGE_KEYS } from '../constants';
+
 import { LocalStorage } from '../utils/localStorage';
 import type { ResumeProfile, SavedJob, CustomSkill, RoleModelProfile, TargetJob } from '../types';
 
@@ -13,6 +15,8 @@ export const Storage = {
     ...ResumeStorage,
     ...SkillStorage,
     ...CoachStorage,
+    ...TranscriptStorage,
+
 
     async syncLocalToCloud() {
         const userId = await getUserId();
@@ -25,22 +29,26 @@ export const Storage = {
             localSkills,
             localRoleModels,
             localTargetJobs,
+            localTranscript,
             { data: cloudResume },
             { data: cloudJobs },
             { data: cloudSkills },
             { data: cloudModels },
-            { data: cloudTargets }
+            { data: cloudTargets },
+            { data: cloudTranscript }
         ] = await Promise.all([
             Vault.getSecure(STORAGE_KEYS.RESUMES) as Promise<ResumeProfile[]>,
             Vault.getSecure(STORAGE_KEYS.JOBS_HISTORY) as Promise<SavedJob[]>,
             Vault.getSecure<CustomSkill[]>(STORAGE_KEYS.SKILLS),
             Vault.getSecure<RoleModelProfile[]>(STORAGE_KEYS.ROLE_MODELS),
             Vault.getSecure<TargetJob[]>(STORAGE_KEYS.TARGET_JOBS),
+            Vault.getSecure(STORAGE_KEYS.TRANSCRIPT_CACHE),
             supabase.from('resumes').select('id').eq('user_id', userId).limit(1).maybeSingle(),
             supabase.from('jobs').select('id').eq('user_id', userId),
             supabase.from('user_skills').select('name').eq('user_id', userId),
             supabase.from('role_models').select('id').eq('user_id', userId),
             supabase.from('target_jobs').select('id').eq('user_id', userId),
+            supabase.from('transcripts').select('id').eq('user_id', userId).limit(1).maybeSingle()
         ]);
 
         const syncTasks: (Promise<any> | PromiseLike<any>)[] = [];
@@ -153,7 +161,13 @@ export const Storage = {
             }
         }
 
+        // 6. Sync Transcripts
+        if (localTranscript && !cloudTranscript) {
+            syncTasks.push(this.saveTranscript(localTranscript));
+        }
+
         const results = await Promise.allSettled(syncTasks);
+
         const failures = results.filter((r): r is PromiseRejectedResult => r.status === 'rejected');
         if (failures.length > 0) {
             console.error(`[Sync] ${failures.length}/${syncTasks.length} sync tasks failed:`, failures.map(f => f.reason));

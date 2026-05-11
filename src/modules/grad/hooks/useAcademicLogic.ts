@@ -1,13 +1,15 @@
 import { useState, useCallback, useMemo, useEffect } from 'react';
 import { useLocalStorage } from '../../../hooks/useLocalStorage';
+import { Storage } from '../../../services/storageService';
 import type { Transcript, Course, AdmissionEligibility } from '../types';
 import { analyzeCurrentProgramRequirements } from '../../../services/ai/eduAiService';
 import { parseTranscript } from '../../../services/geminiService';
 import { useToast } from '../../../contexts/ToastContext';
 
 export const useAcademicLogic = () => {
-    const [transcript, setTranscript] = useLocalStorage<Transcript | null>('NAVIGATOR_TRANSCRIPT_CACHE', null);
+    const [transcript, setTranscriptState] = useState<Transcript | null>(null);
     const [targetCredits, setTargetCredits] = useLocalStorage<number>('NAVIGATOR_TARGET_CREDITS', 0);
+
     const [tempTranscript, setTempTranscript] = useState<Transcript | null>(null);
     const [showVerification, setShowVerification] = useState(false);
     const [editingCourse, setEditingCourse] = useState<{
@@ -16,10 +18,24 @@ export const useAcademicLogic = () => {
         course: Course
     } | null>(null);
     const [programRequirements, setProgramRequirements] = useLocalStorage<AdmissionEligibility | null>('NAVIGATOR_PROGRAM_REQUIREMENTS', null);
-    const [isParsingRequirements, setIsAnalyzingRequirements] = useState(false);
+    const [isAnalyzingRequirements, setIsAnalyzingRequirements] = useState(false);
+
     const [isParsing, setIsParsing] = useState(false);
     const [parseError, setParseError] = useState<string | null>(null);
     const { showError } = useToast();
+
+    // Initial load from Storage (Local + Cloud Sync)
+    useEffect(() => {
+        Storage.getTranscript().then(setTranscriptState);
+    }, []);
+
+    const setTranscript = useCallback(async (newTranscript: Transcript | null) => {
+        setTranscriptState(newTranscript);
+        if (newTranscript) {
+            await Storage.saveTranscript(newTranscript);
+        }
+    }, []);
+
 
     const handleFileUpload = useCallback(async (files: File[]) => {
         if (files.length === 0) return;
@@ -72,7 +88,7 @@ export const useAcademicLogic = () => {
             return;
         }
 
-        // Formatter to clean up screaming caps
+        // Formatter to clean up screaming caps and validate data
         const cleaned: Transcript = {
             ...verified,
             studentName: toTitleCase(verified.studentName || ''),
@@ -80,13 +96,23 @@ export const useAcademicLogic = () => {
             program: toTitleCase(verified.program || ''),
             semesters: verified.semesters.map(sem => ({
                 ...sem,
-                courses: sem.courses.map(course => ({
-                    ...course,
-                    title: toTitleCase(course.title)
-                }))
-            }))
+                courses: sem.courses
+                    .filter(course => course.title && course.title.trim().length > 0)
+                    .map(course => ({
+                        ...course,
+                        title: toTitleCase(course.title),
+                        credits: Number(course.credits) || 0
+                    }))
+            })).filter(sem => sem.courses.length > 0)
         };
+
+        if (cleaned.semesters.length === 0) {
+            showError('No valid courses found. Please ensure your transcript data is correct.');
+            return;
+        }
+
         setTranscript(cleaned);
+
         setTempTranscript(null);
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [setTranscript]);
@@ -297,7 +323,8 @@ export const useAcademicLogic = () => {
         deleteSemester,
         addCourse,
         programRequirements,
-        isAnalyzingRequirements: isParsingRequirements,
+        isAnalyzingRequirements,
+
         fetchRequirements
     };
 };
