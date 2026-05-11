@@ -2,6 +2,11 @@
 
 All notable changes to this project will be documented in this file.
  
+## [2.39.2] - 2026-05-11
+
+### Security
+- **Dependency Patches**: Upgraded `vite` to 8.0.5 (arbitrary file read via WebSocket, `server.fs.deny` bypass, `.map` path traversal), `happy-dom` to 20.8.9 (fetch credential cookie leak, ECMAScript module code injection), and enforced `picomatch ≥4.0.4` via overrides (POSIX character class method injection) — applies to both root and extension packages.
+
 ## [2.39.1] - 2026-04-08
 
 ### Changed
