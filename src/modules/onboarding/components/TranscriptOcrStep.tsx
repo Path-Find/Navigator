@@ -7,7 +7,7 @@ import { Storage } from '../../../services/storageService';
 
 interface TranscriptOcrStepProps {
     setTranscriptUploaded: (uploaded: boolean) => void;
-    setStep: (step: number) => void;
+    setStep: (step: any) => void;
 }
 
 export const TranscriptOcrStep = ({ setTranscriptUploaded, setStep }: TranscriptOcrStepProps) => {

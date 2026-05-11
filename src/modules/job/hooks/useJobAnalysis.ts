@@ -5,7 +5,7 @@ import { Storage } from '../../../services/storageService';
 import type { SavedJob } from '../types';
 import type { ResumeProfile } from '../../resume/types';
 import type { CustomSkill } from '../../skills/types';
-import type { Transcript } from '../../grad/types';
+
 import { useNextGen } from '../../../hooks/useNextGen';
 import { RdTrajectoryService } from '../../../services/ai/rd/trajectoryService';
 import { useUser } from '../../../contexts/UserContext';

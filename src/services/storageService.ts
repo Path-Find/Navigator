@@ -9,6 +9,7 @@ import { STORAGE_KEYS } from '../constants';
 
 import { LocalStorage } from '../utils/localStorage';
 import type { ResumeProfile, SavedJob, CustomSkill, RoleModelProfile, TargetJob } from '../types';
+import type { Transcript } from '../modules/grad/types';
 
 export const Storage = {
     ...JobStorage,
@@ -42,7 +43,7 @@ export const Storage = {
             Vault.getSecure<CustomSkill[]>(STORAGE_KEYS.SKILLS),
             Vault.getSecure<RoleModelProfile[]>(STORAGE_KEYS.ROLE_MODELS),
             Vault.getSecure<TargetJob[]>(STORAGE_KEYS.TARGET_JOBS),
-            Vault.getSecure(STORAGE_KEYS.TRANSCRIPT_CACHE),
+            Vault.getSecure<Transcript>(STORAGE_KEYS.TRANSCRIPT_CACHE),
             supabase.from('resumes').select('id').eq('user_id', userId).limit(1).maybeSingle(),
             supabase.from('jobs').select('id').eq('user_id', userId),
             supabase.from('user_skills').select('name').eq('user_id', userId),
