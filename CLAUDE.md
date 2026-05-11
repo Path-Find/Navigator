@@ -2,6 +2,8 @@
 
 *A running log of observations, instincts, and ideas — not tasks, just thinking.*
 
+For Notion logging rules, see [NAVIGATORLOG.md](./NAVIGATORLOG.md). `NavigatorLog` is a portfolio tracker, not a feature log.
+
 ---
 
 ## March 5, 2026

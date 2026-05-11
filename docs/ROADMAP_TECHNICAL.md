@@ -54,7 +54,8 @@ Technical foundation and scaling initiatives to support growth and long-term sta
 - [ ] **Mixed async/await and `.then()` chains**: Services mix patterns throughout, making error paths hard to follow. Standardize to async/await.
 - [x] **Suppressed linter in `useResumeEditor.ts:31`**: Fixed dep array with `onSaveRef` pattern to avoid stale closure without over-triggering (Mar 2026).
 - [ ] **Inconsistent error message localization**: Raw API/Supabase error strings shown to users in some flows. Route all user-facing errors through the `errorMessages` utility.
-- [ ] **Missing transcript data validation** (`useAcademicLogic.ts:70`): No required-field validation before persisting transcript verification — empty/partial course data can be saved.
+- [x] **Missing transcript data validation** (`useAcademicLogic.ts`): Implemented course filtering and title/credit validation (Apr 2026).
+
 - [x] **Target job name not validated** (`useCoachManager.ts:162`): Dedup via title collision check — appends `(2)`, `(3)` etc. on conflict (Mar 2026).
 
 ---
