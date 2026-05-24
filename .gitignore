@@ -27,3 +27,15 @@ dist-ssr
 # AI context files
 CLAUDE.md
 GEMINI.md
+
+# Build artifacts & Temporary files
+dist
+test-results
+.current_lint_errors.txt
+.lint_output.txt
+.lint_output_main.txt
+.lint_results.json
+.lint.json
+supabase/.temp
+*.orig
+
