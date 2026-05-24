@@ -2,7 +2,7 @@
 
 All notable changes to this project will be documented in this file.
  
-## [Unreleased]
+## [2.40.0] - 2026-05-24
 
 ### Changed
 - **PDF Infrastructure Hardening**: Resolved CDN loading failures by migrating the PDF loader to modern ESM dynamic imports and upgrading to `pdf.js` v4.3.136. This improves reliability across various network environments and addresses known security vulnerabilities in older versions.
