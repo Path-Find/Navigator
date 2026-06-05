@@ -51,6 +51,7 @@ Canada primarily follows a **"first-to-file"** system, but also recognizes **Com
 
 #### **Legal Risk: "Descriptiveness" vs. "Passing Off"**
 *   **Descriptiveness**: Because "job fit" is a standard industry term, it is considered "weak" for trademark protection. CIPO often requires a "disclaimer" of the words "JOB" and "FIT," meaning you can't stop others from using the phrase descriptively.
+*   **The Hyphen Distinction**: In Canada, the distinction between **"Job-Fit"** and **"JobFit"** is legally negligible. CIPO and the courts use the "Ordinary Casual Consumer" test; since they sound identical and look nearly identical, a hyphen is rarely enough to avoid a finding of "Likelihood of Confusion."
 *   **Passing Off**: Even if the word "JOBFIT" is abandoned at CIPO, using it as a primary brand in Canada carries a risk of "passing off" claims from Prevue HR or Canadian Investigations due to their long-term market presence.
 
 #### **Opportunity**: 
