@@ -4,6 +4,18 @@ All notable changes to this project will be documented in this file.
  
 ## [Unreleased]
 
+## [2.41.0] - 2026-06-05
+
+### Added
+- **Navigator V3 Roadmap**: Documented the strategic direction for V3, focusing on a Jobs-first architecture and end-to-end outcome loops.
+
+### Fixed
+- **Sign-out Reliability**: Improved `signOut` logic to handle missing auth sessions gracefully and added toast notifications for failure states.
+- **Cleanup**: Purged legacy agent workflows and temporary lint artifacts to maintain repository hygiene.
+
+### Changed
+- **Storage Management**: Added internal test user and tier keys to the global clear-data sequence to ensure complete local resets.
+
 ## [2.40.0] - 2026-05-24
 
 ### Changed
