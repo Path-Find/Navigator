@@ -42,7 +42,19 @@ The project is currently branded as **Navigator**, but the underlying codebase a
 *   **Differentiation:** To succeed in the US, the brand would need a distinctive "plus" element (e.g., `JobFit.ai`, `JobFit Navigator`, or a unique logo).
 
 ### **Trademarks in Canada (CIPO)**
-*   **Opportunity:** As noted, the exact mark "JOBFIT" is **Abandoned** in Canada. This remains your strongest legal opening for a primary brand registration.
+Canada primarily follows a **"first-to-file"** system, but also recognizes **Common Law** rights established through use.
+
+#### **Key Canadian Conflicts**
+*   **Groom & Associates Canada**: Holds a registration for **"JOB FIT, BOSS FIT, COMPANY FIT"** (No. 1296226) for employment agency and recruitment services. 
+*   **Prevue HR (Vancouver)**: A major HR tech player that has used **"JobFit Assessment Tests"** as a core product brand for over a decade.
+*   **Canadian Investigations (Ontario)**: Operates a behavioral pre-screening system under the brand **JOBFIT** since 2011.
+
+#### **Legal Risk: "Descriptiveness" vs. "Passing Off"**
+*   **Descriptiveness**: Because "job fit" is a standard industry term, it is considered "weak" for trademark protection. CIPO often requires a "disclaimer" of the words "JOB" and "FIT," meaning you can't stop others from using the phrase descriptively.
+*   **Passing Off**: Even if the word "JOBFIT" is abandoned at CIPO, using it as a primary brand in Canada carries a risk of "passing off" claims from Prevue HR or Canadian Investigations due to their long-term market presence.
+
+#### **Opportunity**: 
+Despite the crowded space, the exact mark "JOBFIT" is **Abandoned** at CIPO. This remains a legal opening for a primary brand registration, provided it is coupled with a distinctive design or unique suffix (e.g., `JobFit.ai`) to differentiate from common law users.
 
 ---
 
