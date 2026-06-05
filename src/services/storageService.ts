@@ -188,7 +188,9 @@ export const Storage = {
             STORAGE_KEYS.ROLE_MODELS,
             STORAGE_KEYS.TARGET_JOBS,
             STORAGE_KEYS.TRANSCRIPT_CACHE,
-            'jobfit_vault_seed' // Also clear the encryption seed
+            'jobfit_vault_seed', // Also clear the encryption seed
+            'navigator_test_user',
+            'navigator_user_tier'
         ];
 
         userKeys.forEach(key => LocalStorage.remove(key));

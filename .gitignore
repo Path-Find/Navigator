@@ -27,10 +27,18 @@ dist-ssr
 # AI context files
 CLAUDE.md
 GEMINI.md
+.copilot/
+.agent/
+
+# Sample / evaluation data (real cover letters, jobs, feedback, etc.)
+samples/
 
 # Build artifacts & Temporary files
 dist
 test-results
+.vite/
+.eslintcache
+coverage/
 .current_lint_errors.txt
 .lint_output.txt
 .lint_output_main.txt
@@ -38,4 +46,3 @@ test-results
 .lint.json
 supabase/.temp
 *.orig
-

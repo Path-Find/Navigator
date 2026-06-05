@@ -7,6 +7,7 @@ import { STORAGE_KEYS } from '../constants';
 import { LocalStorage } from '../utils/localStorage';
 import { invalidateUserIdCache } from '../services/storage/storageCore';
 import { useUserPreferences, type UserPreferencesContextType } from './UserPreferencesContext';
+import { useToast } from './ToastContext';
 
 import type { UserTier } from '../types';
 
@@ -52,6 +53,7 @@ const UserContext = createContext<UserCoreContextType | undefined>(undefined);
 
 export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
     const prefs = useUserPreferences();
+    const { showError } = useToast();
 
     const [user, setUser] = useState<User | null>(null);
     const [actualTier, setActualTier] = useState<UserTier>('free');
@@ -163,7 +165,12 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     const signOut = async () => {
         await Storage.clearAllData();
-        await supabase.auth.signOut();
+        const { error } = await supabase.auth.signOut({ scope: 'local' });
+        if (error && !error.message?.includes('Auth session missing')) {
+            console.error('Sign out failed:', error);
+            showError('Sign out failed. Please try again.');
+            return;
+        }
         window.location.href = '/';
     };
 

@@ -62,6 +62,7 @@ For speculative "if we rebuilt Navigator from scratch" thinking, see [V3-Greenfi
 | 5 | Add structured events around vault migrations and failed cloud syncs | Observability | Medium | Storage layer currently only logs to console. |
 | 6 | Build a lightweight "Testers" mode + automatic capture of AI generations (starting with cover letters) as the foundation for a real evaluation harness and golden datasets | AI Quality | Medium | You already have partial dark wiring via `RdFeedbackService` → `rd_modeling_feedback`, but it is tied to NextGen and not designed for systematic prompt/model experimentation or human review. The recent discovery that Gemini struggles with cover letters makes this higher priority. See ongoing discussion in chat + Audit-NextGen-RD-Deep-Dive.md. |
 | 7 | Improve "My Career Model" visibility and user controls for NextGen | Product / Trust | Medium | Users currently have almost no insight into what the system has learned about them. |
+| 8 | Fix bloated component sizing and visual density (e.g. large "Status check" cards with stretched buttons) | Product / UX | Low-Medium | Components like the Navigator Bot status cards feel oversized and low-density. |
 
 ---
 

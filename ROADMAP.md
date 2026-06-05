@@ -12,6 +12,8 @@ Navigator is an AI-powered career co-pilot that automates job monitoring, qualif
 
 Behind the scenes, we are building **[NextGen Navigator](docs/ROADMAP_NEXTGEN.md)**: a professional modeling engine R&D initiative focusing on feedback loops, latent professional space, autonomous refinement, and **[Next-Gen Prompt Engineering](docs/ROADMAP_PROMPT.md)** for failure point mapping and logic translation.
 
+Looking ahead, **[Navigator V3](docs/ROADMAP_V3.md)** captures future-facing concepts and bets (not committed), with a Jobs-first focus and a tighter end-to-end loop from ingestion to outcomes.
+
 ---
 
 [Back to Home](./README.md)
