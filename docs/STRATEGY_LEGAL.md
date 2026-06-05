@@ -9,11 +9,11 @@ The project is currently branded as **Navigator**, but the underlying codebase a
 
 ## 2. Competitor Analysis: The "JobFit" Landscape
 
-### **JobFit.fyi (Internal / Founder: Ryan Hanna)**
+### **JobFit.fyi (Direct Competitor)**
 *   **Status:** Active.
 *   **Target:** Candidates / Job Seekers.
 *   **Core Offer:** CV-to-JD matching, "Brutal" feedback, gap analysis.
-*   **Strategic Position:** This is your existing "entry-level" brand. It has strong SEO potential but is currently positioned as a utility tool rather than a comprehensive platform.
+*   **Verdict:** This is your primary direct competitor. They focus on quick CV scoring and gap analysis for candidates.
 
 ### **JobFit.org (B2B Competitor)**
 *   **Status:** Active (JobFit AI, San Francisco).
