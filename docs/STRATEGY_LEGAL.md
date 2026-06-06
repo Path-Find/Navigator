@@ -71,16 +71,24 @@ Despite the crowded space, the exact mark "JOBFIT" is **Abandoned** at CIPO. Thi
 *   **Pros**: Stronger, more direct product-market fit; leverages the `.fyi` domain you already own; matches the legacy codebase.
 *   **Cons**: Face-to-face competition with `jobfit.org`; potential trademark hurdles in Australia/USA.
 
-### **Option 3: The "Evolutionary" Strategy (JobFit.ai / JobFit.tools)**
-*   **Concept**: Move away from a generic word mark to a more distinctive tech-branded mark.
+### **Option 3: The "Evolutionary" Strategy (JobFit.ai / Jobify)**
+*   **Concept**: Move away from a generic word mark to a more distinctive or active tech-branded mark.
+*   **Candidates**:
+    *   **JobFit.ai / JobFit.tools**: Keeps the core keyword with a modern suffix.
+    *   **Jobify**: A punchy, "verb-able" brand that signals a modern web application (e.g., "Jobify your resume").
 *   **Pros**: Easier to trademark (Section 2(d) defense); clearly signals "AI-First" tool; differentiates from stale competitors.
-*   **Action**: Trademark "JobFit.ai" or "JobFit.tools" in Canada and the US.
+*   **Action**: Trademark the selected mark in Canada and the US.
 
 ---
 
+## 5. Sub-Product Branding (Module Candidates)
+To keep the main platform brand clean, specific modules can carry their own punchy, descriptive names:
+*   **JobScout**: The ideal candidate for the **Ingest engine**. It implies a proactive agent searching the market for opportunities.
+*   **JobRadar**: The ideal candidate for the **Telegram Bot / Alerts**. It implies a real-time monitoring system that notifies the user when a match is detected.
+
 ---
 
-## 5. Immediate Next Steps
+## 6. Immediate Next Steps
 1.  **CIPO Filing**: If moving to "JobFit," initiate a formal trademark application in Canada (Classes 9, 35, 42).
 2.  **Domain Acquisition**: Secure `jobfit.tools` or `jobfit.ai` if available.
 3.  **UI Lean-Out**: If focusing on Jobs-only, remove Career/Edu modules to increase product focus.
