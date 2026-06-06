@@ -1,4 +1,4 @@
-# Competitor & Legal Strategy Report: Navigator vs. JobFit
+# Legal
 **Date:** June 5, 2026
 **Project:** Navigator (formerly JobFit)
 
@@ -62,7 +62,7 @@ Despite the crowded space, the exact mark "JOBFIT" is **Abandoned** at CIPO. Thi
 ## 4. Proposed Branding Strategy: "The Platform Evolution"
 
 ### **Option 1: The "Dual-Brand" Strategy (Navigator + JobFit)**
-*   **Concept**: Keep **JobFit.fyi** as the SEO-driven "Utility" landing page for quick matching. Use **Navigator** as the "Premium" platform brand for the full suite (Ingest, Bot, Deep Analysis).
+*   **Concept**: Keep **JobFit.fyi** as the SEO-driven "Utility" landing page for quick matching. Use **Navigator** as the "Premium" platform brand for the full suite (Ingest Engine, Telegram Bot, Deep Analysis).
 *   **Pros**: Avoids direct trademark conflict with JobFit health/medical; preserves existing SEO; keeps the "Platform" vision broad.
 *   **Cons**: Fragmented brand identity; requires maintaining two names.
 
@@ -81,10 +81,10 @@ Despite the crowded space, the exact mark "JOBFIT" is **Abandoned** at CIPO. Thi
 
 ---
 
-## 5. Sub-Product Branding (Module Candidates)
-To keep the main platform brand clean, specific modules can carry their own punchy, descriptive names:
-*   **JobScout**: The ideal candidate for the **Ingest engine**. It implies a proactive agent searching the market for opportunities.
-*   **JobRadar**: The ideal candidate for the **Telegram Bot / Alerts**. It implies a real-time monitoring system that notifies the user when a match is detected.
+## 5. Naming Concepts (Future Modules)
+The following are conceptual names for sub-products or modules within the Navigator platform. These are not finalized and are currently for strategic planning only:
+*   **JobScout**: A potential name for the **Ingest Engine**. It implies a proactive agent searching the market for opportunities.
+*   **JobRadar**: A potential name for the **Telegram Bot / Alerts**. It implies a real-time monitoring system that notifies the user when a match is detected.
 
 ---
 

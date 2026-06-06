@@ -1,4 +1,4 @@
-# Feedback Roadmap
+# Feedback
 
 Closing the loop between what Navigator generates and whether it actually works. The core question: *did Navigator help you get a job?*
 
@@ -24,7 +24,7 @@ Right now these are disconnected fragments. This roadmap treats them as one syst
 
 Three distinct moments, designed separately.
 
-### 1. Quality — Right After Generation
+### Quality — Right After Generation
 
 > "Is this cover letter good?" / "Was this analysis accurate?"
 
@@ -33,7 +33,7 @@ Three distinct moments, designed separately.
 - [ ] Wire both to `submitFeedback(jobId, rating, context)` — context distinguishes cover letter vs. analysis.
 - [ ] No friction — passive, always visible once output exists.
 
-### 2. Usage — Around Application Time
+### Usage — Around Application Time
 
 > "Did you actually use this?"
 
@@ -41,13 +41,10 @@ Three distinct moments, designed separately.
 - [ ] Store as `coverLetterUsed: boolean` on the job record.
 - [ ] No intercept, no status change required.
 
-### 3. Outcome — The Nudge
-
-> "What happened?"
+### Outcome — The Nudge
 
 The NudgeCard exists but needs fixes and expansion:
 
-- [x] **Persist dismissal** — dismissed job IDs stored in localStorage per job (Mar 2026).
 - [ ] **Decouple from `applied` status** — nudge should fire for any job with a cover letter past N days, regardless of whether the user ever set a status.
 - [ ] **Surface in JobDetail** — not just the home page. A subtle banner on the Analysis tab after a few weeks gives context-aware prompting.
 - [ ] **Two nudge tiers** — first nudge asks "did you apply?", second (if interview) asks "did you use the Navigator cover letter?"
@@ -56,12 +53,18 @@ The NudgeCard exists but needs fixes and expansion:
 
 ## Phase 2 — Email Nudge (Later)
 
-Meet users where they are, without requiring them to open the app. *(Requires infrastructure work — see [Technical Roadmap](./ROADMAP_TECHNICAL.md).)*
+Meet users where they are, without requiring them to open the app. *(Requires infrastructure work — see [Technical Roadmap](./TECHNICAL.md).)*
 
 - [ ] **One-click outcome email** — sent very occasionally (once per job, max), 2–4 weeks after a cover letter is generated. Single question: "Did you get the interview?" Two buttons: **Got an interview** / **No news yet**.
 - [ ] Clicking either button logs the outcome via a magic-link action token and lands the user in Navigator — no separate login step.
 - [ ] Tone: thoughtful check-in, not a marketing email. One line of context, two buttons, nothing else.
 - [ ] **Requires:** email service (Resend), magic-link action tokens, a simple resolve endpoint.
+
+---
+
+## Completed
+
+- [x] **Persist dismissal** — dismissed job IDs stored in localStorage per job (Mar 2026).
 
 ---
 
