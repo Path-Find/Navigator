@@ -347,7 +347,6 @@ export const FEATURE_REGISTRY: Record<string, FeatureDefinition> = {
         link: '/education',
         rank: 8,
         showOnHomepage: false,
-        planHighlight: true,
     },
     EDU_EXPLORER: {
         id: 'edu-explorer',
