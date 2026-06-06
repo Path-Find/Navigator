@@ -77,4 +77,6 @@ Meet users where they are, without requiring them to open the app. *(Requires in
 
 ---
 
+For a full history of completed features, see the [Changelog](../CHANGELOG.md) and [Changelog Archive](../CHANGELOG_ARCHIVE.md).
+
 [Back to Roadmap](../ROADMAP.md)

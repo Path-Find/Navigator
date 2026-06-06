@@ -44,4 +44,6 @@ Strategic model mapping based on task complexity and token efficiency:
 
 ---
 
+For a full history of completed features, see the [Changelog](../CHANGELOG.md) and [Changelog Archive](../CHANGELOG_ARCHIVE.md).
+
 [Back to Roadmap](../ROADMAP.md)

@@ -1,18 +1,17 @@
 import React from 'react';
-import { TrendingUp, Briefcase, LogOut, Settings, Bookmark, Sparkles, FileText, Users, Target, GraduationCap, ShieldCheck, Sun, Moon, MessageSquare, X } from 'lucide-react';
+import { TrendingUp, Briefcase, LogOut, Settings, Bookmark, Sparkles, FileText, Target, ShieldCheck, Sun, Moon, MessageSquare, X } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useNavigate } from 'react-router-dom';
 import { useUser } from '../../contexts/UserContext';
 import { useModal } from '../../contexts/ModalContext';
 import { useGlobalUI } from '../../contexts/GlobalUIContext';
 import { ROUTES } from '../../constants';
-import { getModeFromViewId, type ViewId } from '../../utils/navigation';
+import { type ViewId } from '../../utils/navigation';
 
 export const Header: React.FC = () => {
-    const { user, isLoading, isAdmin, isTester, signOut } = useUser();
+    const { user, isLoading, isAdmin, signOut } = useUser();
     const { openModal } = useModal();
     const { currentView, setView: onViewChange, isDark, toggleDarkMode, isFocusedMode, setFocusedMode, setView } = useGlobalUI();
-    const { isCoachMode, isEduMode } = getModeFromViewId(currentView);
     const [scrolled, setScrolled] = React.useState(false);
     const navigate = useNavigate();
 
@@ -40,7 +39,7 @@ export const Header: React.FC = () => {
             id: 'job',
             label: 'Jobs',
             icon: Briefcase,
-            isActive: !isCoachMode && !isEduMode && !['privacy', 'home', 'admin', 'plans', 'plans-compare', 'settings', 'welcome', 'features', 'terms', 'contact'].includes(currentView),
+            isActive: !['privacy', 'home', 'admin', 'plans', 'plans-compare', 'settings', 'welcome', 'features', 'terms', 'contact'].includes(currentView),
             defaultView: 'job-home' as ViewId,
             items: [
                 { id: 'resumes' as ViewId, label: 'Resume', icon: FileText },
@@ -51,28 +50,6 @@ export const Header: React.FC = () => {
             ]
         },
         {
-            id: 'career',
-            label: 'Career',
-            icon: TrendingUp,
-            isActive: isCoachMode,
-            defaultView: 'coach-home' as ViewId,
-            items: [
-                { id: 'skills' as ViewId, label: 'Skills', icon: Target },
-                { id: 'coach-role-models' as ViewId, label: 'Mentors', icon: Users },
-            ]
-        },
-        {
-            id: 'edu',
-            label: 'Education',
-            icon: GraduationCap,
-            isActive: isEduMode,
-            defaultView: 'edu-home' as ViewId,
-            items: [
-                { id: 'edu-transcript' as ViewId, label: 'Transcript', icon: GraduationCap },
-                { id: 'edu-programs' as ViewId, label: 'Pathfinding', icon: Sparkles }
-            ]
-        },
-        {
             id: 'plans',
             label: 'Upgrade',
             icon: Sparkles,
@@ -80,12 +57,7 @@ export const Header: React.FC = () => {
             defaultView: 'plans' as ViewId,
             items: []
         }
-    ].filter(group => {
-        if (group.id === 'career' || group.id === 'edu') {
-            return isAdmin || isTester;
-        }
-        return true;
-    });
+    ];
 
 
     return (
@@ -100,11 +72,8 @@ export const Header: React.FC = () => {
                         className="group flex items-center gap-2.5 cursor-pointer"
                         onClick={() => isFocusedMode ? handleExit() : onViewChange('home')}
                     >
-                        <div className={`p-1.5 rounded-xl shadow-lg transition-all duration-500 group-hover:scale-105 active:scale-95 ${isCoachMode ? 'bg-emerald-500 text-white shadow-emerald-500/20' :
-                            isEduMode ? 'bg-amber-500 text-white shadow-amber-500/20' :
-                                'bg-indigo-600 text-white shadow-indigo-600/20'
-                            }`}>
-                            {isFocusedMode ? <ShieldCheck className="w-5 h-5" /> : (isCoachMode ? <Sparkles className="w-5 h-5" /> : isEduMode ? <GraduationCap className="w-5 h-5" /> : <TrendingUp className="w-5 h-5" />)}
+                        <div className={`p-1.5 rounded-xl shadow-lg transition-all duration-500 group-hover:scale-105 active:scale-95 bg-indigo-600 text-white shadow-indigo-600/20`}>
+                            {isFocusedMode ? <ShieldCheck className="w-5 h-5" /> : <TrendingUp className="w-5 h-5" />}
                         </div>
                         <div className="flex flex-col">
                             <span className="text-lg font-black tracking-tight bg-clip-text text-transparent bg-gradient-to-br from-neutral-900 via-neutral-700 to-neutral-800 dark:from-white dark:via-neutral-200 dark:to-neutral-400 leading-none">
@@ -152,7 +121,7 @@ export const Header: React.FC = () => {
                                             <button
                                                 onClick={() => onViewChange(group.defaultView || group.items[0].id)}
                                                 className={`px-2 py-1.5 rounded-2xl text-[11px] font-bold transition-all duration-300 flex items-center gap-1.5 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500/50 cursor-pointer ${group.isActive
-                                                    ? (group.id === 'career' ? 'text-emerald-600' : group.id === 'edu' ? 'text-amber-600' : group.id === 'plans' ? 'text-amber-500' : 'text-indigo-600')
+                                                    ? (group.id === 'plans' ? 'text-amber-500' : 'text-indigo-600')
                                                     : (group.id === 'plans' ? 'text-amber-500/80 hover:text-amber-600' : 'text-neutral-500 hover:text-neutral-800 dark:text-neutral-400 dark:hover:text-neutral-200')
                                                     } ${group.id === 'plans' ? '!py-1.5 !px-2.5' : ''}`}
                                             >
@@ -173,7 +142,7 @@ export const Header: React.FC = () => {
                                                                 key={item.id}
                                                                 onClick={() => onViewChange(item.id)}
                                                                 className={`relative px-2 py-1.5 rounded-xl text-[10px] font-black transition-all whitespace-nowrap tracking-wide overflow-hidden focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500/50 cursor-pointer ${currentView === item.id
-                                                                    ? (group.id === 'career' ? 'text-emerald-600' : group.id === 'edu' ? 'text-amber-600' : 'text-indigo-600')
+                                                                    ? 'text-indigo-600'
                                                                     : 'text-neutral-400 hover:text-neutral-700 dark:text-neutral-500 dark:hover:text-neutral-300 hover:bg-neutral-50 dark:hover:bg-neutral-800/50'
                                                                     }`}
                                                             >

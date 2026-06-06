@@ -95,3 +95,9 @@ The following are conceptual names for sub-products or modules within the Naviga
 
 ---
 *Disclaimer: This report is for informational purposes and does not constitute formal legal advice.*
+
+---
+
+For a full history of completed features, see the [Changelog](../CHANGELOG.md) and [Changelog Archive](../CHANGELOG_ARCHIVE.md).
+
+[Back to Roadmap](../ROADMAP.md)

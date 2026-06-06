@@ -20,4 +20,6 @@ Performance and quality benchmarks for the Navigator platform.
 
 ---
 
+For a full history of completed features, see the [Changelog](../CHANGELOG.md) and [Changelog Archive](../CHANGELOG_ARCHIVE.md).
+
 [Back to Roadmap](../ROADMAP.md)

@@ -21,4 +21,6 @@ Evolution from a career utility into an intelligence layer for professional grow
 
 ---
 
+For a full history of completed features, see the [Changelog](../CHANGELOG.md) and [Changelog Archive](../CHANGELOG_ARCHIVE.md).
+
 [Back to Roadmap](../ROADMAP.md)

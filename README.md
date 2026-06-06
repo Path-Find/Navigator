@@ -23,6 +23,7 @@ The modern career path is fragmented. Job seekers juggle siloed resumes, navigat
 
 ---
 
+- [Features](./docs/FEATURES.md)
 - [Roadmap](./ROADMAP.md)
 - [Changelog](./CHANGELOG.md)
 - [Security](./SECURITY.md)

@@ -81,7 +81,7 @@ export const FEATURE_REGISTRY: Record<string, FeatureDefinition> = {
         targetView: 'skills',
         link: '/career/skills',
         rank: 3,
-        showOnHomepage: true,
+        showOnHomepage: false,
         planHighlight: true,
     },
     RESUMES: {
@@ -286,7 +286,7 @@ export const FEATURE_REGISTRY: Record<string, FeatureDefinition> = {
         targetView: 'coach-home',
         link: '/career/growth',
         rank: 7,
-        showOnHomepage: true,
+        showOnHomepage: false,
         planHighlight: true,
     },
     ROLE_MODELS: {
@@ -346,7 +346,7 @@ export const FEATURE_REGISTRY: Record<string, FeatureDefinition> = {
         targetView: 'edu-home',
         link: '/education',
         rank: 8,
-        showOnHomepage: true,
+        showOnHomepage: false,
         planHighlight: true,
     },
     EDU_EXPLORER: {

@@ -62,4 +62,6 @@ Technical foundation and scaling initiatives to support growth and long-term sta
 
 ---
 
+For a full history of completed features, see the [Changelog](../CHANGELOG.md) and [Changelog Archive](../CHANGELOG_ARCHIVE.md).
+
 [Back to Roadmap](../ROADMAP.md)

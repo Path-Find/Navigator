@@ -15,4 +15,6 @@ Immediate focus on expanding active workflow tools and solidifying platform trus
 
 ---
 
+For a full history of completed features, see the [Changelog](../CHANGELOG.md) and [Changelog Archive](../CHANGELOG_ARCHIVE.md).
+
 [Back to Roadmap](../ROADMAP.md)

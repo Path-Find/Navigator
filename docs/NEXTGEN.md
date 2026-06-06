@@ -45,4 +45,6 @@ The engine functions as a feedback-driven optimization loop designed to minimize
 
 ---
 
+For a full history of completed features, see the [Changelog](../CHANGELOG.md) and [Changelog Archive](../CHANGELOG_ARCHIVE.md).
+
 [Back to Roadmap](../ROADMAP.md)
