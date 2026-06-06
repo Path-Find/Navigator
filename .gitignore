@@ -46,3 +46,4 @@ coverage/
 .lint.json
 supabase/.temp
 *.orig
+.vercel
