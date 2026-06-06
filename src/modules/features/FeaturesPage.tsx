@@ -62,6 +62,7 @@ export const FeaturesPage: React.FC = () => {
         return getAllFeatures()
             .filter(f => !f.id.startsWith('_notice_')) // Filter system notices
             .filter(f => f.stage !== 'admin')
+            .filter(f => f.category === 'JOB') // Focus strictly on Jobs-first experience
             .sort((a, b) => a.rank - b.rank);
     }, []);
 

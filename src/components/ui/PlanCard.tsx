@@ -152,24 +152,6 @@ export const PlanCard = ({
                                 {limits.emails !== 0 && limits.emailPeriod && <span className="text-neutral-300 font-bold ml-0.5">/ {limits.emailPeriod}</span>}
                             </span>
                         </div>
-                        <div className="flex justify-between items-center text-[10px]">
-                            <div className="flex items-center gap-1.5">
-                                <span className="font-bold text-neutral-400 capitalize tracking-wide">Mentors</span>
-                            </div>
-                            <span className="font-black text-neutral-900 dark:text-white">
-                                {limits.mentors === Infinity || limits.mentors === 'Unlimited' ? 'Unlimited' : limits.mentors === 0 ? '—' : limits.mentors}
-                                {limits.mentors !== 0 && limits.mentors !== Infinity && limits.mentorPeriod && <span className="text-neutral-300 font-bold ml-0.5">/ {limits.mentorPeriod}</span>}
-                            </span>
-                        </div>
-                        <div className="flex justify-between items-center text-[10px]">
-                            <div className="flex items-center gap-1.5">
-                                <span className="font-bold text-neutral-400 capitalize tracking-wide">Interviews</span>
-                            </div>
-                            <span className="font-black text-neutral-900 dark:text-white">
-                                {limits.interviews === 0 ? '—' : limits.interviews}
-                                {limits.interviews !== 0 && typeof limits.interviews === 'number' && <span className="text-neutral-300 font-bold ml-0.5">/ mo</span>}
-                            </span>
-                        </div>
                     </div>
                 )}
 

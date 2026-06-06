@@ -12,9 +12,6 @@ export type JourneyStage = 'student' | 'job-hunter' | 'employed' | 'career-chang
 
 export const JOURNEY_OPTIONS: { id: JourneyStage; icon: React.ReactNode; title: string; description: string; color: string }[] = [
     { id: 'job-hunter', icon: <Search className="w-6 h-6" />, title: "I'm searching for a job", description: "Actively applying and interviewing for new roles", color: 'indigo' },
-    { id: 'employed', icon: <Building2 className="w-6 h-6" />, title: "I'm growing in my role", description: "Looking to level up, build new skills, or get promoted", color: 'emerald' },
-    { id: 'career-changer', icon: <ArrowRight className="w-6 h-6 -rotate-45" />, title: "I'm changing careers", description: "Pivoting to a new industry or different field", color: 'amber' },
-    { id: 'student', icon: <GraduationCap className="w-6 h-6" />, title: "I'm in school", description: "Managing studies, internships, or planning my next degree", color: 'violet' },
     { id: 'exploring', icon: <Search className="w-6 h-6" />, title: "I'm just exploring", description: "Keeping an eye on the market and my career options", color: 'indigo' },
 ];
 
@@ -70,7 +67,7 @@ export const OnboardingPage: React.FC = () => {
     // Verify: Journey depends on user selection.
 
     // Initial State: Start at Step 3 (Journey)
-    const [step, setStep] = useState<1 | 1.5 | 3 | 4 | 5 | 5.5 | 5.8 | 6>(3); // 5.8 is Plans
+    const [step, setStep] = useState<1 | 1.5 | 3 | 4 | 5 | 5.8 | 6>(3); // 5.8 is Plans
     const [privacyAccepted, setPrivacyAccepted] = useState(false);
     const [selectedJourneys, setSelectedJourneys] = useState<JourneyStage[]>([]);
     const [resumeUploaded, setResumeUploaded] = useState(false);
@@ -105,13 +102,7 @@ export const OnboardingPage: React.FC = () => {
 
             const delay = 2500; // Give a bit more time for the delight snapshot
             const timer = setTimeout(() => {
-                const latestResume = resumes[resumes.length - 1];
-                const detected = (hasNewResume && latestResume) ? detectStudentStatus(latestResume.blocks) : false;
-                if (detected || selectedJourneys.includes('student')) {
-                    setStep(5.5);
-                } else {
-                    setStep(6);
-                }
+                setStep(6);
             }, delay);
             return () => clearTimeout(timer);
         }
@@ -254,24 +245,22 @@ export const OnboardingPage: React.FC = () => {
                 {/* Header / Progress */}
                 <div className="px-8 pt-8 flex justify-between items-center">
                     <div className="flex gap-2">
-                        {[3, 1.5, 1, 4, 5, 5.5, 5.8, 6].map((s, idx) => {
-                            // Only show 5.5 if it's the current step or we are a student
-                            if (s === 5.5 && step < 5.5 && !isStudent) return null;
+                        {[3, 1.5, 1, 4, 5, 5.8, 6].map((s, idx) => {
 
                             // Determine if "active" or "completed" based on index in this specific array
                             // We need to find the index of the CURRENT step in this array
-                            const currentStepIndex = [3, 1.5, 1, 4, 5, 5.5, 5.8, 6].indexOf(step);
+                            const currentStepIndex = [3, 1.5, 1, 4, 5, 5.8, 6].indexOf(step as any);
                             const thisStepIndex = idx;
 
                             return (
                                 <div
                                     key={s}
-                                    className={`h - 1.5 rounded - full transition - all duration - 500 ${s === step
+                                    className={`h-1.5 rounded-full transition-all duration-500 ${s === step
                                         ? 'w-8 bg-gradient-to-r from-indigo-600 to-violet-600'
                                         : thisStepIndex < currentStepIndex
                                             ? 'w-2 bg-indigo-200 dark:bg-indigo-900'
                                             : 'w-2 bg-neutral-100 dark:bg-neutral-800'
-                                        } `}
+                                        }`}
                                 />
                             );
                         })}

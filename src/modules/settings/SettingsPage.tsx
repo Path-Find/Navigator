@@ -116,9 +116,7 @@ export const SettingsPage: React.FC = () => {
                                 >
                                     {[
                                         { id: 'job-hunter', label: 'Job Search' },
-                                        { id: 'employed', label: 'Career Growth' },
                                         { id: 'career-changer', label: 'Career Change' },
-                                        { id: 'student', label: 'Education' },
                                         { id: 'exploring', label: 'Just Exploring' }
                                     ].map((opt) => (
                                         <option key={opt.id} value={opt.id}>
