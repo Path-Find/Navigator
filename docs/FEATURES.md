@@ -25,6 +25,8 @@ The Navigator platform is a suite of AI-powered tools designed to automate the m
 
 ---
 
+Looking for stashed or legacy features? See the [Future Concepts](FUTURE_CONCEPTS.md) page.
+
 For a full history of completed features, see the [Changelog](../CHANGELOG.md) and [Changelog Archive](../CHANGELOG_ARCHIVE.md).
 
 [Back to Roadmap](../ROADMAP.md)
