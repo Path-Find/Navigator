@@ -21,7 +21,7 @@ Navigator is an AI-powered career co-pilot that automates job monitoring, qualif
 - **[NextGen](docs/NEXTGEN.md)**: Professional modeling engine and latent space architecture.
 
 ### Future & Legacy
-- **[Future Concepts](docs/FUTURE_CONCEPTS.md)**: Stashed Career, Coaching, and Education plans.
+- **[Legacy Features](docs/LEGACY.md)**: Stashed Career, Coaching, and Education plans.
 
 ---
 
