@@ -11,7 +11,7 @@ Strategic focus on trial conversion and the transition to modular feature access
 ## Pricing & Growth
 
 - [ ] **Value Locking**: Strategy to lock actions (e.g., export/drafting), not insights (e.g., scores/analysis).
-- [ ] **Product Packs**: Optional specialized "Packs" for Jobs, Coach, and Edu on top of the main subscription.
+- [ ] **Product Packs**: Optional specialized feature packs (e.g., Advanced AI Drafting or Bulk Alerts) on top of the main subscription.
 - [ ] **Growth Loops**: Implement referral credits and short-term "deep dive" access offers.
 - [ ] **Stripe Customer Portal**: Full self-service for subscription management and billing history.
 

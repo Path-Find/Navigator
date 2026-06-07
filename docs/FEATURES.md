@@ -1,6 +1,6 @@
 # Features
 
-The Navigator platform is a suite of AI-powered tools designed to automate the manual labor of the job search and career growth process.
+The Navigator platform is a suite of AI-powered tools designed to automate the manual labor of the job search process.
 
 ## Core Modules
 
@@ -19,7 +19,7 @@ The Navigator platform is a suite of AI-powered tools designed to automate the m
 - **AI Cover Letters**: Role-specific, grounded cover letters drafted using your unique narrative context.
 - **Hyper-Tailoring**: Sequential AI pass that rewrites specific resume bullets to align with the target job's nomenclature.
 
-### 4. Career Companion (The Future)
+### 4. Interview Companion (The Future)
 - **Telegram Bot (Conceptual)**: Real-time alerts and conversational interview prep via messaging apps.
 - **Interview Mock Sessions**: Guided practice sessions using role-specific AI prompts to simulate high-stakes interviews.
 
