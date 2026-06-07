@@ -1,24 +1,24 @@
 # Vision
 
-Navigator aims to eliminate the "manual labor" of career transitions by automating job monitoring, qualification mapping, and application workflows through high-fidelity AI orchestration.
+Navigator is built to take the tedious manual labor out of finding a job.
 
-## Core Philosophy
+## Core Principles
 
-1. **Passive Execution over Active Labor**
-   Finding a job shouldn't feel like a second full-time job. The ideal experience is passive: the system operates as a quiet background companion, triaging listings, measuring compatibility, and preparing assets without interrupting the user's flow.
+1. **Passive Search**
+   Looking for a job shouldn't be a second full-time job. Instead of spending hours browsing job boards, the app works in the background—triaging your email alerts, scoring compatibility, and organizing roles for you.
 
-2. **Semantic Alignment over Keyword Matching**
-   Traditional job search tools rely on fragile keyword matches. Navigator models the "latent space" of a career—measuring the semantic distance between a user's experience and market requirements to identify true compatibility.
+2. **Real Compatibility**
+   Traditional tools look for exact keyword matches. Navigator looks at your actual experience to see if you can do the work, even if the job post uses different phrasing.
 
-3. **Grounded Narrative over Generative Fabrication**
-   AI resume tailoring should never fabricate experience. We believe in high-fidelity alignment: translating the user's authentic professional story into the specific nomenclature of a target role while maintaining absolute factual integrity.
+3. **Absolute Honesty**
+   AI shouldn't make up experience. When we tailor your resume, we rewrite your real experience to highlight the most relevant details and match the employer's terms, without fabricating skills.
 
-4. **Continuous Readiness**
-   Opportunity is unpredictable. Instead of rebuilding a career profile from scratch every few years, Navigator maintains a dynamic, modular representation of a user’s experience, keeping them ready to act on any role instantly.
+4. **Always Ready**
+   Instead of rewriting your resume from scratch every time you want to apply, Navigator breaks your work history into modular blocks that can be compiled and customized in seconds.
 
-## The North Star
+## The Goal
 
-Ultimately, Navigator moves towards a fully autonomous, privacy-first career agent. A system that continuously monitors the market, refines your narrative, matches compatibility, and handles the coordination funnel—leaving the human to focus purely on connection and high-stakes interviews.
+We want to build a tool that handles the busywork of job hunting—scraping, filtering, and drafting—so you can spend your time talking to real people and preparing for interviews.
 
 ---
 
