@@ -1,4 +1,4 @@
-# Product Vision
+# Vision
 
 Navigator aims to eliminate the "manual labor" of career transitions by automating job monitoring, qualification mapping, and application workflows through high-fidelity AI orchestration.
 
