@@ -1,5 +1,5 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { ArrowRight, GraduationCap, Search, Building2 } from 'lucide-react';
+import { Search } from 'lucide-react';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useResumeContext } from '../resume/context/ResumeContext';
@@ -59,7 +59,7 @@ export const OnboardingPage: React.FC = () => {
     const [searchParams] = useSearchParams();
     const { resumes, handleImportResume, isParsingResume } = useResumeContext();
     const [lastKnownResumeCount, setLastKnownResumeCount] = useState(resumes.length);
-    const [isStudent, setIsStudent] = useState(false);
+
 
     const [parsingSnapshot, setParsingSnapshot] = useState<{ skills: number, roles: number, education: boolean } | null>(null);
 
@@ -67,7 +67,7 @@ export const OnboardingPage: React.FC = () => {
     // Verify: Journey depends on user selection.
 
     // Initial State: Start at Step 3 (Journey)
-    const [step, setStep] = useState<1 | 1.5 | 3 | 4 | 5 | 5.8 | 6>(3); // 5.8 is Plans
+    const [step, setStep] = useState<1 | 1.5 | 3 | 4 | 5 | 5.5 | 5.8 | 6>(3); // 5.8 is Plans
     const [privacyAccepted, setPrivacyAccepted] = useState(false);
     const [selectedJourneys, setSelectedJourneys] = useState<JourneyStage[]>([]);
     const [resumeUploaded, setResumeUploaded] = useState(false);
@@ -95,7 +95,7 @@ export const OnboardingPage: React.FC = () => {
                     education: detected
                 };
                 setParsingSnapshot(snapshot);
-                setIsStudent(detected || selectedJourneys.includes('student'));
+
             }
 
             setLastKnownResumeCount(resumes.length);
