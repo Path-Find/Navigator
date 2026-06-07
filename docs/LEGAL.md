@@ -8,11 +8,13 @@ The project is currently branded as **Navigator**, but the underlying codebase a
 ---
 
 ## 2. Competitor Analysis: The "JobFit" Landscape
+*For raw company registration and trademark evidence, see the [Legal Research Log](./LEGAL_SEARCH.md).*
 
 ### **JobFit.fyi (Direct Competitor)**
 *   **Status:** Active.
 *   **Target:** Candidates / Job Seekers.
 *   **Core Offer:** CV-to-JD matching, "Brutal" feedback, gap analysis.
+*   **Legal Status**: Their Terms of Service claim to be **"Registered in the UK,"** however, public records in Companies House do not show a direct match for an entity named "JobFit.fyi." They may be operating under a parent company or as a sole trader.
 *   **Verdict:** This is your primary direct competitor. They focus on quick CV scoring and gap analysis for candidates.
 
 ### **JobFit.org (B2B Competitor)**
@@ -21,11 +23,17 @@ The project is currently branded as **Navigator**, but the underlying codebase a
 *   **Core Offer:** AI screening and automated interview questions.
 *   **Verdict:** Different target audience, but they own the "premium" .org domain. Low risk of direct confusion for your candidate users, but they are the most "corporate" JobFit in the AI space.
 
-### **Job&Talent (Enterprise Giant)**
-*   **Status:** Massive ($1B+ funding).
-*   **Target:** Global Workforce Management.
-*   **Use of "Job Fit":** They use a proprietary **"Job Fit" model** internally to match workers to roles. They have a pending patent for this algorithm.
-*   **Risk:** While their primary brand is "Job&Talent," their dominance in the "AI Matching" space makes them a potential legal or SEO threat if they ever launch a consumer-facing "JobFit" product.
+### **JobCopilot (Automation Leader)**
+*   **Status**: Active / High-Growth.
+*   **Focus**: Application automation and "Auto-Apply" agents.
+*   **Strategic Position**: They own the high-end automation space (~$30/month). Their UI is built around a Kanban pipeline.
+*   **Differentiator**: Navigator can compete on **Trust** and **Transparency** (Human-in-the-loop) and **Price** ($19 vs $30).
+
+### **AIApply (SEO Leader)**
+*   **Status**: Active.
+*   **Focus**: Broad tool suite (Resume, STAR, STAR, Salary, etc.).
+*   **Strategic Position**: "Everything App" approach. They use dozens of free micro-tools to funnel users.
+*   **Differentiator**: Navigator focuses on a **cohesive, high-fidelity workspace** rather than a fragmented set of tiny tools.
 
 ### **JobFit Health & Medical (Australian Leader)**
 *   **Status:** Dominant in AU/NZ.
@@ -40,6 +48,18 @@ The project is currently branded as **Navigator**, but the underlying codebase a
 *   **Section 2(d) Risk:** The term "Job Fit" is highly "crowded" in the US. The USPTO often views "Job Fit" as a descriptive term in the recruitment industry.
 *   **Existing Marks:** "JobFit Systems" and "Job Fit Now" already hold rights in Classes 9 and 42. A pure "JobFit" word mark application would likely face a **Likelihood of Confusion** refusal.
 *   **Differentiation:** To succeed in the US, the brand would need a distinctive "plus" element (e.g., `JobFit.ai`, `JobFit Navigator`, or a unique logo).
+
+### **UK Trademark & Company Risks (UKIPO / Companies House)**
+The UK is a high-risk jurisdiction for the "JobFit" name due to historical and active entities.
+
+#### **1. UKIPO Trademarks**
+*   **Crowded Space**: Multiple registrations exist for "JobFit" and "Job Fit" in Classes 9, 35, and 42.
+*   **Descriptiveness**: Like the US, the UKIPO frequently flags "Job Fit" as descriptive, which limits your ability to exclusively own the term unless it is part of a stylized logo.
+
+#### **2. Companies House (Entity Conflicts)**
+*   **JOBFIT LLP (OC361614)**: A significant historical entity registered in 2011 (often referred to as "Rehab Jobfit") that delivered UK government welfare-to-work contracts. 
+*   **JOB FIT STUDIO LIMITED (16835544)**: A very recent UK incorporation (Nov 2025) which owns the **`jobfitstudio.com`** domain. They operate in the HR and recruitment space (SIC 78300).
+*   **Verdict**: Claiming to be "JobFit" in the UK carries a high risk of being blocked by an existing company name registration, regardless of trademark status.
 
 ### **Trademarks in Canada (CIPO)**
 Canada primarily follows a **"first-to-file"** system, but also recognizes **Common Law** rights established through use.

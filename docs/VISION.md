@@ -7,7 +7,7 @@ Navigator is built to take the tedious manual labor out of finding a job.
 - **Passive Search**: Looking for a job shouldn't be a second full-time job. Instead of spending hours browsing job boards, the app works in the background—triaging your email alerts, scoring compatibility, and organizing roles for you.
 - **Real Compatibility**: Traditional tools look for exact keyword matches. Navigator looks at your actual experience to see if you can do the work, even if the job post uses different phrasing.
 - **Absolute Honesty**: AI shouldn't make up experience. When we tailor your resume, we rewrite your real experience to highlight the most relevant details and match the employer's terms, without fabricating skills.
-- **Always Ready**: Instead of rewriting your resume from scratch every time you want to apply, Navigator breaks your work history into modular blocks that can be compiled and customized in seconds.
+- **Always Ready**: Instead of rewriting your resume from scratch every time you want to apply, Navigator breaks your work history into blocks that can be compiled and customized in seconds.
 
 ## The Goal
 

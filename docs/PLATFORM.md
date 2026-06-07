@@ -16,7 +16,7 @@ Evolution from a career utility into an intelligence layer for professional grow
 
 ## Future Expansion
 
-- [ ] **Telegram Bot**: Async companion channel (Telegram/WhatsApp) for users already in messaging apps. Includes real-time alerts with inline Save/Skip/Analyze buttons, narrative interview prep, and deadline nudges.
+- [ ] **Telegram Bot**: Async companion channel to notify you of high-match jobs you should apply for.
 - [ ] **Proactive Nudges**: Chrome notifications (opt-in) for high-priority job matches.
 
 ---

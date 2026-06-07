@@ -1,6 +1,6 @@
 # Legacy Features
 
-This document contains features, concepts, and roadmap items for Career, Coaching, and Education modules that were stashed during the Jobs-first pivot.
+This document contains features and roadmap items for Career, Coaching, and Education modules that are currently paused to focus on the job search experience.
 
 ## Built
 
@@ -12,10 +12,10 @@ These features are implemented in the codebase but are currently disabled or hid
 
 ## Planned
 
-These conceptual features were planned or in early R&D prior to stashing:
+These features were planned or in early development prior to this focus shift:
 
 - **Predictive Trajectory**: ML-based forecasting of salary levels, promotion timelines, and title path-modeling over 5–10 years.
 - **Global Mobility Engine**: Automating visa eligibility checks, international relocation pathways, and cost-of-living adjustments.
 - **Autonomous Job Agent**: Full funnel management, automatically applying to high-match jobs on behalf of the user until an interview is booked.
 - **Stealth Prep (Mock Interviews)**: Low-latency voice/video simulation for high-stakes preparation.
-- **Specialized Product Packs**: Modular, optional add-on "Packs" for Coach and Edu on top of the base Jobs subscription.
+- **Specialized Product Packs**: Optional add-on "Packs" for Coach and Edu on top of the base Jobs subscription.

@@ -1,6 +1,6 @@
 # Monetization
 
-Strategic focus on trial conversion and the transition to modular feature access.
+Strategic focus on trial conversion and the transition to tiered feature access.
 
 ## Trial Strategy
 
