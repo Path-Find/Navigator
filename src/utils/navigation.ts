@@ -8,6 +8,7 @@ export type ViewId =
     | 'resumes'
     | 'interviews'
     | 'cover-letters'
+    | 'job-match'
     | 'job-detail'
     | 'coach-home'
     | 'skills'
@@ -35,6 +36,7 @@ export type ViewId =
 const PATH_TO_VIEW: Record<string, ViewId> = {
     [ROUTES.HOME]: 'home',
     [ROUTES.JOB_HOME]: 'job-home',
+    [ROUTES.JOB_MATCH]: 'job-match',
     [ROUTES.FEED]: 'feed',
     [ROUTES.PRO_FEED]: 'feed',
     [ROUTES.HISTORY]: 'history',
@@ -66,6 +68,7 @@ const PATH_TO_VIEW: Record<string, ViewId> = {
 const VIEW_TO_PATH: Record<ViewId, string> = {
     'home': ROUTES.HOME,
     'job-home': ROUTES.JOB_HOME,
+    'job-match': ROUTES.JOB_MATCH,
     'feed': ROUTES.FEED,
     'history': ROUTES.HISTORY,
     'resumes': ROUTES.RESUMES,
