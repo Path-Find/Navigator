@@ -1,101 +1,74 @@
 import { supabase } from '../supabase';
-import { Vault, getUserId, areBlocksEqual } from './storageCore';
-import { STORAGE_KEYS } from '../../constants';
+import { getUserId, areBlocksEqual } from './storageCore';
 import { withTimeout } from '../../utils/promiseUtils';
 import type { ResumeProfile } from '../../types';
 
+const DEFAULT_PROFILE: ResumeProfile = { id: 'primary', name: 'Primary Experience', blocks: [] };
+
 export const ResumeStorage = {
     async getResumes(): Promise<ResumeProfile[]> {
-        const localResult = await Vault.getSecure<ResumeProfile[]>(STORAGE_KEYS.RESUMES);
-
-        if (localResult === undefined) {
-            console.error("[ResumeStorage] Failed to decrypt resumes. Aborting to prevent data loss.");
-            return [{ id: 'primary', name: 'Primary Experience', blocks: [] }];
-        }
-
-        let profiles = localResult || [{ id: 'primary', name: 'Primary Experience', blocks: [] }];
-
         const userId = await getUserId();
-        if (userId) {
-            const { data } = await supabase
-                .from('resumes')
-                .select('profile_id, content, updated_at')
-                .eq('user_id', userId)
-                .order('profile_id');
+        if (!userId) return [{ ...DEFAULT_PROFILE }];
 
-            if (data && data.length > 0) {
-                const cloudProfiles: ResumeProfile[] = data.map(row => {
-                    const p = typeof row.content === 'string' ? JSON.parse(row.content) : row.content;
-                    return p as ResumeProfile;
-                });
+        const { data, error } = await supabase
+            .from('resumes')
+            .select('profile_id, content')
+            .eq('user_id', userId)
+            .order('profile_id');
 
-                const cloudUpdatedAt = cloudProfiles.reduce((max, p) => Math.max(max, p.updatedAt || 0), 0);
-                const localUpdatedAt = profiles.reduce((max, p) => Math.max(max, p.updatedAt || 0), 0);
-                const localHasData = profiles.some(p => p.blocks.length > 0);
-                const cloudHasData = cloudProfiles.some(p => p.blocks?.length > 0);
-
-                if (cloudUpdatedAt > localUpdatedAt + 1000 || (!localHasData && cloudHasData)) {
-                    profiles = cloudProfiles;
-                    await Vault.setSecure(STORAGE_KEYS.RESUMES, profiles);
-                } else if (localUpdatedAt > cloudUpdatedAt + 1000) {
-                    this.saveResumes(profiles).catch(err => console.error("[ResumeStorage] Sync-back failed:", err));
-                }
-            }
+        if (error) {
+            console.error('[ResumeStorage] Failed to fetch resumes:', error.message);
+            return [{ ...DEFAULT_PROFILE }];
         }
-        return profiles;
+
+        if (!data || data.length === 0) return [{ ...DEFAULT_PROFILE }];
+
+        return data.map(row => {
+            const p = typeof row.content === 'string' ? JSON.parse(row.content) : row.content;
+            return p as ResumeProfile;
+        });
     },
 
     async saveResumes(resumes: ResumeProfile[]) {
         const userId = await getUserId();
+        if (!userId) return;
+
         const now = Date.now();
         const updatedResumes = resumes.map(r => ({ ...r, updatedAt: now }));
 
-        await Promise.all([
-            Vault.setSecure(STORAGE_KEYS.RESUMES, updatedResumes),
-            (async () => {
-                if (!userId) return;
+        const upserts = updatedResumes.map(profile =>
+            withTimeout(
+                supabase.from('resumes').upsert(
+                    {
+                        user_id: userId,
+                        profile_id: profile.id,
+                        name: profile.name || 'Default Profile',
+                        content: profile,
+                        updated_at: new Date().toISOString(),
+                    },
+                    { onConflict: 'user_id,profile_id' }
+                )
+            ).then(({ error }) => { if (error) throw error; })
+        );
 
-                // Upsert each profile individually — eliminates the SELECT-then-INSERT race condition.
-                // UNIQUE (user_id, profile_id) means concurrent saves to the same profile merge safely.
-                const upserts = updatedResumes.map(profile =>
-                    withTimeout(
-                        supabase.from('resumes').upsert(
-                            {
-                                user_id: userId,
-                                profile_id: profile.id,
-                                name: profile.name || 'Default Profile',
-                                content: profile,
-                                updated_at: new Date().toISOString(),
-                            },
-                            { onConflict: 'user_id,profile_id' }
-                        )
-                    ).then(({ error }) => { if (error) throw error; })
-                );
+        // Delete rows for profiles that were removed from the array
+        const activeIds = updatedResumes.map(p => p.id);
+        const cleanup = withTimeout(
+            supabase.from('resumes')
+                .delete()
+                .eq('user_id', userId)
+                .not('profile_id', 'in', `(${activeIds.map(id => `"${id}"`).join(',')})`)
+        );
 
-                // Delete any rows for profiles that were removed from the local array
-                const activeIds = updatedResumes.map(p => p.id);
-                const cleanup = withTimeout(
-                    supabase.from('resumes')
-                        .delete()
-                        .eq('user_id', userId)
-                        .not('profile_id', 'in', `(${activeIds.map(id => `"${id}"`).join(',')})`)
-                );
-
-                await Promise.all([...upserts, cleanup]);
-            })()
-        ]);
+        await Promise.all([...upserts, cleanup]);
     },
 
     async addResume(profile: ResumeProfile) {
-        const localResult = await Vault.getSecure<ResumeProfile[]>(STORAGE_KEYS.RESUMES);
-        if (localResult === undefined) {
-            console.error("[ResumeStorage] Decryption error. Aborting addResume.");
-            throw new Error("Storage unavailable");
-        }
-        const existing: ResumeProfile[] = localResult || [];
+        const existing = await this.getResumes();
         let updated: ResumeProfile[];
 
-        if (existing.length === 0) {
+        const masterIsEmpty = existing.length === 0 || (existing.length === 1 && existing[0].blocks.length === 0);
+        if (masterIsEmpty) {
             updated = [profile];
         } else {
             const master = existing[0];

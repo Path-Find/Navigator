@@ -24,7 +24,7 @@ export const PrivacyStep = ({ privacyAccepted, setPrivacyAccepted, setStep, hand
 
                 <div className="space-y-3 mb-10">
                     {[
-                        { icon: <Lock className="w-5 h-5 text-emerald-500" />, title: 'Local Vault', desc: 'Your resumes never leave your device storage unless you say so.', bg: 'bg-emerald-500/5' },
+                        { icon: <Lock className="w-5 h-5 text-emerald-500" />, title: 'Secure Cloud Sync', desc: 'Your resume data is stored securely in your account and syncs across devices.', bg: 'bg-emerald-500/5' },
                         { icon: <Zap className="w-5 h-5 text-amber-500" />, title: 'AI Processing', desc: 'We send anonymous text to Google Gemini for analysis. It is not used for training.', bg: 'bg-amber-500/5' },
                         { icon: <span className="font-black text-rose-500">X</span>, title: 'Zero Tracking', desc: 'No analytics. No cookies. No creepiness.', bg: 'bg-rose-500/5' }
                     ].map((item, i) => (

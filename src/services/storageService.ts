@@ -25,20 +25,20 @@ export const Storage = {
 
         // Fetch local data and cloud ID state in parallel to identify deltas
         const [
-            localResumes,
+            ,  // resumes: Supabase-only, no local sync
             localJobs,
             localSkills,
             localRoleModels,
             localTargetJobs,
             localTranscript,
-            { data: cloudResume },
+            ,  // resumes cloud check removed — Supabase-only
             { data: cloudJobs },
             { data: cloudSkills },
             { data: cloudModels },
             { data: cloudTargets },
             { data: cloudTranscript }
         ] = await Promise.all([
-            Vault.getSecure(STORAGE_KEYS.RESUMES) as Promise<ResumeProfile[]>,
+            Promise.resolve(null) as Promise<null>, // Resumes are Supabase-only; no local sync needed
             Vault.getSecure(STORAGE_KEYS.JOBS_HISTORY) as Promise<SavedJob[]>,
             Vault.getSecure<CustomSkill[]>(STORAGE_KEYS.SKILLS),
             Vault.getSecure<RoleModelProfile[]>(STORAGE_KEYS.ROLE_MODELS),
@@ -54,12 +54,7 @@ export const Storage = {
 
         const syncTasks: (Promise<any> | PromiseLike<any>)[] = [];
 
-        // 1. Sync Resumes (Batched)
-        if (localResumes && localResumes.length > 0 && !cloudResume) {
-            syncTasks.push(this.saveResumes(localResumes));
-        }
-
-        // 2. Sync Jobs (Corrected N+1 by Batching)
+        // 1. Sync Jobs (Corrected N+1 by Batching)
         if (localJobs && localJobs.length > 0) {
             const cloudIds = new Set(cloudJobs?.map(j => j.id) || []);
             const missingFromCloud = localJobs.filter(j => !cloudIds.has(j.id) && !(j as typeof j & { _synced?: boolean })._synced);
