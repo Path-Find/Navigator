@@ -15,25 +15,36 @@ export function useResumeEditor(
     const onSaveRef = useRef(onSave);
     useEffect(() => { onSaveRef.current = onSave; });
 
-    const lastSyncedResumeIdRef = useRef(resumes[0]?.id);
-    // Sync blocks when the active resume changes (e.g., after import or cloud load).
-    // React-recommended render-time pattern avoids the cascading-render anti-pattern.
+    // Always-fresh ref so the debounce effect doesn't capture a stale initialResume
+    const initialResumeRef = useRef(initialResume);
+    useEffect(() => { initialResumeRef.current = initialResume; });
+
+    // Sync blocks when the active resume changes (new profile ID) OR after a PDF import
+    // (same ID but bumped importRevision). Keeps the editor in sync with external writes
+    // without triggering on every normal save (which would cause a perpetual-save loop).
+    const syncKey = `${resumes[0]?.id}:${resumes[0]?.importRevision ?? 0}`;
+    const lastSyncKeyRef = useRef<string | undefined>(undefined);
     // eslint-disable-next-line react-hooks/refs
-    if (resumes.length > 0 && resumes[0].id !== lastSyncedResumeIdRef.current) {
+    if (resumes.length > 0 && syncKey !== lastSyncKeyRef.current) {
         // eslint-disable-next-line react-hooks/refs
-        lastSyncedResumeIdRef.current = resumes[0].id;
+        lastSyncKeyRef.current = syncKey;
         setBlocks(resumes[0].blocks || []);
     }
 
     useEffect(() => {
         const handler = setTimeout(() => {
-            if (!initialResume) return;
-            const updatedProfile = { ...initialResume, blocks };
+            const resume = initialResumeRef.current;
+            if (!resume) return;
+            const updatedProfile = { ...resume, blocks };
             onSaveRef.current([updatedProfile]);
             EventService.trackUsage(TRACKING_EVENTS.RESUMES);
         }, 800);
         return () => clearTimeout(handler);
-    }, [blocks, initialResume?.id, initialResume]);
+    // initialResume?.id covers profile switches; blocks covers user edits.
+    // The full initialResume object is intentionally excluded — it changes after
+    // every save and would cause an infinite save loop.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [blocks, initialResume?.id]);
 
     const addBlock = useCallback((type: SectionType) => {
         if (type === 'summary' && blocks.some(b => b.type === 'summary')) return;

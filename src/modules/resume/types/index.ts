@@ -24,6 +24,7 @@ export interface ResumeProfile {
     blocks: ExperienceBlock[];
     suggestedUpdates?: ResumeSuggestion[]; // New: Persistent bank of AI suggestions
     updatedAt?: number;
+    importRevision?: number; // Incremented on each PDF import to trigger UI sync
 }
 
 export interface RoleModelProfile {

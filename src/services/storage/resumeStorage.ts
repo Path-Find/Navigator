@@ -72,7 +72,7 @@ export const ResumeStorage = {
                 if (!userId) return;
 
                 const { data, error: selectError } = await withTimeout(
-                    supabase.from('resumes').select('id').eq('user_id', userId).limit(1).maybeSingle()
+                    supabase.from('resumes').select('id').eq('user_id', userId).order('created_at', { ascending: false }).limit(1).maybeSingle()
                 );
 
                 if (selectError) throw selectError;
@@ -126,7 +126,7 @@ export const ResumeStorage = {
                     newBlocks.push(newBlock);
                 }
             });
-            updated = [{ ...master, blocks: newBlocks }, ...existing.slice(1)];
+            updated = [{ ...master, blocks: newBlocks, importRevision: (master.importRevision || 0) + 1 }, ...existing.slice(1)];
         }
 
         const userId = await getUserId();
