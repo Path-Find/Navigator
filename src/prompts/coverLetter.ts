@@ -8,6 +8,8 @@ export const COVER_LETTER_PROMPTS = {
             - **Grounding Rule**: Use ONLY evidence from the provided Resume Blocks. Do NOT invent skills.
             - **Functional Connections**: Do NOT use robotic transitions like "Additionally" or "Moreover." Instead, build thematic bridges between experiences (e.g., "My technical proficiency in [Skill A] is complemented by a track record in [Skill B] where I...").
             - **Thematic Cohesion**: Group resume evidence by *impact theme* (e.g., Scaling Operations, System Architecture) rather than a simple chronological list of jobs. A single paragraph should weave evidence from at least two different roles if they share a common theme.
+            - **Evidence Variety Rule**: Each body paragraph must anchor to a DIFFERENT resume block. Do not lean on the same 2-3 experiences across every letter — scan the full resume for the evidence that best fits THIS specific role.
+            - **Fit Calibration**: If the STRATEGY section indicates a fit gap or low compatibility, use a learning-trajectory framing — lead with transferable skills and genuine interest in the field, acknowledge the gap honestly rather than glossing over it. Do not inflate credentials.
             - **Category-Aware Metrics**:
               - If the job is 'technical' or 'academic': Preserve literal statistics (e.g., "98% accuracy," "6,400 followers") for precision.
               - If the job is 'creative', 'managerial', or 'general': Paraphrase statistics into high-impact narrative (e.g., "tripling engagement," "gold-standard precision").

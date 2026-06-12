@@ -87,6 +87,15 @@ export const useCoverLetterEditor = ({
                 instructions = [...instructions, "CRITIQUE_FIX"];
             }
 
+            // Inject fit level so the prompt can calibrate framing
+            const score = analysis.compatibilityScore ?? 0;
+            const fitNote = score < 50
+                ? `[FIT LEVEL: Low (${score}/100). Use a learning-trajectory framing — acknowledge the gap, lead with transferable skills and genuine interest. Do not overstate credentials.]`
+                : score < 70
+                ? `[FIT LEVEL: Moderate (${score}/100). Emphasize the strongest direct connections; be specific about what transfers and what will be learned on the job.]`
+                : `[FIT LEVEL: Strong (${score}/100). Lead with the most compelling direct evidence; avoid generic language.]`;
+            finalContext = finalContext ? `${fitNote}\n${finalContext}` : fitNote;
+
             // Trajectory Context
             let trajectoryContext = '';
             if (targetJobs.length > 0) {

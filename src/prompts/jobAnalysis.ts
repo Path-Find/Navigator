@@ -57,7 +57,11 @@ export const JOB_ANALYSIS_PROMPTS = {
         "salaryRange": "Salary or wage range as stated (e.g. '$55,000–$65,000/yr' or '$22–$28/hr'), otherwise null"
       },
       "resumeTailoringInstructions": ["3 extremely concise, 1-sentence bullet points on how to adjust the resume"],
-      "coverLetterTailoringInstructions": ["3 extremely concise, 1-sentence bullet points for the cover letter strategy"],
+      "coverLetterTailoringInstructions": [
+        "EVIDENCE_BRIDGE_1: Map the single most critical job requirement to the best-matching resume block ID — format as: '[Requirement] → [Block ID]: [one-sentence explanation of the connection]'",
+        "EVIDENCE_BRIDGE_2: Map the second most critical job requirement to a DIFFERENT resume block ID (must not reuse the block from bridge 1)",
+        "FIT_FRAME: If compatibility score < 60, write a one-sentence framing instruction for the gap (e.g. 'Lead with transferable X skill; acknowledge Y gap as a learning goal'). If score >= 60, write one sentence on the candidate's strongest differentiator for this specific role."
+      ],
       "recommendedBlockIds": ["List of IDs from the candidate resume blocks that are most relevant to this job"],
       "internalAnalysis": "DEDICATED SCRATCHPAD: Record your logical checks, self-reminders (e.g. 'check date logic', 'missing Pro experience'), and meta-commentary here. Do NOT leak these into user-facing fields."
     }
