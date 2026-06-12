@@ -3,7 +3,7 @@ import type { SavedJob, ResumeProfile, JobAnalysis, TargetJob } from '../../type
 import type { UserTier } from '../../types/app';
 import { useCoverLetterEditor } from './hooks/useCoverLetterEditor';
 import { useUser } from '../../contexts/UserContext';
-import { Sparkles, PenTool } from 'lucide-react';
+import { Sparkles, PenTool, ShieldAlert } from 'lucide-react';
 import { Alert } from '../../components/ui/Alert';
 import { Button } from '../../components/ui/Button';
 import { GenerationProgress } from './components/cover-letter/GenerationProgress';
@@ -43,8 +43,13 @@ export const CoverLetterEditor: React.FC<CoverLetterEditorProps> = (props) => {
         handleEditCoverLetter,
         generationStatus,
         generationProgress,
-        isGenerating
+        isGenerating,
+        acknowledgedAiBan,
+        setAcknowledgedAiBan,
     } = useCoverLetterEditor(props);
+
+    const isAiBanned = analysis.distilledJob?.isAiBanned;
+    const aiBanReason = analysis.distilledJob?.aiBanReason;
 
     if (!bestResume) {
         return <CoverLetterEmptyState />;
@@ -106,6 +111,41 @@ export const CoverLetterEditor: React.FC<CoverLetterEditorProps> = (props) => {
                         >
                             {localJob.coverLetter}
                         </div>
+                    ) : isAiBanned && !acknowledgedAiBan ? (
+                        <div className="flex-1 flex flex-col items-center justify-center text-center space-y-6 py-20 animate-in fade-in duration-700">
+                            <div className="w-24 h-24 bg-amber-50 dark:bg-amber-950/40 rounded-full flex items-center justify-center">
+                                <ShieldAlert className="w-10 h-10 text-amber-500" />
+                            </div>
+                            <div className="max-w-md space-y-3">
+                                <h3 className="text-xl font-black text-neutral-900 dark:text-white tracking-tight">AI-Assisted Applications Prohibited</h3>
+                                <p className="text-neutral-500 dark:text-neutral-400 text-sm leading-relaxed">
+                                    {aiBanReason || 'This employer prohibits the use of AI to write application materials.'}
+                                </p>
+                                <p className="text-neutral-400 dark:text-neutral-500 text-xs leading-relaxed">
+                                    You can still generate a draft for personal reference — to understand the format or get ideas — but <strong>do not submit it directly</strong>.
+                                </p>
+                            </div>
+                            <div className="flex flex-col sm:flex-row gap-3">
+                                <Button
+                                    variant="accent"
+                                    size="lg"
+                                    onClick={() => { setAcknowledgedAiBan(true); handleGenerateCoverLetter(); }}
+                                    className="px-8 bg-amber-500 hover:bg-amber-600 border-amber-500 hover:border-amber-600"
+                                    icon={<Sparkles className="w-4 h-4" />}
+                                >
+                                    Generate for reference only
+                                </Button>
+                                <Button
+                                    variant="outline"
+                                    size="lg"
+                                    onClick={() => setAcknowledgedAiBan(true)}
+                                    className="px-8"
+                                    icon={<PenTool className="w-4 h-4" />}
+                                >
+                                    I'll write it myself
+                                </Button>
+                            </div>
+                        </div>
                     ) : (
                         <div className="flex-1 flex flex-col items-center justify-center text-center space-y-8 py-20 animate-in fade-in duration-700">
                             <div className="w-24 h-24 bg-neutral-50 dark:bg-neutral-800 rounded-full flex items-center justify-center">
@@ -116,8 +156,8 @@ export const CoverLetterEditor: React.FC<CoverLetterEditorProps> = (props) => {
                                 <p className="text-neutral-500 dark:text-neutral-400 font-bold text-sm leading-relaxed mb-8">
                                     Create a personalized, story-driven cover letter tailored specifically to this role and company.
                                 </p>
-                                <Button 
-                                    variant="accent" 
+                                <Button
+                                    variant="accent"
                                     size="lg"
                                     onClick={() => handleGenerateCoverLetter()}
                                     className="px-8"

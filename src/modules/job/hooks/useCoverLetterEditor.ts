@@ -36,6 +36,7 @@ export const useCoverLetterEditor = ({
     const [generating, setGenerating] = useState(false);
     const [showContextInput, setShowContextInput] = useState(false);
     const [copiedState, setCopiedState] = useState<'cl' | null>(null);
+    const [acknowledgedAiBan, setAcknowledgedAiBan] = useState(false);
     const [analysisProgress, setAnalysisProgress] = useState<string | null>(null);
     const [comparisonVersions, setComparisonVersions] = useState<{ text: string; promptVersion: string }[] | null>(null);
     const [localJob, setLocalJob] = useState(job);
@@ -327,9 +328,10 @@ export const useCoverLetterEditor = ({
         }
     }, [localJob, onJobUpdate, showError, isNextGen, user, analysis]);
 
-    // Auto-Generate on Mount if no letter exists
+    // Auto-Generate on Mount if no letter exists — skipped for AI-banned employers
     useEffect(() => {
-        if (!localJob.coverLetter && !generating && !localJob.coverLetterCritique && bestResume) {
+        const isBanned = analysis.distilledJob?.isAiBanned;
+        if (!localJob.coverLetter && !generating && !localJob.coverLetterCritique && bestResume && !isBanned) {
             handleGenerateCoverLetter();
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -351,6 +353,8 @@ export const useCoverLetterEditor = ({
         handleEditCoverLetter,
         generationStatus,
         generationProgress,
-        isGenerating
+        isGenerating,
+        acknowledgedAiBan,
+        setAcknowledgedAiBan,
     };
 };
