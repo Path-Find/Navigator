@@ -8,7 +8,7 @@ import { TranscriptStorage } from './storage/transcriptStorage';
 import { STORAGE_KEYS } from '../constants';
 
 import { LocalStorage } from '../utils/localStorage';
-import type { ResumeProfile, SavedJob, CustomSkill, RoleModelProfile, TargetJob } from '../types';
+import type { SavedJob, CustomSkill, RoleModelProfile, TargetJob } from '../types';
 import type { Transcript } from '../modules/grad/types';
 
 export const Storage = {
@@ -25,26 +25,22 @@ export const Storage = {
 
         // Fetch local data and cloud ID state in parallel to identify deltas
         const [
-            ,  // resumes: Supabase-only, no local sync
             localJobs,
             localSkills,
             localRoleModels,
             localTargetJobs,
             localTranscript,
-            ,  // resumes cloud check removed — Supabase-only
             { data: cloudJobs },
             { data: cloudSkills },
             { data: cloudModels },
             { data: cloudTargets },
             { data: cloudTranscript }
         ] = await Promise.all([
-            Promise.resolve(null) as Promise<null>, // Resumes are Supabase-only; no local sync needed
             Vault.getSecure(STORAGE_KEYS.JOBS_HISTORY) as Promise<SavedJob[]>,
             Vault.getSecure<CustomSkill[]>(STORAGE_KEYS.SKILLS),
             Vault.getSecure<RoleModelProfile[]>(STORAGE_KEYS.ROLE_MODELS),
             Vault.getSecure<TargetJob[]>(STORAGE_KEYS.TARGET_JOBS),
             Vault.getSecure<Transcript>(STORAGE_KEYS.TRANSCRIPT_CACHE),
-            supabase.from('resumes').select('id').eq('user_id', userId).limit(1).maybeSingle(),
             supabase.from('jobs').select('id').eq('user_id', userId),
             supabase.from('user_skills').select('name').eq('user_id', userId),
             supabase.from('role_models').select('id').eq('user_id', userId),
@@ -175,7 +171,9 @@ export const Storage = {
     },
 
     async clearAllData() {
-        // Wipe all user-specific localStorage keys
+        const userId = await getUserId();
+
+        // Wipe localStorage
         const userKeys = [
             STORAGE_KEYS.RESUMES,
             STORAGE_KEYS.JOBS_HISTORY,
@@ -183,12 +181,16 @@ export const Storage = {
             STORAGE_KEYS.ROLE_MODELS,
             STORAGE_KEYS.TARGET_JOBS,
             STORAGE_KEYS.TRANSCRIPT_CACHE,
-            'jobfit_vault_seed', // Also clear the encryption seed
+            'jobfit_vault_seed',
             'navigator_test_user',
             'navigator_user_tier'
         ];
-
         userKeys.forEach(key => LocalStorage.remove(key));
+
+        // Resumes are Supabase-only — must delete from cloud too
+        if (userId) {
+            await supabase.from('resumes').delete().eq('user_id', userId);
+        }
     },
 
     // Legacy support for feedback and optimization logging if needed

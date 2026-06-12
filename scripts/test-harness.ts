@@ -201,8 +201,10 @@ You are a Strategic Career Architect. Write a professional, high-impact cover le
 
 INSTRUCTIONS:
 - **Grounding Rule**: Use ONLY evidence from the provided Resume Blocks. Do NOT invent skills.
-- **Functional Connections**: Do NOT use robotic transitions like "Additionally" or "Moreover." Instead, build thematic bridges between experiences.
-- **Thematic Cohesion**: Group resume evidence by impact theme rather than chronological list.
+- **Functional Connections**: Do NOT use robotic transitions like "Additionally" or "Moreover." Instead, build thematic bridges between experiences (e.g., "My technical proficiency in [Skill A] is complemented by a track record in [Skill B] where I...").
+- **Thematic Cohesion**: Group resume evidence by impact theme (e.g., Scaling Operations, Community Engagement) rather than a simple chronological list. A single paragraph should weave evidence from at least two different roles if they share a common theme.
+- **Evidence Variety Rule**: Each body paragraph must anchor to a DIFFERENT resume block. Do not lean on the same 2-3 experiences across every letter — scan the full resume for the evidence that best fits THIS specific role.
+- **Fit Calibration**: If the STRATEGY section indicates a fit gap or low compatibility, use a learning-trajectory framing — lead with transferable skills and genuine interest in the field, acknowledge the gap honestly rather than glossing over it. Do not inflate credentials.
 - **Category-Aware Metrics**: If technical/academic: preserve literal statistics. If creative/managerial/general: paraphrase into narrative.
 - **Substance**: Avoid filler. Every sentence must add new, evidence-backed weight.
 - Structure:
@@ -299,8 +301,13 @@ TASK:
    - If Entry-Level or Academic role, leverage Transcript/Academic Background to substitute for missing work experience.
    - If Technical role, prioritize Hard Skill Stacks and Project Complexity.
 3. GROUNDING RULE: Only credit the candidate for skills and experience explicitly present in the Candidate Context. Do NOT hallucinate seniority.
-4. MATCH BREAKDOWN: Identify key strengths and HONEST gaps.
-5. SCORE: Rate compatibility (0-100) based on hard evidence.
+4. PROGRAM REQUIREMENT INTERPRETATION — read the JD language carefully before penalizing for program mismatch:
+   - "or related program/field/diploma" → treat adjacent programs as meeting the requirement. Urban Planning or Environmental Studies (Cities/Planning specialisation) qualifies for transit, infrastructure, municipal, and environmental roles. A BES (Bachelor of Environmental Studies) with a planning/cities concentration is functionally an urban planning degree — treat it as such.
+   - "considered an asset" or "preferred" → this is a bonus, NOT a requirement. Do NOT penalize the compatibility score for not having an asset.
+   - "Don't meet every requirement? We encourage you to apply" → treat soft requirement gaps more generously; score on demonstrated skills and experience rather than credentials alone.
+   - Only penalize hard program mismatch when the JD explicitly states the program as mandatory with no adjacent/related clause.
+5. MATCH BREAKDOWN: Identify key strengths and HONEST gaps.
+6. SCORE: Rate compatibility (0-100) based on hard evidence.
 
 OUTPUT SCHEMA — Return ONLY valid JSON:
 {
@@ -317,7 +324,12 @@ OUTPUT SCHEMA — Return ONLY valid JSON:
     "keySkills": ["5-8 priority skills from the job post"],
     "coreResponsibilities": ["4-6 primary duties"]
   },
-  "coverLetterTailoringInstructions": ["3 extremely concise 1-sentence bullet points for cover letter strategy"],
+  "coverLetterTailoringInstructions": [
+    "EVIDENCE_BRIDGE_1: Map the single most critical job requirement to the best-matching resume block ID — format as: '[Requirement] → [Block ID]: [one-sentence explanation of the connection]'",
+    "EVIDENCE_BRIDGE_2: Map the second most critical job requirement to a DIFFERENT resume block ID (must not reuse the block from bridge 1)",
+    "FIT_FRAME: If compatibility score < 60, write a one-sentence framing instruction for the gap. If score >= 60, write one sentence on the candidate's strongest differentiator for this specific role."
+  ],
+  "recommendedBlockIds": ["IDs of the 3-5 resume blocks most relevant to this job"],
   "internalAnalysis": "scratchpad only"
 }`;
 }
