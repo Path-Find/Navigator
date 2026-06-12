@@ -13,7 +13,6 @@ import { motion } from 'framer-motion';
 import { SharedPageLayout } from '../../components/common/SharedPageLayout';
 import { useJobContext } from './context/JobContext';
 import { ROUTES } from '../../constants';
-import { getScoreColorClasses } from './utils/jobUtils';
 import type { SavedJob } from '../../types';
 
 export const MinimalDashboard: React.FC = () => {
