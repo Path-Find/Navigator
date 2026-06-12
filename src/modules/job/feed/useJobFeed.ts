@@ -123,7 +123,7 @@ export const useJobFeed = () => {
             const jobText = await ScraperService.scrapeJobContent(job.url);
             if (!jobText) return;
 
-            const analysis = await analyzeJobFit(jobText, resume.content, undefined, undefined);
+            const analysis = await analyzeJobFit(jobText, [resume.content], undefined, undefined);
             const matchScore = analysis.compatibilityScore;
 
             setFeed(prev => prev.map(f => f.id === job.id ? { ...f, matchScore } : f));
