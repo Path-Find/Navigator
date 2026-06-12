@@ -28,8 +28,13 @@ export const JOB_ANALYSIS_PROMPTS = {
        - If this is a Creative role (Design, Marketing), prioritize Portfolio Impact and Tool Mastery.
        - If this is an Entry-Level or Academic role, leverage the Transcript/Academic Background to substitute for missing work experience.
     3. GROUNDING RULE: Only credit the candidate for skills and experience explicitly present in the provided Candidate Context. Do NOT hallucinate levels of seniority.
-    4. MATCH BREAKDOWN: Identify key strengths and HONEST gaps.
-    5. SCORE: Rate compatibility (0-100) based on hard evidence.
+    4. PROGRAM REQUIREMENT INTERPRETATION — read the JD language carefully before penalizing for program mismatch:
+       - "or related program/field/diploma" → treat adjacent programs as meeting the requirement. Examples: Urban Planning or Environmental Studies (Cities/Planning specialisation) qualifies for transit, infrastructure, municipal, and environmental roles; Journalism/Communications qualifies for policy comms, stakeholder engagement, and public affairs roles. A BES (Bachelor of Environmental Studies) with a planning/cities concentration is functionally an urban planning degree — treat it as such.
+       - "considered an asset" or "preferred" → this is a bonus, NOT a requirement. Do NOT penalize the compatibility score for not having an asset.
+       - "Don't meet every requirement? We encourage you to apply" or similar open-invitation language → the employer has explicitly lowered the gate. Treat soft requirement gaps more generously; score the candidate on demonstrated skills and experience rather than credentials alone.
+       - Only penalize hard program mismatch when the JD explicitly states the program as mandatory with no adjacent/related clause (e.g. "Must be enrolled in a P.Eng. program", "Licensed Professional Engineer required").
+    5. MATCH BREAKDOWN: Identify key strengths and HONEST gaps.
+    6. SCORE: Rate compatibility (0-100) based on hard evidence.
 
     OUTPUT SCHEMA:
     Return ONLY valid JSON matching this structure.
