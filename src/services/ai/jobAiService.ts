@@ -1,4 +1,5 @@
 import { getModel, callWithRetry, cleanJsonOutput } from "./aiCore";
+import { KNOWN_AI_BAN_EMPLOYERS } from "../../data/knownAiBanEmployers";
 import type { RetryProgressCallback } from "./aiCore";
 import type {
     JobAnalysis,
@@ -49,6 +50,20 @@ export const detectAiBan = (text: string): { isBanned: boolean; reason: string |
         if (match) return { isBanned: true, reason: match[0] };
     }
     return { isBanned: false, reason: null };
+};
+
+// Secondary check: employer name against the known-ban list.
+// Call this after extraction once we have the company name.
+export const checkKnownEmployerBan = (companyName: string): { isBanned: boolean; reason: string | null } => {
+    if (!companyName) return { isBanned: false, reason: null };
+    const normalized = companyName.toLowerCase();
+    const match = KNOWN_AI_BAN_EMPLOYERS.find(e =>
+        normalized.includes(e.name.toLowerCase()) ||
+        e.aliases.some(a => normalized.includes(a.toLowerCase()))
+    );
+    return match
+        ? { isBanned: true, reason: match.reason }
+        : { isBanned: false, reason: null };
 };
 
 const preCleanJobText = (text: string): string => {
@@ -184,11 +199,13 @@ const extractJobInfo = async (
         });
         metadata.token_usage = response.response.usageMetadata;
         const result = JSON.parse(cleanJsonOutput(response.response.text()));
-        // Merge the deterministic AI-ban result — AI doesn't need to do this work
+        // Text scan + known-employer list — text scan wins if both fire
+        const employerBan = checkKnownEmployerBan(result.companyName);
+        const finalBan = aiBan.isBanned ? aiBan : employerBan;
         const distilledJob: DistilledJob = {
             ...result,
-            isAiBanned: aiBan.isBanned,
-            aiBanReason: aiBan.reason,
+            isAiBanned: finalBan.isBanned,
+            aiBanReason: finalBan.reason,
         };
         return { distilledJob, cleanedDescription: cleanedText };
     }, { event_type: 'job_extraction', prompt: extractionPrompt, model: AI_MODELS.EXTRACTION, job_id: undefined }, undefined, undefined, onProgress);
