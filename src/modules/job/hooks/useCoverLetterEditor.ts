@@ -77,7 +77,18 @@ export const useCoverLetterEditor = ({
         setGenerating(true);
         setAnalysisProgress("Generating cover letter...");
         try {
-            const textToUse = analysis.cleanedDescription || localJob.description || `Role: ${toTitleCase(analysis.distilledJob.roleTitle)} at ${toTitleCase(analysis.distilledJob.companyName)} `;
+            // Build a focused job context: distilled signal upfront, short raw excerpt for tone.
+            // This replaces dumping the full 12k-char raw JD into the prompt.
+            const d = analysis.distilledJob;
+            const distilledLines = [
+                `Role: ${toTitleCase(d.roleTitle)} at ${toTitleCase(d.companyName)}`,
+                d.keySkills?.length ? `Key Skills Required: ${d.keySkills.join(', ')}` : '',
+                d.coreResponsibilities?.length
+                    ? `Core Responsibilities:\n${d.coreResponsibilities.map(r => `- ${r}`).join('\n')}`
+                    : '',
+            ].filter(Boolean).join('\n');
+            const rawExcerpt = (analysis.cleanedDescription || localJob.description || '').substring(0, 2000);
+            const textToUse = `${distilledLines}\n\n---\n${rawExcerpt}`;
 
             let finalContext = localJob.contextNotes;
             let instructions = analysis.coverLetterTailoringInstructions || analysis.tailoringInstructions || [];
@@ -117,6 +128,13 @@ export const useCoverLetterEditor = ({
                 trajectoryContext = trajectoryContext ? `${trajectoryContext} ${archetypesContext}` : archetypesContext;
             }
 
+            // Filter resume to only blocks the analysis flagged as relevant.
+            // Always keep the summary block. Falls back to full resume if no recommendations.
+            const recommendedIds = new Set(analysis.recommendedBlockIds ?? []);
+            const focusedResume = recommendedIds.size > 0
+                ? { ...bestResume, blocks: bestResume.blocks.filter(b => b.type === 'summary' || recommendedIds.has(b.id)) }
+                : bestResume;
+
             const isPro = ['pro', 'admin', 'tester'].includes(userTier);
             const canonicalTitle = analysis.distilledJob?.canonicalTitle;
 
@@ -134,7 +152,7 @@ export const useCoverLetterEditor = ({
                 const variants = Object.keys(COVER_LETTER_PROMPTS.COVER_LETTER.VARIANTS).slice(0, 2);
 
                 const results = await Promise.all(variants.map(v =>
-                    generateCoverLetter(textToUse, bestResume, instructions || [], finalContext, v, trajectoryContext, localJob.id, canonicalTitle, personalizedStyle)
+                    generateCoverLetter(textToUse, focusedResume, instructions || [], finalContext, v, trajectoryContext, localJob.id, canonicalTitle, personalizedStyle)
                 ));
 
                 setComparisonVersions(results);
@@ -144,7 +162,7 @@ export const useCoverLetterEditor = ({
             if (isPro) {
                 const result = await generateCoverLetterWithQuality(
                     textToUse,
-                    bestResume,
+                    focusedResume,
                     instructions,
                     userTier,
                     finalContext,
@@ -196,7 +214,7 @@ export const useCoverLetterEditor = ({
             } else {
                 const { text: letter, promptVersion } = await generateCoverLetter(
                     textToUse,
-                    bestResume,
+                    focusedResume,
                     instructions,
                     finalContext,
                     undefined,

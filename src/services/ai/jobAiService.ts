@@ -28,6 +28,29 @@ const sanitizeInput = (text: string): string => {
         .replace(/\(BLOCK_ID:\s*[a-zA-Z0-9-]+\)/g, '');
 };
 
+// Deterministic AI-ban check — runs before any AI call so it can't be missed.
+// Add patterns here as new employer policies are discovered.
+const AI_BAN_PATTERNS: RegExp[] = [
+    /\bchatgpt\b/i,
+    /\bllm\b/i,
+    /generative[\s-]?ai\b/i,
+    /ai[\s-]?(assisted|generated|written|tools)\b/i,
+    /\bno\b.{0,25}\b(ai|artificial intelligence)\b/i,
+    /artificial intelligence.{0,25}\b(prohibited|not permitted|not allowed|banned)\b/i,
+    /original work.{0,30}\b(without|no)\b.{0,20}\b(ai|assistance)\b/i,
+    /applications?.{0,30}(must|should).{0,20}(be|remain).{0,20}original/i,
+    /do not (use|utilize).{0,20}(ai|artificial intelligence)/i,
+    /use of (ai|artificial intelligence|chatgpt|generative).{0,30}(prohibited|not permitted|not allowed)/i,
+];
+
+export const detectAiBan = (text: string): { isBanned: boolean; reason: string | null } => {
+    for (const pattern of AI_BAN_PATTERNS) {
+        const match = text.match(pattern);
+        if (match) return { isBanned: true, reason: match[0] };
+    }
+    return { isBanned: false, reason: null };
+};
+
 const preCleanJobText = (text: string): string => {
     // Remove common website navigation/boilerplate labels that often get caught in clippings
     const junkPatterns = [
@@ -134,21 +157,20 @@ const extractJobInfo = async (
     // Basic cleanup to prevent AI confusion on junk website headers
     const cleanedText = preCleanJobText(rawJobText);
 
+    // isAiBanned is detected deterministically before this call — no need to ask the AI.
+    const aiBan = detectAiBan(cleanedText);
+
     const extractionPrompt = `
-    Analyze this job posting: 
+    Analyze this job posting:
     ${cleanedText}
-    
+
     1. ROLE: What is the official role title?
     2. COMPANY: What is the company name?
     3. REFERENCE CODE: Is there a job ID or reference number? (Set as 'referenceCode')
     4. CATEGORY: Classify into 'technical', 'managerial', 'trades', 'healthcare', 'creative', or 'general'.
     5. CANONICAL TITLE: What is the most standard, high-level name for this role? (e.g. "Junior React Dev" -> "Software Engineer").
-    6. SECURITY SCAN:
-       Look for text explicitly prohibiting 'AI', 'ChatGPT', 'LLMs', 'Generative AI', or requiring 'original work without assistance'.
-       - If found, set 'isAiBanned': true and 'aiBanReason': "Quote the prohibition policy".
-       - Otherwise, set 'isAiBanned': false.
 
-    Return JSON with 'roleTitle', 'companyName', 'referenceCode', 'category', 'canonicalTitle', 'isAiBanned', and 'aiBanReason' fields.
+    Return JSON with 'roleTitle', 'companyName', 'referenceCode', 'category', and 'canonicalTitle' fields.
     `;
 
     return callWithRetry(async (metadata) => {
@@ -162,8 +184,14 @@ const extractJobInfo = async (
         });
         metadata.token_usage = response.response.usageMetadata;
         const result = JSON.parse(cleanJsonOutput(response.response.text()));
-        return { distilledJob: result as DistilledJob, cleanedDescription: cleanedText };
-    }, { event_type: 'job_extraction', prompt: extractionPrompt, model: AI_MODELS.EXTRACTION, job_id: undefined }, undefined, undefined, onProgress); // Extraction usually happens before job is fully saved, but could pass if available.
+        // Merge the deterministic AI-ban result — AI doesn't need to do this work
+        const distilledJob: DistilledJob = {
+            ...result,
+            isAiBanned: aiBan.isBanned,
+            aiBanReason: aiBan.reason,
+        };
+        return { distilledJob, cleanedDescription: cleanedText };
+    }, { event_type: 'job_extraction', prompt: extractionPrompt, model: AI_MODELS.EXTRACTION, job_id: undefined }, undefined, undefined, onProgress);
 };
 
 export const analyzeJobFit = async (
