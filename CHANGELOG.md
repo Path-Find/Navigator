@@ -7,6 +7,7 @@ All notable changes to this project will be documented in this file.
 ## [Unreleased]
 
 ### Changed
+- **Resume storage refactor**: Migrated from a single blob-per-user row to one row per profile, keyed on `(user_id, profile_id)` with a UNIQUE constraint. `saveResumes` now upserts each profile individually — eliminating the SELECT-then-INSERT race condition that created 378 duplicate rows. `getResumes` reconstructs the profiles array by reading all rows for the user. Existing data migrated in-place; 378 duplicate rows cleaned up.
 - **AI-ban confirmation gate**: Cover letter generation is now blocked for employers on the AI ban list (e.g. TTC). Auto-generation is suppressed; the editor shows a warning screen explaining the employer's policy with two explicit choices — "Generate for reference only" (requires a click to acknowledge) or "I'll write it myself". The passive post-generation warning banner remains as a reminder once a letter exists.
 - **Jobs-First Strategy Pivot**: Streamlined the entire platform to focus exclusively on Job Match and Application outcomes. Hidden Career Growth, Skills Interviews, and Education modules from the primary navigation, onboarding flows, pricing pages, and public features registry.
 - **Leaner cover letter prompts**: Cover letter generation now passes a focused job context (distilled key skills + responsibilities + 2,000-char raw excerpt) instead of the full raw JD, and filters the resume to only the blocks the job analysis flagged as relevant — reducing prompt size significantly while keeping the signal.

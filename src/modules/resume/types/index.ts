@@ -42,7 +42,9 @@ export interface RoleModelProfile {
 export interface ResumeRow {
     id: string;
     user_id: string;
-    content: ResumeProfile[];
+    profile_id: string;
+    content: ResumeProfile;
     name?: string;
     created_at?: string;
+    updated_at?: string;
 }

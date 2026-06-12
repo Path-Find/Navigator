@@ -7,10 +7,10 @@ import type { ResumeProfile } from '../../types';
 export const ResumeStorage = {
     async getResumes(): Promise<ResumeProfile[]> {
         const localResult = await Vault.getSecure<ResumeProfile[]>(STORAGE_KEYS.RESUMES);
-        
+
         if (localResult === undefined) {
-             console.error("[ResumeStorage] Failed to decrypt resumes. Aborting to prevent data loss.");
-             return [{ id: 'primary', name: 'Primary Experience', blocks: [] }];
+            console.error("[ResumeStorage] Failed to decrypt resumes. Aborting to prevent data loss.");
+            return [{ id: 'primary', name: 'Primary Experience', blocks: [] }];
         }
 
         let profiles = localResult || [{ id: 'primary', name: 'Primary Experience', blocks: [] }];
@@ -19,42 +19,26 @@ export const ResumeStorage = {
         if (userId) {
             const { data } = await supabase
                 .from('resumes')
-                .select('content')
+                .select('profile_id, content, updated_at')
                 .eq('user_id', userId)
-                .order('created_at', { ascending: false })
-                .limit(1)
-                .maybeSingle();
+                .order('profile_id');
 
-            if (data?.content) {
-                let cloudProfiles = data.content;
-                if (typeof cloudProfiles === 'string') {
-                    try {
-                        cloudProfiles = JSON.parse(cloudProfiles);
-                    } catch (e) {
-                        console.error('Failed to parse resumes content string:', e);
-                    }
-                }
+            if (data && data.length > 0) {
+                const cloudProfiles: ResumeProfile[] = data.map(row => {
+                    const p = typeof row.content === 'string' ? JSON.parse(row.content) : row.content;
+                    return p as ResumeProfile;
+                });
 
-                if (Array.isArray(cloudProfiles) && cloudProfiles.length > 0) {
-                    // Non-destructive merge: Since resumes are a nested structure in a single column,
-                    // we check if the cloud actually has something. 
-                    // To be safe, if we have local profiles with blocks and cloud has fewer/none, we merge.
-                    // But usually resumes are synced as a whole unit.
-                    // For now, let's just ensure we don't wipe local if cloud is weirdly empty.
+                const cloudUpdatedAt = cloudProfiles.reduce((max, p) => Math.max(max, p.updatedAt || 0), 0);
+                const localUpdatedAt = profiles.reduce((max, p) => Math.max(max, p.updatedAt || 0), 0);
+                const localHasData = profiles.some(p => p.blocks.length > 0);
+                const cloudHasData = cloudProfiles.some(p => p.blocks?.length > 0);
 
-                    const localHasData = profiles.some(p => p.blocks.length > 0);
-                    const cloudHasData = (cloudProfiles as ResumeProfile[]).some(p => p.blocks?.length > 0);
-
-                    const cloudUpdatedAt = (cloudProfiles as ResumeProfile[]).reduce((max, p) => Math.max(max, p.updatedAt || 0), 0);
-                    const localUpdatedAt = profiles.reduce((max, p) => Math.max(max, p.updatedAt || 0), 0);
-
-                    if (cloudUpdatedAt > localUpdatedAt + 1000 || (!localHasData && cloudHasData)) {
-                        profiles = cloudProfiles;
-                        await Vault.setSecure(STORAGE_KEYS.RESUMES, profiles);
-                    } else if (localUpdatedAt > cloudUpdatedAt + 1000) {
-                        // Local is newer, sync back to cloud
-                        this.saveResumes(profiles).catch(err => console.error("[ResumeStorage] Sync-back failed:", err));
-                    }
+                if (cloudUpdatedAt > localUpdatedAt + 1000 || (!localHasData && cloudHasData)) {
+                    profiles = cloudProfiles;
+                    await Vault.setSecure(STORAGE_KEYS.RESUMES, profiles);
+                } else if (localUpdatedAt > cloudUpdatedAt + 1000) {
+                    this.saveResumes(profiles).catch(err => console.error("[ResumeStorage] Sync-back failed:", err));
                 }
             }
         }
@@ -71,23 +55,33 @@ export const ResumeStorage = {
             (async () => {
                 if (!userId) return;
 
-                const { data, error: selectError } = await withTimeout(
-                    supabase.from('resumes').select('id').eq('user_id', userId).order('created_at', { ascending: false }).limit(1).maybeSingle()
+                // Upsert each profile individually — eliminates the SELECT-then-INSERT race condition.
+                // UNIQUE (user_id, profile_id) means concurrent saves to the same profile merge safely.
+                const upserts = updatedResumes.map(profile =>
+                    withTimeout(
+                        supabase.from('resumes').upsert(
+                            {
+                                user_id: userId,
+                                profile_id: profile.id,
+                                name: profile.name || 'Default Profile',
+                                content: profile,
+                                updated_at: new Date().toISOString(),
+                            },
+                            { onConflict: 'user_id,profile_id' }
+                        )
+                    ).then(({ error }) => { if (error) throw error; })
                 );
 
-                if (selectError) throw selectError;
+                // Delete any rows for profiles that were removed from the local array
+                const activeIds = updatedResumes.map(p => p.id);
+                const cleanup = withTimeout(
+                    supabase.from('resumes')
+                        .delete()
+                        .eq('user_id', userId)
+                        .not('profile_id', 'in', `(${activeIds.map(id => `"${id}"`).join(',')})`)
+                );
 
-                if (data) {
-                    const { error: updateError } = await withTimeout(
-                        supabase.from('resumes').update({ content: updatedResumes, name: 'Default Profile' }).eq('id', data.id)
-                    );
-                    if (updateError) throw updateError;
-                } else {
-                    const { error: insertError } = await withTimeout(
-                        supabase.from('resumes').insert({ user_id: userId, name: 'Default Profile', content: updatedResumes })
-                    );
-                    if (insertError) throw insertError;
-                }
+                await Promise.all([...upserts, cleanup]);
             })()
         ]);
     },
@@ -95,8 +89,8 @@ export const ResumeStorage = {
     async addResume(profile: ResumeProfile) {
         const localResult = await Vault.getSecure<ResumeProfile[]>(STORAGE_KEYS.RESUMES);
         if (localResult === undefined) {
-             console.error("[ResumeStorage] Decryption error. Aborting addResume.");
-             throw new Error("Storage unavailable");
+            console.error("[ResumeStorage] Decryption error. Aborting addResume.");
+            throw new Error("Storage unavailable");
         }
         const existing: ResumeProfile[] = localResult || [];
         let updated: ResumeProfile[];
@@ -129,30 +123,7 @@ export const ResumeStorage = {
             updated = [{ ...master, blocks: newBlocks, importRevision: (master.importRevision || 0) + 1 }, ...existing.slice(1)];
         }
 
-        const userId = await getUserId();
-        await Promise.all([
-            Vault.setSecure(STORAGE_KEYS.RESUMES, updated),
-            (async () => {
-                if (!userId) return;
-                const { data: existingRow, error: selectError } = await supabase
-                    .from('resumes')
-                    .select('id')
-                    .eq('user_id', userId)
-                    .order('created_at', { ascending: false })
-                    .limit(1)
-                    .maybeSingle();
-                if (selectError && selectError.code !== 'PGRST116') {
-                    console.error('Cloud Sync Error (Add Resume, select):', selectError);
-                }
-                if (existingRow) {
-                    const { error: updateError } = await supabase.from('resumes').update({ content: updated }).eq('user_id', userId);
-                    if (updateError) console.error('Cloud Sync Error (Add Resume, update):', updateError);
-                } else {
-                    const { error: insertError } = await supabase.from('resumes').insert({ user_id: userId, name: 'Default Profile', content: updated });
-                    if (insertError) console.error('Cloud Sync Error (Add Resume, insert):', insertError);
-                }
-            })()
-        ]);
+        await this.saveResumes(updated);
         return updated;
     }
 };
