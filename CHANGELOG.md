@@ -6,6 +6,10 @@ All notable changes to this project will be documented in this file.
 
 ## [Unreleased]
 
+---
+
+## [2.42.0] — 2026-06-12
+
 ### Changed
 - **Resume storage cleanup**: Removed the wasted `resumes` Supabase query from `syncLocalToCloud` (result was never used after the Vault removal). `clearAllData` now also deletes the user's Supabase resume rows — previously it only cleared localStorage keys that no longer get written. Removed unused `ResumeProfile` import from `storageService.ts`. Updated `scripts/test-harness.ts` analysis and cover letter prompts to match current app versions (program requirement interpretation, evidence bridge tailoring instructions, Evidence Variety Rule, Fit Calibration).
 - **Resume storage: Supabase-only (AI-26)**: Removed the Vault/localStorage dual-write from `resumeStorage.ts`. Reads and writes now go directly to Supabase — no local cache, no merge logic, no device-specific encryption key. `syncLocalToCloud` no longer tries to sync local resume data. Onboarding privacy copy updated to reflect cloud sync instead of "Local Vault".
