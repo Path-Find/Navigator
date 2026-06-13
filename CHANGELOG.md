@@ -4,10 +4,6 @@ All notable changes to this project will be documented in this file.
 
 ---
 
-## [Unreleased]
-
----
-
 ## [2.42.0] — 2026-06-12
 
 ### Changed
