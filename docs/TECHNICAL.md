@@ -2,6 +2,20 @@
 
 Technical foundation and scaling initiatives to support growth and long-term stability.
 
+## AI Model Strategy
+
+All AI calls are proxied through the `gemini-proxy` Supabase Edge Function, which enforces tier gating and quota tracking before forwarding to the provider.
+
+**Current provider**: Google Gemini (`gemini-2.0-flash` for all tiers and task types). Model selection is defined in `TIER_MODELS` inside the edge function and can be updated without a frontend deploy.
+
+**Task types**: `extraction` (job metadata parsing), `analysis` (compatibility scoring + cover letters), `interview` (mock session generation), `embedding` (semantic search).
+
+**Considered alternatives**:
+- **DeepSeek**: Evaluated as a cost-reduction option for extraction tasks. Not adopted — Gemini Flash pricing is already competitive and keeping a single provider simplifies key management and fallback logic.
+- Multi-provider routing (e.g. Gemini for analysis, DeepSeek for extraction) remains an option if costs become a concern at scale.
+
+---
+
 ## Foundation
 
 - [ ] **Storage Service**: Migrate local storage calls to encrypted StorageService.
