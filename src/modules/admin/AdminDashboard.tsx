@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useMemo } from 'react';
-import { AlertTriangle, ShieldAlert, Activity, TrendingUp, Users, Laptop, Cpu, Calendar, ShieldCheck, Zap, Search } from 'lucide-react';
+import { AlertTriangle, ShieldAlert, Activity, TrendingUp, Users, Laptop, Cpu, Calendar, ShieldCheck, Zap } from 'lucide-react';
 import { getUsageOutliers, getAdminUsers, getDailyPulse, type UsageOutlier, type AdminUser, type DailyPulse } from '../../services/adminService';
 import { SharedPageLayout } from '../../components/common/SharedPageLayout';
 
@@ -26,7 +26,6 @@ export const AdminDashboard: React.FC = () => {
     const [users, setUsers] = useState<AdminUser[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
-    const [searchQuery, setSearchQuery] = useState('');
     const [dailyPulse, setDailyPulse] = useState<DailyPulse[]>([]);
 
     const loadData = async () => {
@@ -61,6 +60,35 @@ export const AdminDashboard: React.FC = () => {
         };
     }, [outliers]);
 
+    const signupsHeatmap = useMemo(() => {
+        const today = new Date();
+        const signupsByDate: Record<string, number> = {};
+        users.forEach(u => {
+            const dateStr = new Date(u.created_at).toISOString().split('T')[0];
+            signupsByDate[dateStr] = (signupsByDate[dateStr] || 0) + 1;
+        });
+        const maxSignups = Math.max(...Object.values(signupsByDate), 1);
+        return Array.from({ length: 28 }).map((_, i) => {
+            const dateObj = new Date(today);
+            dateObj.setDate(today.getDate() - (27 - i));
+            const dateStr = dateObj.toISOString().split('T')[0];
+            const count = signupsByDate[dateStr] || 0;
+            const intensity = count > 0 ? (0.3 + (count / maxSignups) * 0.7) : 0.05;
+            return (
+                <div
+                    key={`signup-${dateStr}-${i}`}
+                    className="w-4 h-4 rounded-[3px] relative group border border-neutral-100/10 dark:border-white/5 transition-all duration-300 hover:ring-2 hover:ring-emerald-500/30"
+                    style={{ backgroundColor: count > 0 ? `rgba(16, 185, 129, ${intensity})` : 'rgba(16, 185, 129, 0.05)' }}
+                >
+                    <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-1.5 px-2 py-1 bg-neutral-900 text-[9px] text-white rounded-md hidden group-hover:block whitespace-nowrap z-50 shadow-xl border border-white/10">
+                        <div className="font-bold">{dateStr}</div>
+                        <div className="text-emerald-400">{count} signup{count !== 1 ? 's' : ''}</div>
+                    </div>
+                </div>
+            );
+        });
+    }, [users]);
+
     const pulseHeatmap = useMemo(() => {
         const pulseCounts = dailyPulse.map(p => p.count);
         const maxOps = pulseCounts.length > 0 ? Math.max(...pulseCounts, 1) : 100;
@@ -87,11 +115,6 @@ export const AdminDashboard: React.FC = () => {
         });
     }, [dailyPulse]);
 
-    const filteredUsers = useMemo(() => users.filter(u =>
-        !searchQuery || u.email?.toLowerCase().includes(searchQuery.toLowerCase()) || u.id.includes(searchQuery)
-    ), [users, searchQuery]);
-
-    const maxActivity = useMemo(() => Math.max(...users.map(u => u.total_ai_calls + u.job_analyses_count), 1), [users]);
 
     return (
         <SharedPageLayout maxWidth="6xl" spacing="compact">
@@ -172,7 +195,7 @@ export const AdminDashboard: React.FC = () => {
                             <p className="text-neutral-400 text-sm">Loading...</p>
                         </div>
                     ) : (
-                        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                             {/* Deviations card — static list */}
                             {(() => {
                                 const extremeCount = outliers.filter(o =>
@@ -251,65 +274,49 @@ export const AdminDashboard: React.FC = () => {
                                     </div>
                                 </div>
                             </div>
-                        </div>
-                    )}
 
-                    {/* Users heatmap */}
-                    {!loading && (
-                        <div className="bg-white/60 dark:bg-neutral-900/40 backdrop-blur-xl rounded-2xl border border-neutral-200/50 dark:border-neutral-800/50 shadow-sm overflow-hidden mt-8">
-                            <div className="px-6 py-4 border-b border-neutral-100 dark:border-neutral-800 flex items-center justify-between gap-4">
-                                <div className="flex items-center gap-3">
-                                    <div className="p-1.5 bg-emerald-500/10 rounded-lg">
-                                        <Users className="w-3.5 h-3.5 text-emerald-500" />
-                                    </div>
-                                    <div>
-                                        <h3 className="text-sm font-bold text-neutral-800 dark:text-neutral-200">All Users</h3>
-                                        <p className="text-xs text-neutral-400">{filteredUsers.length} registered</p>
-                                    </div>
-                                </div>
-                                <div className="relative">
-                                    <Search className="w-3.5 h-3.5 text-neutral-400 absolute left-3 top-1/2 -translate-y-1/2" />
-                                    <input
-                                        type="text"
-                                        placeholder="Search..."
-                                        value={searchQuery}
-                                        onChange={(e) => setSearchQuery(e.target.value)}
-                                        className="bg-neutral-100/50 dark:bg-neutral-800/50 border border-neutral-200/20 dark:border-neutral-700/30 rounded-lg pl-9 pr-4 py-1.5 text-xs font-medium focus:outline-none focus:ring-2 focus:ring-indigo-500/20 transition-all w-48 placeholder:text-neutral-400"
-                                    />
-                                </div>
-                            </div>
-                            <div className="p-4 grid grid-cols-2 md:grid-cols-3 gap-3">
-                                {filteredUsers.map(user => {
-                                    const activity = user.total_ai_calls + user.job_analyses_count;
-                                    const intensity = activity > 0 ? 0.06 + (activity / maxActivity) * 0.22 : 0.03;
-                                    return (
-                                        <div
-                                            key={user.id}
-                                            className="rounded-xl p-3 border border-indigo-100/20 dark:border-indigo-500/10 transition-all hover:scale-[1.01]"
-                                            style={{ backgroundColor: `rgba(99, 102, 241, ${intensity})` }}
-                                        >
-                                            <div className="flex items-start justify-between mb-2">
-                                                <span className={`text-[10px] font-semibold px-1.5 py-0.5 rounded-full ${
-                                                    user.subscription_tier === 'pro' ? 'bg-indigo-500/20 text-indigo-700 dark:text-indigo-300' :
-                                                    user.subscription_tier === 'admin' ? 'bg-purple-500/20 text-purple-700 dark:text-purple-300' :
-                                                    'bg-neutral-400/15 text-neutral-500'
-                                                }`}>{user.subscription_tier}</span>
-                                                <div className="flex gap-1">
-                                                    {user.is_admin && <ShieldCheck className="w-3 h-3 text-indigo-500" />}
-                                                    {user.is_tester && <Cpu className="w-3 h-3 text-amber-500" />}
-                                                </div>
-                                            </div>
-                                            <p className="text-xs font-semibold text-neutral-800 dark:text-neutral-100 truncate mb-2">{user.email || 'Unknown'}</p>
-                                            <div className="flex items-center justify-between">
-                                                <span className="text-[10px] text-neutral-500 dark:text-neutral-400">{new Date(user.created_at).toLocaleDateString('en-US', { month: 'short', year: 'numeric' })}</span>
-                                                <span className="text-[10px] font-bold text-indigo-600 dark:text-indigo-400 flex items-center gap-0.5">
-                                                    <Zap className="w-2.5 h-2.5" />
-                                                    {activity}
-                                                </span>
-                                            </div>
+                            {/* Signups heatmap */}
+                            <div className="bg-white/60 dark:bg-neutral-900/40 backdrop-blur-xl rounded-2xl p-5 border border-neutral-200/50 dark:border-neutral-800/50 shadow-sm flex flex-col">
+                                <div className="flex items-center justify-between mb-5">
+                                    <div className="flex items-center gap-2">
+                                        <div className="p-1.5 bg-emerald-500/10 rounded-lg">
+                                            <Users className="w-3.5 h-3.5 text-emerald-500" />
                                         </div>
-                                    );
-                                })}
+                                        <span className="text-sm font-semibold text-neutral-600 dark:text-neutral-300">Signups (28d)</span>
+                                    </div>
+                                    <div className="flex items-center gap-1 px-2 py-1 bg-neutral-100/50 dark:bg-neutral-800/50 rounded-lg">
+                                        <span className="text-[10px] font-medium text-neutral-400">Less</span>
+                                        {[0, 0.25, 0.5, 0.75, 1].map(lvl => (
+                                            <div key={lvl} className="w-2.5 h-2.5 rounded-[2px]" style={{ backgroundColor: `rgba(16, 185, 129, ${Math.max(0.1, lvl)})` }} />
+                                        ))}
+                                        <span className="text-[10px] font-medium text-neutral-400">More</span>
+                                    </div>
+                                </div>
+                                <div className="flex-1 flex flex-col justify-center gap-5">
+                                    <div className="grid grid-cols-7 gap-1">
+                                        {signupsHeatmap}
+                                    </div>
+                                    <div className="flex justify-between items-end border-t border-neutral-100 dark:border-neutral-800 pt-4">
+                                        <div>
+                                            <p className="text-xs font-medium text-neutral-400 mb-1">Total signups</p>
+                                            <p className="text-xl font-black text-neutral-900 dark:text-white tabular-nums">
+                                                {users.length}
+                                                <span className="text-xs text-emerald-500 ml-1 font-semibold">users</span>
+                                            </p>
+                                        </div>
+                                        <div className="text-right">
+                                            <p className="text-xs font-medium text-neutral-400 mb-1">Last 28d</p>
+                                            <p className="text-xl font-black text-neutral-900 dark:text-white tabular-nums">
+                                                {(() => {
+                                                    const cutoff = new Date();
+                                                    cutoff.setDate(cutoff.getDate() - 28);
+                                                    return users.filter(u => new Date(u.created_at) >= cutoff).length;
+                                                })()}
+                                                <span className="text-xs text-emerald-500 ml-1 font-semibold">new</span>
+                                            </p>
+                                        </div>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     )}
