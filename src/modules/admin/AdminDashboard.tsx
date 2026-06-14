@@ -197,40 +197,58 @@ export const AdminDashboard: React.FC = () => {
                         </div>
                     ) : (
                         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-                            {/* Deviations card — static list */}
+                            {/* Deviations card */}
                             {(() => {
                                 const extremeCount = outliers.filter(o =>
                                     activeStats.meanOutput > 0 && (o.total_output_tokens / activeStats.meanOutput) > 2.5
                                 ).length;
+                                const maxMultiplier = outliers.length > 0 && activeStats.meanOutput > 0
+                                    ? Math.max(...outliers.map(o => o.total_output_tokens / activeStats.meanOutput))
+                                    : 0;
                                 return (
-                                    <div className="bg-white/60 dark:bg-neutral-900/40 backdrop-blur-xl rounded-2xl border border-neutral-200/50 dark:border-neutral-800/50 shadow-sm overflow-hidden flex flex-col">
-                                        <div className="px-5 py-4 flex items-center gap-2 border-b border-neutral-100 dark:border-neutral-800">
-                                            <div className="p-1.5 bg-amber-500/10 rounded-lg">
-                                                <ShieldAlert className="w-3.5 h-3.5 text-amber-500" />
+                                    <div className="bg-white/60 dark:bg-neutral-900/40 backdrop-blur-xl rounded-2xl p-5 border border-neutral-200/50 dark:border-neutral-800/50 shadow-sm flex flex-col">
+                                        <div className="flex items-center justify-between mb-5">
+                                            <div className="flex items-center gap-2">
+                                                <div className="p-1.5 bg-amber-500/10 rounded-lg">
+                                                    <ShieldAlert className="w-3.5 h-3.5 text-amber-500" />
+                                                </div>
+                                                <span className="text-sm font-semibold text-neutral-600 dark:text-neutral-300">Deviations</span>
                                             </div>
-                                            <span className="text-sm font-semibold text-neutral-600 dark:text-neutral-300">Deviations</span>
-                                            <div className="ml-auto flex items-center gap-2">
-                                                {extremeCount > 0 && (
-                                                    <span className="text-xs font-bold text-red-500 bg-red-500/10 px-2 py-0.5 rounded-full">{extremeCount} extreme</span>
-                                                )}
-                                                <span className="text-xs font-medium text-neutral-400">{outliers.length} users</span>
-                                            </div>
+                                            {extremeCount > 0 && (
+                                                <span className="text-xs font-bold text-red-500 bg-red-500/10 px-2 py-0.5 rounded-full">{extremeCount} extreme</span>
+                                            )}
                                         </div>
-                                        <div className="px-5 py-4 flex flex-col gap-3">
+                                        <div className="flex-1 flex flex-col justify-center gap-2">
                                             {outliers.length === 0 ? (
-                                                <p className="text-xs text-neutral-400 py-4 text-center">No deviations detected</p>
+                                                <p className="text-xs text-neutral-400 text-center py-6">No deviations detected</p>
                                             ) : outliers.slice(0, 6).map((row) => {
                                                 const multiplier = activeStats.meanOutput > 0 ? (row.total_output_tokens / activeStats.meanOutput) : 1;
                                                 const isExtreme = multiplier > 2.5;
                                                 return (
                                                     <div key={row.user_id} className="flex items-center justify-between">
-                                                        <span className="text-xs text-neutral-600 dark:text-neutral-300 truncate max-w-[220px]">{row.email || 'Anonymous'}</span>
+                                                        <span className="text-xs text-neutral-600 dark:text-neutral-300 truncate max-w-[200px]">{row.email || 'Anonymous'}</span>
                                                         <div className={`text-xs font-bold px-2 py-0.5 rounded-lg ${isExtreme ? 'bg-red-500/10 text-red-500' : 'bg-neutral-100 dark:bg-neutral-800 text-neutral-500'}`}>
                                                             {multiplier.toFixed(1)}x
                                                         </div>
                                                     </div>
                                                 );
                                             })}
+                                        </div>
+                                        <div className="flex justify-between items-end border-t border-neutral-100 dark:border-neutral-800 pt-4 mt-5">
+                                            <div>
+                                                <p className="text-xs font-medium text-neutral-400 mb-1">Tracked users</p>
+                                                <p className="text-xl font-black text-neutral-900 dark:text-white tabular-nums">
+                                                    {outliers.length}
+                                                    <span className="text-xs text-amber-500 ml-1 font-semibold">users</span>
+                                                </p>
+                                            </div>
+                                            <div className="text-right">
+                                                <p className="text-xs font-medium text-neutral-400 mb-1">Peak drift</p>
+                                                <p className="text-xl font-black text-neutral-900 dark:text-white tabular-nums">
+                                                    {maxMultiplier > 0 ? maxMultiplier.toFixed(1) : '—'}
+                                                    {maxMultiplier > 0 && <span className="text-xs text-amber-500 ml-1 font-semibold">x</span>}
+                                                </p>
+                                            </div>
                                         </div>
                                     </div>
                                 );
