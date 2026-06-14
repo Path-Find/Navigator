@@ -32,7 +32,7 @@ const JobModuleContent: React.FC = () => {
         <>
             <JobSyncEffect />
             <Routes>
-                <Route path="/" element={<HomePage />} />
+                <Route path="/" element={<JobMatchInput />} />
                 <Route path="match" element={<JobMatchInput />} />
                 <Route path="history" element={<History />} />
                 <Route path="cover-letters" element={<CoverLetters />} />

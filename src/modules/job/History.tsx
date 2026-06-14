@@ -82,7 +82,7 @@ export default function History() {
     };
 
     return (
-        <SharedPageLayout className="theme-job" spacing="compact" maxWidth="5xl">
+        <SharedPageLayout className="theme-job" spacing="compact" maxWidth="6xl">
             <PageHeader
                 variant="simple"
                 title="Application History"
@@ -114,14 +114,16 @@ export default function History() {
             {/* Content */}
             <div className="space-y-4">
                 {jobs.length === 0 ? (
-                    <div className="py-20 text-center">
-                        <div className="w-20 h-20 bg-neutral-100 dark:bg-neutral-800 rounded-full flex items-center justify-center mx-auto mb-6">
-                            <Clock className="w-8 h-8 text-neutral-400" />
+                    <div className="card-premium p-12 text-center space-y-8 max-w-2xl mx-auto shadow-2xl shadow-indigo-500/5 border-neutral-100 dark:border-white/5">
+                        <div className="w-20 h-20 bg-gradient-to-br from-neutral-50 to-neutral-100 dark:from-neutral-800 dark:to-neutral-900 rounded-[2rem] flex items-center justify-center mx-auto mb-4 shadow-inner">
+                            <Clock className="w-10 h-10 text-neutral-300 dark:text-neutral-600" />
                         </div>
-                        <h3 className="text-xl font-bold text-neutral-900 dark:text-white mb-2">No history yet</h3>
-                        <p className="text-neutral-500 dark:text-neutral-400 max-w-sm mx-auto">
-                            Jobs you save and assess will appear here. Start by finding a job fit!
-                        </p>
+                        <div className="space-y-3">
+                            <h3 className="text-xl font-bold text-neutral-800 dark:text-neutral-200">No history yet</h3>
+                            <p className="text-sm text-neutral-400 dark:text-neutral-500 max-w-sm mx-auto leading-relaxed">
+                                Jobs you save and assess will appear here. Start by finding a job fit!
+                            </p>
+                        </div>
                     </div>
                 ) : filteredJobs.length === 0 ? (
                     <Card variant="glass" className="py-20 text-center border-dashed">

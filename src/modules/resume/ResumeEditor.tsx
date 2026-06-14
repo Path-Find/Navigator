@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Upload, Loader2, Plus, Briefcase, Code, Zap, Sparkles, Heart, FileText, Download, X } from 'lucide-react';
+import { AnimatePresence } from 'framer-motion';
 import { SharedPageLayout } from '../../components/common/SharedPageLayout';
 import { LoadingState } from '../../components/common/LoadingState';
 import { PageHeader } from '../../components/ui/PageHeader';
@@ -13,7 +14,9 @@ import { GlobalDragOverlay } from '../../components/common/GlobalDragOverlay';
 import { ResumePreview } from './components/ResumePreview';
 import { ResumeSectionEditor } from './components/ResumeSectionEditor';
 import { ResumeDiscoverySidebar } from './components/ResumeDiscoverySidebar';
+import { AddEntryModal } from './components/AddEntryModal';
 import { SECTIONS, getSortDate, getTypeColor } from './constants';
+import type { SectionType } from './constants';
 import { useSkillContext } from '../skills/context/SkillContext';
 import { printElement } from '../../utils/printService';
 
@@ -51,6 +54,7 @@ export const ResumeEditor: React.FC = () => {
     } = useResumeEditor(initialResume, resumes, onSave);
 
     const [hasStartedManually, setHasStartedManually] = useState(false);
+    const [addingSection, setAddingSection] = useState<SectionType | null>(null);
     const [parsingMessageIndex, setParsingMessageIndex] = useState(0);
     const [isPreviewOpen, setIsPreviewOpen] = useState(false);
     const fileInputRef = useRef<HTMLInputElement>(null);
@@ -323,7 +327,13 @@ export const ResumeEditor: React.FC = () => {
                                             </div>
                                             {(section.type !== 'summary' || sectionBlocks.length === 0) && (
                                                 <Button
-                                                    onClick={() => addBlock(section.type)}
+                                                    onClick={() => {
+                                                        if (section.type === 'summary' || section.type === 'skill') {
+                                                            addBlock(section.type);
+                                                        } else {
+                                                            setAddingSection(section.type);
+                                                        }
+                                                    }}
                                                     variant="subtle"
                                                     size="xs"
                                                     className="group/add"
@@ -368,6 +378,21 @@ export const ResumeEditor: React.FC = () => {
                     />
                 </div>
             )}
+
+            {/* Add Entry Modal */}
+            <AnimatePresence>
+                {addingSection && (
+                    <AddEntryModal
+                        type={addingSection}
+                        sectionLabel={SECTIONS.find(s => s.type === addingSection)?.label ?? addingSection}
+                        onAdd={(title, organization, dateRange) => {
+                            addBlock(addingSection, { title, organization, dateRange });
+                            setAddingSection(null);
+                        }}
+                        onClose={() => setAddingSection(null)}
+                    />
+                )}
+            </AnimatePresence>
 
             {/* Preview Modal */}
             {isPreviewOpen && (

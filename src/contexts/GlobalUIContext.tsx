@@ -40,7 +40,6 @@ export const GlobalUIProvider: React.FC<{ children: ReactNode }> = ({ children }
         if (typeof window !== 'undefined') {
             const saved = LocalStorage.get(STORAGE_KEYS.THEME);
             if (saved) return saved === 'dark';
-            return window.matchMedia('(prefers-color-scheme: dark)').matches;
         }
         return false;
     });

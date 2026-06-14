@@ -4,6 +4,21 @@ All notable changes to this project will be documented in this file.
 
 ---
 
+## [Unreleased]
+
+### Changed
+- **Resume: Add Entry modal (AI-44)**: Clicking "Add Entry" now opens a modal with Title, Organization, and Date fields instead of silently appending a blank card to the bottom of the list. Date field includes a format hint ("Month Year — e.g. Jan 2024 – Present"). Summary and Skill sections still add directly. `useResumeEditor.addBlock` updated to accept optional initial field values.
+- **Admin dashboard overhaul (AI-43)**: Removed all `uppercase` CSS across the entire page (labels, table headers, badges, stat cards). Fixed broken StatsCard icons — `bg-color bg-opacity-X` is incompatible with Tailwind JIT; replaced with explicit `iconBg`/`iconColor` props using slash-notation. Reduced oversized `rounded-[32px]`/`p-8` to `rounded-2xl`/`p-6`. Removed Simulate tier switcher. Replaced "cohort" jargon with plain language throughout.
+- **History page consistency (AI-45)**: `maxWidth` corrected from `5xl` → `6xl` to match Feed, Jobs, and all other pages. Empty state updated to use `card-premium` wrapper and gradient icon circle, matching Feed's empty state.
+- **Light mode default**: Removed system dark-mode preference fallback; app now defaults to light mode when no saved preference exists in localStorage.
+- **Header icon order**: Moved icon group (Admin, Theme, Settings) before Sign Out button.
+- **Jobs route**: `/jobs` now routes directly to the job match input instead of the homepage.
+
+### Security
+- **Waitlist bypass identified (AI-42)**: `PlansOnboardingStep.tsx` calls `supabase.auth.signUp` without the `check_user_exists` waitlist gate present in `AuthModal`. One external account (disposable email, zero usage) was created via this path. Issue logged as urgent in Linear.
+
+---
+
 ## [2.42.0] — 2026-06-12
 
 ### Changed
