@@ -47,9 +47,9 @@ Technical foundation and scaling initiatives to support growth and long-term sta
 - [x] **Missing error state in analysis progress**: Standardized error propagation (Mar 2026).
 - [x] **Deploy `create-portal-session` edge function**: Deployed Mar 2026 via CLI.
 - [x] **Target job name not validated**: Dedup via title collision check (Mar 2026).
-
 ### Performance & Quality
 - [x] **Unbounded bucket cache**: Added TTL clearing strategy (Mar 2026).
+...
 - [x] **Large PDF memory spike**: PDF extraction refactored to sequential processing (Mar 2026).
 - [x] **PDF parse silent failure**: Descriptive errors thrown and logged (Mar 2026).
 - [x] **Placeholder Supabase client**: Throws on startup in production if env vars missing (Mar 2026).

@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useMemo } from 'react';
-import { AlertTriangle, ShieldAlert, Activity, RefreshCw, TrendingUp, Users, Laptop, Cpu, Mail, Calendar, ShieldCheck, Zap, UserCheck, Search, Filter } from 'lucide-react';
+import { AlertTriangle, ShieldAlert, Activity, TrendingUp, Users, Laptop, Cpu, Mail, Calendar, ShieldCheck, Zap, UserCheck, Search, Filter, ChevronDown } from 'lucide-react';
 import { getUsageOutliers, getAdminUsers, getDailyPulse, type UsageOutlier, type AdminUser, type DailyPulse } from '../../services/adminService';
 
 const StatsCard = ({ title, value, subtext, icon: Icon, iconBg, iconColor }: {
@@ -26,6 +26,7 @@ export const AdminDashboard: React.FC = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const [tierFilter, setTierFilter] = useState<'all' | 'free' | 'pro' | 'admin' | 'tester'>('all');
+    const [deviationsExpanded, setDeviationsExpanded] = useState(false);
     const [searchQuery, setSearchQuery] = useState('');
     const [dailyPulse, setDailyPulse] = useState<DailyPulse[]>([]);
 
@@ -121,47 +122,25 @@ export const AdminDashboard: React.FC = () => {
                 {/* Header */}
                 <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
                     <div>
-                        <div className="flex items-center gap-2 mb-2">
-                            <div className="p-1.5 bg-indigo-600 rounded-lg shadow-md shadow-indigo-500/20">
-                                <ShieldAlert className="w-4 h-4 text-white" />
-                            </div>
-                            <span className="text-xs font-semibold text-indigo-600 dark:text-indigo-400">Management Portal</span>
-                        </div>
                         <h1 className="text-3xl font-black text-neutral-900 dark:text-white tracking-tight">Admin</h1>
                         <p className="text-neutral-500 dark:text-neutral-400 mt-1 text-sm">
                             Monitoring usage and resource utilization.
                         </p>
                     </div>
 
-                    <div className="flex flex-wrap items-center gap-3">
-                        {/* Tier filter */}
-                        <div className="flex bg-neutral-100/50 dark:bg-neutral-800/50 p-1 rounded-xl border border-neutral-200/20 backdrop-blur-md">
-                            {tiers.map((tier) => (
-                                <button
-                                    key={tier.id}
-                                    onClick={() => setTierFilter(tier.id as any)}
-                                    className={`flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-semibold transition-all duration-200 ${
-                                        tierFilter === tier.id
-                                            ? 'bg-white dark:bg-neutral-700 text-neutral-900 dark:text-white shadow-sm'
-                                            : 'text-neutral-400 hover:text-neutral-600 dark:hover:text-neutral-200'
-                                    }`}
-                                >
-                                    <tier.icon className="w-3 h-3" />
-                                    {tier.label}
-                                </button>
-                            ))}
+                    <div className="flex items-center gap-3">
+                        <div className="relative">
+                            <select
+                                value={tierFilter}
+                                onChange={e => setTierFilter(e.target.value as any)}
+                                className="appearance-none bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-lg pl-3 pr-8 py-2 text-xs font-semibold text-neutral-700 dark:text-neutral-200 shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 cursor-pointer"
+                            >
+                                {tiers.map(t => (
+                                    <option key={t.id} value={t.id}>{t.label}</option>
+                                ))}
+                            </select>
+                            <ChevronDown className="w-3 h-3 text-neutral-400 absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none" />
                         </div>
-
-                        <div className="h-7 w-px bg-neutral-200 dark:bg-neutral-800 hidden md:block" />
-
-                        <button
-                            onClick={loadData}
-                            disabled={loading}
-                            className="p-2 bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-lg shadow-sm hover:border-neutral-300 dark:hover:border-neutral-700 transition-all active:scale-95 disabled:opacity-50"
-                        >
-                            <RefreshCw className={`w-3.5 h-3.5 text-neutral-500 ${loading ? 'animate-spin' : ''}`} />
-                        </button>
-
                     </div>
                 </div>
 
@@ -233,54 +212,90 @@ export const AdminDashboard: React.FC = () => {
                         </div>
                     ) : (
                         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                            {/* Deviations table */}
-                            <div className="bg-white/60 dark:bg-neutral-900/40 backdrop-blur-xl rounded-2xl border border-neutral-200/50 dark:border-neutral-800/50 shadow-sm overflow-hidden flex flex-col">
-                                <div className="px-5 py-4 border-b border-neutral-100 dark:border-neutral-800 flex items-center justify-between">
-                                    <div className="flex items-center gap-2">
-                                        <div className="p-1.5 bg-amber-500/10 rounded-lg">
-                                            <ShieldAlert className="w-3.5 h-3.5 text-amber-500" />
-                                        </div>
-                                        <span className="text-sm font-semibold text-neutral-600 dark:text-neutral-300">Deviations</span>
-                                    </div>
-                                    <span className="text-[10px] font-medium text-neutral-400 bg-neutral-100 dark:bg-neutral-800 px-2 py-0.5 rounded-full">Active loop</span>
-                                </div>
-                                <div className="overflow-x-auto flex-1">
-                                    <table className="w-full text-left border-collapse">
-                                        <thead>
-                                            <tr className="border-b border-neutral-100 dark:border-neutral-800">
-                                                <th className="px-5 py-3 text-xs font-semibold text-neutral-400">User</th>
-                                                <th className="px-5 py-3 text-xs font-semibold text-neutral-400 text-right">Tokens</th>
-                                                <th className="px-5 py-3 text-xs font-semibold text-neutral-400 text-right">Drift</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody className="divide-y divide-neutral-100 dark:divide-neutral-800">
-                                            {outliers.filter(o => tierFilter === 'all' || o.subscription_tier === tierFilter).slice(0, 10).map((row) => {
-                                                const mean = activeStats.meanOutput;
-                                                const multiplier = mean > 0 ? (row.total_output_tokens / mean) : 1;
-                                                const isExtreme = multiplier > 2.5;
-                                                return (
-                                                    <tr key={row.user_id} className="hover:bg-neutral-50/50 dark:hover:bg-neutral-800/40 transition-colors">
-                                                        <td className="px-5 py-3">
-                                                            <div className="flex flex-col">
-                                                                <span className="text-xs font-semibold text-neutral-900 dark:text-white truncate max-w-[140px]">{row.email || 'Anonymous'}</span>
-                                                                <span className="text-[10px] font-mono text-neutral-400">{row.user_id.substring(0, 8)}...</span>
-                                                            </div>
-                                                        </td>
-                                                        <td className="px-5 py-3 text-right font-bold text-xs text-neutral-900 dark:text-white tabular-nums">
-                                                            {row.total_output_tokens.toLocaleString()}
-                                                        </td>
-                                                        <td className="px-5 py-3 text-right">
-                                                            <div className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-lg text-xs font-bold ${isExtreme ? 'bg-red-500/10 text-red-500' : 'bg-neutral-100 dark:bg-neutral-800 text-neutral-500'}`}>
+                            {/* Deviations card */}
+                            {(() => {
+                                const filtered = outliers.filter(o => tierFilter === 'all' || o.subscription_tier === tierFilter);
+                                const extremeCount = filtered.filter(o => activeStats.meanOutput > 0 && (o.total_output_tokens / activeStats.meanOutput) > 2.5).length;
+                                return (
+                                    <div className="bg-white/60 dark:bg-neutral-900/40 backdrop-blur-xl rounded-2xl border border-neutral-200/50 dark:border-neutral-800/50 shadow-sm overflow-hidden flex flex-col">
+                                        <button
+                                            onClick={() => setDeviationsExpanded(p => !p)}
+                                            className="px-5 py-4 flex items-center justify-between hover:bg-neutral-50/50 dark:hover:bg-neutral-800/20 transition-colors text-left w-full"
+                                        >
+                                            <div className="flex items-center gap-2">
+                                                <div className="p-1.5 bg-amber-500/10 rounded-lg">
+                                                    <ShieldAlert className="w-3.5 h-3.5 text-amber-500" />
+                                                </div>
+                                                <span className="text-sm font-semibold text-neutral-600 dark:text-neutral-300">Deviations</span>
+                                            </div>
+                                            <div className="flex items-center gap-2">
+                                                {extremeCount > 0 && (
+                                                    <span className="text-xs font-bold text-red-500 bg-red-500/10 px-2 py-0.5 rounded-full">{extremeCount} extreme</span>
+                                                )}
+                                                <span className="text-xs font-medium text-neutral-400">{filtered.length} users</span>
+                                                <ChevronDown className={`w-3.5 h-3.5 text-neutral-400 transition-transform duration-200 ${deviationsExpanded ? 'rotate-180' : ''}`} />
+                                            </div>
+                                        </button>
+
+                                        {/* Summary row — always visible */}
+                                        {!deviationsExpanded && filtered.length > 0 && (
+                                            <div className="px-5 pb-4 flex flex-col gap-2">
+                                                {filtered.slice(0, 3).map((row) => {
+                                                    const multiplier = activeStats.meanOutput > 0 ? (row.total_output_tokens / activeStats.meanOutput) : 1;
+                                                    const isExtreme = multiplier > 2.5;
+                                                    return (
+                                                        <div key={row.user_id} className="flex items-center justify-between">
+                                                            <span className="text-xs text-neutral-600 dark:text-neutral-300 truncate max-w-[200px]">{row.email || 'Anonymous'}</span>
+                                                            <div className={`text-xs font-bold px-2 py-0.5 rounded-lg ${isExtreme ? 'bg-red-500/10 text-red-500' : 'bg-neutral-100 dark:bg-neutral-800 text-neutral-500'}`}>
                                                                 {multiplier.toFixed(1)}x
                                                             </div>
-                                                        </td>
-                                                    </tr>
-                                                );
-                                            })}
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
+                                                        </div>
+                                                    );
+                                                })}
+                                            </div>
+                                        )}
+
+                                        {/* Expanded table */}
+                                        {deviationsExpanded && (
+                                            <div className="overflow-x-auto border-t border-neutral-100 dark:border-neutral-800">
+                                                <table className="w-full text-left border-collapse">
+                                                    <thead>
+                                                        <tr className="border-b border-neutral-100 dark:border-neutral-800">
+                                                            <th className="px-5 py-3 text-xs font-semibold text-neutral-400">User</th>
+                                                            <th className="px-5 py-3 text-xs font-semibold text-neutral-400 text-right">Tokens</th>
+                                                            <th className="px-5 py-3 text-xs font-semibold text-neutral-400 text-right">Drift</th>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody className="divide-y divide-neutral-100 dark:divide-neutral-800">
+                                                        {filtered.slice(0, 10).map((row) => {
+                                                            const multiplier = activeStats.meanOutput > 0 ? (row.total_output_tokens / activeStats.meanOutput) : 1;
+                                                            const isExtreme = multiplier > 2.5;
+                                                            return (
+                                                                <tr key={row.user_id} className="hover:bg-neutral-50/50 dark:hover:bg-neutral-800/40 transition-colors">
+                                                                    <td className="px-5 py-3">
+                                                                        <div className="flex flex-col">
+                                                                            <span className="text-xs font-semibold text-neutral-900 dark:text-white truncate max-w-[140px]">{row.email || 'Anonymous'}</span>
+                                                                            <span className="text-[10px] font-mono text-neutral-400">{row.user_id.substring(0, 8)}...</span>
+                                                                        </div>
+                                                                    </td>
+                                                                    <td className="px-5 py-3 text-right font-bold text-xs text-neutral-900 dark:text-white tabular-nums">
+                                                                        {row.total_output_tokens.toLocaleString()}
+                                                                    </td>
+                                                                    <td className="px-5 py-3 text-right">
+                                                                        <div className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-lg text-xs font-bold ${isExtreme ? 'bg-red-500/10 text-red-500' : 'bg-neutral-100 dark:bg-neutral-800 text-neutral-500'}`}>
+                                                                            {multiplier.toFixed(1)}x
+                                                                        </div>
+                                                                    </td>
+                                                                </tr>
+                                                            );
+                                                        })}
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        )}
+                                    </div>
+                                );
+                            })()}
 
                             {/* Heatmap */}
                             <div className="bg-white/60 dark:bg-neutral-900/40 backdrop-blur-xl rounded-2xl p-5 border border-neutral-200/50 dark:border-neutral-800/50 shadow-sm flex flex-col">
