@@ -1,6 +1,7 @@
 import React, { useEffect, useState, useMemo } from 'react';
-import { AlertTriangle, ShieldAlert, Activity, TrendingUp, Users, Laptop, Cpu, Mail, Calendar, ShieldCheck, Zap, UserCheck, Search, Filter, ChevronDown } from 'lucide-react';
+import { AlertTriangle, ShieldAlert, Activity, TrendingUp, Users, Laptop, Cpu, Calendar, ShieldCheck, Zap, Search } from 'lucide-react';
 import { getUsageOutliers, getAdminUsers, getDailyPulse, type UsageOutlier, type AdminUser, type DailyPulse } from '../../services/adminService';
+import { SharedPageLayout } from '../../components/common/SharedPageLayout';
 
 const StatsCard = ({ title, value, subtext, icon: Icon, iconBg, iconColor }: {
     title: string, value: string, subtext?: string,
@@ -25,18 +26,8 @@ export const AdminDashboard: React.FC = () => {
     const [users, setUsers] = useState<AdminUser[]>([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
-    const [tierFilter, setTierFilter] = useState<'all' | 'free' | 'pro' | 'admin' | 'tester'>('all');
-    const [deviationsExpanded, setDeviationsExpanded] = useState(false);
     const [searchQuery, setSearchQuery] = useState('');
     const [dailyPulse, setDailyPulse] = useState<DailyPulse[]>([]);
-
-    const tiers = [
-        { id: 'all', label: 'All Users', icon: Users },
-        { id: 'free', label: 'Free', icon: Activity },
-        { id: 'pro', label: 'Pro', icon: TrendingUp },
-        { id: 'admin', label: 'Admins', icon: ShieldAlert },
-        { id: 'tester', label: 'Testers', icon: UserCheck },
-    ];
 
     const loadData = async () => {
         setLoading(true);
@@ -59,31 +50,14 @@ export const AdminDashboard: React.FC = () => {
 
     useEffect(() => { loadData(); }, []);
 
-    const stats = useMemo(() => {
-        const calculateMedian = (values: number[]) => {
-            if (values.length === 0) return 0;
-            const sorted = [...values].sort((a, b) => a - b);
-            const mid = Math.floor(sorted.length / 2);
-            return sorted.length % 2 !== 0 ? sorted[mid] : (sorted[mid - 1] + sorted[mid]) / 2;
-        };
-        const processCohort = (users: UsageOutlier[]) => {
-            if (users.length === 0) return { count: 0, meanOutput: 0, medianOutput: 0, avgEfficiency: 0 };
-            const outputs = users.map(u => u.total_output_tokens);
-            const total = outputs.reduce((a, b) => a + b, 0);
-            const totalOps = users.reduce((a, b) => a + b.total_operations, 0);
-            return {
-                count: users.length,
-                meanOutput: Math.round(total / users.length),
-                medianOutput: calculateMedian(outputs),
-                avgEfficiency: totalOps > 0 ? Math.round(total / totalOps) : 0
-            };
-        };
+    const activeStats = useMemo(() => {
+        if (outliers.length === 0) return { count: 0, meanOutput: 0, avgEfficiency: 0 };
+        const total = outliers.reduce((a, b) => a + b.total_output_tokens, 0);
+        const totalOps = outliers.reduce((a, b) => a + b.total_operations, 0);
         return {
-            all: processCohort(outliers),
-            pro: processCohort(outliers.filter(u => u.subscription_tier === 'pro')),
-            free: processCohort(outliers.filter(u => u.subscription_tier === 'free')),
-            admin: processCohort(outliers.filter(u => u.subscription_tier === 'admin')),
-            tester: processCohort(outliers.filter(u => u.subscription_tier === 'tester')),
+            count: outliers.length,
+            meanOutput: Math.round(total / outliers.length),
+            avgEfficiency: totalOps > 0 ? Math.round(total / totalOps) : 0
         };
     }, [outliers]);
 
@@ -101,7 +75,7 @@ export const AdminDashboard: React.FC = () => {
             return (
                 <div
                     key={`${dateStr}-${i}`}
-                    className="w-4 h-4 rounded-[3px] relative group border border-neutral-100/10 dark:border-white/5 transition-all duration-300 hover:ring-2 hover:ring-indigo-500/30 shrink-0"
+                    className="w-4 h-4 rounded-[3px] relative group border border-neutral-100/10 dark:border-white/5 transition-all duration-300 hover:ring-2 hover:ring-indigo-500/30"
                     style={{ backgroundColor: count > 0 ? `rgba(99, 102, 241, ${intensity})` : 'rgba(99, 102, 241, 0.05)' }}
                 >
                     <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-1.5 px-2 py-1 bg-neutral-900 text-[9px] text-white rounded-md hidden group-hover:block whitespace-nowrap z-50 shadow-xl border border-white/10">
@@ -113,35 +87,22 @@ export const AdminDashboard: React.FC = () => {
         });
     }, [dailyPulse]);
 
-    const activeStats = stats[tierFilter];
+    const filteredUsers = useMemo(() => users.filter(u =>
+        !searchQuery || u.email?.toLowerCase().includes(searchQuery.toLowerCase()) || u.id.includes(searchQuery)
+    ), [users, searchQuery]);
+
+    const maxActivity = useMemo(() => Math.max(...users.map(u => u.total_ai_calls + u.job_analyses_count), 1), [users]);
 
     return (
-        <div className="min-h-screen bg-[#fafafa] dark:bg-neutral-950 p-6 md:p-10 pt-24">
-            <div className="max-w-6xl mx-auto space-y-8">
+        <SharedPageLayout maxWidth="6xl" spacing="compact">
+            <div className="space-y-8 pb-16">
 
                 {/* Header */}
-                <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
-                    <div>
-                        <h1 className="text-3xl font-black text-neutral-900 dark:text-white tracking-tight">Admin</h1>
-                        <p className="text-neutral-500 dark:text-neutral-400 mt-1 text-sm">
-                            Monitoring usage and resource utilization.
-                        </p>
-                    </div>
-
-                    <div className="flex items-center gap-3">
-                        <div className="relative">
-                            <select
-                                value={tierFilter}
-                                onChange={e => setTierFilter(e.target.value as any)}
-                                className="appearance-none bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-lg pl-3 pr-8 py-2 text-xs font-semibold text-neutral-700 dark:text-neutral-200 shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500/20 cursor-pointer"
-                            >
-                                {tiers.map(t => (
-                                    <option key={t.id} value={t.id}>{t.label}</option>
-                                ))}
-                            </select>
-                            <ChevronDown className="w-3 h-3 text-neutral-400 absolute right-2.5 top-1/2 -translate-y-1/2 pointer-events-none" />
-                        </div>
-                    </div>
+                <div>
+                    <h1 className="text-2xl font-bold text-neutral-900 dark:text-white tracking-tight">Admin</h1>
+                    <p className="text-neutral-500 dark:text-neutral-400 mt-1 text-sm">
+                        Monitoring usage and resource utilization.
+                    </p>
                 </div>
 
                 {/* Stats */}
@@ -150,7 +111,7 @@ export const AdminDashboard: React.FC = () => {
                         <StatsCard
                             title="Total users"
                             value={activeStats.count.toString()}
-                            subtext={`Active ${tierFilter === 'all' ? 'users' : tierFilter + ' users'}`}
+                            subtext="Registered accounts"
                             icon={Users}
                             iconBg="bg-blue-500/10"
                             iconColor="text-blue-600 dark:text-blue-400"
@@ -198,7 +159,7 @@ export const AdminDashboard: React.FC = () => {
                     </div>
                 )}
 
-                {/* Usage Deviations */}
+                {/* Usage Deviations + Activity */}
                 <div className="space-y-4">
                     <h2 className="text-base font-bold text-neutral-900 dark:text-white flex items-center gap-2 px-1">
                         Usage Deviations
@@ -212,92 +173,46 @@ export const AdminDashboard: React.FC = () => {
                         </div>
                     ) : (
                         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                            {/* Deviations card */}
+                            {/* Deviations card — static list */}
                             {(() => {
-                                const filtered = outliers.filter(o => tierFilter === 'all' || o.subscription_tier === tierFilter);
-                                const extremeCount = filtered.filter(o => activeStats.meanOutput > 0 && (o.total_output_tokens / activeStats.meanOutput) > 2.5).length;
+                                const extremeCount = outliers.filter(o =>
+                                    activeStats.meanOutput > 0 && (o.total_output_tokens / activeStats.meanOutput) > 2.5
+                                ).length;
                                 return (
                                     <div className="bg-white/60 dark:bg-neutral-900/40 backdrop-blur-xl rounded-2xl border border-neutral-200/50 dark:border-neutral-800/50 shadow-sm overflow-hidden flex flex-col">
-                                        <button
-                                            onClick={() => setDeviationsExpanded(p => !p)}
-                                            className="px-5 py-4 flex items-center justify-between hover:bg-neutral-50/50 dark:hover:bg-neutral-800/20 transition-colors text-left w-full"
-                                        >
-                                            <div className="flex items-center gap-2">
-                                                <div className="p-1.5 bg-amber-500/10 rounded-lg">
-                                                    <ShieldAlert className="w-3.5 h-3.5 text-amber-500" />
-                                                </div>
-                                                <span className="text-sm font-semibold text-neutral-600 dark:text-neutral-300">Deviations</span>
+                                        <div className="px-5 py-4 flex items-center gap-2 border-b border-neutral-100 dark:border-neutral-800">
+                                            <div className="p-1.5 bg-amber-500/10 rounded-lg">
+                                                <ShieldAlert className="w-3.5 h-3.5 text-amber-500" />
                                             </div>
-                                            <div className="flex items-center gap-2">
+                                            <span className="text-sm font-semibold text-neutral-600 dark:text-neutral-300">Deviations</span>
+                                            <div className="ml-auto flex items-center gap-2">
                                                 {extremeCount > 0 && (
                                                     <span className="text-xs font-bold text-red-500 bg-red-500/10 px-2 py-0.5 rounded-full">{extremeCount} extreme</span>
                                                 )}
-                                                <span className="text-xs font-medium text-neutral-400">{filtered.length} users</span>
-                                                <ChevronDown className={`w-3.5 h-3.5 text-neutral-400 transition-transform duration-200 ${deviationsExpanded ? 'rotate-180' : ''}`} />
+                                                <span className="text-xs font-medium text-neutral-400">{outliers.length} users</span>
                                             </div>
-                                        </button>
-
-                                        {/* Summary row — always visible */}
-                                        {!deviationsExpanded && filtered.length > 0 && (
-                                            <div className="px-5 pb-4 flex flex-col gap-2">
-                                                {filtered.slice(0, 3).map((row) => {
-                                                    const multiplier = activeStats.meanOutput > 0 ? (row.total_output_tokens / activeStats.meanOutput) : 1;
-                                                    const isExtreme = multiplier > 2.5;
-                                                    return (
-                                                        <div key={row.user_id} className="flex items-center justify-between">
-                                                            <span className="text-xs text-neutral-600 dark:text-neutral-300 truncate max-w-[200px]">{row.email || 'Anonymous'}</span>
-                                                            <div className={`text-xs font-bold px-2 py-0.5 rounded-lg ${isExtreme ? 'bg-red-500/10 text-red-500' : 'bg-neutral-100 dark:bg-neutral-800 text-neutral-500'}`}>
-                                                                {multiplier.toFixed(1)}x
-                                                            </div>
+                                        </div>
+                                        <div className="px-5 py-4 flex flex-col gap-3">
+                                            {outliers.length === 0 ? (
+                                                <p className="text-xs text-neutral-400 py-4 text-center">No deviations detected</p>
+                                            ) : outliers.slice(0, 6).map((row) => {
+                                                const multiplier = activeStats.meanOutput > 0 ? (row.total_output_tokens / activeStats.meanOutput) : 1;
+                                                const isExtreme = multiplier > 2.5;
+                                                return (
+                                                    <div key={row.user_id} className="flex items-center justify-between">
+                                                        <span className="text-xs text-neutral-600 dark:text-neutral-300 truncate max-w-[220px]">{row.email || 'Anonymous'}</span>
+                                                        <div className={`text-xs font-bold px-2 py-0.5 rounded-lg ${isExtreme ? 'bg-red-500/10 text-red-500' : 'bg-neutral-100 dark:bg-neutral-800 text-neutral-500'}`}>
+                                                            {multiplier.toFixed(1)}x
                                                         </div>
-                                                    );
-                                                })}
-                                            </div>
-                                        )}
-
-                                        {/* Expanded table */}
-                                        {deviationsExpanded && (
-                                            <div className="overflow-x-auto border-t border-neutral-100 dark:border-neutral-800">
-                                                <table className="w-full text-left border-collapse">
-                                                    <thead>
-                                                        <tr className="border-b border-neutral-100 dark:border-neutral-800">
-                                                            <th className="px-5 py-3 text-xs font-semibold text-neutral-400">User</th>
-                                                            <th className="px-5 py-3 text-xs font-semibold text-neutral-400 text-right">Tokens</th>
-                                                            <th className="px-5 py-3 text-xs font-semibold text-neutral-400 text-right">Drift</th>
-                                                        </tr>
-                                                    </thead>
-                                                    <tbody className="divide-y divide-neutral-100 dark:divide-neutral-800">
-                                                        {filtered.slice(0, 10).map((row) => {
-                                                            const multiplier = activeStats.meanOutput > 0 ? (row.total_output_tokens / activeStats.meanOutput) : 1;
-                                                            const isExtreme = multiplier > 2.5;
-                                                            return (
-                                                                <tr key={row.user_id} className="hover:bg-neutral-50/50 dark:hover:bg-neutral-800/40 transition-colors">
-                                                                    <td className="px-5 py-3">
-                                                                        <div className="flex flex-col">
-                                                                            <span className="text-xs font-semibold text-neutral-900 dark:text-white truncate max-w-[140px]">{row.email || 'Anonymous'}</span>
-                                                                            <span className="text-[10px] font-mono text-neutral-400">{row.user_id.substring(0, 8)}...</span>
-                                                                        </div>
-                                                                    </td>
-                                                                    <td className="px-5 py-3 text-right font-bold text-xs text-neutral-900 dark:text-white tabular-nums">
-                                                                        {row.total_output_tokens.toLocaleString()}
-                                                                    </td>
-                                                                    <td className="px-5 py-3 text-right">
-                                                                        <div className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-lg text-xs font-bold ${isExtreme ? 'bg-red-500/10 text-red-500' : 'bg-neutral-100 dark:bg-neutral-800 text-neutral-500'}`}>
-                                                                            {multiplier.toFixed(1)}x
-                                                                        </div>
-                                                                    </td>
-                                                                </tr>
-                                                            );
-                                                        })}
-                                                    </tbody>
-                                                </table>
-                                            </div>
-                                        )}
+                                                    </div>
+                                                );
+                                            })}
+                                        </div>
                                     </div>
                                 );
                             })()}
 
-                            {/* Heatmap */}
+                            {/* Activity heatmap */}
                             <div className="bg-white/60 dark:bg-neutral-900/40 backdrop-blur-xl rounded-2xl p-5 border border-neutral-200/50 dark:border-neutral-800/50 shadow-sm flex flex-col">
                                 <div className="flex items-center justify-between mb-5">
                                     <div className="flex items-center gap-2">
@@ -315,7 +230,7 @@ export const AdminDashboard: React.FC = () => {
                                     </div>
                                 </div>
                                 <div className="flex-1 flex flex-col justify-center gap-5">
-                                    <div className="flex flex-wrap gap-1">
+                                    <div className="grid grid-cols-7 gap-1">
                                         {pulseHeatmap}
                                     </div>
                                     <div className="flex justify-between items-end border-t border-neutral-100 dark:border-neutral-800 pt-4">
@@ -327,8 +242,11 @@ export const AdminDashboard: React.FC = () => {
                                             </p>
                                         </div>
                                         <div className="text-right">
-                                            <p className="text-xs font-medium text-neutral-400 mb-1">Cluster pulse</p>
-                                            <p className="text-xl font-black text-emerald-500">Live</p>
+                                            <p className="text-xs font-medium text-neutral-400 mb-1">Total (28d)</p>
+                                            <p className="text-xl font-black text-neutral-900 dark:text-white tabular-nums">
+                                                {dailyPulse.reduce((sum, p) => sum + p.count, 0)}
+                                                <span className="text-xs text-indigo-500 ml-1 font-semibold">ops</span>
+                                            </p>
                                         </div>
                                     </div>
                                 </div>
@@ -336,102 +254,67 @@ export const AdminDashboard: React.FC = () => {
                         </div>
                     )}
 
-                    {/* Users table */}
+                    {/* Users heatmap */}
                     {!loading && (
                         <div className="bg-white/60 dark:bg-neutral-900/40 backdrop-blur-xl rounded-2xl border border-neutral-200/50 dark:border-neutral-800/50 shadow-sm overflow-hidden mt-8">
-                            <div className="px-6 py-4 border-b border-neutral-100 dark:border-neutral-800 flex flex-col md:flex-row md:items-center justify-between gap-4">
+                            <div className="px-6 py-4 border-b border-neutral-100 dark:border-neutral-800 flex items-center justify-between gap-4">
                                 <div className="flex items-center gap-3">
                                     <div className="p-1.5 bg-emerald-500/10 rounded-lg">
                                         <Users className="w-3.5 h-3.5 text-emerald-500" />
                                     </div>
                                     <div>
                                         <h3 className="text-sm font-bold text-neutral-800 dark:text-neutral-200">All Users</h3>
-                                        <p className="text-xs text-neutral-400">{users.length} registered</p>
+                                        <p className="text-xs text-neutral-400">{filteredUsers.length} registered</p>
                                     </div>
                                 </div>
-                                <div className="flex items-center gap-3">
-                                    <div className="relative">
-                                        <Search className="w-3.5 h-3.5 text-neutral-400 absolute left-3 top-1/2 -translate-y-1/2" />
-                                        <input
-                                            type="text"
-                                            placeholder="Search by email or ID..."
-                                            value={searchQuery}
-                                            onChange={(e) => setSearchQuery(e.target.value)}
-                                            className="bg-neutral-100/50 dark:bg-neutral-800/50 border border-neutral-200/20 dark:border-neutral-700/30 rounded-lg pl-9 pr-4 py-1.5 text-xs font-medium focus:outline-none focus:ring-2 focus:ring-indigo-500/20 transition-all w-56 placeholder:text-neutral-400"
-                                        />
-                                    </div>
-                                    <button className="p-1.5 bg-neutral-100/50 dark:bg-neutral-800/50 border border-neutral-200/20 dark:border-neutral-700/30 rounded-lg">
-                                        <Filter className="w-3.5 h-3.5 text-neutral-400" />
-                                    </button>
+                                <div className="relative">
+                                    <Search className="w-3.5 h-3.5 text-neutral-400 absolute left-3 top-1/2 -translate-y-1/2" />
+                                    <input
+                                        type="text"
+                                        placeholder="Search..."
+                                        value={searchQuery}
+                                        onChange={(e) => setSearchQuery(e.target.value)}
+                                        className="bg-neutral-100/50 dark:bg-neutral-800/50 border border-neutral-200/20 dark:border-neutral-700/30 rounded-lg pl-9 pr-4 py-1.5 text-xs font-medium focus:outline-none focus:ring-2 focus:ring-indigo-500/20 transition-all w-48 placeholder:text-neutral-400"
+                                    />
                                 </div>
                             </div>
-                            <div className="overflow-x-auto">
-                                <table className="w-full text-left border-collapse">
-                                    <thead>
-                                        <tr className="border-b border-neutral-100 dark:border-neutral-800 bg-neutral-50/20">
-                                            <th className="px-6 py-3 text-xs font-semibold text-neutral-400">User</th>
-                                            <th className="px-6 py-3 text-xs font-semibold text-neutral-400 text-center">Plan</th>
-                                            <th className="px-6 py-3 text-xs font-semibold text-neutral-400 text-center">Roles</th>
-                                            <th className="px-6 py-3 text-xs font-semibold text-neutral-400 text-right">Activity</th>
-                                            <th className="px-6 py-3 text-xs font-semibold text-neutral-400 text-right">Joined</th>
-                                        </tr>
-                                    </thead>
-                                    <tbody className="divide-y divide-neutral-100 dark:divide-neutral-800">
-                                        {users.filter(u => {
-                                            const matchesTier = tierFilter === 'all' || u.subscription_tier === tierFilter;
-                                            const matchesSearch = u.email?.toLowerCase().includes(searchQuery.toLowerCase()) || u.id.includes(searchQuery);
-                                            return matchesTier && matchesSearch;
-                                        }).map((user) => (
-                                            <tr key={user.id} className="hover:bg-white/40 dark:hover:bg-neutral-800/20 transition-colors">
-                                                <td className="px-6 py-4">
-                                                    <div className="flex items-center gap-3">
-                                                        <div className="w-8 h-8 rounded-xl bg-neutral-100 dark:bg-neutral-800/50 flex items-center justify-center border border-neutral-200/20 shrink-0">
-                                                            <Mail className="w-3.5 h-3.5 text-neutral-400" />
-                                                        </div>
-                                                        <div className="flex flex-col">
-                                                            <span className="text-xs font-semibold text-neutral-900 dark:text-white">{user.email || 'N/A'}</span>
-                                                            <span className="text-[10px] font-mono text-neutral-400">{user.id.substring(0, 16)}...</span>
-                                                        </div>
-                                                    </div>
-                                                </td>
-                                                <td className="px-6 py-4">
-                                                    <div className="flex justify-center">
-                                                        <div className={`px-2 py-0.5 rounded-full text-xs font-semibold ${
-                                                            user.subscription_tier === 'pro' ? 'bg-indigo-500/10 text-indigo-500' :
-                                                            user.subscription_tier === 'admin' ? 'bg-purple-500/10 text-purple-500' :
-                                                            'bg-neutral-400/10 text-neutral-400'
-                                                        }`}>
-                                                            {user.subscription_tier}
-                                                        </div>
-                                                    </div>
-                                                </td>
-                                                <td className="px-6 py-4">
-                                                    <div className="flex justify-center gap-1.5">
-                                                        {user.is_admin && <span title="Admin"><ShieldCheck className="w-3.5 h-3.5 text-indigo-500" /></span>}
-                                                        {user.is_tester && <span title="Tester"><Cpu className="w-3.5 h-3.5 text-amber-500" /></span>}
-                                                    </div>
-                                                </td>
-                                                <td className="px-6 py-4 text-right">
-                                                    <div className="flex flex-col items-end">
-                                                        <span className="text-xs font-bold text-neutral-900 dark:text-white tabular-nums flex items-center gap-1">
-                                                            <Zap className="w-3 h-3 text-emerald-500" />
-                                                            {user.total_ai_calls + user.job_analyses_count}
-                                                        </span>
-                                                        <span className="text-[10px] text-neutral-400">total ops</span>
-                                                    </div>
-                                                </td>
-                                                <td className="px-6 py-4 text-right text-xs text-neutral-400 tabular-nums">
-                                                    {new Date(user.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
-                                                </td>
-                                            </tr>
-                                        ))}
-                                    </tbody>
-                                </table>
+                            <div className="p-4 grid grid-cols-2 md:grid-cols-3 gap-3">
+                                {filteredUsers.map(user => {
+                                    const activity = user.total_ai_calls + user.job_analyses_count;
+                                    const intensity = activity > 0 ? 0.06 + (activity / maxActivity) * 0.22 : 0.03;
+                                    return (
+                                        <div
+                                            key={user.id}
+                                            className="rounded-xl p-3 border border-indigo-100/20 dark:border-indigo-500/10 transition-all hover:scale-[1.01]"
+                                            style={{ backgroundColor: `rgba(99, 102, 241, ${intensity})` }}
+                                        >
+                                            <div className="flex items-start justify-between mb-2">
+                                                <span className={`text-[10px] font-semibold px-1.5 py-0.5 rounded-full ${
+                                                    user.subscription_tier === 'pro' ? 'bg-indigo-500/20 text-indigo-700 dark:text-indigo-300' :
+                                                    user.subscription_tier === 'admin' ? 'bg-purple-500/20 text-purple-700 dark:text-purple-300' :
+                                                    'bg-neutral-400/15 text-neutral-500'
+                                                }`}>{user.subscription_tier}</span>
+                                                <div className="flex gap-1">
+                                                    {user.is_admin && <ShieldCheck className="w-3 h-3 text-indigo-500" />}
+                                                    {user.is_tester && <Cpu className="w-3 h-3 text-amber-500" />}
+                                                </div>
+                                            </div>
+                                            <p className="text-xs font-semibold text-neutral-800 dark:text-neutral-100 truncate mb-2">{user.email || 'Unknown'}</p>
+                                            <div className="flex items-center justify-between">
+                                                <span className="text-[10px] text-neutral-500 dark:text-neutral-400">{new Date(user.created_at).toLocaleDateString('en-US', { month: 'short', year: 'numeric' })}</span>
+                                                <span className="text-[10px] font-bold text-indigo-600 dark:text-indigo-400 flex items-center gap-0.5">
+                                                    <Zap className="w-2.5 h-2.5" />
+                                                    {activity}
+                                                </span>
+                                            </div>
+                                        </div>
+                                    );
+                                })}
                             </div>
                         </div>
                     )}
                 </div>
             </div>
-        </div>
+        </SharedPageLayout>
     );
 };
