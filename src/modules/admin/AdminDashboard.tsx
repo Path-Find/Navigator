@@ -27,6 +27,7 @@ export const AdminDashboard: React.FC = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const [dailyPulse, setDailyPulse] = useState<DailyPulse[]>([]);
+    const [timeRange, setTimeRange] = useState(28);
 
     const loadData = async () => {
         setLoading(true);
@@ -68,7 +69,7 @@ export const AdminDashboard: React.FC = () => {
             signupsByDate[dateStr] = (signupsByDate[dateStr] || 0) + 1;
         });
         const maxSignups = Math.max(...Object.values(signupsByDate), 1);
-        return Array.from({ length: 28 }).map((_, i) => {
+        return Array.from({ length: timeRange }).map((_, i) => {
             const dateObj = new Date(today);
             dateObj.setDate(today.getDate() - (27 - i));
             const dateStr = dateObj.toISOString().split('T')[0];
@@ -87,13 +88,13 @@ export const AdminDashboard: React.FC = () => {
                 </div>
             );
         });
-    }, [users]);
+    }, [users, timeRange]);
 
     const pulseHeatmap = useMemo(() => {
         const pulseCounts = dailyPulse.map(p => p.count);
         const maxOps = pulseCounts.length > 0 ? Math.max(...pulseCounts, 1) : 100;
         const today = new Date();
-        return Array.from({ length: 28 }).map((_, i) => {
+        return Array.from({ length: timeRange }).map((_, i) => {
             const dateObj = new Date(today);
             dateObj.setDate(today.getDate() - (27 - i));
             const dateStr = dateObj.toISOString().split('T')[0];
@@ -113,7 +114,7 @@ export const AdminDashboard: React.FC = () => {
                 </div>
             );
         });
-    }, [dailyPulse]);
+    }, [dailyPulse, timeRange]);
 
 
     return (
@@ -121,11 +122,26 @@ export const AdminDashboard: React.FC = () => {
             <div className="space-y-8 pb-16">
 
                 {/* Header */}
-                <div>
-                    <h1 className="text-2xl font-bold text-neutral-900 dark:text-white tracking-tight">Admin</h1>
-                    <p className="text-neutral-500 dark:text-neutral-400 mt-1 text-sm">
-                        Monitoring usage and resource utilization.
-                    </p>
+                <div className="flex items-end justify-between gap-4">
+                    <div>
+                        <h1 className="text-2xl font-bold text-neutral-900 dark:text-white tracking-tight">Admin</h1>
+                        <p className="text-neutral-500 dark:text-neutral-400 mt-1 text-sm">
+                            Monitoring usage and resource utilization.
+                        </p>
+                    </div>
+                    <div className="flex items-center gap-1 bg-neutral-100/60 dark:bg-neutral-800/60 rounded-lg p-1 shrink-0">
+                        {[7, 14, 28].map(d => (
+                            <button
+                                key={d}
+                                onClick={() => setTimeRange(d)}
+                                className={`px-3 py-1.5 rounded-md text-xs font-semibold transition-all ${
+                                    timeRange === d
+                                        ? 'bg-white dark:bg-neutral-700 text-neutral-900 dark:text-white shadow-sm'
+                                        : 'text-neutral-400 hover:text-neutral-600 dark:hover:text-neutral-300'
+                                }`}
+                            >{d}d</button>
+                        ))}
+                    </div>
                 </div>
 
                 {/* Stats */}
@@ -242,7 +258,7 @@ export const AdminDashboard: React.FC = () => {
                                         <div className="p-1.5 bg-indigo-500/10 rounded-lg">
                                             <Calendar className="w-3.5 h-3.5 text-indigo-500" />
                                         </div>
-                                        <span className="text-sm font-semibold text-neutral-600 dark:text-neutral-300">Activity (28d)</span>
+                                        <span className="text-sm font-semibold text-neutral-600 dark:text-neutral-300">Activity</span>
                                     </div>
                                     <div className="flex items-center gap-1 px-2 py-1 bg-neutral-100/50 dark:bg-neutral-800/50 rounded-lg">
                                         <span className="text-[10px] font-medium text-neutral-400">Less</span>
@@ -265,7 +281,7 @@ export const AdminDashboard: React.FC = () => {
                                             </p>
                                         </div>
                                         <div className="text-right">
-                                            <p className="text-xs font-medium text-neutral-400 mb-1">Total (28d)</p>
+                                            <p className="text-xs font-medium text-neutral-400 mb-1">Total ({timeRange}d)</p>
                                             <p className="text-xl font-black text-neutral-900 dark:text-white tabular-nums">
                                                 {dailyPulse.reduce((sum, p) => sum + p.count, 0)}
                                                 <span className="text-xs text-indigo-500 ml-1 font-semibold">ops</span>
@@ -282,7 +298,7 @@ export const AdminDashboard: React.FC = () => {
                                         <div className="p-1.5 bg-emerald-500/10 rounded-lg">
                                             <Users className="w-3.5 h-3.5 text-emerald-500" />
                                         </div>
-                                        <span className="text-sm font-semibold text-neutral-600 dark:text-neutral-300">Signups (28d)</span>
+                                        <span className="text-sm font-semibold text-neutral-600 dark:text-neutral-300">Signups</span>
                                     </div>
                                     <div className="flex items-center gap-1 px-2 py-1 bg-neutral-100/50 dark:bg-neutral-800/50 rounded-lg">
                                         <span className="text-[10px] font-medium text-neutral-400">Less</span>
@@ -305,11 +321,11 @@ export const AdminDashboard: React.FC = () => {
                                             </p>
                                         </div>
                                         <div className="text-right">
-                                            <p className="text-xs font-medium text-neutral-400 mb-1">Last 28d</p>
+                                            <p className="text-xs font-medium text-neutral-400 mb-1">Last {timeRange}d</p>
                                             <p className="text-xl font-black text-neutral-900 dark:text-white tabular-nums">
                                                 {(() => {
                                                     const cutoff = new Date();
-                                                    cutoff.setDate(cutoff.getDate() - 28);
+                                                    cutoff.setDate(cutoff.getDate() - timeRange);
                                                     return users.filter(u => new Date(u.created_at) >= cutoff).length;
                                                 })()}
                                                 <span className="text-xs text-emerald-500 ml-1 font-semibold">new</span>
