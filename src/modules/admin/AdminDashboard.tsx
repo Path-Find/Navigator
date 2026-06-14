@@ -27,7 +27,7 @@ export const AdminDashboard: React.FC = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const [dailyPulse, setDailyPulse] = useState<DailyPulse[]>([]);
-    const [timeRange, setTimeRange] = useState(28);
+    const timeRange = 28;
 
     const loadData = async () => {
         setLoading(true);
@@ -122,26 +122,11 @@ export const AdminDashboard: React.FC = () => {
             <div className="space-y-8 pb-16">
 
                 {/* Header */}
-                <div className="flex items-end justify-between gap-4">
-                    <div>
-                        <h1 className="text-2xl font-bold text-neutral-900 dark:text-white tracking-tight">Admin</h1>
-                        <p className="text-neutral-500 dark:text-neutral-400 mt-1 text-sm">
-                            Monitoring usage and resource utilization.
-                        </p>
-                    </div>
-                    <div className="flex items-center gap-1 bg-neutral-100/60 dark:bg-neutral-800/60 rounded-lg p-1 shrink-0">
-                        {[7, 14, 28].map(d => (
-                            <button
-                                key={d}
-                                onClick={() => setTimeRange(d)}
-                                className={`px-3 py-1.5 rounded-md text-xs font-semibold transition-all ${
-                                    timeRange === d
-                                        ? 'bg-white dark:bg-neutral-700 text-neutral-900 dark:text-white shadow-sm'
-                                        : 'text-neutral-400 hover:text-neutral-600 dark:hover:text-neutral-300'
-                                }`}
-                            >{d}d</button>
-                        ))}
-                    </div>
+                <div>
+                    <h1 className="text-2xl font-bold text-neutral-900 dark:text-white tracking-tight">Admin</h1>
+                    <p className="text-neutral-500 dark:text-neutral-400 mt-1 text-sm">
+                        Monitoring usage and resource utilization.
+                    </p>
                 </div>
 
                 {/* Stats */}
