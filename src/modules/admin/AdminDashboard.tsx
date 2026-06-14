@@ -243,10 +243,10 @@ export const AdminDashboard: React.FC = () => {
                                                 </p>
                                             </div>
                                             <div className="text-right">
-                                                <p className="text-xs font-medium text-neutral-400 mb-1">Peak drift</p>
+                                                <p className="text-xs font-medium text-neutral-400 mb-1">Highest usage</p>
                                                 <p className="text-xl font-black text-neutral-900 dark:text-white tabular-nums">
                                                     {maxMultiplier > 0 ? maxMultiplier.toFixed(1) : '—'}
-                                                    {maxMultiplier > 0 && <span className="text-xs text-amber-500 ml-1 font-semibold">x</span>}
+                                                    {maxMultiplier > 0 && <span className="text-xs text-amber-500 ml-1 font-semibold">× avg</span>}
                                                 </p>
                                             </div>
                                         </div>
