@@ -15,7 +15,9 @@ All notable changes to this project will be documented in this file.
 - **Jobs route**: `/jobs` now routes directly to the job match input instead of the homepage.
 
 ### Security
-- **Waitlist bypass identified (AI-42)**: `PlansOnboardingStep.tsx` calls `supabase.auth.signUp` without the `check_user_exists` waitlist gate present in `AuthModal`. One external account (disposable email, zero usage) was created via this path. Issue logged as urgent in Linear.
+- **Waitlist bypass patched (AI-42)**: Added `check_user_exists` waitlist gate to `PlansOnboardingStep.tsx` before any auth call (both password and magic-link paths). Matches the gate in `AuthModal`. Previously an unapproved email could bypass the waitlist by going through the onboarding flow directly.
+- **Test accounts deleted**: Removed 4 fake accounts (`ryan@ryan.com`, `testuser@gmail.com`, `tester@gmail.com`, `test.checkout.errorcap@gmail.com`) from auth and profiles.
+- **Usage limits fixed**: `check_analysis_limit` was using a stale lifetime counter for Plus and Pro. Replaced with rolling windows — Plus: 200/week, Pro: 100/day. Old duplicate function overloads removed.
 
 ---
 

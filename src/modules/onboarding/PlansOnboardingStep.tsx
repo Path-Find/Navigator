@@ -56,6 +56,16 @@ export const PlansOnboardingStep: React.FC<PlansOnboardingStepProps> = ({
                     return;
                 }
 
+                // Waitlist gate — must match AuthModal behaviour
+                const { data: exists, error: checkError } = await supabase.rpc('check_user_exists', {
+                    email_input: email.toLowerCase().trim()
+                });
+                if (!checkError && exists === false) {
+                    setAuthError('This email isn\'t on the waitlist yet. Sign up at the main page to join.');
+                    setLoadingTier(null);
+                    return;
+                }
+
                 if (authMode === 'magic-link') {
                     const { error: magicError } = await supabase.auth.signInWithOtp({
                         email,
