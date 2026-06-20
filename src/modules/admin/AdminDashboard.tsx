@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useMemo } from 'react';
-import { AlertTriangle, ShieldAlert, Activity, TrendingUp, Users, Laptop, Cpu, Calendar, ShieldCheck, Zap } from 'lucide-react';
+import { AlertTriangle, ShieldAlert, Activity, TrendingUp, Users, Laptop, Calendar } from 'lucide-react';
 import { getUsageOutliers, getAdminUsers, getDailyPulse, type UsageOutlier, type AdminUser, type DailyPulse } from '../../services/adminService';
 import { SharedPageLayout } from '../../components/common/SharedPageLayout';
 
@@ -64,7 +64,7 @@ export const AdminDashboard: React.FC = () => {
     const signupsHeatmap = useMemo(() => {
         const today = new Date();
         const signupsByDate: Record<string, number> = {};
-        users.forEach(u => {
+        users.filter(u => !u.is_admin && !u.is_tester).forEach(u => {
             const dateStr = new Date(u.created_at).toISOString().split('T')[0];
             signupsByDate[dateStr] = (signupsByDate[dateStr] || 0) + 1;
         });
@@ -134,7 +134,7 @@ export const AdminDashboard: React.FC = () => {
                     <div className="lg:col-span-3 grid grid-cols-1 md:grid-cols-3 gap-4">
                         <StatsCard
                             title="Total users"
-                            value={activeStats.count.toString()}
+                            value={users.filter(u => !u.is_admin && !u.is_tester).length.toString()}
                             subtext="Registered accounts"
                             icon={Users}
                             iconBg="bg-blue-500/10"
@@ -185,9 +185,8 @@ export const AdminDashboard: React.FC = () => {
 
                 {/* Usage Deviations + Activity */}
                 <div className="space-y-4">
-                    <h2 className="text-base font-bold text-neutral-900 dark:text-white flex items-center gap-2 px-1">
+                    <h2 className="text-base font-bold text-neutral-900 dark:text-white px-1">
                         Usage Deviations
-                        <span className="px-2 py-0.5 rounded-md bg-neutral-100 dark:bg-neutral-800 text-[10px] font-semibold text-neutral-500">Real-time</span>
                     </h2>
 
                     {loading ? (
@@ -319,7 +318,7 @@ export const AdminDashboard: React.FC = () => {
                                         <div>
                                             <p className="text-xs font-medium text-neutral-400 mb-1">Total signups</p>
                                             <p className="text-xl font-black text-neutral-900 dark:text-white tabular-nums">
-                                                {users.length}
+                                                {users.filter(u => !u.is_admin && !u.is_tester).length}
                                                 <span className="text-xs text-emerald-500 ml-1 font-semibold">users</span>
                                             </p>
                                         </div>
@@ -329,7 +328,7 @@ export const AdminDashboard: React.FC = () => {
                                                 {(() => {
                                                     const cutoff = new Date();
                                                     cutoff.setDate(cutoff.getDate() - timeRange);
-                                                    return users.filter(u => new Date(u.created_at) >= cutoff).length;
+                                                    return users.filter(u => !u.is_admin && !u.is_tester && new Date(u.created_at) >= cutoff).length;
                                                 })()}
                                                 <span className="text-xs text-emerald-500 ml-1 font-semibold">new</span>
                                             </p>
