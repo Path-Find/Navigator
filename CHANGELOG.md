@@ -4,7 +4,7 @@ All notable changes to this project will be documented in this file.
 
 ---
 
-## [Unreleased]
+## [2.43.0] — 2026-06-20
 
 ### Changed
 - **Resume: Add Entry modal (AI-44)**: Clicking "Add Entry" now opens a modal with Title, Organization, and Date fields instead of silently appending a blank card to the bottom of the list. Date field includes a format hint ("Month Year — e.g. Jan 2024 – Present"). Summary and Skill sections still add directly. `useResumeEditor.addBlock` updated to accept optional initial field values.
@@ -13,8 +13,6 @@ All notable changes to this project will be documented in this file.
 - **Light mode default**: Removed system dark-mode preference fallback; app now defaults to light mode when no saved preference exists in localStorage.
 - **Header icon order**: Moved icon group (Admin, Theme, Settings) before Sign Out button.
 - **Jobs route**: `/jobs/match` routes directly to the job match input. `/jobs` (index) shows the homepage.
-
-### Changed
 - **Settings: Removed all-caps section headers**: "ACCOUNT", "PLAN", "INTEGRATIONS" headings now use normal title case. Removed `uppercase` from all three `h4` elements in `SettingsPage.tsx`.
 - **NextGen Calibration redesign**: Replaced the sci-fi console aesthetic with the app's standard card style. Removed manual "Initialize" and "Map resume" buttons (signals and style are captured automatically). Removed "Test a role" panel (trajectory and match are already in the Career/Education modules). Panel is now read-only status: writing style learned from cover letters, activity signal count.
 - **Browser Extension marked coming soon**: Added `stage: 'beta'` to the extension feature entry — it was showing as a public feature with a broken "Install" link. Now shows the "Soon" badge like Interview Advisor.
@@ -34,6 +32,7 @@ All notable changes to this project will be documented in this file.
 - **Dependabot: undici bumped to 8.5.0 / 7.28.0** (alerts #46–#49): Resolved 2 high and 2 medium severity vulnerabilities in `undici` — TLS certificate validation bypass (GHSA-vmh5-mc38-953g), cross-user information disclosure via shared cache whitespace bypass (GHSA-pr7r-676h-xcf6), WebSocket DoS via cumulative fragment bypass (GHSA-38rv-x7px-6hhq), and WebSocket DoS via fragment count bypass (GHSA-vxpw-j846-p89q). Root `undici` bumped to `8.5.0`; `jsdom`'s transitive `undici` pinned to `7.28.0` via nested override for API compatibility.
 
 ---
+
 
 ## [2.42.0] — 2026-06-12
 
