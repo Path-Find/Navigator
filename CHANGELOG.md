@@ -12,12 +12,26 @@ All notable changes to this project will be documented in this file.
 - **History page consistency (AI-45)**: `maxWidth` corrected from `5xl` → `6xl` to match Feed, Jobs, and all other pages. Empty state updated to use `card-premium` wrapper and gradient icon circle, matching Feed's empty state.
 - **Light mode default**: Removed system dark-mode preference fallback; app now defaults to light mode when no saved preference exists in localStorage.
 - **Header icon order**: Moved icon group (Admin, Theme, Settings) before Sign Out button.
-- **Jobs route**: `/jobs` now routes directly to the job match input instead of the homepage.
+- **Jobs route**: `/jobs/match` routes directly to the job match input. `/jobs` (index) shows the homepage.
+
+### Changed
+- **Settings: Removed all-caps section headers**: "ACCOUNT", "PLAN", "INTEGRATIONS" headings now use normal title case. Removed `uppercase` from all three `h4` elements in `SettingsPage.tsx`.
+- **NextGen Calibration redesign**: Replaced the sci-fi console aesthetic with the app's standard card style. Removed manual "Initialize" and "Map resume" buttons (signals and style are captured automatically). Removed "Test a role" panel (trajectory and match are already in the Career/Education modules). Panel is now read-only status: writing style learned from cover letters, activity signal count.
+- **Browser Extension marked coming soon**: Added `stage: 'beta'` to the extension feature entry — it was showing as a public feature with a broken "Install" link. Now shows the "Soon" badge like Interview Advisor.
+- **Retired "Explorer" tier branding**: The free tier is no longer presented as a named plan. Plans page is now a 2-column Plus/Pro grid with a "Start with N free analyses — no credit card required" note above. Features page filter is now All | Plus | Pro (Explorer tab removed). Plus card subtext updated from "Everything in Explorer, plus..." to "Everything in the free trial, plus...". Internal tier keys and feature registry tags are unchanged.
+- **Loading screen consistency**: Job analysis (`JobProcessingState`) now uses the same cycling-stages pattern as cover letter generation — animated icon that changes per step, SVG progress ring, character-by-character step label, and step dots. Removed the old scanning document card and gradient progress bar. Ambient glow removed from both screens. Also removed the `overflow-hidden` clip on the cover letter editor panel that was creating a hard border around the loading state.
+
+### Fixed
+- **Skills extraction quality**: `keySkills` was including enrollment requirements and program eligibility criteria (e.g. "Enrolled in co-op program") as if they were skills. Updated extraction prompt to restrict `keySkills` to actual technical skills, soft skills, tools, and domain knowledge only. Also capped skill labels at 1–4 words — long verbatim JD sentences were being copied directly into skill pills.
+- **Admin: Total users count** was showing `outliers.length` (users with tracked AI usage) instead of registered account count. Now correctly reads from `profiles` and excludes admins and testers.
+- **AI model deprecated**: `gemini-2.0-flash` returned 404 from the Gemini API (model removed). Updated all tiers in `TIER_MODELS` to `gemini-2.5-flash` and redeployed `gemini-proxy`. AI analysis was broken since ~March 2026.
+- **Missing `decrement_analysis_count` RPC**: Edge function calls this on analysis failure to refund the quota increment, but the function didn't exist. Created it — failed analyses now correctly refund the counter instead of permanently inflating `job_analyses_count`.
 
 ### Security
 - **Waitlist bypass patched (AI-42)**: Added `check_user_exists` waitlist gate to `PlansOnboardingStep.tsx` before any auth call (both password and magic-link paths). Matches the gate in `AuthModal`. Previously an unapproved email could bypass the waitlist by going through the onboarding flow directly.
 - **Test accounts deleted**: Removed 4 fake accounts (`ryan@ryan.com`, `testuser@gmail.com`, `tester@gmail.com`, `test.checkout.errorcap@gmail.com`) from auth and profiles.
 - **Usage limits fixed**: `check_analysis_limit` was using a stale lifetime counter for Plus and Pro. Replaced with rolling windows — Plus: 200/week, Pro: 100/day. Old duplicate function overloads removed.
+- **Dependabot: undici bumped to 8.5.0 / 7.28.0** (alerts #46–#49): Resolved 2 high and 2 medium severity vulnerabilities in `undici` — TLS certificate validation bypass (GHSA-vmh5-mc38-953g), cross-user information disclosure via shared cache whitespace bypass (GHSA-pr7r-676h-xcf6), WebSocket DoS via cumulative fragment bypass (GHSA-38rv-x7px-6hhq), and WebSocket DoS via fragment count bypass (GHSA-vxpw-j846-p89q). Root `undici` bumped to `8.5.0`; `jsdom`'s transitive `undici` pinned to `7.28.0` via nested override for API compatibility.
 
 ---
 
