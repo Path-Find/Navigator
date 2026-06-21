@@ -4,7 +4,7 @@ All notable changes to this project will be documented in this file.
 
 ---
 
-## [Unreleased]
+## [2.43.2] — 2026-06-21
 
 ### Fixed
 - **GitHub Pages: Node 20 → 22**: Workflow was using Node 20 which doesn't satisfy the `>=22.19.0` engine requirement from `undici`/`jsdom` deps — causing `npm ci` to fail before the build even ran. Bumped to Node 22. Also set `cancel-in-progress: false` to prevent the race condition where back-to-back pushes caused the second deployment to be rejected while the first was still in progress.
