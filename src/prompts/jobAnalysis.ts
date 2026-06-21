@@ -53,7 +53,7 @@ export const JOB_ANALYSIS_PROMPTS = {
         "canonicalTitle": "The most standard, high-level name for this role",
         "isAiBanned": boolean,
         "aiBanReason": "If banned, quote the prohibition policy, otherwise null",
-        "keySkills": ["List of 5-8 priority skills found in the job post"],
+        "keySkills": ["List of 5-8 actual skills found in the job post — technical skills, soft skills, tools, and domain knowledge ONLY. Do NOT include enrollment requirements, program eligibility criteria, or administrative prerequisites (e.g. 'Enrolled in co-op program', 'Enrolled in Business Administration' are NOT skills). Keep each skill label short and scannable — 1 to 4 words maximum (e.g. 'Problem-solving', 'Microsoft Office', 'Written communication', 'Data analysis'). Do not copy JD sentences verbatim."],
         "requiredSkills": [
           { "name": "Skill Name", "level": "learning" | "comfortable" | "expert" }
         ],

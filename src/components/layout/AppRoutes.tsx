@@ -1,5 +1,11 @@
-import React, { Suspense } from 'react';
-import { Routes, Route, Navigate } from 'react-router-dom';
+import React, { Suspense, useEffect } from 'react';
+import { Routes, Route, Navigate, useLocation } from 'react-router-dom';
+
+const ScrollToTop: React.FC = () => {
+    const { pathname } = useLocation();
+    useEffect(() => { window.scrollTo(0, 0); }, [pathname]);
+    return null;
+};
 import { LoadingState } from '../common/LoadingState';
 import { ErrorBoundary } from '../common/ErrorBoundary';
 import { ROUTES } from '../../constants';
@@ -28,6 +34,7 @@ const EmailVerificationScreen = lazyWithRetry(() => import('../auth/EmailVerific
 export const AppRoutes: React.FC = () => {
     return (
         <ErrorBoundary>
+            <ScrollToTop />
             <Routes>
                 {/* ─── Public / Marketing ───────────────────────────────────── */}
                 <Route path="/*" element={

@@ -123,7 +123,7 @@ export const PlansPage: React.FC = () => {
                     variant="hero"
                     title={headline.text}
                     highlight={headline.highlight}
-                    subtitle="Choose the plan that fits your pace — from exploring to all-in."
+                    subtitle="Start free, then upgrade when you're ready."
                 />
 
                 <div className="flex flex-wrap justify-center items-center gap-8 mb-16 -mt-4 animate-in fade-in slide-in-from-top-4 duration-700">
@@ -195,37 +195,17 @@ export const PlansPage: React.FC = () => {
                 </div>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-24 max-w-6xl mx-auto px-4 sm:px-6 items-stretch">
-                {/* Explorer Plan */}
-                <PlanCard
-                    title="Explorer"
-                    price="$0"
-                    accentColor="slate"
-                    buttonText={
-                        !user ? 'Start Free Trial' :
-                            (userTier === USER_TIERS.FREE || !userTier) ? 'Current Plan' :
-                                (userTier === USER_TIERS.ADMIN || userTier === USER_TIERS.TESTER) ? 'Your access exceeds this' :
-                                    'Trial Plan'
-                    }
-                    onSelect={() => handleSelectPlan(USER_TIERS.FREE)}
-                    features={getFeaturesForPlan('explorer').map(f => ({ name: f.name, desc: f.description.plan, isComingSoon: f.stage === 'beta' }))}
-                    limits={{
-                        analyses: String(PLAN_LIMITS[USER_TIERS.FREE].TOTAL_ANALYSES),
-                        analysesPeriod: 'lifetime',
-                        emails: PLAN_LIMITS[USER_TIERS.FREE].DAILY_EMAILS,
-                        emailPeriod: 'day',
-                        mentors: PLAN_LIMITS[USER_TIERS.FREE].ROLE_MODELS,
-                        mentorPeriod: 'total',
-                        interviews: PLAN_LIMITS[USER_TIERS.FREE].SKILLS_INTERVIEWS
-                    }}
-                />
+            <p className="text-center text-sm text-neutral-400 dark:text-neutral-500 mb-6 -mt-8">
+                Start with {PLAN_LIMITS[USER_TIERS.FREE].TOTAL_ANALYSES} free analyses — no credit card required.
+            </p>
 
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-24 max-w-4xl mx-auto px-4 sm:px-6 items-stretch">
                 {/* Plus Plan */}
                 <PlanCard
                     title="Plus"
                     price={`$${plusPrice}`}
                     accentColor="indigo"
-                    subText="Everything in Explorer, plus..."
+                    subText="Everything in the free trial, plus..."
                     buttonText={userTier === USER_TIERS.PLUS ? 'Current Plan' : 'Join Plus Waitlist'}
                     onSelect={() => handleSelectPlan(USER_TIERS.PLUS)}
                     isLoading={loadingTier === USER_TIERS.PLUS || (loadingTier === USER_TIERS.PLUS && waitlistStatus === 'loading')}

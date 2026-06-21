@@ -38,7 +38,8 @@ export const getDeadlineInfo = (deadline: string | null | undefined) => {
     const now = new Date();
     const daysUntil = Math.ceil((date.getTime() - now.getTime()) / (1000 * 60 * 60 * 24));
     const formatted = date.toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' });
-    if (daysUntil < 0) return { label: 'Closed', formatted, style: 'text-rose-500 dark:text-rose-400' };
+    if (daysUntil <= 0) return { label: 'Closed', formatted, style: 'text-rose-500 dark:text-rose-400' };
+    if (daysUntil === 1) return { label: 'Closes today', formatted, style: 'text-amber-500 dark:text-amber-400' };
     if (daysUntil <= 7) return { label: `Closes in ${daysUntil}d`, formatted, style: 'text-amber-500 dark:text-amber-400' };
     return { label: formatted, formatted, style: 'text-neutral-500 dark:text-neutral-400' };
 };

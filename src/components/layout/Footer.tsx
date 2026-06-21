@@ -34,7 +34,6 @@ export const Footer: React.FC = () => {
 
         navigate(path);
         setView(viewId as ViewId);
-        window.scrollTo({ top: 0, behavior: 'smooth' });
     };
 
 

@@ -6,7 +6,7 @@ Technical foundation and scaling initiatives to support growth and long-term sta
 
 All AI calls are proxied through the `gemini-proxy` Supabase Edge Function, which enforces tier gating and quota tracking before forwarding to the provider.
 
-**Current provider**: Google Gemini (`gemini-2.0-flash` for all tiers and task types). Model selection is defined in `TIER_MODELS` inside the edge function and can be updated without a frontend deploy.
+**Current provider**: Google Gemini (`gemini-2.5-flash` for all tiers and task types). Model selection is defined in `TIER_MODELS` inside the edge function and can be updated without a frontend deploy.
 
 **Task types**: `extraction` (job metadata parsing), `analysis` (compatibility scoring + cover letters), `interview` (mock session generation), `embedding` (semantic search).
 

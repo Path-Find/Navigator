@@ -32,20 +32,13 @@ export const GenerationProgress: React.FC<GenerationProgressProps> = ({
     const currentStep = activeStepIdx === -1 ? steps[steps.length - 1] : steps[activeStepIdx];
 
     return (
-        <div className="flex flex-col items-center justify-center p-12 text-center h-full min-h-[500px] max-w-2xl mx-auto relative overflow-hidden">
-            {/* Immersive Ambient Background */}
-            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-indigo-500/10 dark:bg-indigo-500/5 rounded-full blur-[100px] animate-pulse pointer-events-none" />
-            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[300px] h-[300px] bg-indigo-500/20 dark:bg-indigo-500/10 rounded-full blur-[80px] animate-pulse delay-700 pointer-events-none" />
-
-            {/* Central High-Fidelity Icon */}
+        <div className="flex flex-col items-center justify-center p-12 text-center h-full min-h-[500px] max-w-2xl mx-auto relative">
             {/* Central Animated Icon Section */}
-            <motion.div 
+            <motion.div
                 initial={{ scale: 0.8, opacity: 0 }}
                 animate={{ scale: 1, opacity: 1 }}
                 className="mb-8 relative"
             >
-                {/* Simplified Icon Glow */}
-                <div className="absolute inset-0 bg-indigo-500/10 dark:bg-indigo-500/20 blur-2xl rounded-full" />
                 
                 {/* Icon Container - Soft, minimal, no "card-in-card" feel */}
                 <div className="relative w-24 h-24 flex items-center justify-center overflow-hidden">

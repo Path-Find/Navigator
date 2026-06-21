@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Sparkles, Zap } from 'lucide-react';
+import { Sparkles, Zap, ChevronDown } from 'lucide-react';
 import { SharedPageLayout } from '../../components/common/SharedPageLayout';
 import { PageHeader } from '../../components/ui/PageHeader';
 import { StandardSearchBar } from '../../components/common/StandardSearchBar';
@@ -75,15 +75,17 @@ export const NavigatorPro: React.FC = () => {
                     themeColor="indigo"
                     rightElement={
                         <div className="flex items-center gap-2 overflow-x-auto scrollbar-hide w-full md:w-auto">
-                            <StandardFilterGroup
-                                options={[
-                                    { id: 'date', label: 'Newest' },
-                                    { id: 'match', label: 'Best Fit' }
-                                ]}
-                                activeFilter={sort}
-                                onSelect={(s) => setSort(s as 'date' | 'match')}
-                                themeColor="indigo"
-                            />
+                            <div className="relative">
+                                <select
+                                    value={sort}
+                                    onChange={(e) => setSort(e.target.value as 'date' | 'match')}
+                                    className="h-10 pl-3 pr-8 text-xs font-bold rounded-2xl border border-neutral-200/50 dark:border-neutral-800 bg-neutral-100/50 dark:bg-neutral-900/40 text-neutral-700 dark:text-neutral-300 appearance-none cursor-pointer focus:outline-none focus:ring-2 focus:ring-indigo-500/20 transition-colors"
+                                >
+                                    <option value="date">Newest</option>
+                                    <option value="match">Best Fit</option>
+                                </select>
+                                <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 w-3 h-3 text-neutral-400 pointer-events-none" />
+                            </div>
 
                             <StandardFilterGroup
                                 options={[

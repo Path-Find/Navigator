@@ -86,7 +86,7 @@ export const CoverLetterEditor: React.FC<CoverLetterEditorProps> = (props) => {
                 )}
 
                 {/* Editor Area */}
-                <div className="p-6 min-h-[600px] flex flex-col bg-white dark:bg-neutral-900 overflow-hidden">
+                <div className="p-6 min-h-[600px] flex flex-col bg-white dark:bg-neutral-900">
                     {isGenerating ? (
                         <GenerationProgress 
                             status={generationStatus || "Drafting Narrative"} 

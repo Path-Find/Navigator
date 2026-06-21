@@ -1,7 +1,7 @@
 import { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import type { SavedJob } from '../../types';
-import { Trash2, ArrowRight, Filter, Clock, ShieldAlert, Briefcase, Loader2 } from 'lucide-react';
+import { Trash2, ArrowRight, Filter, Clock, ShieldAlert, Briefcase, Loader2, ChevronDown } from 'lucide-react';
 import { SharedPageLayout } from '../../components/common/SharedPageLayout';
 import { StandardSearchBar } from '../../components/common/StandardSearchBar';
 import { PageHeader } from '../../components/ui/PageHeader';
@@ -9,7 +9,6 @@ import { Card } from '../../components/ui/Card';
 import { Button } from '../../components/ui/Button';
 import { ROUTES } from '../../constants';
 import { getScoreLabel, getScoreColorClasses, getDeadlineInfo } from './utils/jobUtils';
-import { StandardFilterGroup } from '../../components/common/StandardFilterGroup';
 
 import { useJobContext } from './context/JobContext';
 
@@ -98,15 +97,23 @@ export default function History() {
                     placeholder="Search"
                     themeColor="indigo"
                     rightElement={
-                        <StandardFilterGroup
-                            options={FILTER_OPTIONS.map(opt => ({
-                                ...opt,
-                                count: getCount(opt.id)
-                            }))}
-                            activeFilter={statusFilter}
-                            onSelect={(f) => setStatusFilter(f as StatusFilter)}
-                            themeColor="indigo"
-                        />
+                        <div className="relative">
+                            <select
+                                value={statusFilter}
+                                onChange={(e) => setStatusFilter(e.target.value as StatusFilter)}
+                                className="h-10 pl-3 pr-8 text-xs font-bold rounded-2xl border border-neutral-200/50 dark:border-neutral-800 bg-neutral-100/50 dark:bg-neutral-900/40 text-neutral-700 dark:text-neutral-300 appearance-none cursor-pointer focus:outline-none focus:ring-2 focus:ring-indigo-500/20 transition-colors"
+                            >
+                                {FILTER_OPTIONS.map(opt => {
+                                    const count = getCount(opt.id);
+                                    return (
+                                        <option key={opt.id} value={opt.id}>
+                                            {opt.label}{count > 0 ? ` (${count})` : ''}
+                                        </option>
+                                    );
+                                })}
+                            </select>
+                            <ChevronDown className="absolute right-2.5 top-1/2 -translate-y-1/2 w-3 h-3 text-neutral-400 pointer-events-none" />
+                        </div>
                     }
                 />
             </div>

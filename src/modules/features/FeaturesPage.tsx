@@ -16,7 +16,7 @@ import { useModal } from '../../contexts/ModalContext';
 import { useGlobalUI } from '../../contexts/GlobalUIContext';
 import { ROUTES } from '../../constants';
 
-type Tier = 'all' | 'explorer' | 'plus' | 'pro';
+type Tier = 'all' | 'plus' | 'pro';
 
 // ─── Icon Map ────────────────────────────────────────────────────────
 
@@ -30,12 +30,12 @@ const ICON_MAP: Record<string, LucideIcon> = {
 
 const filterTabs: { key: Tier; label: string }[] = [
     { key: 'all', label: 'All' },
-    { key: 'explorer', label: 'Explorer' },
     { key: 'plus', label: 'Plus' },
     { key: 'pro', label: 'Pro' },
 ];
 
-const TIER_LEVEL: Record<Exclude<Tier, 'all'>, number> = { explorer: 0, plus: 1, pro: 2 };
+// explorer kept in map so features tagged 'explorer' still resolve correctly
+const TIER_LEVEL: Record<string, number> = { explorer: 0, free: 0, plus: 1, pro: 2 };
 
 // ─── Page Component ───────────────────────────────────────────────────
 

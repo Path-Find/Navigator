@@ -324,6 +324,7 @@ export const FEATURE_REGISTRY: Record<string, FeatureDefinition> = {
         colorKey: 'blue',
         category: 'JOB',
         tier: 'explorer',
+        stage: 'beta',
         targetView: 'history',
         link: '/jobs',
         rank: 20,

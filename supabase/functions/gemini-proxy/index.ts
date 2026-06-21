@@ -27,24 +27,24 @@ const sanitizeLog = (val: unknown) => {
 
 export const TIER_MODELS: Record<string, { extraction: string; analysis: string }> = {
     free: {
-        extraction: 'gemini-2.0-flash',
-        analysis: 'gemini-2.0-flash',
+        extraction: 'gemini-2.5-flash',
+        analysis: 'gemini-2.5-flash',
     },
     plus: {
-        extraction: 'gemini-2.0-flash',
-        analysis: 'gemini-2.0-flash',
+        extraction: 'gemini-2.5-flash',
+        analysis: 'gemini-2.5-flash',
     },
     pro: {
-        extraction: 'gemini-2.0-flash',
-        analysis: 'gemini-2.0-flash',
+        extraction: 'gemini-2.5-flash',
+        analysis: 'gemini-2.5-flash',
     },
     admin: {
-        extraction: 'gemini-2.0-flash',
-        analysis: 'gemini-2.0-flash',
+        extraction: 'gemini-2.5-flash',
+        analysis: 'gemini-2.5-flash',
     },
     tester: {
-        extraction: 'gemini-2.0-flash',
-        analysis: 'gemini-2.0-flash',
+        extraction: 'gemini-2.5-flash',
+        analysis: 'gemini-2.5-flash',
     }
 };
 
@@ -225,7 +225,11 @@ export const handler = async (req: Request) => {
                 },
                 body: JSON.stringify({
                     ...payload,
-                    generationConfig,
+                    generationConfig: {
+                        ...generationConfig,
+                        // Disable thinking mode — keeps latency equivalent to 2.0-flash for structured tasks
+                        thinkingConfig: { thinkingBudget: 0 },
+                    },
                     // Inject a safety rule for all analysis tasks
                     systemInstruction: safeTask === 'analysis' ? {
                         role: 'system',

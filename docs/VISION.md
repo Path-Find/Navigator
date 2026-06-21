@@ -13,6 +13,12 @@ Navigator is built to take the tedious manual labor out of finding a job.
 
 We want to build a tool that handles the busywork of job hunting—scraping, filtering, and drafting—so you can spend your time talking to real people and preparing for interviews.
 
+## Where We're Headed
+
+The next step is moving from a tool you use to find a job, to a platform that finds one for you.
+
+Right now, Navigator analyzes jobs when you bring them to it. The next evolution is a system that already knows what fits you — learning from your writing style, your saved jobs, your outcomes — and surfaces the right opportunities without being asked. The less you have to do, the better we're working.
+
 ---
 
 For a full history of completed features, see the [Changelog](../CHANGELOG.md) and [Changelog Archive](../CHANGELOG_ARCHIVE.md).
