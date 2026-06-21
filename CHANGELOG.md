@@ -4,6 +4,14 @@ All notable changes to this project will be documented in this file.
 
 ---
 
+## [Unreleased]
+
+### Fixed
+- **GitHub Pages: Node 20 → 22**: Workflow was using Node 20 which doesn't satisfy the `>=22.19.0` engine requirement from `undici`/`jsdom` deps — causing `npm ci` to fail before the build even ran. Bumped to Node 22. Also set `cancel-in-progress: false` to prevent the race condition where back-to-back pushes caused the second deployment to be rejected while the first was still in progress.
+- **Dependabot #50: `@babel/core` overridden to `>=7.29.6`**: Resolved the arbitrary file read via sourceMappingURL vulnerability (GHSA-4x5r-pxfx-6jf8). Added a top-level override so npm resolves `@babel/core` to the patched version without downgrading `eslint-plugin-react-hooks`. `npm audit` now reports **0 vulnerabilities**.
+
+---
+
 ## [2.43.1] — 2026-06-21
 
 ### Fixed
