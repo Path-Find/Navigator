@@ -4,7 +4,7 @@ All notable changes to this project will be documented in this file.
 
 ---
 
-## [Unreleased]
+## [2.43.1] — 2026-06-21
 
 ### Fixed
 - **Build: unused imports removed** (`AdminDashboard.tsx`, `AddEntryModal.tsx`): Removed `Cpu`, `ShieldCheck`, `Zap` from `AdminDashboard` and `AnimatePresence` from `AddEntryModal` — leftover from the admin overhaul and Add Entry modal work. TypeScript's `noUnusedLocals` flagged these at build time, causing Vercel deployment failures.
