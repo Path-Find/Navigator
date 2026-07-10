@@ -4,6 +4,11 @@ All notable changes to this project will be documented in this file.
 
 ---
 
+## [Unreleased]
+
+### Fixed
+- **Extension**: Resolved Tailwind v4 PostCSS build issue in the browser extension by installing `@tailwindcss/postcss` and updating `extension/postcss.config.js`.
+
 ## [2.43.2] — 2026-06-21
 
 ### Fixed
