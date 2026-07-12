@@ -16,14 +16,14 @@ This document outlines the different user roles in Navigator and the features av
 
 | Feature | Free | Plus | Pro | Admin | Tester |
 | :--- | :---: | :---: | :---: | :---: | :---: |
-| **JobFit Score** | ✓ | ✓ | ✓ | ✓ | ✓ |
-| **Keyword Targeting** | ✓ | ✓ | ✓ | ✓ | ✓ |
-| **Tailored Summaries** | ✓ | ✓ | ✓ | ✓ | ✓ |
-| **Career Coach** | ✓ | ✓ | ✓ | ✓ | ✓ |
-| **Save from Anywhere (History)** | ✓ | ✓ | ✓ | ✓ | ✓ |
+| **JobFit Score** | Yes | Yes | Yes | Yes | Yes |
+| **Keyword Targeting** | Yes | Yes | Yes | Yes | Yes |
+| **Tailored Summaries** | Yes | Yes | Yes | Yes | Yes |
+| **Career Coach** | Yes | Yes | Yes | Yes | Yes |
+| **Save from Anywhere (History)** | Yes | Yes | Yes | Yes | Yes |
 | **Smart Cover Letters** | 1 Gen | 3 Auto | 3 Auto | 3 Auto | 3 Auto |
-| **Edu HQ** | - | - | - | ✓ | ✓ |
-| **Auto-Ingestion (Email)**| - | 5/day | 25/day | ✓ | ✓ |
+| **Edu HQ** | - | - | - | Yes | Yes |
+| **Auto-Ingestion (Email)**| - | 5/day | 25/day | Yes | Yes |
 
 ## Usage Limits
 

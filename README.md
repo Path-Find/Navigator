@@ -20,10 +20,9 @@ The modern career path is fragmented. Job seekers juggle siloed resumes, navigat
 - **Backend**: Supabase + Vercel
 - **Commerce**: Stripe
 
-
 ---
 
-- [Features](./docs/FEATURES.md)
+- [Features](./docs/roadmap/FEATURES.md)
 - [Roadmap](./ROADMAP.md)
 - [Changelog](./CHANGELOG.md)
 - [Security](./SECURITY.md)

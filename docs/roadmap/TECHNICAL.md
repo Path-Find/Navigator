@@ -26,7 +26,7 @@ All AI calls are proxied through the `gemini-proxy` Supabase Edge Function, whic
 
 ## Maintenance
 
-- [ ] **Resume update without rollback** (`ResumeContext.tsx:98`): State is committed before confirming storage write. On failure, UI and storage are out of sync.
+- [ ] **Resume update without rollback** (`ResumeContext.tsx:108-119`, in `handleUpdateResume`/`handleUpdateResumes`): State is committed before confirming storage write. On failure, UI and storage are out of sync.
 - [ ] **Inconsistent storage error handling**: Some methods throw, some silent-fail, some `console.error()`. Standardize so callers can rely on consistent error propagation.
 - [ ] **Mixed async/await and `.then()` chains**: Services mix patterns throughout, making error paths hard to follow. Standardize to async/await.
 - [ ] **Inconsistent error message localization**: Raw API/Supabase error strings shown to users in some flows. Route all user-facing errors through the `errorMessages` utility.
@@ -76,6 +76,6 @@ All AI calls are proxied through the `gemini-proxy` Supabase Edge Function, whic
 
 ---
 
-For a full history of completed features, see the [Changelog](../CHANGELOG.md) and [Changelog Archive](../CHANGELOG_ARCHIVE.md).
+For a full history of completed features, see the [Changelog](../../CHANGELOG.md) and [Changelog Archive](../../CHANGELOG_ARCHIVE.md).
 
-[Back to Roadmap](../ROADMAP.md)
+[Back to Roadmap](../../ROADMAP.md)

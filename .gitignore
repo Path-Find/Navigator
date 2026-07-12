@@ -24,12 +24,6 @@ dist-ssr
 *.sw?
 .env
 
-# AI context files
-CLAUDE.md
-GEMINI.md
-.copilot/
-.agent/
-
 # Sample / evaluation data (real cover letters, jobs, feedback, etc.)
 samples/
 test-runs/

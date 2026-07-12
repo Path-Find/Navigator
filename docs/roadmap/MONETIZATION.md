@@ -21,6 +21,6 @@ Strategic focus on trial conversion and the transition to tiered feature access.
 
 ---
 
-For a full history of completed features, see the [Changelog](../CHANGELOG.md) and [Changelog Archive](../CHANGELOG_ARCHIVE.md).
+For a full history of completed features, see the [Changelog](../../CHANGELOG.md) and [Changelog Archive](../../CHANGELOG_ARCHIVE.md).
 
-[Back to Roadmap](../ROADMAP.md)
+[Back to Roadmap](../../ROADMAP.md)

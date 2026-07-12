@@ -8,7 +8,7 @@ The project is currently branded as **Navigator**, but the underlying codebase a
 ---
 
 ## 2. Competitor Analysis: The "JobFit" Landscape
-*For raw company registration and trademark evidence, see the [Legal Research Log](./LEGAL_SEARCH.md).*
+*For raw company registration and trademark evidence, see the [Legal Research Log](../LEGAL_SEARCH.md).*
 
 ### **JobFit.fyi (Direct Competitor)**
 *   **Status:** Active.
@@ -118,6 +118,6 @@ The following are conceptual names for sub-products or modules within the Naviga
 
 ---
 
-For a full history of completed features, see the [Changelog](../CHANGELOG.md) and [Changelog Archive](../CHANGELOG_ARCHIVE.md).
+For a full history of completed features, see the [Changelog](../../CHANGELOG.md) and [Changelog Archive](../../CHANGELOG_ARCHIVE.md).
 
-[Back to Roadmap](../ROADMAP.md)
+[Back to Roadmap](../../ROADMAP.md)
