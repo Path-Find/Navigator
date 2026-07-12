@@ -15,15 +15,11 @@ See [CHANGELOG_ARCHIVE.md](CHANGELOG_ARCHIVE.md) for earlier history.
 - **GitHub Pages: Node 20 → 22**: Workflow was using Node 20 which doesn't satisfy the `>=22.19.0` engine requirement from `undici`/`jsdom` deps — causing `npm ci` to fail before the build even ran. Bumped to Node 22. Also set `cancel-in-progress: false` to prevent the race condition where back-to-back pushes caused the second deployment to be rejected while the first was still in progress.
 - **Dependabot #50: `@babel/core` overridden to `>=7.29.6`**: Resolved the arbitrary file read via sourceMappingURL vulnerability (GHSA-4x5r-pxfx-6jf8). Added a top-level override so npm resolves `@babel/core` to the patched version without downgrading `eslint-plugin-react-hooks`. `npm audit` now reports **0 vulnerabilities**.
 
----
-
 ## [2.43.1] — 2026-06-21
 
 ### Fixed
 - **Build: unused imports removed** (`AdminDashboard.tsx`, `AddEntryModal.tsx`): Removed `Cpu`, `ShieldCheck`, `Zap` from `AdminDashboard` and `AnimatePresence` from `AddEntryModal` — leftover from the admin overhaul and Add Entry modal work. TypeScript's `noUnusedLocals` flagged these at build time, causing Vercel deployment failures.
 - **Build: `tsc -b --force`**: Changed build script from `tsc -b` to `tsc -b --force` to prevent stale incremental TypeScript build cache on Vercel from producing false-positive unused-variable errors after cache restores.
-
----
 
 ## [2.43.0] — 2026-06-20
 
@@ -52,9 +48,6 @@ See [CHANGELOG_ARCHIVE.md](CHANGELOG_ARCHIVE.md) for earlier history.
 - **Usage limits fixed**: `check_analysis_limit` was using a stale lifetime counter for Plus and Pro. Replaced with rolling windows — Plus: 200/week, Pro: 100/day. Old duplicate function overloads removed.
 - **Dependabot: undici bumped to 8.5.0 / 7.28.0** (alerts #46–#49): Resolved 2 high and 2 medium severity vulnerabilities in `undici` — TLS certificate validation bypass (GHSA-vmh5-mc38-953g), cross-user information disclosure via shared cache whitespace bypass (GHSA-pr7r-676h-xcf6), WebSocket DoS via cumulative fragment bypass (GHSA-38rv-x7px-6hhq), and WebSocket DoS via fragment count bypass (GHSA-vxpw-j846-p89q). Root `undici` bumped to `8.5.0`; `jsdom`'s transitive `undici` pinned to `7.28.0` via nested override for API compatibility.
 
----
-
-
 ## [2.42.0] — 2026-06-12
 
 ### Changed
@@ -74,8 +67,6 @@ See [CHANGELOG_ARCHIVE.md](CHANGELOG_ARCHIVE.md) for earlier history.
 
 ### Security
 - **Dependency Bumps**: Updated a significant number of core project and browser extension dependencies to their latest secure versions.
-
----
 
 ## [2.41.0] — 2026-06-05
 
