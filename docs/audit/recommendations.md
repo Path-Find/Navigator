@@ -29,7 +29,7 @@ For speculative "if we rebuilt Navigator from scratch" thinking, see [V3-Greenfi
 | # | Recommendation | Area | Effort | Rationale & References |
 |---|----------------|------|--------|------------------------|
 | 1 | Fix the two real lint errors (unused `savedJobId` in extension popup + missing dependency in `useCoachManager.ts`) | Code Quality | Low | Immediate hygiene wins. |
-| 2 | Resolve GitHub Pages vs Vercel deployment mismatch | DevEx / Infra | Low | High risk of confusion or broken deploys. See main Audit. |
+| ~~2~~ | ~~Resolve GitHub Pages vs Vercel deployment mismatch~~ **RESOLVED 2026-07-11** | DevEx / Infra | Low | GH Pages workflow deleted, Pages site unpublished via API, Vercel confirmed as the real deploy target. |
 | 3 | Add outbound timeout to Gemini fetch in the proxy | Reliability | Low | Prevents hanging requests. Gemini Proxy Deep Dive. |
 | 4 | Make Gemini response parsing defensive (null checks + clear error) | Reliability | Low | Currently brittle to upstream response shape changes. |
 | 5 | Fix obvious placeholder code in NextGen R&D (zero-vector search, regex JSON parsing) | R&D Quality | Low-Medium | Trajectory and similarity services contain non-functional stubs. |

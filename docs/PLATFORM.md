@@ -12,7 +12,7 @@ Evolution from a career utility into an intelligence layer for professional grow
 
 - [ ] **Localization**: Multi-language support (ES, FR, DE) for the core platform.
 - [ ] **Networking Graph**: Tracking alumni and internal contacts during application phases.
-- [ ] **Ingest Engine**: Deep integration with the standalone triage service for automated job alert parsing. *(Requires backend: standalone service — see [Technical Roadmap](./TECHNICAL.md))*
+- [ ] **Ingest Engine**: Deep integration with the standalone triage service for automated job alert parsing. *(Requires backend: standalone service — see [Technical Roadmap](./roadmap/TECHNICAL.md))*
 
 ## Future Expansion
 

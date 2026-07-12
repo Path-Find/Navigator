@@ -53,7 +53,7 @@ The NudgeCard exists but needs fixes and expansion:
 
 ## Phase 2 — Email Nudge (Later)
 
-Meet users where they are, without requiring them to open the app. *(Requires infrastructure work — see [Technical Roadmap](./TECHNICAL.md).)*
+Meet users where they are, without requiring them to open the app. *(Requires infrastructure work — see [Technical Roadmap](./roadmap/TECHNICAL.md).)*
 
 - [ ] **One-click outcome email** — sent very occasionally (once per job, max), 2–4 weeks after a cover letter is generated. Single question: "Did you get the interview?" Two buttons: **Got an interview** / **No news yet**.
 - [ ] Clicking either button logs the outcome via a magic-link action token and lands the user in Navigator — no separate login step.

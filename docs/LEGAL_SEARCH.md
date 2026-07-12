@@ -29,7 +29,7 @@ Raw background search data and evidence logs for naming and trademark strategy.
 ## Canadian Trademark Search (CIPO)
 - **JOBFIT** (Mark No. 0644342)
   - **Status**: Abandoned
-  - **Context**: Provides a legal opening for registration, but see main [Legal](./LEGAL.md) doc for Common Law risks (Prevue HR, etc.).
+  - **Context**: Provides a legal opening for registration, but see main [Legal](./roadmap/LEGAL.md) doc for Common Law risks (Prevue HR, etc.).
 
 ---
 
@@ -48,4 +48,4 @@ Raw background search data and evidence logs for naming and trademark strategy.
 
 ---
 
-[Back to Legal Strategy](./LEGAL.md) | [Back to Roadmap](../ROADMAP.md)
+[Back to Legal Strategy](./roadmap/LEGAL.md) | [Back to Roadmap](../ROADMAP.md)

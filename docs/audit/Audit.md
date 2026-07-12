@@ -5,7 +5,7 @@
 **Scope**: Full repository (main application, browser extension, Supabase Edge Functions, build configuration, documentation, and R&D components).
 
 **Relationship to Other Docs**:
-- Complements [ROADMAP.md](../ROADMAP.md) and the detailed roadmaps in this folder.
+- Complements [ROADMAP.md](../../ROADMAP.md) and the detailed roadmaps in this folder.
 - Focuses on current state, maintainability, and engineering leverage points rather than feature commitments.
 - **Active recommendations**: See [recommendations.md](./recommendations.md) — the working backlog of prioritized items.
 - **Strategic Considerations**: See [Strategic-Considerations.md](./Strategic-Considerations.md).
@@ -71,7 +71,7 @@ See [recommendations.md](./recommendations.md) for the current prioritized backl
 
 ### Documentation & Planning
 - Exceptional roadmap documentation: product, technical, NextGen, monetization, platform, prompts, feedback, and V3 visions.
-- `NAVIGATORLOG.md` enforces high-signal portfolio tracking (distinct from churn logs).
+- `docs/NAVIGATORLOG.md` enforces high-signal portfolio tracking (distinct from churn logs).
 - Clear feature registry and modular breakdown.
 
 ### Extension & Capture
@@ -157,6 +157,6 @@ This document should be revisited after major milestones.
 
 ---
 
-**Back to**: [ROADMAP.md](../ROADMAP.md) | [VISION.md](./VISION.md)
+**Back to**: [ROADMAP.md](../../ROADMAP.md) | [VISION.md](../roadmap/VISION.md)
 
 *Audit conducted April 2026 (based on repository state at time of review). Updated with subsystem deep dives.*
