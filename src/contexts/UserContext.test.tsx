@@ -2,7 +2,8 @@ import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
 import { render, waitFor } from '@testing-library/react';
 import React from 'react';
 import { UserProvider } from './UserContext';
-import { supabase } from '../services/supabase';
+import { ToastProvider } from './ToastContext';
+import { authClient } from '../lib/auth-client';
 
 // Mock UserPreferencesContext — UserProvider calls useUserPreferences() at the top level
 vi.mock('./UserPreferencesContext', () => ({
@@ -25,16 +26,18 @@ vi.mock('../utils/fingerprint', () => ({
     getDeviceFingerprint: vi.fn(() => Promise.resolve('test-fingerprint')),
 }));
 
-// Mock Supabase
-vi.mock('../services/supabase', () => ({
-    supabase: {
-        auth: {
-            getSession: vi.fn(),
-            onAuthStateChange: vi.fn(() => ({ data: { subscription: { unsubscribe: vi.fn() } } })),
-        },
-        from: vi.fn(),
+// Mock Neon Auth client
+vi.mock('../lib/auth-client', () => ({
+    authClient: {
+        getSession: vi.fn(),
+        onAuthStateChange: vi.fn(() => ({ data: { subscription: { unsubscribe: vi.fn() } } })),
     },
+    getAccessToken: vi.fn(() => Promise.resolve('test-token')),
 }));
+
+// Mock the api/profile.ts fetch call
+const mockFetch = vi.fn();
+global.fetch = mockFetch;
 
 describe('UserContext Security Check', () => {
     let consoleLogSpy: ReturnType<typeof vi.spyOn>;
@@ -58,38 +61,28 @@ describe('UserContext Security Check', () => {
         };
 
         // Mock getSession to return a user
-        vi.mocked(supabase.auth.getSession).mockResolvedValue({
-            data: { session: { user: mockUser } },
+        vi.mocked(authClient.getSession).mockResolvedValue({
+            data: { session: { user: mockUser, access_token: 'test-token' } },
             error: null,
         } as any);
 
-        // Mock database query to return profile data
-        const mockFrom = vi.fn().mockReturnValue({
-            select: vi.fn().mockReturnValue({
-                eq: vi.fn().mockReturnValue({
-                    single: vi.fn().mockResolvedValue({
-                        data: mockProfileData,
-                        error: null,
-                    }),
-                }),
-            }),
-            update: vi.fn().mockReturnValue({
-                eq: vi.fn().mockReturnValue({
-                    then: vi.fn().mockImplementation((cb) => cb({ error: null }))
-                }),
-            }),
+        // Mock api/profile.ts GET to return profile data
+        mockFetch.mockResolvedValue({
+            ok: true,
+            json: () => Promise.resolve({ profile: mockProfileData }),
         });
-        vi.mocked(supabase.from).mockImplementation(mockFrom);
 
         render(
-            <UserProvider>
-                <div>Test Child</div>
-            </UserProvider>
+            <ToastProvider>
+                <UserProvider>
+                    <div>Test Child</div>
+                </UserProvider>
+            </ToastProvider>
         );
 
         // Wait for the async processUser to complete
         await waitFor(() => {
-            expect(supabase.from).toHaveBeenCalledWith('profiles');
+            expect(mockFetch).toHaveBeenCalledWith('/api/profile', expect.anything());
         });
 
         // Check if sensitive data was logged
