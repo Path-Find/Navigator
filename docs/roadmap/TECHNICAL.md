@@ -30,6 +30,7 @@ All AI calls are proxied through the `gemini-proxy` Supabase Edge Function, whic
 - [ ] **Inconsistent storage error handling**: Some methods throw, some silent-fail, some `console.error()`. Standardize so callers can rely on consistent error propagation.
 - [ ] **Mixed async/await and `.then()` chains**: Services mix patterns throughout, making error paths hard to follow. Standardize to async/await.
 - [ ] **Inconsistent error message localization**: Raw API/Supabase error strings shown to users in some flows. Route all user-facing errors through the `errorMessages` utility.
+- [ ] **In-app URL scraper fails ~99% of the time** (`scraperService.ts` / `api/scrape-jobs.ts`, `mode: 'text'`): plain server-side fetch + regex, no JS execution — fails on anything beyond the hardcoded ATS blocklist (most modern career pages, bot detection). The browser extension's `content/extractor.ts` already solves this correctly (reads the rendered DOM client-side, has a working Workday selector) but is a separate, opt-in flow. Options: add a headless-browser backend (Playwright, same approach as GovJobs/Feed's scraper), or lean into steering users toward the extension instead of fixing the backend path. Undecided — tabled 2026-07-18.
 
 ## Data Retention
 
