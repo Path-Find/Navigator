@@ -17,6 +17,7 @@
   "dependencies": {
     "@google/generative-ai": "^0.24.1",
     "@neondatabase/auth": "^0.4.2-beta",
+    "@neondatabase/postgrest-js": "^0.2.0-beta",
     "@neondatabase/serverless": "^1.1.0",
     "@radix-ui/react-dialog": "^1.1.16",
     "@radix-ui/react-progress": "^1.1.9",

@@ -11,7 +11,7 @@ vi.mock('./storageCore', () => ({
     getUserId: vi.fn(),
 }));
 
-vi.mock('../supabase', () => {
+vi.mock('../../lib/data-client', () => {
     const chain: any = {
         select: vi.fn(),
         insert: vi.fn(),
@@ -27,7 +27,7 @@ vi.mock('../supabase', () => {
     chain.delete.mockResolvedValue({ error: null });
     chain.single.mockResolvedValue({ data: null, error: null });
 
-    return { supabase: { from: vi.fn(() => chain) } };
+    return { dataClient: { from: vi.fn(() => chain) } };
 });
 
 vi.mock('../../utils/promiseUtils', () => ({

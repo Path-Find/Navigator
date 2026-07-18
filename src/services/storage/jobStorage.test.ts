@@ -13,7 +13,7 @@ vi.mock('./storageCore', () => ({
     getUserId: vi.fn()
 }));
 
-vi.mock('../supabase', () => {
+vi.mock('../../lib/data-client', () => {
     const mockQueryBuilder: any = {
         insert: vi.fn(),
         update: vi.fn(),
@@ -36,11 +36,8 @@ vi.mock('../supabase', () => {
     );
 
     return {
-        supabase: {
+        dataClient: {
             from: vi.fn(() => mockQueryBuilder),
-            auth: {
-                getUser: vi.fn(() => Promise.resolve({ data: { user: { id: 'test-user' } }, error: null }))
-            }
         }
     };
 });

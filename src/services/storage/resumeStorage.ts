@@ -1,4 +1,4 @@
-import { supabase } from '../supabase';
+import { dataClient } from '../../lib/data-client';
 import { getUserId, areBlocksEqual } from './storageCore';
 import { withTimeout } from '../../utils/promiseUtils';
 import type { ResumeProfile } from '../../types';
@@ -10,7 +10,7 @@ export const ResumeStorage = {
         const userId = await getUserId();
         if (!userId) return [{ ...DEFAULT_PROFILE }];
 
-        const { data, error } = await supabase
+        const { data, error } = await dataClient
             .from('resumes')
             .select('profile_id, content')
             .eq('user_id', userId)
@@ -38,7 +38,7 @@ export const ResumeStorage = {
 
         const upserts = updatedResumes.map(profile =>
             withTimeout(
-                supabase.from('resumes').upsert(
+                dataClient.from('resumes').upsert(
                     {
                         user_id: userId,
                         profile_id: profile.id,
@@ -54,7 +54,7 @@ export const ResumeStorage = {
         // Delete rows for profiles that were removed from the array
         const activeIds = updatedResumes.map(p => p.id);
         const cleanup = withTimeout(
-            supabase.from('resumes')
+            dataClient.from('resumes')
                 .delete()
                 .eq('user_id', userId)
                 .not('profile_id', 'in', `(${activeIds.map(id => `"${id}"`).join(',')})`)

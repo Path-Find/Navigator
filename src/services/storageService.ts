@@ -1,4 +1,5 @@
-import { supabase } from './supabase';
+import { dataClient } from '../lib/data-client';
+import { authClient } from '../lib/auth-client';
 import { Vault, getUserId } from './storage/storageCore';
 import { JobStorage } from './storage/jobStorage';
 import { ResumeStorage } from './storage/resumeStorage';
@@ -41,11 +42,11 @@ export const Storage = {
             Vault.getSecure<RoleModelProfile[]>(STORAGE_KEYS.ROLE_MODELS),
             Vault.getSecure<TargetJob[]>(STORAGE_KEYS.TARGET_JOBS),
             Vault.getSecure<Transcript>(STORAGE_KEYS.TRANSCRIPT_CACHE),
-            supabase.from('jobs').select('id').eq('user_id', userId),
-            supabase.from('user_skills').select('name').eq('user_id', userId),
-            supabase.from('role_models').select('id').eq('user_id', userId),
-            supabase.from('target_jobs').select('id').eq('user_id', userId),
-            supabase.from('transcripts').select('id').eq('user_id', userId).limit(1).maybeSingle()
+            dataClient.from('jobs').select('id').eq('user_id', userId),
+            dataClient.from('user_skills').select('name').eq('user_id', userId),
+            dataClient.from('role_models').select('id').eq('user_id', userId),
+            dataClient.from('target_jobs').select('id').eq('user_id', userId),
+            dataClient.from('transcripts').select('id').eq('user_id', userId).limit(1).maybeSingle()
         ]);
 
         const syncTasks: (Promise<any> | PromiseLike<any>)[] = [];
@@ -74,7 +75,7 @@ export const Storage = {
                     date_added: new Date(job.dateAdded || Date.now()).toISOString(),
                     updated_at: new Date(job.updatedAt || job.dateAdded || Date.now()).toISOString()
                 }));
-                syncTasks.push(supabase.from('jobs').insert(payload).then(({ error }) => {
+                syncTasks.push(dataClient.from('jobs').insert(payload).then(({ error }) => {
                     if (error) {
                         console.error("Cloud Sync Error (Sync Jobs):", error);
                         throw new Error(`Sync Jobs failed: ${error.message}`);
@@ -96,7 +97,7 @@ export const Storage = {
                     evidence: skill.evidence,
                     updated_at: new Date().toISOString()
                 }));
-                syncTasks.push(supabase.from('user_skills').upsert(payload, { onConflict: 'user_id,name' }).then(({ error }) => {
+                syncTasks.push(dataClient.from('user_skills').upsert(payload, { onConflict: 'user_id,name' }).then(({ error }) => {
                     if (error) {
                         console.error("Cloud Sync Error (Sync Skills):", error);
                         throw new Error(`Sync Skills failed: ${error.message}`);
@@ -117,7 +118,7 @@ export const Storage = {
                     name: model.name,
                     content: model
                 }));
-                syncTasks.push(supabase.from('role_models').insert(payload).then(({ error }) => {
+                syncTasks.push(dataClient.from('role_models').insert(payload).then(({ error }) => {
                     if (error) {
                         console.error("Cloud Sync Error (Sync Role Models):", error);
                         throw new Error(`Sync Role Models failed: ${error.message}`);
@@ -144,7 +145,7 @@ export const Storage = {
                     strict_mode: target.strictMode ?? true,
                     date_added: new Date(target.dateAdded || Date.now()).toISOString()
                 }));
-                syncTasks.push(supabase.from('target_jobs').upsert(payload).then(({ error }) => {
+                syncTasks.push(dataClient.from('target_jobs').upsert(payload).then(({ error }) => {
                     if (error) {
                         console.error("Cloud Sync Error (Sync Target Jobs):", error);
                         throw new Error(`Sync Target Jobs failed: ${error.message}`);
@@ -167,7 +168,7 @@ export const Storage = {
     },
 
     async signOut() {
-        await supabase.auth.signOut();
+        await authClient.signOut();
     },
 
     async clearAllData() {
@@ -189,7 +190,7 @@ export const Storage = {
 
         // Resumes are Supabase-only — must delete from cloud too
         if (userId) {
-            await supabase.from('resumes').delete().eq('user_id', userId);
+            await dataClient.from('resumes').delete().eq('user_id', userId);
         }
     },
 
@@ -197,7 +198,7 @@ export const Storage = {
     async submitFeedback(jobId: string, rating: 1 | -1, context: string) {
         const userId = await getUserId();
         if (userId) {
-            await supabase.from('feedback').insert({ user_id: userId, job_id: jobId, rating, context });
+            await dataClient.from('feedback').insert({ user_id: userId, job_id: jobId, rating, context });
         }
     }
 };

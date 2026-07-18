@@ -1,11 +1,11 @@
 import { describe, bench, vi, beforeEach } from 'vitest';
 import { Storage } from './storageService';
-import { supabase } from './supabase';
+import { dataClient } from '../lib/data-client';
 import { Vault } from './storage/storageCore';
 import { STORAGE_KEYS } from '../constants';
 
-vi.mock('./supabase', () => ({
-    supabase: {
+vi.mock('../lib/data-client', () => ({
+    dataClient: {
         from: vi.fn(() => ({
             select: vi.fn(() => ({
                 eq: vi.fn(() => ({
@@ -79,7 +79,7 @@ describe('Storage syncLocalToCloud Benchmark', () => {
             then: vi.fn((onfulfilled) => Promise.resolve({ data: [], error: null }).then(onfulfilled))
         } as any;
 
-        vi.mocked(supabase.from).mockReturnValue(mockQueryBuilder);
+        vi.mocked(dataClient.from).mockReturnValue(mockQueryBuilder);
     });
 
     bench('syncLocalToCloud with many local items', async () => {

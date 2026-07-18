@@ -1,4 +1,4 @@
-import { supabase } from '../supabase';
+import { dataClient } from '../../lib/data-client';
 import { Vault, getUserId } from './storageCore';
 import { STORAGE_KEYS } from '../../constants';
 import { withTimeout } from '../../utils/promiseUtils';
@@ -21,7 +21,7 @@ export const JobStorage = {
         if (userId) {
             try {
                 const { data, error } = await withTimeout(
-                    supabase
+                    dataClient
                         .from('jobs')
                         .select('*')
                         .eq('user_id', userId)
@@ -136,7 +136,7 @@ export const JobStorage = {
                 date_added: new Date(job.dateAdded).toISOString()
             }));
 
-            const { error } = await supabase.from('jobs').insert(payload);
+            const { error } = await dataClient.from('jobs').insert(payload);
             if (error) console.error("Cloud Sync Error (Add Jobs):", error);
         }
         return updated;
@@ -155,7 +155,7 @@ export const JobStorage = {
         // Cloud sync happens in background after local persistence
         if (userId) {
             withTimeout(
-                supabase.from('jobs').insert({
+                dataClient.from('jobs').insert({
                     user_id: userId,
                     id: job.id,
                     job_title: job.analysis?.distilledJob?.roleTitle || job.position || 'Untitled Role',
@@ -191,7 +191,7 @@ export const JobStorage = {
         // Cloud sync happens in background after local persistence
         if (userId) {
             withTimeout(
-                supabase.from('jobs').update({
+                dataClient.from('jobs').update({
                     job_title: updatedJob.analysis?.distilledJob?.roleTitle || updatedJob.position,
                     company: updatedJob.analysis?.distilledJob?.companyName || updatedJob.company,
                     original_text: updatedJob.description,
@@ -222,7 +222,7 @@ export const JobStorage = {
 
         try {
             // 1. Check cloud state
-            const { data: cloudJobs, error } = await supabase
+            const { data: cloudJobs, error } = await dataClient
                 .from('jobs')
                 .select('id')
                 .eq('user_id', userId);
@@ -242,7 +242,7 @@ export const JobStorage = {
 
                 // Upload in small batches to avoid hitting limits
                 for (const job of missingFromCloud) {
-                    await supabase.from('jobs').insert({
+                    await dataClient.from('jobs').insert({
                         user_id: userId,
                         id: job.id,
                         job_title: job.analysis?.distilledJob?.roleTitle || job.position || 'Untitled Role',
@@ -280,7 +280,7 @@ export const JobStorage = {
         if (userId) {
             (async () => {
                 try {
-                    const { error } = await supabase.from('jobs').delete().eq('id', id);
+                    const { error } = await dataClient.from('jobs').delete().eq('id', id);
                     if (error) throw error;
                 } catch (err) {
                     console.error('Cloud Sync Error (Delete Job):', err);

@@ -1,4 +1,4 @@
-import { supabase } from '../supabase';
+import { dataClient } from '../../lib/data-client';
 import { Vault, getUserId } from './storageCore';
 import { STORAGE_KEYS } from '../../constants';
 import { withTimeout } from '../../utils/promiseUtils';
@@ -17,7 +17,7 @@ export const CoachStorage = {
         if (userId) {
             try {
                 const { data, error } = await withTimeout(
-                    supabase
+                    dataClient
                         .from('role_models')
                         .select('*')
                         .eq('user_id', userId)
@@ -61,7 +61,7 @@ export const CoachStorage = {
                 name: roleModel.name,
                 content: roleModel
             }));
-            const { error } = await supabase.from('role_models').insert(payload);
+            const { error } = await dataClient.from('role_models').insert(payload);
             if (error) console.error("Failed to sync role models to cloud:", error);
         }
         return updated;
@@ -82,7 +82,7 @@ export const CoachStorage = {
             (async () => {
                 if (!userId) return;
                 const { error } = await withTimeout(
-                    supabase.from('role_models').insert({
+                    dataClient.from('role_models').insert({
                         id: roleModel.id,
                         user_id: userId,
                         name: roleModel.name,
@@ -106,7 +106,7 @@ export const CoachStorage = {
             (async () => {
                 if (!userId) return;
                 const { error } = await withTimeout(
-                    supabase.from('role_models').delete().eq('id', id)
+                    dataClient.from('role_models').delete().eq('id', id)
                 );
                 if (error) console.error('Cloud Sync Error (Delete Role Model):', error);
             })()
@@ -127,7 +127,7 @@ export const CoachStorage = {
         if (userId) {
             try {
                 const { data, error } = await withTimeout(
-                    supabase
+                    dataClient
                         .from('target_jobs')
                         .select('*')
                         .eq('user_id', userId)
@@ -193,7 +193,7 @@ export const CoachStorage = {
                 date_added: new Date(targetJob.dateAdded).toISOString()
             }));
 
-            const { error } = await supabase.from('target_jobs').upsert(payload);
+            const { error } = await dataClient.from('target_jobs').upsert(payload);
             if (error) console.error("Failed to sync target jobs to cloud:", error);
         }
         return updated;
@@ -223,7 +223,7 @@ export const CoachStorage = {
             (async () => {
                 if (!userId) return;
                 const { error } = await withTimeout(
-                    supabase.from('target_jobs').upsert({
+                    dataClient.from('target_jobs').upsert({
                         id: targetJob.id,
                         user_id: userId,
                         title: targetJob.title,
@@ -253,7 +253,7 @@ export const CoachStorage = {
             (async () => {
                 if (!userId) return;
                 const { error } = await withTimeout(
-                    supabase.from('target_jobs').delete().eq('id', id)
+                    dataClient.from('target_jobs').delete().eq('id', id)
                 );
                 if (error) console.error('Cloud Sync Error (Delete Target Job):', error);
             })()

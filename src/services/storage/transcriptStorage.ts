@@ -1,4 +1,4 @@
-import { supabase } from '../supabase';
+import { dataClient } from '../../lib/data-client';
 import { Vault, getUserId } from './storageCore';
 import { STORAGE_KEYS } from '../../constants';
 import { withTimeout } from '../../utils/promiseUtils';
@@ -17,7 +17,7 @@ export const TranscriptStorage = {
 
         const userId = await getUserId();
         if (userId) {
-            const { data } = await supabase
+            const { data } = await dataClient
                 .from('transcripts')
                 .select('content')
                 .eq('user_id', userId)
@@ -63,7 +63,7 @@ export const TranscriptStorage = {
                 if (!userId) return;
 
                 const { data, error: selectError } = await withTimeout(
-                    supabase.from('transcripts').select('id').eq('user_id', userId).limit(1).maybeSingle()
+                    dataClient.from('transcripts').select('id').eq('user_id', userId).limit(1).maybeSingle()
                 );
 
                 if (selectError) throw selectError;
@@ -78,12 +78,12 @@ export const TranscriptStorage = {
 
                 if (data) {
                     const { error: updateError } = await withTimeout(
-                        supabase.from('transcripts').update(payload).eq('id', data.id)
+                        dataClient.from('transcripts').update(payload).eq('id', data.id)
                     );
                     if (updateError) throw updateError;
                 } else {
                     const { error: insertError } = await withTimeout(
-                        supabase.from('transcripts').insert(payload)
+                        dataClient.from('transcripts').insert(payload)
                     );
                     if (insertError) throw insertError;
                 }

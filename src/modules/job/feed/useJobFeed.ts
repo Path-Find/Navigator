@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { ScraperService } from '../../../services/scraperService';
-import { supabase } from '../../../services/supabase';
+import { dataClient } from '../../../lib/data-client';
 import { analyzeJobFit } from '../../../services/geminiService';
 import type { JobFeedItem, ResumeRow } from '../../../types';
 import { STORAGE_KEYS } from '../../../constants';
@@ -45,7 +45,7 @@ export const useJobFeed = () => {
         setLoading(true);
         try {
             const scraperData = await ScraperService.getFeed();
-            const { data: dbFeed } = await supabase
+            const { data: dbFeed } = await dataClient
                 .from('jobs')
                 .select('*')
                 .eq('status', 'feed')
@@ -81,7 +81,7 @@ export const useJobFeed = () => {
 
     const analyzeJobsInBackground = async (jobs: JobFeedItem[]) => {
         try {
-            const { data: resumes } = await supabase
+            const { data: resumes } = await dataClient
                 .from('resumes')
                 .select('*')
                 .order('created_at', { ascending: false })
@@ -91,7 +91,7 @@ export const useJobFeed = () => {
             const resume = resumes[0] as ResumeRow;
 
             const jobUrls = jobs.map(j => j.url);
-            const { data: existingJobs } = await supabase
+            const { data: existingJobs } = await dataClient
                 .from('jobs')
                 .select('url, analysis')
                 .in('url', jobUrls);
@@ -128,7 +128,7 @@ export const useJobFeed = () => {
 
             setFeed(prev => prev.map(f => f.id === job.id ? { ...f, matchScore } : f));
 
-            await supabase.from('jobs').upsert({
+            await dataClient.from('jobs').upsert({
                 user_id: resume.user_id,
                 job_title: job.title,
                 company: job.company,

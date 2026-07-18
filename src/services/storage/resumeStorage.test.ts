@@ -12,7 +12,7 @@ vi.mock('./storageCore', () => ({
     areBlocksEqual: vi.fn(),
 }));
 
-vi.mock('../supabase', () => {
+vi.mock('../../lib/data-client', () => {
     const chain: any = {
         select: vi.fn(),
         insert: vi.fn(),
@@ -27,7 +27,7 @@ vi.mock('../supabase', () => {
     chain.insert.mockResolvedValue({ error: null });
     chain.update.mockResolvedValue({ error: null });
 
-    return { supabase: { from: vi.fn(() => chain) } };
+    return { dataClient: { from: vi.fn(() => chain) } };
 });
 
 vi.mock('../../utils/promiseUtils', () => ({
@@ -92,12 +92,12 @@ describe('ResumeStorage.saveResumes', () => {
     });
 
     it('does not sync to cloud when no userId', async () => {
-        const { supabase } = await import('../supabase');
+        const { dataClient } = await import('../../lib/data-client');
         vi.mocked(Vault.getSecure).mockResolvedValue(null);
 
         await ResumeStorage.saveResumes([makeProfile('p1')]);
 
-        expect(supabase.from).not.toHaveBeenCalled();
+        expect(dataClient.from).not.toHaveBeenCalled();
     });
 });
 

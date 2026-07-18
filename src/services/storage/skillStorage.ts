@@ -1,4 +1,4 @@
-import { supabase } from '../supabase';
+import { dataClient } from '../../lib/data-client';
 import { Vault, getUserId } from './storageCore';
 import { STORAGE_KEYS } from '../../constants';
 import { withTimeout } from '../../utils/promiseUtils';
@@ -20,7 +20,7 @@ export const SkillStorage = {
         if (userId) {
             try {
                 const { data, error } = await withTimeout(
-                    supabase
+                    dataClient
                         .from('user_skills')
                         .select('*')
                         .eq('user_id', userId)
@@ -93,7 +93,7 @@ export const SkillStorage = {
             updated_at: new Date().toISOString()
         }));
 
-        const { data, error } = await supabase
+        const { data, error } = await dataClient
             .from('user_skills')
             .upsert(payload, { onConflict: 'user_id,name' })
             .select();
@@ -135,7 +135,7 @@ export const SkillStorage = {
         }
 
         const { data, error } = await withTimeout(
-            supabase
+            dataClient
                 .from('user_skills')
                 .upsert({
                     user_id: userId,
@@ -166,7 +166,7 @@ export const SkillStorage = {
         const userId = await getUserId();
         if (userId) {
             const { error } = await withTimeout(
-                supabase.from('user_skills').delete().eq('user_id', userId).eq('name', name)
+                dataClient.from('user_skills').delete().eq('user_id', userId).eq('name', name)
             );
             if (error) throw error;
         }
