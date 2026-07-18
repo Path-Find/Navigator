@@ -1,4 +1,4 @@
-import { supabase } from './supabase';
+import { authClient } from '../lib/auth-client';
 import type { JobFeedItem } from '../types';
 import { LocalStorage } from '../utils/localStorage';
 import { CONTENT_VALIDATION, STORAGE_KEYS } from '../constants';
@@ -76,23 +76,27 @@ export const ScraperService = {
             throw new Error("DOMAIN_BLOCKED");
         }
 
-        // Use Supabase Edge Function for secure, server-side scraping
+        // Use a Vercel Function for secure, server-side scraping
         try {
-            const { data: { session } } = await supabase.auth.getSession();
+            const { data: { session } } = await authClient.getSession();
             if (!session) {
                 throw new Error("Proxy Error: Authentication required. Please sign in again.");
             }
 
-            const { data, error } = await supabase.functions.invoke('scrape-jobs', {
-                body: { url: targetUrl, mode: 'text' },
+            const fnResponse = await fetch('/api/scrape-jobs', {
+                method: 'POST',
                 headers: {
-                    Authorization: `Bearer ${session.access_token}`
-                }
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${session.access_token}`,
+                },
+                body: JSON.stringify({ url: targetUrl, mode: 'text' }),
             });
 
-            if (error) {
-                console.error("Edge function error:", error);
-                throw new Error(`Failed to scrape job content: ${error.message || 'Unknown error'}`);
+            const data = await fnResponse.json().catch(() => ({}));
+
+            if (!fnResponse.ok) {
+                console.error("Function error:", data);
+                throw new Error(`Failed to scrape job content: ${data?.error || 'Unknown error'}`);
             }
 
             if (!data?.text || data.text.length < CONTENT_VALIDATION.MIN_SCRAPED_TEXT_LENGTH) {
