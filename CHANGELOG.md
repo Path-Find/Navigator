@@ -4,6 +4,11 @@ All notable changes to this project will be documented in this file.
 
 See [CHANGELOG_ARCHIVE.md](CHANGELOG_ARCHIVE.md) for earlier history.
 
+## [Unreleased]
+
+### Added
+- **Neon migration (in progress)**: `gemini-proxy` ported from a Supabase Edge Function to a Vercel Function (`api/gemini-proxy.ts`), and Neon Auth wired up as the future auth provider (`src/lib/auth-client.ts`). Supabase remains the live backend for now — this is infrastructure groundwork, nothing user-facing has switched over yet.
+
 ## [2.43.3] — 2026-07-12
 
 ### Fixed

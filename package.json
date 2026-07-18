@@ -16,6 +16,8 @@
   },
   "dependencies": {
     "@google/generative-ai": "^0.24.1",
+    "@neondatabase/auth": "^0.4.2-beta",
+    "@neondatabase/serverless": "^1.1.0",
     "@radix-ui/react-dialog": "^1.1.16",
     "@radix-ui/react-progress": "^1.1.9",
     "@radix-ui/react-slot": "^1.2.4",
@@ -25,6 +27,7 @@
     "@supabase/supabase-js": "^2.107.0",
     "@vercel/analytics": "^2.0.1",
     "framer-motion": "^12.40.0",
+    "jose": "^6.2.3",
     "lucide-react": "^1.17.0",
     "react": "^19.2.7",
     "react-dom": "^19.2.7",
