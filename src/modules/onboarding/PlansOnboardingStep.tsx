@@ -5,7 +5,7 @@ import React, { useState } from 'react';
 import { PlanCard } from '../../components/ui/PlanCard';
 import { paymentService } from '../../services/paymentService';
 import { useUser } from '../../contexts/UserContext';
-import { supabase } from '../../services/supabase';
+import { authClient } from '../../lib/auth-client';
 
 interface PlansOnboardingStepProps {
     onNext: () => void;
@@ -57,17 +57,23 @@ export const PlansOnboardingStep: React.FC<PlansOnboardingStepProps> = ({
                 }
 
                 // Waitlist gate — must match AuthModal behaviour
-                const { data: exists, error: checkError } = await supabase.rpc('check_user_exists', {
-                    email_input: email.toLowerCase().trim()
+                const checkRes = await fetch('/api/check-user-exists', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email: email.toLowerCase().trim() }),
                 });
-                if (!checkError && exists === false) {
+                const { exists } = checkRes.ok ? await checkRes.json() : { exists: true };
+                if (exists === false) {
                     setAuthError('This email isn\'t on the waitlist yet. Sign up at the main page to join.');
                     setLoadingTier(null);
                     return;
                 }
 
                 if (authMode === 'magic-link') {
-                    const { error: magicError } = await supabase.auth.signInWithOtp({
+                    // NOTE (2026-07-18): needs live verification — Better Auth treats magic-link
+                    // as a separate plugin that must be enabled server-side, unlike Supabase
+                    // where it's built into core Auth. Confirm an email actually arrives before shipping.
+                    const { error: magicError } = await authClient.signInWithOtp({
                         email,
                         options: {
                             data: {
@@ -97,7 +103,7 @@ export const PlansOnboardingStep: React.FC<PlansOnboardingStepProps> = ({
                     return;
                 }
 
-                const { error: signUpError } = await supabase.auth.signUp({
+                const { error: signUpError } = await authClient.signUp({
                     email,
                     password,
                     options: {

@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import type { User } from '@supabase/supabase-js';
-import { supabase } from '../services/supabase';
+import { authClient, getAccessToken } from '../lib/auth-client';
 import { Storage } from '../services/storageService';
 import { getDeviceFingerprint } from '../utils/fingerprint';
 import { STORAGE_KEYS } from '../constants';
@@ -28,6 +28,31 @@ const getTestUser = (): User | null => {
     }
     return null;
 };
+
+// api/profile.ts replaces direct supabase.from('profiles') calls — Neon has no
+// client-safe direct-Postgres access, so profile reads/writes go through this instead.
+async function fetchProfile(): Promise<ProfileRow | null> {
+    const token = await getAccessToken();
+    if (!token) return null;
+    const res = await fetch('/api/profile', { headers: { Authorization: `Bearer ${token}` } });
+    if (!res.ok) return null;
+    const { profile } = await res.json();
+    return profile;
+}
+
+async function patchProfile(updates: Record<string, unknown>): Promise<void> {
+    const token = await getAccessToken();
+    if (!token) throw new Error('Not authenticated');
+    const res = await fetch('/api/profile', {
+        method: 'PATCH',
+        headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify(updates),
+    });
+    if (!res.ok) {
+        const { error } = await res.json().catch(() => ({ error: 'Profile update failed' }));
+        throw new Error(error);
+    }
+}
 
 interface UserCoreContextType {
     user: User | null;
@@ -83,35 +108,16 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
         // Start non-blocking fingerprinting immediately
         (getDeviceFingerprint() as Promise<string>).then(fingerprint => {
             if (currentUser) {
-                (supabase.from('profiles').select('device_id').eq('id', currentUser.id).single() as unknown as Promise<any>).then(({ data }) => {
-                    const profile = data as Pick<ProfileRow, 'device_id'> | null;
+                fetchProfile().then(profile => {
                     if (profile && profile.device_id !== fingerprint) {
-                        (supabase.from('profiles').update({ device_id: fingerprint }).eq('id', currentUser.id) as unknown as Promise<any>).then(({ error }) => {
-                            if (error) console.warn("Fingerprint update failed:", error);
-                        }).catch((err: unknown) => console.warn("Fingerprint update failed:", err));
+                        patchProfile({ device_id: fingerprint }).catch((err: unknown) => console.warn("Fingerprint update failed:", err));
                     }
                 }).catch(() => console.warn("Fingerprint profile fetch failed"));
             }
         }).catch((err: unknown) => console.warn("Device fingerprint failed:", err));
 
         try {
-            const { data, error } = await supabase
-                .from('profiles')
-                .select('subscription_tier, is_admin, is_tester, next_gen_enabled, journey, device_id, last_archetype_update, accepted_tos_version')
-                .eq('id', currentUser.id)
-                .single();
-
-            let profileData = data as ProfileRow | null;
-
-            if (error && error.code === 'PGRST204') {
-                // Fallback to absolute basics if schema mismatch
-                const basic = await supabase
-                    .from('profiles')
-                    .select('subscription_tier, is_admin, is_tester')
-                    .eq('id', currentUser.id)
-                    .single();
-                profileData = basic.data as ProfileRow | null;
-            }
+            const profileData = await fetchProfile();
 
             if (profileData) {
                 const tier = (profileData.subscription_tier as UserTier) || 'free';
@@ -134,7 +140,7 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     useEffect(() => {
         // Initial Session Check
-        supabase.auth.getSession().then(({ data: { session } }) => {
+        authClient.getSession().then(({ data: { session } }) => {
             const testUser = getTestUser();
             const targetUser = session?.user ?? testUser;
 
@@ -154,7 +160,7 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
         });
 
         // Auth Change Listener
-        const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+        const { data: { subscription } } = authClient.onAuthStateChange((_event, session) => {
             invalidateUserIdCache();
             processUser(session?.user ?? getTestUser());
         });
@@ -165,7 +171,7 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     const signOut = async () => {
         await Storage.clearAllData();
-        const { error } = await supabase.auth.signOut({ scope: 'local' });
+        const { error } = await authClient.signOut({ scope: 'local' });
         if (error && !error.message?.includes('Auth session missing')) {
             console.error('Sign out failed:', error);
             showError('Sign out failed. Please try again.');
@@ -198,30 +204,24 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
         if (updates.accepted_tos_version) prefs.setAcceptedTosVersion(updates.accepted_tos_version);
         if (updates.next_gen_enabled !== undefined) setIsNextGenEnabled(updates.next_gen_enabled);
 
-        const { error } = await supabase.from('profiles').update(updates).eq('id', user.id);
+        try {
+            await patchProfile(updates);
+        } catch (error) {
+            console.error("Failed to update profile context. Rolling back.", error);
 
-        if (error) {
-            const isGraceful = error.code === 'PGRST204' || error.message?.includes('device_id') || error.message?.includes('journey') || error.message?.includes('last_archetype_update') || error.message?.includes('accepted_tos_version');
+            // Rollback
+            prefs.setJourney(oldJourney);
+            prefs.setLastArchetypeUpdate(oldLastArchetypeUpdate);
+            prefs.setAcceptedTosVersion(oldAcceptedTosVersion);
+            setIsNextGenEnabled(oldNextGenEnabled);
 
-            if (isGraceful) {
-                console.warn("Profile update partially skipped: some columns might be missing in DB.");
-            } else {
-                console.error("Failed to update profile context. Rolling back.", error);
-
-                // Rollback
-                prefs.setJourney(oldJourney);
-                prefs.setLastArchetypeUpdate(oldLastArchetypeUpdate);
-                prefs.setAcceptedTosVersion(oldAcceptedTosVersion);
-                setIsNextGenEnabled(oldNextGenEnabled);
-
-                throw error;
-            }
+            throw error;
         }
     };
 
     const resendVerificationEmail = async () => {
         if (!user?.email) return { success: false, error: 'No email found' };
-        const { error } = await supabase.auth.resend({
+        const { error } = await authClient.resend({
             type: 'signup',
             email: user.email,
         });
@@ -229,7 +229,7 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
     };
 
     const refreshUser = async () => {
-        const { data: { user: updatedUser } } = await supabase.auth.getUser();
+        const { data: { user: updatedUser } } = await authClient.getUser();
         if (updatedUser) {
             processUser(updatedUser);
         }

@@ -1,5 +1,5 @@
 import { neon } from '@neondatabase/serverless';
-import { jwtVerify, createRemoteJWKSet } from 'jose';
+import { verifyUser, getCorsHeaders } from './_lib/verifyAuth';
 
 // Vercel Function port of supabase/functions/gemini-proxy/index.ts.
 // Same business logic (tier gating, quota, refunds); auth + data access moved to Neon Auth + Neon Postgres.
@@ -8,45 +8,12 @@ import { jwtVerify, createRemoteJWKSet } from 'jose';
 
 const sql = neon(process.env.NEON_DATABASE_URL!);
 
-const ALLOWED_ORIGINS = [
-    process.env.SITE_URL ?? '',
-    'http://localhost:5173',
-    'http://localhost:4173',
-].filter(Boolean);
-
-const getCorsHeaders = (req: Request) => {
-    const origin = req.headers.get('Origin') ?? '';
-    const isVercel = origin.endsWith('.vercel.app');
-    const allowedOrigin = (ALLOWED_ORIGINS.includes(origin) || isVercel) ? origin : '';
-
-    return {
-        'Access-Control-Allow-Origin': allowedOrigin,
-        'Access-Control-Allow-Headers': 'authorization, content-type',
-    };
-};
-
 const MAX_LOG_LENGTH = 200;
 const sanitizeLog = (val: unknown) => {
     // eslint-disable-next-line no-control-regex
     const str = String(val).replace(/[\n\r\t\0\x08\x09\x1a\x1b]/g, ' ');
     return str.length > MAX_LOG_LENGTH ? str.substring(0, MAX_LOG_LENGTH) + '...' : str;
 };
-
-// Neon Auth JWT verification — https://neon.com/docs/auth/guides/plugins/jwt
-// NEON_AUTH_BASE_URL must be set once Neon Auth is wired up client-side (Task #7).
-const JWKS = process.env.NEON_AUTH_BASE_URL
-    ? createRemoteJWKSet(new URL(`${process.env.NEON_AUTH_BASE_URL}/.well-known/jwks.json`))
-    : null;
-
-async function verifyUser(authHeader: string): Promise<string> {
-    if (!JWKS) throw new Error('NEON_AUTH_BASE_URL not configured');
-    const token = authHeader.replace(/^Bearer\s+/i, '');
-    const { payload } = await jwtVerify(token, JWKS, {
-        issuer: new URL(process.env.NEON_AUTH_BASE_URL!).origin,
-    });
-    if (!payload.sub) throw new Error('Token missing subject claim');
-    return payload.sub;
-}
 
 export const TIER_MODELS: Record<string, { extraction: string; analysis: string }> = {
     free: { extraction: 'gemini-2.5-flash', analysis: 'gemini-2.5-flash' },
@@ -63,12 +30,7 @@ export default async function handler(req: Request): Promise<Response> {
 
     try {
         // 1. AUTHORIZATION & USER TIER CHECK
-        const authHeader = req.headers.get('Authorization');
-        if (!authHeader) {
-            throw new Error('Missing Authorization header');
-        }
-
-        const userId = await verifyUser(authHeader);
+        const userId = await verifyUser(req.headers.get('Authorization'));
 
         const profileRows = await sql`
             SELECT subscription_tier, is_admin, is_tester FROM profiles WHERE id = ${userId}

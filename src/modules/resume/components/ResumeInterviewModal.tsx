@@ -9,7 +9,7 @@ import {
     type ResumeInterviewQA
 } from '../../../services/ai/interviewAiService';
 import { checkInterviewLimit } from '../../../services/usageLimits';
-import { supabase } from '../../../services/supabase';
+import { authClient } from '../../../lib/auth-client';
 import type { ExperienceBlock } from '../types';
 
 interface ResumeInterviewModalProps {
@@ -35,7 +35,7 @@ export const ResumeInterviewModal: React.FC<ResumeInterviewModalProps> = ({ bloc
     React.useEffect(() => {
         const load = async () => {
             try {
-                const { data: { user } } = await supabase.auth.getUser();
+                const { data: { user } } = await authClient.getUser();
                 if (user) {
                     const limit = await checkInterviewLimit(user.id);
                     if (!limit.allowed) {

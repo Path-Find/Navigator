@@ -7,7 +7,7 @@ import { useToast } from '../../../contexts/ToastContext';
 import { useLocalStorage } from '../../../hooks/useLocalStorage';
 import { STORAGE_KEYS } from '../../../constants';
 import { checkRoleModelLimit } from '../../../services/usageLimits';
-import { supabase } from '../../../services/supabase';
+import { authClient } from '../../../lib/auth-client';
 
 export const useCoachManager = () => {
     const { showInfo, showError } = useToast();
@@ -46,7 +46,7 @@ export const useCoachManager = () => {
 
     const handleAddRoleModel = useCallback(async (file: File) => {
         try {
-            const { data: { user } } = await supabase.auth.getUser();
+            const { data: { user } } = await authClient.getUser();
             if (user) {
                 const limitResult = await checkRoleModelLimit(user.id);
                 if (!limitResult.allowed) {

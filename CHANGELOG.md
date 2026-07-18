@@ -8,6 +8,7 @@ See [CHANGELOG_ARCHIVE.md](CHANGELOG_ARCHIVE.md) for earlier history.
 
 ### Added
 - **Neon migration (in progress)**: `gemini-proxy` ported from a Supabase Edge Function to a Vercel Function (`api/gemini-proxy.ts`), and Neon Auth wired up as the future auth provider (`src/lib/auth-client.ts`). Supabase remains the live backend for now — this is infrastructure groundwork, nothing user-facing has switched over yet.
+- **Neon migration: auth cutover**: `UserContext.tsx` and 12 other files now drive sign-in/session/profile reads through Neon Auth instead of Supabase Auth, via a new `api/profile.ts` and `api/check-user-exists.ts`. Known gap: `paymentService.ts` (billing portal) and `scraperService.ts` still depend on a live Supabase session and will stop working once this ships, until their edge functions are ported too.
 
 ## [2.43.3] — 2026-07-12
 

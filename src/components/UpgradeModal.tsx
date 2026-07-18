@@ -4,7 +4,7 @@ import { X, Sparkles, Zap, Check, Shield, Cpu, Loader2 } from 'lucide-react';
 import { useToast } from '../contexts/ToastContext';
 import { paymentService } from '../services/paymentService';
 import { PLAN_PRICING } from '../constants';
-import { supabase } from '../services/supabase';
+import { authClient } from '../lib/auth-client';
 
 interface UpgradeModalProps {
     limitInfo?: UsageLimitResult | null;
@@ -21,7 +21,7 @@ export const UpgradeModal: React.FC<UpgradeModalProps> = ({ limitInfo, onClose, 
 
     const handleUpgrade = async (plan: string) => {
         // Check authentication
-        const { data: { user } } = await supabase.auth.getUser();
+        const { data: { user } } = await authClient.getUser();
         if (!user) {
             showError('Please sign in first to upgrade.');
             return;

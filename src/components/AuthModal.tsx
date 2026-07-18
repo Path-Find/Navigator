@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { supabase } from '../services/supabase';
+import { authClient } from '../lib/auth-client';
 import { X } from 'lucide-react';
 import { getUserFriendlyError } from '../utils/errorMessages';
 import type { FeatureDefinition } from '../featureRegistry';
@@ -64,11 +64,14 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, featureCo
         setError(null);
 
         try {
-            const { data: exists, error: checkError } = await supabase.rpc('check_user_exists', {
-                email_input: email.toLowerCase().trim()
+            const checkRes = await fetch('/api/check-user-exists', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email: email.toLowerCase().trim() }),
             });
+            const { exists } = checkRes.ok ? await checkRes.json() : { exists: true };
 
-            if (!checkError && exists === false) {
+            if (exists === false) {
                 setShowWaitlist(true);
             } else {
                 setIsSignUp(false);
@@ -88,11 +91,11 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, featureCo
 
         try {
             if (isSignUp) {
-                const { error } = await supabase.auth.signUp({ email, password });
+                const { error } = await authClient.signUp({ email, password });
                 if (error) throw error;
                 setSuccessMessage("Account created! Please check your email to confirm.");
             } else {
-                const { error } = await supabase.auth.signInWithPassword({ email, password });
+                const { error } = await authClient.signInWithPassword({ email, password });
                 if (error) throw error;
                 await import('../services/storageService').then(m => m.Storage.syncLocalToCloud());
                 onClose();
@@ -113,7 +116,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, featureCo
         setError(null);
 
         try {
-            const { error: resetError } = await supabase.auth.resetPasswordForEmail(email.trim(), {
+            const { error: resetError } = await authClient.resetPasswordForEmail(email.trim(), {
                 redirectTo: `${window.location.origin}/settings`,
             });
             if (resetError) throw resetError;

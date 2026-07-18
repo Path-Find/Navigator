@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import { supabase } from '../../services/supabase';
+import { authClient } from '../../lib/auth-client';
 import { checkInterviewLimit } from '../../services/usageLimits';
 import { useToast } from '../../contexts/ToastContext';
 import { useGlobalUI } from '../../contexts/GlobalUIContext';
@@ -46,7 +46,7 @@ export const InterviewAdvisor: React.FC = () => {
     useEffect(() => {
         if (type === 'general' || type === 'tailored') {
             const startSession = async () => {
-                const { data: { user } } = await supabase.auth.getUser();
+                const { data: { user } } = await authClient.getUser();
                 if (!user) {
                     showError(`Please sign in to start a ${type} session`);
                     navigate(ROUTES.INTERVIEWS);

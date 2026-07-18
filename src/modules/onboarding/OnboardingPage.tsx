@@ -188,16 +188,17 @@ export const OnboardingPage: React.FC = () => {
         LocalStorage.set(STORAGE_KEYS.USER_JOURNEY, primaryJourney);
         sessionStorage.setItem('pending_user_meta', JSON.stringify(userData));
 
-        // Try to update Supabase if user exists (though they likely don't yet)
+        // Try to update the profile if user exists (though they likely don't yet)
         try {
-            const { supabase } = await import('../../services/supabase');
-            const { data: { user } } = await supabase.auth.getUser();
-            if (user) {
-                await supabase.from('profiles').update({
-                    first_name: firstName,
-                    last_name: lastName,
-                    journey: primaryJourney
-                }).eq('id', user.id);
+            const { authClient, getAccessToken } = await import('../../lib/auth-client');
+            const { data: { user } } = await authClient.getUser();
+            const token = await getAccessToken();
+            if (user && token) {
+                await fetch('/api/profile', {
+                    method: 'PATCH',
+                    headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ journey: primaryJourney }),
+                });
             }
         } catch {
             // Ignore auth errors here

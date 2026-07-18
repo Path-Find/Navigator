@@ -1,4 +1,5 @@
-import { supabase, supabaseAnonKey } from "../supabase";
+import { supabase } from "../supabase";
+import { authClient } from "../../lib/auth-client";
 import { getUserFriendlyError, getRetryMessage } from "../../utils/errorMessages";
 import { API_CONFIG } from "../../constants";
 
@@ -27,18 +28,16 @@ export const getModel = async (params: ModelParams & { signal?: AbortSignal }) =
     return {
         generateContent: async (payload: { contents: { role: string; parts: ({ text: string } | { inlineData: { mimeType: string; data: string } })[] }[]; generationConfig?: Record<string, unknown> }) => {
             const { generationConfig: payloadGenerationConfig, ...contentsOnly } = payload;
-            const { data: { session } } = await supabase.auth.getSession();
+            const { data: { session } } = await authClient.getSession();
             if (!session) {
                 console.error("AI Proxy call failed: No active session found.");
                 throw new Error("Proxy Error: Authentication required. Please sign in again.");
             }
 
-            const fnUrl = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/gemini-proxy`;
-            const fnResponse = await fetch(fnUrl, {
+            const fnResponse = await fetch('/api/gemini-proxy', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    'apikey': supabaseAnonKey,
                     'Authorization': `Bearer ${session.access_token}`,
                 },
                 body: JSON.stringify({
@@ -79,16 +78,25 @@ throw new Error(`Proxy Error: ${statusCode ?? ''} ${errObj.message}${details ? `
 export const getEmbeddingModel = async (params: EmbeddingParams) => {
     return {
         embedContent: async (text: string) => {
-            const { data, error } = await supabase.functions.invoke('gemini-proxy', {
-                body: {
+            const { data: { session } } = await authClient.getSession();
+            if (!session) throw new Error("Proxy Error: Authentication required. Please sign in again.");
+
+            const fnResponse = await fetch('/api/gemini-proxy', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${session.access_token}`,
+                },
+                body: JSON.stringify({
                     payload: { content: { parts: [{ text }] } },
                     task: 'embedding',
                     feature: params.feature,
                     model: params.model || 'text-embedding-004'
-                }
+                }),
             });
 
-            if (error) throw new Error(`Proxy Error: ${error.message}`);
+            const data = await fnResponse.json().catch(() => ({}));
+            if (!fnResponse.ok) throw new Error(`Proxy Error: ${fnResponse.status} ${fnResponse.statusText}`);
             if (data?.error) throw new Error(`AI Error: ${data.error}`);
             if (!data?.embedding) throw new Error('AI Error: no embedding returned');
 
@@ -116,9 +124,12 @@ export const logToSupabase = async (params: {
     };
 
     try {
-        const { data: { session } } = await supabase.auth.getSession();
+        const { data: { session } } = await authClient.getSession();
         const userId = session?.user?.id;
 
+        // NOTE (2026-07-18): still writes to Supabase's logs table — non-critical
+        // client-side telemetry, deferred along with the rest of the data layer
+        // (see storageService.ts). Neon has the equivalent table already.
         await supabase.from('logs').insert({
             user_id: userId,
             job_id: params.job_id,

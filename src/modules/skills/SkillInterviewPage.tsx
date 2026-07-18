@@ -8,7 +8,7 @@ import { generateUnifiedQuestions, analyzeUnifiedResponse } from '../../services
 import { useSkillContext } from './context/SkillContext';
 import { useGlobalUI } from '../../contexts/GlobalUIContext';
 import { checkInterviewLimit, getUsageStats } from '../../services/usageLimits';
-import { supabase } from '../../services/supabase';
+import { authClient } from '../../lib/auth-client';
 import { useToast } from '../../contexts/ToastContext';
 
 type InterviewStep = 'intro' | 'interview' | 'summary';
@@ -63,7 +63,7 @@ export const SkillInterviewPage: React.FC = () => {
     useEffect(() => {
         const fetchUsage = async () => {
             try {
-                const { data: { user } } = await supabase.auth.getUser();
+                const { data: { user } } = await authClient.getUser();
                 if (!user) return;
                 const stats = await getUsageStats(user.id);
                 if (stats.isFallback) {
@@ -92,7 +92,7 @@ export const SkillInterviewPage: React.FC = () => {
         setLimitError(null);
 
         try {
-            const { data: { user } } = await supabase.auth.getUser();
+            const { data: { user } } = await authClient.getUser();
             if (!user) {
                 navigate('/');
                 return;

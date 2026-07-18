@@ -5,7 +5,7 @@ import { useModal } from '../../contexts/ModalContext';
 import { useToast } from '../../contexts/ToastContext';
 import { useUser } from '../../contexts/UserContext';
 import { useJobContext } from '../job/context/JobContext';
-import { supabase } from '../../services/supabase';
+import { authClient } from '../../lib/auth-client';
 import { Button } from '../../components/ui/Button';
 import { SharedPageLayout } from '../../components/common/SharedPageLayout';
 import { PageHeader } from '../../components/ui/PageHeader';
@@ -24,7 +24,7 @@ export const SettingsPage: React.FC = () => {
 
     const handleResetPassword = async () => {
         if (user?.email) {
-            const { error } = await supabase.auth.resetPasswordForEmail(user.email, {
+            const { error } = await authClient.resetPasswordForEmail(user.email, {
                 redirectTo: window.location.origin + '/reset-password',
             });
             if (error) {
@@ -36,7 +36,7 @@ export const SettingsPage: React.FC = () => {
     };
 
     const handleCopyToken = async () => {
-        const { data } = await supabase.auth.getSession();
+        const { data } = await authClient.getSession();
         if (data.session?.access_token) {
             navigator.clipboard.writeText(data.session.access_token);
             setIsCopyingToken(true);

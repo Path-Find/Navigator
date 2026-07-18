@@ -1,4 +1,4 @@
-import { supabase } from '../supabase';
+import { authClient } from '../../lib/auth-client';
 import { encryptionService } from '../encryptionService';
 import { Logger } from '../../utils/logger';
 import { OperationQueue } from '../../utils/promiseUtils';
@@ -11,7 +11,7 @@ const vaultQueue = new OperationQueue();
 
 export const getUserId = async (): Promise<string | undefined> => {
     if (!cachedUserIdPromise) {
-        cachedUserIdPromise = supabase.auth.getSession()
+        cachedUserIdPromise = authClient.getSession()
             .then(({ data: { session } }) => session?.user?.id)
             .catch(() => undefined);
         setTimeout(() => { cachedUserIdPromise = null; }, 5_000);
