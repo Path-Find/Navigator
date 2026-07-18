@@ -1,4 +1,4 @@
-import { supabase } from "../supabase";
+import { dataClient } from "../../lib/data-client";
 import { authClient } from "../../lib/auth-client";
 import { getUserFriendlyError, getRetryMessage } from "../../utils/errorMessages";
 import { API_CONFIG } from "../../constants";
@@ -127,10 +127,7 @@ export const logToSupabase = async (params: {
         const { data: { session } } = await authClient.getSession();
         const userId = session?.user?.id;
 
-        // NOTE (2026-07-18): still writes to Supabase's logs table — non-critical
-        // client-side telemetry, deferred along with the rest of the data layer
-        // (see storageService.ts). Neon has the equivalent table already.
-        await supabase.from('logs').insert({
+        await dataClient.from('logs').insert({
             user_id: userId,
             job_id: params.job_id,
             event_type: params.event_type,

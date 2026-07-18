@@ -1,4 +1,4 @@
-import { supabase } from './supabase';
+import { dataClient } from '../lib/data-client';
 import type { UserTier } from '../types/app';
 import { PLAN_LIMITS } from '../constants';
 
@@ -42,7 +42,7 @@ export interface UsageStats {
  */
 export const checkAnalysisLimit = async (userId: string): Promise<UsageLimitResult> => {
     try {
-        const { data, error } = await supabase.rpc('check_analysis_limit', {
+        const { data, error } = await dataClient.rpc('check_analysis_limit', {
             p_user_id: userId
         });
 
@@ -63,7 +63,7 @@ export const checkAnalysisLimit = async (userId: string): Promise<UsageLimitResu
  */
 export const incrementAnalysisCount = async (userId: string): Promise<void> => {
     try {
-        const { error } = await supabase.rpc('increment_analysis_count', {
+        const { error } = await dataClient.rpc('increment_analysis_count', {
             p_user_id: userId
         });
 
@@ -136,7 +136,7 @@ export const getUsageStats = async (userId: string): Promise<UsageStats> => {
         const results = await Promise.allSettled([
             // Attempt to fetch all profile columns, but handle potential missing columns gracefully
             (async () => {
-                const { data, error } = await supabase
+                const { data, error } = await dataClient
                     .from('profiles')
                     .select('subscription_tier, is_admin, is_tester, job_analyses_count, total_ai_calls, inbound_email_token')
                     .eq('id', userId)
@@ -145,7 +145,7 @@ export const getUsageStats = async (userId: string): Promise<UsageStats> => {
                 if (error && error.code === 'PGRST204') { // PGRST204 can indicate no row found, or sometimes schema mismatch if single() fails
                     console.warn(`Profile query failed for user ${userId} with code PGRST204. Attempting basic profile fetch.`);
                     // Fallback to a more basic query if the initial one fails, e.g., due to missing columns
-                    const { data: basicData, error: basicError } = await supabase
+                    const { data: basicData, error: basicError } = await dataClient
                         .from('profiles')
                         .select('subscription_tier,is_admin,is_tester,total_ai_calls,job_analyses_count,inbound_email_token')
                         .eq('id', userId)
@@ -161,28 +161,28 @@ export const getUsageStats = async (userId: string): Promise<UsageStats> => {
                 }
                 return { data, error };
             })(),
-            (async () => supabase
+            (async () => dataClient
                 .from('jobs')
                 .select('*', { count: 'exact', head: true })
                 .eq('user_id', userId)
                 .gte('date_added', today))(),
-            (async () => supabase
+            (async () => dataClient
                 .from('jobs')
                 .select('*', { count: 'exact', head: true })
                 .eq('user_id', userId)
                 .gte('date_added', weekAgo.toISOString()))(),
             // Monthly interview count: count the START of sessions, not individual analyses
-            (async () => supabase
+            (async () => dataClient
                 .from('logs')
                 .select('*', { count: 'exact', head: true })
                 .eq('user_id', userId)
                 .in('event_type', ['interview_generation', 'unified_skill_interview_generation', 'skill_interview_generation'])
                 .gte('created_at', firstOfMonth.toISOString()))(),
-            (async () => supabase
+            (async () => dataClient
                 .from('role_models')
                 .select('*', { count: 'exact', head: true })
                 .eq('user_id', userId))(),
-            (async () => supabase
+            (async () => dataClient
                 .from('jobs')
                 .select('*', { count: 'exact', head: true })
                 .eq('user_id', userId)

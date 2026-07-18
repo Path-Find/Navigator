@@ -1,4 +1,4 @@
-import { supabase } from '../../supabase';
+import { dataClient } from '../../../lib/data-client';
 import { getEmbeddingModel } from '../aiCore';
 
 export type EmbeddingSource = 'full_profile' | 'experience_block' | 'onboarding_goal' | 'job_role';
@@ -20,7 +20,7 @@ export class RdEmbeddingService {
 
             const embedding = await model.embedContent(text);
 
-            const { error } = await supabase
+            const { error } = await dataClient
                 .from('rd_user_embeddings')
                 .upsert({
                     user_id: userId,
@@ -52,7 +52,7 @@ export class RdEmbeddingService {
     static async searchSimilar(userId: string, vector: number[], limit: number = 5) {
         try {
             // Note: This requires a custom RPC in Supabase to perform vector comparison
-            const { data, error } = await supabase.rpc('match_rd_embeddings', {
+            const { data, error } = await dataClient.rpc('match_rd_embeddings', {
                 query_embedding: vector,
                 match_limit: limit,
                 p_user_id: userId
