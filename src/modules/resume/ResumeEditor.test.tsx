@@ -25,7 +25,7 @@ vi.mock('../skills/context/SkillContext', () => ({
     }),
 }));
 
-vi.mock('react-router-dom', () => ({
+vi.mock('react-router', () => ({
     useNavigate: () => vi.fn(),
 }));
 

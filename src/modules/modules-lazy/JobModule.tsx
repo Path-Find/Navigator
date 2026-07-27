@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { useLocation, Routes, Route } from 'react-router-dom';
+import { useLocation, Routes, Route } from 'react-router';
 import { useJobContext } from '../job/context/JobContext';
 import HomePage from '../job/HomePage';
 import JobMatchInput from '../job/JobMatchInput';

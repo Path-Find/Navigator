@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation } from 'react-router';
 import type { SavedJob } from '../types';
 import { ROUTES, TIME_PERIODS } from '../constants';
 import type { UsageLimitResult } from '../services/usageLimits';

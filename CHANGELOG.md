@@ -13,6 +13,9 @@ See [CHANGELOG_ARCHIVE.md](CHANGELOG_ARCHIVE.md) for earlier history.
 - **Neon migration: scraper ported**: `scrape-jobs` moved to a Vercel Function (`api/scrape-jobs.ts`), including its SSRF-safe fetch/DNS validation. `paymentService.ts`'s billing portal was found to already be non-functional independent of this migration — `stripe-webhook` was meant to populate `profiles.stripe_customer_id` but that column doesn't exist and checkout has been kill-switched for a while, so it's left on Supabase rather than porting dead functionality.
 - **Neon migration: complete except payments**: remaining R&D/telemetry calls (`usageLimits.ts`, `embeddingService.ts`, `aiCore.ts`'s debug log) moved to Neon. Every real, working feature in the app now runs on Neon — only the already-dead billing-portal path is still on Supabase.
 
+### Security
+- **Dependabot #53**: Upgraded React Router to the patched 8.3.0 release to resolve the RSC CSRF vulnerability.
+
 ## [2.43.3] — 2026-07-12
 
 ### Fixed
@@ -1591,4 +1594,3 @@ See [CHANGELOG_ARCHIVE.md](CHANGELOG_ARCHIVE.md) for earlier history.
 ### Fixed
 - **Performance**: Resolved an infinite render loop in `HomeInput` component that caused high CPU usage.
 - **Cleanup**: Terminated orphaned background processes during initialization.
-

@@ -1,6 +1,6 @@
 import React from 'react';
 import { Plus, ArrowRightLeft, Check } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router';
 import type { ExperienceBlock, ResumeProfile, ResumeSuggestion } from '../types';
 import type { CustomSkill } from '../../skills/types';
 import { Card } from '../../../components/ui/Card';

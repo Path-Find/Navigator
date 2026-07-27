@@ -61,7 +61,7 @@ function EnvErrorPage({ errors }: { errors: string[] }) {
   );
 }
 
-import { BrowserRouter } from 'react-router-dom';
+import { BrowserRouter } from 'react-router';
 
 const root = ReactDOM.createRoot(rootElement);
 

@@ -7,7 +7,7 @@ import { SharedPageLayout } from '../../components/common/SharedPageLayout';
 import { PageHeader } from '../../components/ui/PageHeader';
 import { useUser } from '../../contexts/UserContext';
 import { useModal } from '../../contexts/ModalContext';
-import { Link, useNavigate, useSearchParams } from 'react-router-dom';
+import { Link, useNavigate, useSearchParams } from 'react-router';
 import { paymentService } from '../../services/paymentService';
 import { PlanCard } from '../../components/ui/PlanCard';
 import { useToast } from '../../contexts/ToastContext';

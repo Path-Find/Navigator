@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect, type ReactNode } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router';
 import { STORAGE_KEYS } from '../constants';
 import { LocalStorage } from '../utils/localStorage';
 import { getViewIdFromPath, type ViewId, getPathFromViewId } from '../utils/navigation';

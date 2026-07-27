@@ -2,7 +2,7 @@ import React from 'react';
 import { TrendingUp, Sparkles, Zap, Bookmark, FileText, Users, Target, GraduationCap, Mail, Shield, Scale, MessageSquare } from 'lucide-react';
 import { useGlobalUI } from '../../contexts/GlobalUIContext';
 import { ROUTES, APP_VERSION } from '../../constants';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router';
 import { type ViewId } from '../../utils/navigation';
 import { useUser } from '../../contexts/UserContext';
 import { useModal } from '../../contexts/ModalContext';

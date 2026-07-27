@@ -14,7 +14,7 @@ import { SkillSuggestions } from './SkillSuggestions';
 import { useLocalStorage } from '../../hooks/useLocalStorage';
 import { STORAGE_KEYS } from '../../constants';
 
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router';
 import { useSkillContext } from '../../modules/skills/context/SkillContext';
 import { useResumeContext } from '../../modules/resume/context/ResumeContext';
 

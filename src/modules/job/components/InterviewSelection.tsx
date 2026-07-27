@@ -1,6 +1,6 @@
 import { Target, Zap, MessageSquare, Sparkles, AlertCircle } from 'lucide-react';
 import { motion } from 'framer-motion';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router';
 import { ROUTES } from '../../../constants';
 import { BentoCard } from '../../../components/ui/BentoCard';
 import { FEATURE_COLORS } from '../../../featureRegistry';

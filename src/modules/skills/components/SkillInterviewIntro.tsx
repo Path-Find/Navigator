@@ -1,7 +1,7 @@
 import { Sparkles, AlertCircle } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { ROUTES } from '../../../constants';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router';
 
 export const SkillInterviewIntro = ({ isLoading, limitError, usageInfo, handleStart, skills, isCapped, MAX_SKILLS_PER_SESSION }: any) => {
     const navigate = useNavigate();

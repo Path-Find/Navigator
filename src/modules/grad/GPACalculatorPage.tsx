@@ -1,5 +1,5 @@
 import React from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router';
 import { SharedPageLayout } from '../../components/common/SharedPageLayout';
 import { ROUTES } from '../../constants';
 import { PageHeader } from '../../components/ui/PageHeader';

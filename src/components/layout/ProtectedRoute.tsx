@@ -1,5 +1,5 @@
 import React from 'react';
-import { Navigate, useLocation, Outlet } from 'react-router-dom';
+import { Navigate, useLocation, Outlet } from 'react-router';
 import { useUser } from '../../contexts/UserContext';
 import { LoadingState } from '../common/LoadingState';
 import { ROUTES } from '../../constants';

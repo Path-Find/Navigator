@@ -1,7 +1,7 @@
 import React from 'react';
 import { TrendingUp, Briefcase, LogOut, Settings, Bookmark, Sparkles, FileText, Target, ShieldCheck, Sun, Moon, MessageSquare, X } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router';
 import { useUser } from '../../contexts/UserContext';
 import { useModal } from '../../contexts/ModalContext';
 import { useGlobalUI } from '../../contexts/GlobalUIContext';

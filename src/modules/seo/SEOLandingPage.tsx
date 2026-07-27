@@ -1,5 +1,5 @@
 import React from 'react';
-import { useParams, Link, useNavigate } from 'react-router-dom';
+import { useParams, Link, useNavigate } from 'react-router';
 import { CanonicalService } from '../../services/seo/canonicalService';
 import { SEO_BUCKETS } from '../../services/seo/seo-data';
 import { ArrowRight, CheckCircle2, Star, TrendingUp, AlertTriangle, Briefcase } from 'lucide-react';

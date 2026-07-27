@@ -9,7 +9,7 @@ import { authClient } from '../../lib/auth-client';
 import { Button } from '../../components/ui/Button';
 import { SharedPageLayout } from '../../components/common/SharedPageLayout';
 import { PageHeader } from '../../components/ui/PageHeader';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router';
 import { NextGenCalibration } from './components/NextGenCalibration';
 
 export const SettingsPage: React.FC = () => {

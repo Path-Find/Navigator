@@ -1,5 +1,5 @@
 import { useState, useMemo } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router';
 import type { SavedJob } from '../../types';
 import { Trash2, ArrowRight, Filter, Clock, ShieldAlert, Briefcase, Loader2, ChevronDown } from 'lucide-react';
 import { SharedPageLayout } from '../../components/common/SharedPageLayout';

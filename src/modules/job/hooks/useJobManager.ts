@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback, useRef, type Dispatch, type SetStateAction } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate } from 'react-router';
 import type { SavedJob, AppState } from '../../../types';
 import { Storage } from '../../../services/storageService';
 import { analyzeJobFit } from '../../../services/geminiService';

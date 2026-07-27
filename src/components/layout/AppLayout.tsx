@@ -1,5 +1,5 @@
 import React, { Suspense } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation } from 'react-router';
 import { Analytics } from '@vercel/analytics/react';
 
 // Components
