@@ -4,6 +4,11 @@ All notable changes to this project will be documented in this file.
 
 See [CHANGELOG_ARCHIVE.md](CHANGELOG_ARCHIVE.md) for earlier history.
 
+## [2.43.5] — 2026-07-27
+
+### Security
+- **Dependabot #51**: Pinned `brace-expansion` to the patched release so transitive ESLint dependencies cannot resolve the vulnerable version.
+
 ## [2.43.4] — 2026-07-27
 
 ### Added
