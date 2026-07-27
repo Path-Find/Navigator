@@ -4,10 +4,12 @@ All notable changes to this project will be documented in this file.
 
 See [CHANGELOG_ARCHIVE.md](CHANGELOG_ARCHIVE.md) for earlier history.
 
-## [Unreleased]
+## [2.43.8] — 2026-07-27
 
 ### Fixed
 - **Vercel deployment**: Pinned TypeScript to the supported 6.x line so API functions bundle without the TypeScript 7 compiler crash.
+
+## [Unreleased]
 
 ## [2.43.7] — 2026-07-27
 
