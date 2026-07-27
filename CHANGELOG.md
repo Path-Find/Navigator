@@ -4,7 +4,7 @@ All notable changes to this project will be documented in this file.
 
 See [CHANGELOG_ARCHIVE.md](CHANGELOG_ARCHIVE.md) for earlier history.
 
-## [Unreleased]
+## [2.43.6] — 2026-07-27
 
 ### Security
 - **Dependabot #55–#64**: Pinned the transitive Better Auth dependency to `1.6.25`, resolving all 11 current Better Auth advisories.
