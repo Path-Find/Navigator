@@ -4,6 +4,11 @@ All notable changes to this project will be documented in this file.
 
 See [CHANGELOG_ARCHIVE.md](CHANGELOG_ARCHIVE.md) for earlier history.
 
+## [Unreleased]
+
+### Security
+- **Dependabot #55–#64**: Aligned the Neon Auth lockfile metadata and Better Auth passkey package with the patched `1.6.25` dependency graph.
+
 ## [2.43.6] — 2026-07-27
 
 ### Security
