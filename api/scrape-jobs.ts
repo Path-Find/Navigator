@@ -237,7 +237,8 @@ export default async function handler(req: Request): Promise<Response> {
 
     } catch (error) {
         const message = error instanceof Error ? error.message : String(error);
-        return new Response(JSON.stringify({ error: message }), {
+        console.error('scrape-jobs error:', message);
+        return new Response(JSON.stringify({ error: 'Unable to process this job page. Please try again.' }), {
             headers: { ...cors, 'Content-Type': 'application/json' },
             status: 400,
         });

@@ -80,7 +80,7 @@ export default async function handler(req: Request): Promise<Response> {
     } catch (error) {
         const message = error instanceof Error ? error.message : String(error);
         console.error('Profile API error:', message);
-        return new Response(JSON.stringify({ error: message }), {
+        return new Response(JSON.stringify({ error: 'Unable to load your profile. Please try again.' }), {
             headers: { ...cors, 'Content-Type': 'application/json' },
             status: 401,
         });

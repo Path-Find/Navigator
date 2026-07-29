@@ -37,7 +37,7 @@ export default async function handler(req: Request): Promise<Response> {
     } catch (error) {
         const message = error instanceof Error ? error.message : String(error);
         console.error('check-user-exists error:', message);
-        return new Response(JSON.stringify({ error: message }), {
+        return new Response(JSON.stringify({ error: 'Unable to check account status. Please try again.' }), {
             headers: { ...cors, 'Content-Type': 'application/json' },
             status: 500,
         });

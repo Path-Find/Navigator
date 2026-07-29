@@ -11,6 +11,9 @@ See [CHANGELOG_ARCHIVE.md](CHANGELOG_ARCHIVE.md) for earlier history.
 
 ## [Unreleased]
 
+### Security
+- **Code scanning**: Stopped returning internal exception details from account, profile, and job-scraping APIs.
+
 ## [2.43.7] — 2026-07-27
 
 ### Security
