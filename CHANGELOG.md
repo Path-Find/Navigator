@@ -9,10 +9,12 @@ See [CHANGELOG_ARCHIVE.md](CHANGELOG_ARCHIVE.md) for earlier history.
 ### Fixed
 - **Vercel deployment**: Pinned TypeScript to the supported 6.x line so API functions bundle without the TypeScript 7 compiler crash.
 
-## [Unreleased]
+## [2.43.9] — 2026-07-28
 
 ### Security
 - **Code scanning**: Stopped returning internal exception details from account, profile, and job-scraping APIs.
+
+## [Unreleased]
 
 ## [2.43.7] — 2026-07-27
 
