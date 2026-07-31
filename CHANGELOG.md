@@ -8,6 +8,7 @@ See [CHANGELOG_ARCHIVE.md](CHANGELOG_ARCHIVE.md) for earlier history.
 
 ### Fixed
 - **All API routes were dead in production**: every `/api/*` function crashed on cold start with `ERR_MODULE_NOT_FOUND`. The shared `_lib` helpers were imported without a `.js` extension, which Node's ESM resolver rejects — so auth, profile reads, job scraping, and all AI generation returned 500. Watch for this on any new `api/` file: the build only reports it as a non-fatal TS2835 diagnostic, so a broken deploy still goes out green.
+- **JWT verification rejected valid Neon Auth tokens**: `verifyUser` required the `iss` claim to equal the Neon Auth *origin*, but Better Auth (which Neon Auth runs) issues `iss` as the full base URL including the `/neondb/auth` path. Every authenticated API call would have 401'd once the routes came back up. Both spellings are now accepted.
 
 ## [2.43.9] — 2026-07-28
 
