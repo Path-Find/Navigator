@@ -1,6 +1,6 @@
 import React from 'react';
 import { Card } from '../../../components/ui/Card';
-import { getScoreLabel, getScoreColorClasses } from '../utils/jobUtils';
+import { getScoreLabel, getScoreColorClasses, stripInternalLabelPrefix, stripInternalIds } from '../utils/jobUtils';
 import { toSentenceCase } from '../../../utils/stringUtils';
 import type { SavedJob } from '../types';
 
@@ -44,7 +44,7 @@ export const ResumeSidebar: React.FC<ResumeSidebarProps> = ({ job, analysisProgr
                     {tailoringFocus.slice(0, 3).map((item: string, idx: number) => (
                         <div key={idx} className="flex gap-3 text-xs font-medium text-neutral-700 dark:text-neutral-300">
                             <div className="w-1.5 h-1.5 rounded-full bg-indigo-400/50 mt-1.5 shrink-0" />
-                            <span className="leading-relaxed">{toSentenceCase(item)}</span>
+                            <span className="leading-relaxed">{toSentenceCase(stripInternalIds(stripInternalLabelPrefix(item)))}</span>
                         </div>
                     ))}
                 </div>

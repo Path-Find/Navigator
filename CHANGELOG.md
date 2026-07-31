@@ -4,7 +4,13 @@ All notable changes to this project will be documented in this file.
 
 See [CHANGELOG_ARCHIVE.md](CHANGELOG_ARCHIVE.md) for earlier history.
 
-## [2.43.12] — 2026-07-31
+## [Unreleased]
+
+### Fixed
+- **Match analysis showed a confident score with no resume behind it**: an empty resume (created automatically but never filled in) slipped past the "do we have data" check, so Gemini produced a specific score and skill list from a blank candidate profile instead of saying so. It now checks the real assembled prompt data and returns no score, with a clear message, when there's genuinely nothing to ground it in.
+- **Internal AI prompt labels leaked into the Cover Letter and Resume tabs**: the "Tailoring Strategy" panel showed raw field names like `EVIDENCE_BRIDGE_1:` and `FIT_FRAME:` instead of plain text.
+- **Saving a job could create it twice in History**: two separate code paths each inserted the job on save; consolidated to one.
+- **Signing out deleted your saved resume**: `clearAllData()` (run on every sign-out) was deleting the cloud resume row along with local browser cache. Sign-out now only clears local cache.
 
 ### Fixed
 - **Signing in didn't visibly sign you in**: the header/app state stayed on "logged out" after a successful sign-in until the page was manually refreshed. `signInWithPassword` never notified the app of the new session in the same tab (only on page load or from another tab) — the sign-in form now pulls the fresh session directly instead of waiting on that notification.

@@ -44,6 +44,27 @@ export const getDeadlineInfo = (deadline: string | null | undefined) => {
     return { label: formatted, formatted, style: 'text-neutral-500 dark:text-neutral-400' };
 };
 
+// AI-generated tailoring instructions (e.g. coverLetterTailoringInstructions) are written
+// against a prompt schema with internal field labels like "EVIDENCE_BRIDGE_1:" or "FIT_FRAME:"
+// prefixed onto each string — those labels tell the model what to generate but are not meant
+// to be user-facing. Strip a leading ALL_CAPS[_N]: label before displaying the text.
+export const stripInternalLabelPrefix = (str: string): string => {
+    if (!str) return '';
+    return str.replace(/^[A-Z][A-Z0-9_]*:\s*/, '');
+};
+
+// The EVIDENCE_BRIDGE prompt format asks the model to map a requirement to a resume
+// block via "[Requirement] → [Block ID]: [explanation]", where Block ID is the raw
+// crypto.randomUUID() resume block id (see stringifyProfile's "BLOCK_ID: <id>" context
+// lines in jobAiService.ts) — a meaningless internal identifier if it leaks through.
+// Collapse "→ <uuid>:" down to a plain ":" so the label disappears without breaking the
+// surrounding sentence.
+const UUID_ARROW_PATTERN = /\s*→\s*[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\s*:/gi;
+export const stripInternalIds = (str: string): string => {
+    if (!str) return '';
+    return str.replace(UUID_ARROW_PATTERN, ':');
+};
+
 export const getBestResume = (resumes: ResumeProfile[], analysis?: JobAnalysis) => {
     if (!resumes.length) return undefined;
     if (!analysis) return resumes[0];

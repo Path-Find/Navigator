@@ -1,5 +1,4 @@
 import React, { useState, useEffect, useCallback, useRef } from 'react';
-import { useNavigate } from 'react-router';
 import {
     Link as LinkIcon,
     FileText,
@@ -19,10 +18,9 @@ import { Button } from '../../components/ui/Button';
 import { Card } from '../../components/ui/Card';
 import { BentoCard } from '../../components/ui/BentoCard';
 import { FEATURE_COLORS } from '../../featureRegistry';
-import { Storage } from '../../services/storageService';
 
 import type { SavedJob } from '../../types';
-import { STORAGE_KEYS, TRACKING_EVENTS, ROUTES } from '../../constants';
+import { STORAGE_KEYS, TRACKING_EVENTS } from '../../constants';
 import { LocalStorage } from '../../utils/localStorage';
 
 import { useUser } from '../../contexts/UserContext';
@@ -35,7 +33,6 @@ const JobMatchInput: React.FC = () => {
     const { user, isAdmin } = useUser();
     const { setView: onNavigate } = useGlobalUI();
     const { openModal } = useModal();
-    const navigate = useNavigate();
     const {
         handleJobCreated: onJobCreated,
         usageStats
@@ -110,17 +107,23 @@ const JobMatchInput: React.FC = () => {
         };
 
         try {
-            await Storage.addJob(newJob);
+            // Persistence, navigation, and usage-limit consumption all happen inside
+            // onJobCreated (handleJobCreated in useJobManager.ts) — it's the single
+            // canonical path. Calling Storage.addJob directly here as well used to
+            // insert this job twice (once unconditionally here, once again — gated by
+            // the usage check — inside handleJobCreated), which could leave two rows
+            // for the same job in history.
             EventService.trackUsage(TRACKING_EVENTS.JOB_FIT);
-            onJobCreated(newJob);
-            navigate(ROUTES.JOB_DETAIL.replace(':id', newJob.id));
-            showSuccess("Matching started");
+            const created = await onJobCreated(newJob);
+            // If the usage limit blocked creation, onJobCreated already surfaces the
+            // upgrade modal — don't also tell the user matching started.
+            if (created) showSuccess("Matching started");
             setIsAnalyzing(false);
         } catch {
             setError("Failed to start analysis. Please try again.");
             setIsAnalyzing(false);
         }
-    }, [user, resumes, navigate, onJobCreated, onNavigate, showSuccess, url]);
+    }, [user, resumes, onJobCreated, onNavigate, showSuccess, url]);
 
     const handleUrlSubmit = async (e?: React.FormEvent) => {
         e?.preventDefault();

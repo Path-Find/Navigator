@@ -19,7 +19,7 @@ interface JobContextType {
     // Actions
     setActiveJobId: (id: string | null) => void;
     handleUpdateJob: (job: SavedJob) => Promise<void>;
-    handleJobCreated: (job: SavedJob) => Promise<void>;
+    handleJobCreated: (job: SavedJob) => Promise<boolean>;
     handleDraftApplication: (url: string) => Promise<void>;
     handleDeleteJob: (id: string) => void;
     handleAnalyzeJob: (job: SavedJob, contextState: { resumes: AppState['resumes'], skills: AppState['skills'] }) => Promise<SavedJob>;

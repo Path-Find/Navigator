@@ -52,7 +52,7 @@ const dummyValue = {
     nudgeJob: null,
     setActiveJobId: () => { },
     handleUpdateJob: async () => { },
-    handleJobCreated: async () => { },
+    handleJobCreated: async () => true,
     handleDraftApplication: async () => { },
     handleDeleteJob: () => { },
     handleAnalyzeJob: async () => ({} as any),

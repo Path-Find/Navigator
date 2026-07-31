@@ -172,9 +172,10 @@ export const Storage = {
     },
 
     async clearAllData() {
-        const userId = await getUserId();
-
-        // Wipe localStorage
+        // Wipe localStorage only. This runs on every sign-out, which users do
+        // routinely and expect to be harmless — it must never delete persisted
+        // cloud data (previously deleted the user's cloud resume here, silently
+        // destroying real resume content on a normal sign-out).
         const userKeys = [
             STORAGE_KEYS.RESUMES,
             STORAGE_KEYS.JOBS_HISTORY,
@@ -187,11 +188,6 @@ export const Storage = {
             'navigator_user_tier'
         ];
         userKeys.forEach(key => LocalStorage.remove(key));
-
-        // Resumes are Supabase-only — must delete from cloud too
-        if (userId) {
-            await dataClient.from('resumes').delete().eq('user_id', userId);
-        }
     },
 
     // Legacy support for feedback and optimization logging if needed

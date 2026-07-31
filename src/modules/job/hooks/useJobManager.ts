@@ -25,7 +25,7 @@ export interface UseJobManagerReturn {
     nudgeJob: SavedJob | null;
     setActiveJobId: Dispatch<SetStateAction<string | null>>;
     handleUpdateJob: (updatedJob: SavedJob) => Promise<void>;
-    handleJobCreated: (newJob: SavedJob) => Promise<void>;
+    handleJobCreated: (newJob: SavedJob) => Promise<boolean>;
     handleDraftApplication: (url: string) => Promise<void>;
     handleDeleteJob: (id: string) => void;
     handleAnalyzeJob: (
@@ -169,9 +169,9 @@ export const useJobManager = (): UseJobManagerReturn => {
         }
     }, [handleUpdateJob]);
 
-    const handleJobCreated = useCallback(async (newJob: SavedJob) => {
+    const handleJobCreated = useCallback(async (newJob: SavedJob): Promise<boolean> => {
         const limitCheck = await checkAndConsumeAnalysis();
-        if (!limitCheck.allowed) return;
+        if (!limitCheck.allowed) return false;
 
         await Storage.addJob(newJob);
         setJobs(prev => {
@@ -183,6 +183,7 @@ export const useJobManager = (): UseJobManagerReturn => {
         navigate(ROUTES.JOB_DETAIL.replace(':id', newJob.id));
 
         await refreshUsageStats();
+        return true;
     }, [checkAndConsumeAnalysis, refreshUsageStats, navigate]);
 
     const handleSaveFromFeed = useCallback(async (jobId: string) => {

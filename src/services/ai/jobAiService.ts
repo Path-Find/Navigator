@@ -175,17 +175,27 @@ const extractJobInfo = async (
     // isAiBanned is detected deterministically before this call — no need to ask the AI.
     const aiBan = detectAiBan(cleanedText);
 
+    // NOTE: Everything asked for here is derived purely from the job posting text — none
+    // of it requires a candidate resume, so this prompt is safe to use as the fallback
+    // path when there's no (or no usable) resume to score a candidate against. It must
+    // stay resume-independent; do not add anything here that implies a match/score.
     const extractionPrompt = `
     Analyze this job posting:
     ${cleanedText}
 
     1. ROLE: What is the official role title?
     2. COMPANY: What is the company name?
-    3. REFERENCE CODE: Is there a job ID or reference number? (Set as 'referenceCode')
-    4. CATEGORY: Classify into 'technical', 'managerial', 'trades', 'healthcare', 'creative', or 'general'.
-    5. CANONICAL TITLE: What is the most standard, high-level name for this role? (e.g. "Junior React Dev" -> "Software Engineer").
+    3. LOCATION: City, State/Province, or "Remote" (strictly geographical, exclude internal IDs).
+    4. REFERENCE CODE: Is there a job ID or reference number? (Set as 'referenceCode')
+    5. CATEGORY: Classify into 'technical', 'managerial', 'trades', 'healthcare', 'creative', or 'general'.
+    6. CANONICAL TITLE: What is the most standard, high-level name for this role? (e.g. "Junior React Dev" -> "Software Engineer").
+    7. KEY SKILLS: 5-8 actual skills required by the posting — technical skills, soft skills, tools, and domain knowledge ONLY. Do NOT include enrollment/eligibility requirements. Keep each 1-4 words (e.g. 'Problem-solving', 'Microsoft Office'). Set as 'keySkills'.
+    8. REQUIRED SKILLS: Same skills as an array of { "name": string, "level": "learning" | "comfortable" | "expert" } reflecting how deeply the posting expects the skill. Set as 'requiredSkills'.
+    9. CORE RESPONSIBILITIES: 4-6 primary duties from the posting. Set as 'coreResponsibilities'.
+    10. APPLICATION DEADLINE: Closing date in YYYY-MM-DD format if stated, otherwise null. Set as 'applicationDeadline'.
+    11. SALARY RANGE: Salary/wage range as stated (e.g. '$55,000-$65,000/yr'), otherwise null. Set as 'salaryRange'.
 
-    Return JSON with 'roleTitle', 'companyName', 'referenceCode', 'category', and 'canonicalTitle' fields.
+    Return JSON with 'roleTitle', 'companyName', 'location', 'referenceCode', 'category', 'canonicalTitle', 'keySkills', 'requiredSkills', 'coreResponsibilities', 'applicationDeadline', and 'salaryRange' fields.
     `;
 
     return callWithRetry(async (metadata) => {
@@ -226,8 +236,32 @@ export const analyzeJobFit = async (
     // 1. Basic cleanup to prevent AI confusion
     const cleanedDescription = preCleanJobText(jobDescription);
 
-    if (resumes.length === 0) {
-        // Just extract basic info if no resumes provided
+    if (onProgress) onProgress("Contextualizing", 2, 6);
+
+    // Build the exact candidate-context payload the prompt will receive, then gate on
+    // that — not on resumes.length or blocks.length — so the check can't drift from what
+    // the model actually sees. A resume row can exist (the primary profile is created as
+    // an empty shell, blocks: [], before the user fills anything in) while still
+    // contributing nothing: stringifyProfile also drops any block with isVisible === false.
+    const resumeContext = resumes.map(stringifyProfile).join('\n---\n');
+    const skillsContext = userSkills.length > 0
+        ? `\nADDITIONAL SKILLS:\n${userSkills.map(s => `- ${s.name}: ${s.proficiency}`).join('\n')}`
+        : '';
+
+    const educationContext = transcript
+        ? `\nACADEMIC BACKGROUND (Transcript):\nProgram: ${transcript.program} at ${transcript.university}\nCourses:\n${transcript.semesters.flatMap((s: Semester) => s.courses).map((c: Course) => `- ${c.title} (${c.code}): ${c.grade}`).join('\n')}`
+        : '';
+
+    // Skills and transcript data are legitimate grounding on their own (the prompt is
+    // explicitly told to use transcript in place of missing work experience) — only
+    // refuse to score when there is truly nothing to ground a match against.
+    const hasGroundingData = Boolean(
+        resumeContext.trim() || skillsContext.trim() || educationContext.trim()
+    );
+
+    if (!hasGroundingData) {
+        // Job-only distillation still runs — none of it depends on candidate data —
+        // but we do not attempt a compatibility score against blank candidate context.
         const { distilledJob } = await extractJobInfo(cleanedDescription, onProgress);
         return {
             distilledJob: {
@@ -237,24 +271,13 @@ export const analyzeJobFit = async (
                 applicationDeadline: distilledJob.applicationDeadline || null
             },
             cleanedDescription,
-            compatibilityScore: 0,
+            compatibilityScore: undefined,
             reasoning: "Resume required for compatibility analysis. Please upload one to see strengths, weaknesses, and a match score.",
             strengths: [],
             weaknesses: [],
             bestResumeProfileId: undefined
         } as JobAnalysis;
     }
-
-    if (onProgress) onProgress("Contextualizing", 2, 6);
-
-    const resumeContext = resumes.map(stringifyProfile).join('\n---\n');
-    const skillsContext = userSkills.length > 0
-        ? `\nADDITIONAL SKILLS:\n${userSkills.map(s => `- ${s.name}: ${s.proficiency}`).join('\n')}`
-        : '';
-
-    const educationContext = transcript
-        ? `\nACADEMIC BACKGROUND (Transcript):\nProgram: ${transcript.program} at ${transcript.university}\nCourses:\n${transcript.semesters.flatMap((s: Semester) => s.courses).map((c: Course) => `- ${c.title} (${c.code}): ${c.grade}`).join('\n')}`
-        : '';
 
     if (onProgress) onProgress("Mapping", 3, 6);
 
