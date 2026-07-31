@@ -91,7 +91,7 @@ export const getEmbeddingModel = async (params: EmbeddingParams) => {
                     payload: { content: { parts: [{ text }] } },
                     task: 'embedding',
                     feature: params.feature,
-                    model: params.model || 'text-embedding-004'
+                    model: params.model || 'gemini-embedding-001'
                 }),
             });
 

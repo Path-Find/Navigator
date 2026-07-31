@@ -185,7 +185,9 @@ async function handler(req: Request): Promise<Response> {
             response = await fetch(apiUrl, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
+                // `embedContent` accepts neither generationConfig nor systemInstruction —
+                // sending either returns 400 "Unknown name". Only generateContent gets them.
+                body: JSON.stringify(safeTask === 'embedding' ? payload : {
                     ...payload,
                     generationConfig: {
                         ...generationConfig,
@@ -253,7 +255,18 @@ async function handler(req: Request): Promise<Response> {
         const totalTokens = data.usageMetadata?.totalTokenCount || 0;
         if (totalTokens > 0) {
             try {
-                await sql`SELECT track_usage(${totalTokens}, false)`;
+                // Was `SELECT track_usage(tokens, false)`, which never ran: the function
+                // takes one argument, and its body resolves the user via Supabase's
+                // `auth.uid()`, which doesn't exist on Neon. The error was swallowed by
+                // this catch, which is why daily_usage.token_count sat at 0 for every
+                // row. Doing the upsert here means we use the userId we already verified.
+                await sql`
+                    INSERT INTO daily_usage (user_id, date, request_count, token_count)
+                    VALUES (${userId}, CURRENT_DATE, 1, ${totalTokens})
+                    ON CONFLICT (user_id, date) DO UPDATE SET
+                        request_count = daily_usage.request_count + 1,
+                        token_count = daily_usage.token_count + EXCLUDED.token_count
+                `;
             } catch (usageError) {
                 console.error('Usage tracking error:', sanitizeLog(usageError));
             }
