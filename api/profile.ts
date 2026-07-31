@@ -15,7 +15,7 @@ const ALLOWED_UPDATE_FIELDS = [
     'next_gen_enabled',
 ] as const;
 
-export default async function handler(req: Request): Promise<Response> {
+async function handler(req: Request): Promise<Response> {
     const cors = getCorsHeaders(req);
 
     if (req.method === 'OPTIONS') {
@@ -45,7 +45,7 @@ export default async function handler(req: Request): Promise<Response> {
         }
 
         if (req.method === 'PATCH') {
-            const body = await req.json();
+            const body = await req.json() as Record<string, unknown>;
             const updates: Record<string, unknown> = {};
             for (const key of ALLOWED_UPDATE_FIELDS) {
                 if (key in body) updates[key] = body[key];
@@ -86,3 +86,9 @@ export default async function handler(req: Request): Promise<Response> {
         });
     }
 }
+
+// Vercel only passes a Web-standard `Request` when the module exports a `fetch`
+// member (or named GET/POST exports). A bare `export default function handler`
+// is read as the legacy Node `(req, res)` signature, which makes every
+// `req.headers.get(...)` throw `is not a function` at runtime.
+export default { fetch: handler };

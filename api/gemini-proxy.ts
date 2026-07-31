@@ -1,5 +1,6 @@
 import { neon } from '@neondatabase/serverless';
 import { verifyUser, getCorsHeaders } from './_lib/verifyAuth.js';
+import { extractText, type GeminiResponse } from './_lib/types.js';
 
 // Vercel Function port of supabase/functions/gemini-proxy/index.ts.
 // Same business logic (tier gating, quota, refunds); auth + data access moved to Neon Auth + Neon Postgres.
@@ -31,7 +32,7 @@ export const TIER_MODELS: Record<string, { extraction: string; analysis: string 
     tester: { extraction: 'gemini-flash-lite-latest', analysis: 'gemini-flash-latest' },
 };
 
-export default async function handler(req: Request): Promise<Response> {
+async function handler(req: Request): Promise<Response> {
     if (req.method === 'OPTIONS') {
         return new Response('ok', { headers: getCorsHeaders(req) });
     }
@@ -74,7 +75,10 @@ export default async function handler(req: Request): Promise<Response> {
         }
 
         // 2. PARSE REQUEST & RESOLVE MODEL
-        const { payload, task = 'analysis', generationConfig, feature, model } = await req.json();
+        const { payload, task = 'analysis', generationConfig, feature, model } = await req.json() as {
+            payload?: Record<string, unknown>; task?: string; generationConfig?: Record<string, unknown>;
+            feature?: string; model?: string;
+        };
 
         const validTasks = ['extraction', 'analysis', 'interview', 'embedding'];
         const safeTask = validTasks.includes(task) ? task : 'analysis';
@@ -214,20 +218,17 @@ export default async function handler(req: Request): Promise<Response> {
             throw apiError;
         }
 
-        const data = await response.json();
+        const data = await response.json() as GeminiResponse;
 
         if (safeTask === 'embedding') {
-            const embedding = data.embedding?.values || [];
+            const embedding = data.embedding?.values ?? [];
             return new Response(JSON.stringify({ embedding }), {
                 headers: { ...getCorsHeaders(req), 'Content-Type': 'application/json' },
                 status: 200,
             });
         }
 
-        let text = '';
-        if (data.candidates && data.candidates[0]?.content?.parts) {
-            text = data.candidates[0].content.parts.map((p: { text: string }) => p.text).join('');
-        }
+        const text = extractText(data);
 
         // 6. CONTENT VALIDATION & REFUND
         if (safeTask === 'analysis' && (text.includes('"error": "not_a_job"') || text.includes('not_a_job'))) {
@@ -284,3 +285,9 @@ export default async function handler(req: Request): Promise<Response> {
         });
     }
 }
+
+// Vercel only passes a Web-standard `Request` when the module exports a `fetch`
+// member (or named GET/POST exports). A bare `export default function handler`
+// is read as the legacy Node `(req, res)` signature, which makes every
+// `req.headers.get(...)` throw `is not a function` at runtime.
+export default { fetch: handler };

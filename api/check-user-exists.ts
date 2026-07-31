@@ -7,7 +7,7 @@ import { getCorsHeaders } from './_lib/verifyAuth.js';
 
 const sql = neon(process.env.NEON_DATABASE_URL!);
 
-export default async function handler(req: Request): Promise<Response> {
+async function handler(req: Request): Promise<Response> {
     const cors = getCorsHeaders(req);
 
     if (req.method === 'OPTIONS') {
@@ -21,7 +21,7 @@ export default async function handler(req: Request): Promise<Response> {
     }
 
     try {
-        const { email } = await req.json();
+        const { email } = await req.json() as { email?: unknown };
         if (!email || typeof email !== 'string') {
             return new Response(JSON.stringify({ error: 'email is required' }), {
                 headers: { ...cors, 'Content-Type': 'application/json' },
@@ -43,3 +43,9 @@ export default async function handler(req: Request): Promise<Response> {
         });
     }
 }
+
+// Vercel only passes a Web-standard `Request` when the module exports a `fetch`
+// member (or named GET/POST exports). A bare `export default function handler`
+// is read as the legacy Node `(req, res)` signature, which makes every
+// `req.headers.get(...)` throw `is not a function` at runtime.
+export default { fetch: handler };

@@ -1,6 +1,7 @@
 import { neon } from '@neondatabase/serverless';
 import { verifyUser, getCorsHeaders } from './_lib/verifyAuth.js';
 import { fetchSafe, readTextSafe } from './_lib/validator.js';
+import { extractText, type GeminiResponse } from './_lib/types.js';
 
 // Vercel Function port of supabase/functions/scrape-jobs/index.ts.
 // Same business logic (tier gating, SSRF-safe fetch, text/AI extraction modes);
@@ -8,7 +9,7 @@ import { fetchSafe, readTextSafe } from './_lib/validator.js';
 
 const sql = neon(process.env.NEON_DATABASE_URL!);
 
-export default async function handler(req: Request): Promise<Response> {
+async function handler(req: Request): Promise<Response> {
     const cors = getCorsHeaders(req);
 
     if (req.method === 'OPTIONS') {
@@ -41,7 +42,7 @@ export default async function handler(req: Request): Promise<Response> {
         }
 
         // 2. Parse Request
-        const { url, source, mode } = await req.json();
+        const { url, source, mode } = await req.json() as { url?: string; source?: string; mode?: string };
         if (!url) throw new Error('Missing URL');
 
         // 3. Fetch HTML (SSRF-safe: DNS/private-IP validation, manual redirect following)
@@ -204,11 +205,8 @@ export default async function handler(req: Request): Promise<Response> {
                 throw new Error(`Gemini Error: ${errText}`);
             }
 
-            const result = await aiResponse.json();
-            let text = '';
-            if (result.candidates && result.candidates[0].content && result.candidates[0].content.parts) {
-                text = result.candidates[0].content.parts.map((p: { text: string }) => p.text).join('');
-            }
+            const result = await aiResponse.json() as GeminiResponse;
+            const text = extractText(result);
 
             const jsonStr = text.replace(/```json/g, '').replace(/```/g, '').trim();
             const parsed = JSON.parse(jsonStr);
@@ -246,3 +244,9 @@ export default async function handler(req: Request): Promise<Response> {
         });
     }
 }
+
+// Vercel only passes a Web-standard `Request` when the module exports a `fetch`
+// member (or named GET/POST exports). A bare `export default function handler`
+// is read as the legacy Node `(req, res)` signature, which makes every
+// `req.headers.get(...)` throw `is not a function` at runtime.
+export default { fetch: handler };
