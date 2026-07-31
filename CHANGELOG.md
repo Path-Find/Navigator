@@ -4,17 +4,20 @@ All notable changes to this project will be documented in this file.
 
 See [CHANGELOG_ARCHIVE.md](CHANGELOG_ARCHIVE.md) for earlier history.
 
-## [2.43.8] — 2026-07-27
+## [Unreleased]
 
 ### Fixed
-- **Vercel deployment**: Pinned TypeScript to the supported 6.x line so API functions bundle without the TypeScript 7 compiler crash.
+- **All API routes were dead in production**: every `/api/*` function crashed on cold start with `ERR_MODULE_NOT_FOUND`. The shared `_lib` helpers were imported without a `.js` extension, which Node's ESM resolver rejects — so auth, profile reads, job scraping, and all AI generation returned 500. Watch for this on any new `api/` file: the build only reports it as a non-fatal TS2835 diagnostic, so a broken deploy still goes out green.
 
 ## [2.43.9] — 2026-07-28
 
 ### Security
 - **Code scanning**: Stopped returning internal exception details from account, profile, and job-scraping APIs.
 
-## [Unreleased]
+## [2.43.8] — 2026-07-27
+
+### Fixed
+- **Vercel deployment**: Pinned TypeScript to the supported 6.x line so API functions bundle without the TypeScript 7 compiler crash.
 
 ## [2.43.7] — 2026-07-27
 

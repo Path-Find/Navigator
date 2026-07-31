@@ -1,5 +1,5 @@
 import { neon } from '@neondatabase/serverless';
-import { getCorsHeaders } from './_lib/verifyAuth';
+import { getCorsHeaders } from './_lib/verifyAuth.js';
 
 // Public endpoint — called pre-login to decide whether to show the password form
 // or the waitlist form, so it can't require a token. Same exposure as the old

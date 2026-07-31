@@ -1,5 +1,5 @@
 import { neon } from '@neondatabase/serverless';
-import { verifyUser, getCorsHeaders } from './_lib/verifyAuth';
+import { verifyUser, getCorsHeaders } from './_lib/verifyAuth.js';
 
 // Vercel Function replacing direct client-side supabase.from('profiles') calls.
 // Neon has no client-safe direct-Postgres access (unlike Supabase's RLS + anon key),

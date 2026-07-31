@@ -1,5 +1,5 @@
 import { neon } from '@neondatabase/serverless';
-import { verifyUser, getCorsHeaders } from './_lib/verifyAuth';
+import { verifyUser, getCorsHeaders } from './_lib/verifyAuth.js';
 
 // Vercel Function port of supabase/functions/gemini-proxy/index.ts.
 // Same business logic (tier gating, quota, refunds); auth + data access moved to Neon Auth + Neon Postgres.

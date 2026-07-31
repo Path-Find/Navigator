@@ -1,6 +1,6 @@
 import { neon } from '@neondatabase/serverless';
-import { verifyUser, getCorsHeaders } from './_lib/verifyAuth';
-import { fetchSafe, readTextSafe } from './_lib/validator';
+import { verifyUser, getCorsHeaders } from './_lib/verifyAuth.js';
+import { fetchSafe, readTextSafe } from './_lib/validator.js';
 
 // Vercel Function port of supabase/functions/scrape-jobs/index.ts.
 // Same business logic (tier gating, SSRF-safe fetch, text/AI extraction modes);
