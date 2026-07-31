@@ -185,7 +185,10 @@ export default async function handler(req: Request): Promise<Response> {
                     ...payload,
                     generationConfig: {
                         ...generationConfig,
-                        thinkingConfig: { thinkingBudget: 0 },
+                        // Gemini 3.x rejects `thinkingBudget: 0` outright (400 INVALID_ARGUMENT)
+                        // — thinking can be turned down but not off. `thinkingLevel: 'low'` is
+                        // the replacement and yields zero thought tokens on the flash models.
+                        thinkingConfig: { thinkingLevel: 'low' },
                     },
                     systemInstruction: safeTask === 'analysis' ? {
                         role: 'system',
