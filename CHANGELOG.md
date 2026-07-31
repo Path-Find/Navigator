@@ -4,7 +4,7 @@ All notable changes to this project will be documented in this file.
 
 See [CHANGELOG_ARCHIVE.md](CHANGELOG_ARCHIVE.md) for earlier history.
 
-## [Unreleased]
+## [2.43.11] — 2026-07-31
 
 ### Fixed
 - **API routes still 500'd after 2.43.10, for a second reason**: the handlers are written against the Web `Request`/`Response` API, but Vercel only passes a Web `Request` when a module exports a `fetch` member. A bare `export default function handler` is read as the legacy Node `(req, res)` signature, so every `req.headers.get(...)` threw `is not a function`. All four functions now `export default { fetch: handler }`.
