@@ -3,6 +3,7 @@ import { authClient } from '../lib/auth-client';
 import { X } from 'lucide-react';
 import { getUserFriendlyError } from '../utils/errorMessages';
 import { ROUTES } from '../constants';
+import { useUser } from '../contexts/UserContext';
 import type { FeatureDefinition } from '../featureRegistry';
 
 // Extracted components
@@ -20,6 +21,15 @@ interface AuthModalProps {
 }
 
 export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, featureContext, authMode }) => {
+    // Better Auth's own reactive session store isn't wired to authClient's
+    // Supabase-shaped onAuthStateChange for same-tab, imperative calls (that
+    // listener only fires on mount and on cross-tab BroadcastChannel messages —
+    // see node_modules/@neondatabase/auth's supabase-adapter dist for the
+    // adapter internals). So a successful signInWithPassword() here never
+    // reaches UserContext on its own; refreshUser() pulls the session UserContext
+    // needs directly instead of waiting on a listener that won't fire.
+    const { refreshUser } = useUser();
+
     // State management
     const [step, setStep] = useState(0); // 0: Email, 1: Password/Invite
     const [isSignUp, setIsSignUp] = useState(false);
@@ -99,6 +109,10 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, featureCo
                 const { error } = await authClient.signInWithPassword({ email, password });
                 if (error) throw error;
                 await import('../services/storageService').then(m => m.Storage.syncLocalToCloud());
+                // signInWithPassword() doesn't broadcast to onAuthStateChange in this
+                // tab (see comment above) — refresh UserContext's user state directly
+                // so the header/UI reflects being signed in without needing a manual reload.
+                await refreshUser();
                 onClose();
             }
         } catch (err: unknown) {

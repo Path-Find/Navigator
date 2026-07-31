@@ -4,6 +4,11 @@ All notable changes to this project will be documented in this file.
 
 See [CHANGELOG_ARCHIVE.md](CHANGELOG_ARCHIVE.md) for earlier history.
 
+## [Unreleased]
+
+### Fixed
+- **Signing in didn't visibly sign you in**: the header/app state stayed on "logged out" after a successful sign-in until the page was manually refreshed. `signInWithPassword` never notified the app of the new session in the same tab (only on page load or from another tab) — the sign-in form now pulls the fresh session directly instead of waiting on that notification.
+
 ## [2.43.11] — 2026-07-31
 
 ### Fixed
