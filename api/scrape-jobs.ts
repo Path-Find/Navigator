@@ -1,5 +1,5 @@
 import { neon } from '@neondatabase/serverless';
-import { verifyUser, getCorsHeaders } from './_lib/verifyAuth.js';
+import { verifyUser, getCorsHeaders, AuthError } from './_lib/verifyAuth.js';
 import { fetchSafe, readTextSafe } from './_lib/validator.js';
 import { extractText, type GeminiResponse } from './_lib/types.js';
 
@@ -238,6 +238,14 @@ async function handler(req: Request): Promise<Response> {
     } catch (error) {
         const message = error instanceof Error ? error.message : String(error);
         console.error('scrape-jobs error:', message);
+
+        if (error instanceof AuthError) {
+            return new Response(JSON.stringify({ error: 'Your session has expired. Please sign in again.' }), {
+                headers: { ...cors, 'Content-Type': 'application/json' },
+                status: 401,
+            });
+        }
+
         return new Response(JSON.stringify({ error: 'Unable to process this job page. Please try again.' }), {
             headers: { ...cors, 'Content-Type': 'application/json' },
             status: 400,

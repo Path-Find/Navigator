@@ -1,5 +1,5 @@
 import { neon } from '@neondatabase/serverless';
-import { verifyUser, getCorsHeaders } from './_lib/verifyAuth.js';
+import { verifyUser, getCorsHeaders, AuthError } from './_lib/verifyAuth.js';
 import { extractText, type GeminiResponse } from './_lib/types.js';
 
 // Vercel Function port of supabase/functions/gemini-proxy/index.ts.
@@ -279,7 +279,17 @@ async function handler(req: Request): Promise<Response> {
     } catch (error) {
         const message = error instanceof Error ? error.message : String(error);
         console.error('Gemini Proxy Error:', sanitizeLog(message));
-        return new Response(JSON.stringify({ error: `Function Error: ${message}` }), {
+
+        if (error instanceof AuthError) {
+            return new Response(JSON.stringify({ error: 'Your session has expired. Please sign in again.' }), {
+                headers: { ...getCorsHeaders(req), 'Content-Type': 'application/json' },
+                status: 401,
+            });
+        }
+
+        // Deliberately generic — the exception text can name internal tables and
+        // env vars. The detail stays in the server log above.
+        return new Response(JSON.stringify({ error: 'Unable to complete this request. Please try again.' }), {
             headers: { ...getCorsHeaders(req), 'Content-Type': 'application/json' },
             status: 500,
         });

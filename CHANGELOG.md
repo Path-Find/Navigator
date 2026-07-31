@@ -8,6 +8,10 @@ See [CHANGELOG_ARCHIVE.md](CHANGELOG_ARCHIVE.md) for earlier history.
 
 ### Fixed
 - **API routes still 500'd after 2.43.10, for a second reason**: the handlers are written against the Web `Request`/`Response` API, but Vercel only passes a Web `Request` when a module exports a `fetch` member. A bare `export default function handler` is read as the legacy Node `(req, res)` signature, so every `req.headers.get(...)` threw `is not a function`. All four functions now `export default { fetch: handler }`.
+- **Expired sessions looked like server errors**: an unauthenticated call to the AI proxy returned 500 and to job scraping returned 400, so the app retried instead of prompting a fresh sign-in. Auth failures now consistently return 401 across all four routes.
+
+### Security
+- **AI proxy leaked internal exception text**: `gemini-proxy` returned the raw error message to the client, which can name internal tables and environment variables. 2.43.9 removed this from the account, profile, and scraping routes but missed this one. The detail now stays in the server log.
 
 ### Changed
 - **`api/` is now type-checked**: added `api/tsconfig.json`, which was missing entirely — the root config only covered `src` and `vite.config.ts`, so Vercel compiled these files with its own defaults and reported `process` as undefined on every build. That noise is what let a genuinely broken deploy look green. Typing the request and response bodies it turned up also removed several unchecked reads of `unknown`.
