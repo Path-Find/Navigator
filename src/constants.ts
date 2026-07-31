@@ -58,11 +58,15 @@ export const UI_CONFIG = {
 } as const;
 
 // AI Model Configuration - Task-based mapping
+// Floating `-latest` aliases only. Pinned versions get retired by Google and start
+// returning 404, which takes down every AI feature at once. The server-side
+// TIER_MODELS in api/gemini-proxy.ts is what actually picks the model for proxied
+// calls; these names are the client-side reference.
 export const AI_MODELS = {
-  EXTRACTION: 'gemini-2.0-flash', // Fast & Cheap
-  ANALYSIS_BASIC: 'gemini-2.0-flash',
-  ANALYSIS_PRO: 'gemini-2.5-pro',    // High Reasoning (Standard Pro)
-  ANALYSIS_ULTRA: 'gemini-3-pro',   // State of the Art (Premium)
+  EXTRACTION: 'gemini-flash-lite-latest', // Fast & Cheap
+  ANALYSIS_BASIC: 'gemini-flash-latest',
+  ANALYSIS_PRO: 'gemini-flash-latest',    // High Reasoning (Standard Pro)
+  ANALYSIS_ULTRA: 'gemini-pro-latest',    // State of the Art (Premium)
 } as const;
 
 // Tier-to-Model mapping to control costs and access

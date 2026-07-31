@@ -15,12 +15,20 @@ const sanitizeLog = (val: unknown) => {
     return str.length > MAX_LOG_LENGTH ? str.substring(0, MAX_LOG_LENGTH) + '...' : str;
 };
 
+// Use Google's floating `-latest` aliases, not pinned versions. Every pinned model
+// this file used to name (2.5-flash, 2.0-flash, 1.5-pro) has since been retired —
+// Google returns 404 "no longer available to new users", which silently kills every
+// AI feature. The aliases track forward on their own.
+//   gemini-flash-lite-latest -> currently gemini-3.5-flash-lite  (cheap, structured)
+//   gemini-flash-latest      -> currently gemini-3.6-flash       (quality generation)
+// Extraction is bulk structured parsing, so it gets the lite model; analysis covers
+// scoring and cover-letter generation, where output quality is what Ryan judges.
 export const TIER_MODELS: Record<string, { extraction: string; analysis: string }> = {
-    free: { extraction: 'gemini-2.5-flash', analysis: 'gemini-2.5-flash' },
-    plus: { extraction: 'gemini-2.5-flash', analysis: 'gemini-2.5-flash' },
-    pro: { extraction: 'gemini-2.5-flash', analysis: 'gemini-2.5-flash' },
-    admin: { extraction: 'gemini-2.5-flash', analysis: 'gemini-2.5-flash' },
-    tester: { extraction: 'gemini-2.5-flash', analysis: 'gemini-2.5-flash' },
+    free: { extraction: 'gemini-flash-lite-latest', analysis: 'gemini-flash-latest' },
+    plus: { extraction: 'gemini-flash-lite-latest', analysis: 'gemini-flash-latest' },
+    pro: { extraction: 'gemini-flash-lite-latest', analysis: 'gemini-flash-latest' },
+    admin: { extraction: 'gemini-flash-lite-latest', analysis: 'gemini-flash-latest' },
+    tester: { extraction: 'gemini-flash-lite-latest', analysis: 'gemini-flash-latest' },
 };
 
 export default async function handler(req: Request): Promise<Response> {
@@ -140,7 +148,7 @@ export default async function handler(req: Request): Promise<Response> {
         let modelName = safeTask === 'extraction' ? tierConfig.extraction : tierConfig.analysis;
 
         if (safeTask === 'embedding') {
-            modelName = model || 'text-embedding-004';
+            modelName = model || 'gemini-embedding-001';
         }
 
         console.log('User action:', { userId: sanitizeLog(userId), tier: sanitizeLog(userTier), task: sanitizeLog(safeTask), model: sanitizeLog(modelName) });

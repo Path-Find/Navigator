@@ -152,12 +152,14 @@ export default async function handler(req: Request): Promise<Response> {
             if (profile.is_admin) userTier = 'admin';
             else if (profile.is_tester) userTier = 'tester';
 
+            // Floating aliases only — the pinned models previously named here are all
+            // retired and 404. See the note on TIER_MODELS in gemini-proxy.ts.
             const TIER_MODELS: Record<string, string> = {
-                free: 'gemini-2.0-flash',
-                plus: 'gemini-2.0-flash',
-                pro: 'gemini-1.5-pro',
-                admin: 'gemini-1.5-pro',
-                tester: 'gemini-1.5-pro',
+                free: 'gemini-flash-lite-latest',
+                plus: 'gemini-flash-lite-latest',
+                pro: 'gemini-flash-latest',
+                admin: 'gemini-flash-latest',
+                tester: 'gemini-flash-latest',
             };
             const modelName = TIER_MODELS[userTier] || TIER_MODELS.free;
 
