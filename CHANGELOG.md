@@ -11,6 +11,10 @@ See [CHANGELOG_ARCHIVE.md](CHANGELOG_ARCHIVE.md) for earlier history.
 - **Internal AI prompt labels leaked into the Cover Letter and Resume tabs**: the "Tailoring Strategy" panel showed raw field names like `EVIDENCE_BRIDGE_1:` and `FIT_FRAME:` instead of plain text.
 - **Saving a job could create it twice in History**: two separate code paths each inserted the job on save; consolidated to one.
 - **Signing out deleted your saved resume**: `clearAllData()` (run on every sign-out) was deleting the cloud resume row along with local browser cache. Sign-out now only clears local cache.
+- **Pasting a job description could silently save it dozens of times**: the manual-paste box treated a bare Enter as submit, so a fast paste or automated input firing one keystroke per line could fire multiple real submissions, each one a permanent blank "New Job" row. Submit now requires Cmd/Ctrl+Enter; plain Enter is just a newline.
+- **A stray debug message could appear instead of "job not found"**: replaced with a proper not-found screen.
+
+## [2.43.12] — 2026-07-31
 
 ### Fixed
 - **Signing in didn't visibly sign you in**: the header/app state stayed on "logged out" after a successful sign-in until the page was manually refreshed. `signInWithPassword` never notified the app of the new session in the same tab (only on page load or from another tab) — the sign-in form now pulls the fresh session directly instead of waiting on that notification.

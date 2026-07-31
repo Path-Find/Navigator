@@ -45,9 +45,7 @@ export const JobDetail: React.FC = () => {
         handleUpdateJob: onUpdateJob, 
         handleAnalyzeJob, 
         checkAndConsumeAnalysis,
-        isLoading,
-        activeJobId,
-        jobs
+        isLoading
     } = useJobContext();
     const { userTier } = useUser();
     const { skills: userSkills } = useSkillContext();
@@ -86,14 +84,21 @@ export const JobDetail: React.FC = () => {
     );
 
     // If we have an active ID but the job isn't in the list yet, we're likely still loading from storage
-    console.log("JobDetail render:", { job, isLoading, activeJobId, urlId: window.location.pathname });
     if (!job && isLoading) {
         return <JobProcessingState job={null as any} analysisProgress="Loading your data..." onBack={onBack} />;
     }
 
     if (!job) {
         // Only return null if we're definitively done loading and still have no job
-        return <div style={{ fontSize: '24px', padding: '100px' }}>Job not found for ID: {activeJobId}. Total jobs: {jobs.length}</div>; 
+        return (
+            <div className="flex flex-col items-center justify-center min-h-[80vh] px-6 bg-white dark:bg-neutral-950 text-center">
+                <h2 className="text-2xl font-black text-neutral-900 dark:text-white mb-2 tracking-tight">Job not found</h2>
+                <p className="text-neutral-500 dark:text-neutral-400 text-sm font-medium mb-8">
+                    This job may have been removed, or the link is out of date.
+                </p>
+                <Button variant="secondary" onClick={onBack}>Back to jobs</Button>
+            </div>
+        );
     }
 
     const bestResume = getBestResume(resumes, job.analysis);

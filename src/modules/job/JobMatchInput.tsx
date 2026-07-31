@@ -51,6 +51,19 @@ const JobMatchInput: React.FC = () => {
 
     const activeHeadline = useHeadlines('apply');
     const lastUrlRef = useRef<string>('');
+    // Synchronous re-entrancy guard for handleJobSubmission. `isAnalyzing` state
+    // is not safe for this on its own — a burst of Enter keydowns (rapid manual
+    // paste/typing, or an automation tool dispatching one keydown per newline in
+    // pasted text) can fire handleJobSubmission several times before React has a
+    // chance to re-render with isAnalyzing=true, since state reads inside the
+    // callback are stale until the next render. Each re-entrant call created a
+    // brand new job with a fresh UUID, blank title/company, and whatever partial
+    // text was in state at that instant — every one of those calls also writes a
+    // permanent row to the cloud jobs table via onJobCreated, so a rapid burst
+    // left dozens of permanent "New Job" / "Unknown Company" garbage rows behind.
+    // A ref is checked and set synchronously, so it closes the gap regardless of
+    // dispatch speed.
+    const isSubmittingRef = useRef(false);
 
     const [initialJobUrl, setInitialJobUrl] = useState<string | null>(null);
 
@@ -70,58 +83,67 @@ const JobMatchInput: React.FC = () => {
     }, []);
 
     const handleJobSubmission = useCallback(async (input: { type: 'url' | 'text', content: string }) => {
-        const hasAcceptedPrivacy = LocalStorage.get(STORAGE_KEYS.PRIVACY_ACCEPTED);
-        const isExistingUser = !!user || resumes.length > 0;
-
-        if (!hasAcceptedPrivacy && !isExistingUser) {
-            onNavigate?.('welcome');
-            return;
-        }
-
-        setIsAnalyzing(true);
-        await new Promise(resolve => setTimeout(resolve, 2000));
-
-        const jobId = crypto.randomUUID();
-
-        let potentialUrl = input.type === 'url' ? input.content : (lastUrlRef.current || url.trim());
-        if (potentialUrl && !potentialUrl.startsWith('http') && potentialUrl.includes('.')) {
-            potentialUrl = `https://${potentialUrl}`;
-        }
-
-        const sourceUrl = (potentialUrl &&
-            potentialUrl.length < 500 &&
-            (potentialUrl.startsWith('http') || (potentialUrl.includes('.') && !potentialUrl.includes(' '))))
-            ? potentialUrl
-            : undefined;
-
-        const newJob: SavedJob = {
-            id: jobId,
-            company: '',
-            position: 'New Job',
-            description: input.type === 'text' ? input.content : '',
-            url: sourceUrl,
-            resumeId: resumes[0]?.id || 'master',
-            dateAdded: Date.now(),
-            updatedAt: Date.now(),
-            status: 'analyzing',
-        };
+        // Must be the first thing that happens — see the isSubmittingRef comment
+        // above for why isAnalyzing state can't do this job on its own.
+        if (isSubmittingRef.current) return;
+        isSubmittingRef.current = true;
 
         try {
-            // Persistence, navigation, and usage-limit consumption all happen inside
-            // onJobCreated (handleJobCreated in useJobManager.ts) — it's the single
-            // canonical path. Calling Storage.addJob directly here as well used to
-            // insert this job twice (once unconditionally here, once again — gated by
-            // the usage check — inside handleJobCreated), which could leave two rows
-            // for the same job in history.
-            EventService.trackUsage(TRACKING_EVENTS.JOB_FIT);
-            const created = await onJobCreated(newJob);
-            // If the usage limit blocked creation, onJobCreated already surfaces the
-            // upgrade modal — don't also tell the user matching started.
-            if (created) showSuccess("Matching started");
-            setIsAnalyzing(false);
-        } catch {
-            setError("Failed to start analysis. Please try again.");
-            setIsAnalyzing(false);
+            const hasAcceptedPrivacy = LocalStorage.get(STORAGE_KEYS.PRIVACY_ACCEPTED);
+            const isExistingUser = !!user || resumes.length > 0;
+
+            if (!hasAcceptedPrivacy && !isExistingUser) {
+                onNavigate?.('welcome');
+                return;
+            }
+
+            setIsAnalyzing(true);
+            await new Promise(resolve => setTimeout(resolve, 2000));
+
+            const jobId = crypto.randomUUID();
+
+            let potentialUrl = input.type === 'url' ? input.content : (lastUrlRef.current || url.trim());
+            if (potentialUrl && !potentialUrl.startsWith('http') && potentialUrl.includes('.')) {
+                potentialUrl = `https://${potentialUrl}`;
+            }
+
+            const sourceUrl = (potentialUrl &&
+                potentialUrl.length < 500 &&
+                (potentialUrl.startsWith('http') || (potentialUrl.includes('.') && !potentialUrl.includes(' '))))
+                ? potentialUrl
+                : undefined;
+
+            const newJob: SavedJob = {
+                id: jobId,
+                company: '',
+                position: 'New Job',
+                description: input.type === 'text' ? input.content : '',
+                url: sourceUrl,
+                resumeId: resumes[0]?.id || 'master',
+                dateAdded: Date.now(),
+                updatedAt: Date.now(),
+                status: 'analyzing',
+            };
+
+            try {
+                // Persistence, navigation, and usage-limit consumption all happen inside
+                // onJobCreated (handleJobCreated in useJobManager.ts) — it's the single
+                // canonical path. Calling Storage.addJob directly here as well used to
+                // insert this job twice (once unconditionally here, once again — gated by
+                // the usage check — inside handleJobCreated), which could leave two rows
+                // for the same job in history.
+                EventService.trackUsage(TRACKING_EVENTS.JOB_FIT);
+                const created = await onJobCreated(newJob);
+                // If the usage limit blocked creation, onJobCreated already surfaces the
+                // upgrade modal — don't also tell the user matching started.
+                if (created) showSuccess("Matching started");
+                setIsAnalyzing(false);
+            } catch {
+                setError("Failed to start analysis. Please try again.");
+                setIsAnalyzing(false);
+            }
+        } finally {
+            isSubmittingRef.current = false;
         }
     }, [user, resumes, onJobCreated, onNavigate, showSuccess, url]);
 
@@ -192,7 +214,15 @@ const JobMatchInput: React.FC = () => {
     }, [user, initialJobUrl, isScrapingUrl, isAnalyzing]);
 
     const handleManualKeyDown = (e: React.KeyboardEvent) => {
-        if (e.key === 'Enter' && !e.shiftKey) {
+        // Require Cmd/Ctrl+Enter to submit, not bare Enter. This is a multi-line
+        // textarea holding a full job description — bare Enter must stay a normal
+        // newline. Treating it as submit meant every newline in a fast/automated
+        // paste (or an accidental Enter mid-paragraph) fired a real submission
+        // with whatever partial text existed at that instant, each one writing a
+        // brand new permanent "New Job" row (see isSubmittingRef comment above —
+        // that alone isn't enough, since letting the *first* partial submission
+        // through and dropping the rest would silently discard the real content).
+        if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) {
             e.preventDefault();
             if (!manualDescription.trim()) return;
             handleJobSubmission({ type: 'text', content: manualDescription });
@@ -230,7 +260,9 @@ const JobMatchInput: React.FC = () => {
                                             placeholder="Paste full job description..."
                                             className="w-full bg-transparent border-none rounded-xl text-lg text-neutral-900 dark:text-white placeholder:text-neutral-500 focus:ring-0 focus:outline-none resize-none h-[60px] py-3 leading-relaxed"
                                             onKeyDown={(e) => {
-                                                if (e.key === 'Enter' && !e.shiftKey) {
+                                                // Same reasoning as handleManualKeyDown above — bare
+                                                // Enter must stay a newline in a multi-line textarea.
+                                                if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) {
                                                     e.preventDefault();
                                                     if (manualDescription.trim()) handleJobSubmission({ type: 'text', content: manualDescription });
                                                 }
@@ -288,7 +320,7 @@ const JobMatchInput: React.FC = () => {
                             onKeyDown={handleManualKeyDown}
                             autoFocus
                         />
-                        <div className="absolute bottom-4 right-4 text-xs text-neutral-400">Press Enter to analyze • Shift+Enter for new line</div>
+                        <div className="absolute bottom-4 right-4 text-xs text-neutral-400">Press ⌘/Ctrl+Enter to analyze • Enter for new line</div>
                     </div>
                     <div className="flex justify-between items-center bg-transparent p-1 rounded-2xl border-none">
                         <Button
