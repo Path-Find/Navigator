@@ -4,15 +4,54 @@ Technical foundation and scaling initiatives to support growth and long-term sta
 
 ## AI Model Strategy
 
-All AI calls are proxied through the `gemini-proxy` Supabase Edge Function, which enforces tier gating and quota tracking before forwarding to the provider.
+All AI calls are proxied through `api/gemini-proxy.ts` (a Vercel Function), which enforces tier gating and quota tracking before forwarding to the provider.
 
-**Current provider**: Google Gemini (`gemini-2.5-flash` for all tiers and task types). Model selection is defined in `TIER_MODELS` inside the edge function and can be updated without a frontend deploy.
+**Current provider**: Google Gemini. Model selection lives in `TIER_MODELS` in that file.
 
-**Task types**: `extraction` (job metadata parsing), `analysis` (compatibility scoring + cover letters), `interview` (mock session generation), `embedding` (semantic search).
+**Never pin a Gemini model version.** Use the floating `-latest` aliases only. On 2026-07-31 every pinned model the app named — `gemini-2.5-flash`, `gemini-2.0-flash`, `gemini-1.5-pro`, `gemini-2.5-pro`, `gemini-3-pro`, `text-embedding-004` — was found to return 404 "no longer available to new users" on a fresh API key. Pinned versions retire silently and take down every AI feature at once.
 
-**Considered alternatives**:
-- **DeepSeek**: Evaluated as a cost-reduction option for extraction tasks. Not adopted — Gemini Flash pricing is already competitive and keeping a single provider simplifies key management and fallback logic.
-- Multi-provider routing (e.g. Gemini for analysis, DeepSeek for extraction) remains an option if costs become a concern at scale.
+| Task | Model | Resolves to (2026-07-31) |
+|---|---|---|
+| `extraction` (job metadata parsing) | `gemini-flash-lite-latest` | gemini-3.5-flash-lite |
+| `analysis` (scoring + cover letters) | `gemini-flash-latest` | gemini-3.6-flash |
+| `embedding` (semantic search) | `gemini-embedding-001` | — |
+
+Gemini 3.x rejects `thinkingConfig: {thinkingBudget: 0}` with a 400. Use `thinkingLevel: 'low'` — it still yields zero thought tokens on the flash models.
+
+### Provider cost comparison (2026-07-31)
+
+Per million tokens, input / output:
+
+| Provider | Model | Cost |
+|---|---|---|
+| Google | Gemini 3.6 Flash (current, analysis) | $1.50 / $7.50 |
+| OpenAI | GPT-5.6 Luna | $0.20 / $1.20 |
+| OpenAI | GPT-5.6 Terra | $2 / $12 |
+| Anthropic | Haiku 4.5 | $1 / $5 |
+| Anthropic | Sonnet 5 | $3 / $15 |
+
+OpenAI cut Luna 80% on 2026-07-30, which makes it roughly 6x cheaper than what extraction currently runs on. **Not adopted** — switching providers means a new SDK, a different response shape, and retuning every prompt, and there is currently no quality data to justify it. Revisit once the cover-letter corpus below is large enough to judge output quality against cost.
+
+Earlier evaluation: **DeepSeek** was considered for extraction and not adopted, on the same single-provider-simplicity reasoning.
+
+### Cover letter quality monitoring
+
+Goal: collect 50–100 generated cover letters paired with the job descriptions that produced them, then judge how good the output actually is before spending anything on a provider switch.
+
+The mechanism already exists and needs no new code. `aiCore.logToSupabase` (name is historical — it writes to Neon) records every AI call in the `logs` table:
+
+- `event_type` — which feature made the call, so cover letters separate from parsing
+- `prompt_text` — the full prompt, with the job description embedded in it
+- `response_text` — the generated letter
+- `metadata.token_usage` — input and output tokens separately, which is what turns usage into cost
+
+Redaction strips only emails and phone numbers, so the letters and job descriptions survive intact.
+
+Status as of 2026-07-31: 11 letters, all from early February, all on the retired `gemini-2.0-flash`, none with token data (capture was added later). Effectively starting from zero.
+
+Two known gaps: `jobs.description` is NULL on the one row that has a cover letter, so the `jobs` table is not a reliable source for job-description pairing — use `logs.prompt_text`. And `daily_usage.token_count` is stuck at 0 across all rows; the real per-call numbers are in `logs.metadata`.
+
+Not built yet: nothing converts token counts into dollar amounts. A price table plus a per-feature cost rollup on the admin dashboard would close that.
 
 ---
 
