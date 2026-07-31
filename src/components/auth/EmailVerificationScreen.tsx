@@ -134,11 +134,6 @@ export const EmailVerificationScreen: React.FC = () => {
                         </div>
                     </div>
                 </div>
-
-                <p className="mt-8 text-center text-xs font-bold text-neutral-400 dark:text-neutral-500 uppercase tracking-widest leading-loose">
-                    TRUSTED BY OVER 10,000+ PROFESSIONALS<br />
-                    NAVIGATOR SECURE VERIFICATION
-                </p>
             </motion.div>
         </div>
     );
