@@ -43,14 +43,14 @@ export const PasswordForm: React.FC<PasswordFormProps> = ({
             </div>
 
             <div>
-                <div className="flex justify-between items-center mb-2 ml-1">
+                <div className="flex justify-between items-center mb-2 ml-1 mr-3">
                     <label className="block text-xs font-bold text-neutral-500 dark:text-neutral-400">Password</label>
                     {!isSignUp && (
                         <button
                             type="button"
                             onClick={onForgotPassword}
                             disabled={resetLoading}
-                            className="text-[10px] font-bold text-indigo-600 dark:text-indigo-400 hover:underline disabled:opacity-50"
+                            className="text-xs font-bold text-indigo-600 dark:text-indigo-400 hover:underline disabled:opacity-50"
                         >
                             {resetLoading ? 'Sending...' : 'Forgot?'}
                         </button>
