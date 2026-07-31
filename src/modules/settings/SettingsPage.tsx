@@ -25,7 +25,7 @@ export const SettingsPage: React.FC = () => {
     const handleResetPassword = async () => {
         if (user?.email) {
             const { error } = await authClient.resetPasswordForEmail(user.email, {
-                redirectTo: window.location.origin + '/reset-password',
+                redirectTo: window.location.origin + ROUTES.RESET_PASSWORD,
             });
             if (error) {
                 showError(error.message);

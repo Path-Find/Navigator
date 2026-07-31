@@ -183,6 +183,7 @@ export const ROUTES = {
   CONTACT: '/contact',
   SETTINGS: '/settings',
   VERIFY_EMAIL: '/verify-email',
+  RESET_PASSWORD: '/reset-password',
 } as const;
 
 // User Tiers

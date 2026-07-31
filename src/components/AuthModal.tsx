@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { authClient } from '../lib/auth-client';
 import { X } from 'lucide-react';
 import { getUserFriendlyError } from '../utils/errorMessages';
+import { ROUTES } from '../constants';
 import type { FeatureDefinition } from '../featureRegistry';
 
 // Extracted components
@@ -117,7 +118,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, featureCo
 
         try {
             const { error: resetError } = await authClient.resetPasswordForEmail(email.trim(), {
-                redirectTo: `${window.location.origin}/settings`,
+                redirectTo: `${window.location.origin}${ROUTES.RESET_PASSWORD}`,
             });
             if (resetError) throw resetError;
             setSuccessMessage('Password reset link sent! Check your inbox.');

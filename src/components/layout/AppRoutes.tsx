@@ -30,6 +30,7 @@ const FeaturesPage = lazyWithRetry(() => import('../../modules/features/Features
 const OnboardingPage = lazyWithRetry(() => import('../../modules/onboarding/OnboardingPage').then(m => ({ default: m.OnboardingPage })));
 const SettingsPage = lazyWithRetry(() => import('../../modules/settings/SettingsPage').then(m => ({ default: m.SettingsPage })));
 const EmailVerificationScreen = lazyWithRetry(() => import('../auth/EmailVerificationScreen').then(m => ({ default: m.EmailVerificationScreen })));
+const ResetPasswordScreen = lazyWithRetry(() => import('../auth/ResetPasswordScreen').then(m => ({ default: m.ResetPasswordScreen })));
 
 export const AppRoutes: React.FC = () => {
     return (
@@ -52,6 +53,15 @@ export const AppRoutes: React.FC = () => {
                 <Route path={ROUTES.VERIFY_EMAIL} element={
                     <Suspense fallback={<LoadingState message="Verifying..." />}>
                         <EmailVerificationScreen />
+                    </Suspense>
+                } />
+
+                {/* Password recovery confirmation — must stay public. The visitor here
+                    has only a one-time recovery token in the URL, not a logged-in
+                    session, so this cannot live behind ProtectedRoute. */}
+                <Route path={ROUTES.RESET_PASSWORD} element={
+                    <Suspense fallback={<LoadingState message="Loading..." />}>
+                        <ResetPasswordScreen />
                     </Suspense>
                 } />
 
