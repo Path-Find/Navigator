@@ -4,7 +4,7 @@ All notable changes to this project will be documented in this file.
 
 See [CHANGELOG_ARCHIVE.md](CHANGELOG_ARCHIVE.md) for earlier history.
 
-## [Unreleased]
+## [2.43.10] — 2026-07-31
 
 ### Fixed
 - **All API routes were dead in production**: every `/api/*` function crashed on cold start with `ERR_MODULE_NOT_FOUND`. The shared `_lib` helpers were imported without a `.js` extension, which Node's ESM resolver rejects — so auth, profile reads, job scraping, and all AI generation returned 500. Watch for this on any new `api/` file: the build only reports it as a non-fatal TS2835 diagnostic, so a broken deploy still goes out green.
