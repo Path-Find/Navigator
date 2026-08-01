@@ -44,7 +44,7 @@ export const Header: React.FC = () => {
             items: [
                 { id: 'resumes' as ViewId, label: 'Resume', icon: FileText },
                 ...(isAdmin ? [{ id: 'interviews' as ViewId, label: 'Interviews', icon: MessageSquare }] : []),
-                { id: 'feed' as ViewId, label: 'Feed', icon: Sparkles },
+                ...(isAdmin ? [{ id: 'feed' as ViewId, label: 'Feed', icon: Sparkles }] : []),
                 { id: 'history' as ViewId, label: 'History', icon: Bookmark },
 
             ]

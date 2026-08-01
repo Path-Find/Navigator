@@ -9,7 +9,7 @@ import { useModal } from '../../contexts/ModalContext';
 
 export const Footer: React.FC = () => {
     const { setView } = useGlobalUI();
-    const { user } = useUser();
+    const { user, isAdmin } = useUser();
     const { openModal } = useModal();
     const navigate = useNavigate();
 
@@ -43,8 +43,8 @@ export const Footer: React.FC = () => {
             title: 'Jobs',
             items: [
                 { label: 'Resume', path: ROUTES.RESUMES, view: 'resumes', icon: FileText },
-                { label: 'Interviews', path: ROUTES.INTERVIEWS, view: 'interviews', icon: MessageSquare },
-                { label: 'Feed', path: ROUTES.FEED, view: 'feed', icon: Sparkles },
+                ...(isAdmin ? [{ label: 'Interviews', path: ROUTES.INTERVIEWS, view: 'interviews', icon: MessageSquare }] : []),
+                ...(isAdmin ? [{ label: 'Feed', path: ROUTES.FEED, view: 'feed', icon: Sparkles }] : []),
                 { label: 'History', path: ROUTES.HISTORY, view: 'history', icon: Bookmark },
 
             ]

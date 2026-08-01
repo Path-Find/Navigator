@@ -9,6 +9,7 @@ See [CHANGELOG_ARCHIVE.md](CHANGELOG_ARCHIVE.md) for earlier history.
 ### Changed
 - **History has a filter for jobs that need attention**: failed analyses already got a distinct "Action Required" badge on their card, but were otherwise bucketed inside "Saved" with no way to isolate them in a long list. Added a dedicated filter tab.
 - **Feed and Skills Interview marked beta**: matches Feed and Skills Interview to how Job Alerts and Interview Advisor already behave — shown as "Coming Soon" instead of open, since neither is ready for general use yet.
+- **Beta gate on Feed/Skills Interview now actually blocks access**: the earlier fix only hid one entry point. The Feed link in the top nav, footer, and both pages themselves were still fully open to every user regardless of tier — nav links now match Interviews' existing admin-only pattern, and both pages redirect non-admins away directly, so a bookmark or typed URL can't bypass it either.
 
 ### Fixed
 - **A skill you verified through the Skills Interview could vanish from "Verified Strengths"**: the section only showed a skill if its exact name happened to appear as text in a resume bullet — so a genuinely AI-interview-verified skill (with real evidence) whose name wasn't typed verbatim into your resume just didn't show up at all. Now shows any skill that's either interview-verified or resume-text-matched.

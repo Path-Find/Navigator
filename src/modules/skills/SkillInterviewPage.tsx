@@ -2,7 +2,7 @@ import { SkillInterviewIntro } from './components/SkillInterviewIntro';
 import { SkillInterviewSession } from './components/SkillInterviewSession';
 import { SkillInterviewSummary } from './components/SkillInterviewSummary';
 import React, { useState, useEffect } from 'react';
-import { useLocation, useNavigate } from 'react-router';
+import { useLocation, useNavigate, Navigate } from 'react-router';
 import type { CustomSkill } from '../../types';
 import { generateUnifiedQuestions, analyzeUnifiedResponse } from '../../services/geminiService';
 import { useSkillContext } from './context/SkillContext';
@@ -10,6 +10,8 @@ import { useGlobalUI } from '../../contexts/GlobalUIContext';
 import { checkInterviewLimit, getUsageStats } from '../../services/usageLimits';
 import { authClient } from '../../lib/auth-client';
 import { useToast } from '../../contexts/ToastContext';
+import { useUser } from '../../contexts/UserContext';
+import { ROUTES } from '../../constants';
 
 type InterviewStep = 'intro' | 'interview' | 'summary';
 
@@ -32,6 +34,7 @@ export const SkillInterviewPage: React.FC = () => {
     const navigate = useNavigate();
     const { handleInterviewComplete } = useSkillContext();
     const { showInfo } = useToast();
+    const { isAdmin, isLoading: isUserLoading } = useUser();
 
     // Accept array of skills from router state, enforced cap for quality
     const locationSkills = location.state?.skills as { name: string; proficiency: string }[] | undefined;
@@ -238,6 +241,8 @@ export const SkillInterviewPage: React.FC = () => {
 
     const handleClose = () => navigate('/career/skills');
 
+    if (isUserLoading) return null;
+    if (!isAdmin) return <Navigate to={ROUTES.FEATURES} replace />;
     if (skills.length === 0) return null;
 
     const verifiedSkills = step === 'summary' ? getVerifiedSkills() : [];

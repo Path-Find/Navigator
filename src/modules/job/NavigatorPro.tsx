@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Navigate } from 'react-router';
 import { Sparkles, Zap, ChevronDown } from 'lucide-react';
 import { SharedPageLayout } from '../../components/common/SharedPageLayout';
 import { PageHeader } from '../../components/ui/PageHeader';
@@ -6,8 +7,9 @@ import { StandardSearchBar } from '../../components/common/StandardSearchBar';
 import { StandardFilterGroup } from '../../components/common/StandardFilterGroup';
 import { useJobContext } from './context/JobContext';
 import { LocalStorage } from '../../utils/localStorage';
-import { STORAGE_KEYS } from '../../constants';
+import { STORAGE_KEYS, ROUTES } from '../../constants';
 import type { JobFeedItem } from '../../types';
+import { useUser } from '../../contexts/UserContext';
 
 // Extracted internal parts
 import { useJobFeed } from './feed/useJobFeed';
@@ -16,6 +18,8 @@ import { EmptyFeedState } from './feed/EmptyFeedState';
 import { LocalizedErrorBoundary } from '../../components/common/LocalizedErrorBoundary';
 
 export const NavigatorPro: React.FC = () => {
+    const { isAdmin, isLoading: isUserLoading } = useUser();
+
     const {
         handleDraftApplication: onDraftApplication,
         handlePromoteFromFeed: onPromoteFromFeed,
@@ -57,6 +61,9 @@ export const NavigatorPro: React.FC = () => {
     };
 
     const displayFeed = getProcessedFeed();
+
+    if (isUserLoading) return null;
+    if (!isAdmin) return <Navigate to={ROUTES.FEATURES} replace />;
 
     return (
         <SharedPageLayout className="theme-job" spacing="compact" maxWidth="6xl">
