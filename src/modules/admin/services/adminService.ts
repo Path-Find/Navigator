@@ -1,5 +1,5 @@
 
-import { supabase } from '../../../services/supabase';
+import { dataClient } from '../../../lib/data-client';
 
 export interface UsageOutlier {
     user_id: string;
@@ -11,7 +11,7 @@ export interface UsageOutlier {
 }
 
 export const getUsageOutliers = async (): Promise<UsageOutlier[]> => {
-    const { data, error } = await supabase
+    const { data, error } = await dataClient
         .from('usage_outliers')
         .select('*')
         .order('total_output_tokens', { ascending: false });

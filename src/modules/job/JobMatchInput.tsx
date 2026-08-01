@@ -41,7 +41,7 @@ const JobMatchInput: React.FC = () => {
         resumes,
     } = useResumeContext();
 
-    const { showSuccess } = useToast();
+    const { showSuccess, showError } = useToast();
     const [url, setUrl] = useState('');
     const [manualDescription, setManualDescription] = useState('');
     const [isManualMode, setIsManualMode] = useState(false);
@@ -172,9 +172,16 @@ const JobMatchInput: React.FC = () => {
         try {
             const { ScraperService } = await import('../../services/scraperService');
             if (!ScraperService.isUrlScrapable(trimmedUrl)) {
-                setUrl('');
+                const wasUrlLike = isLikelyUrl;
                 lastUrlRef.current = '';
-                setError("This domain has a high failure rate for automatic scraping. Please paste the job description below:");
+                setUrl('');
+                setManualDescription(wasUrlLike ? '' : trimmedUrl);
+                setIsManualMode(true);
+                showError(
+                    wasUrlLike
+                        ? "This domain has a high failure rate for automatic scraping. Please paste the job description below."
+                        : "That doesn't look like a valid URL. Paste the full job description below instead."
+                );
                 return;
             }
         } catch {
@@ -191,15 +198,14 @@ const JobMatchInput: React.FC = () => {
             const msg = err instanceof Error ? err.message : String(err);
             setIsManualMode(true);
 
-            if (msg === "DOMAIN_BLOCKED") {
-                setError("This domain has a high failure rate for automatic scraping. Please paste the job description below:");
-            } else if (msg.includes("403") || msg.includes("Forbidden")) {
-                setError("This site blocks automated access. Please paste the job description below:");
-            } else if (msg.includes("timeout")) {
-                setError("The connection timed out. Please paste the job description below:");
-            } else {
-                setError("We couldn't reach that URL. Please paste the job description below:");
-            }
+            const friendlyMessage =
+                msg === "DOMAIN_BLOCKED" ? "This domain has a high failure rate for automatic scraping. Please paste the job description below." :
+                msg.includes("403") || msg.includes("Forbidden") ? "This site blocks automated access. Please paste the job description below." :
+                msg.includes("timeout") ? "The connection timed out. Please paste the job description below." :
+                "We couldn't reach that URL. Please paste the job description below.";
+
+            setError(friendlyMessage);
+            showError(friendlyMessage);
         } finally {
             setIsScrapingUrl(false);
         }
