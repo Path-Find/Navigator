@@ -63,9 +63,9 @@ export const JOB_ANALYSIS_PROMPTS = {
       },
       "resumeTailoringInstructions": ["3 extremely concise, 1-sentence bullet points on how to adjust the resume"],
       "coverLetterTailoringInstructions": [
-        "EVIDENCE_BRIDGE_1: Map the single most critical job requirement to the best-matching resume block ID — format as: '[Requirement] → [Block ID]: [one-sentence explanation of the connection]'",
-        "EVIDENCE_BRIDGE_2: Map the second most critical job requirement to a DIFFERENT resume block ID (must not reuse the block from bridge 1)",
-        "FIT_FRAME: If compatibility score < 60, write a one-sentence framing instruction for the gap (e.g. 'Lead with transferable X skill; acknowledge Y gap as a learning goal'). If score >= 60, write one sentence on the candidate's strongest differentiator for this specific role."
+        "EVIDENCE_BRIDGE_1: Map the single most critical job requirement to the best-matching resume block ID — format as: '[Requirement] → [Block ID]: [one-sentence explanation of the connection]'. Write this as an instruction for what to emphasize, not as a description of a letter that already exists (e.g. 'Lead with the TTC customer-service block to show direct transit experience', not 'The letter draws on TTC experience to show...').",
+        "EVIDENCE_BRIDGE_2: Map the second most critical job requirement to a DIFFERENT resume block ID (must not reuse the block from bridge 1). Same forward-looking instruction voice as EVIDENCE_BRIDGE_1.",
+        "FIT_FRAME: If compatibility score < 60, write a one-sentence framing instruction for the gap (e.g. 'Lead with transferable X skill; acknowledge Y gap as a learning goal'). If score >= 60, write one sentence identifying the candidate's strongest differentiator for this specific role, as an instruction (what to lead with), not a review of finished writing."
       ],
       "recommendedBlockIds": ["List of IDs from the candidate resume blocks that are most relevant to this job"],
       "internalAnalysis": "DEDICATED SCRATCHPAD: Record your logical checks, self-reminders (e.g. 'check date logic', 'missing Pro experience'), and meta-commentary here. Do NOT leak these into user-facing fields."
