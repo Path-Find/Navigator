@@ -19,6 +19,7 @@ const FILTER_OPTIONS = [
     { id: 'interview', label: 'Interview' },
     { id: 'offer', label: 'Offer' },
     { id: 'rejected', label: 'Rejected' },
+    { id: 'error', label: 'Action Required' },
 ] as const;
 
 type StatusFilter = typeof FILTER_OPTIONS[number]['id'];
@@ -44,7 +45,8 @@ export default function History() {
                 if (statusFilter === 'interview' && job.status !== 'interview') return false;
                 if (statusFilter === 'rejected' && (job.status !== 'rejected' && job.status !== 'ghosted')) return false;
                 if (statusFilter === 'applied' && job.status !== 'applied') return false;
-                if (statusFilter === 'saved' && (job.status !== 'saved' && job.status !== 'analyzing' && job.status !== 'error' && !!job.status)) return false;
+                if (statusFilter === 'error' && job.status !== 'error') return false;
+                if (statusFilter === 'saved' && (job.status !== 'saved' && job.status !== 'analyzing' && !!job.status)) return false;
             }
 
             if (!searchQuery.trim()) return true;
@@ -75,7 +77,8 @@ export default function History() {
             if (filter === 'interview') return job.status === 'interview';
             if (filter === 'rejected') return job.status === 'rejected' || job.status === 'ghosted';
             if (filter === 'applied') return job.status === 'applied';
-            if (filter === 'saved') return job.status === 'saved' || job.status === 'analyzing' || job.status === 'error' || !job.status;
+            if (filter === 'error') return job.status === 'error';
+            if (filter === 'saved') return job.status === 'saved' || job.status === 'analyzing' || !job.status;
             return false;
         }).length;
     };

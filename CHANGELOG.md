@@ -7,6 +7,7 @@ See [CHANGELOG_ARCHIVE.md](CHANGELOG_ARCHIVE.md) for earlier history.
 ## [Unreleased]
 
 ### Changed
+- **History has a filter for jobs that need attention**: failed analyses already got a distinct "Action Required" badge on their card, but were otherwise bucketed inside "Saved" with no way to isolate them in a long list. Added a dedicated filter tab.
 - **Feed and Skills Interview marked beta**: matches Feed and Skills Interview to how Job Alerts and Interview Advisor already behave — shown as "Coming Soon" instead of open, since neither is ready for general use yet.
 
 ### Fixed
