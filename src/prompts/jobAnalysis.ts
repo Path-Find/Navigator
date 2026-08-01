@@ -76,6 +76,7 @@ export const JOB_ANALYSIS_PROMPTS = {
     2. USER-FACING: 'reasoning', 'strengths', and 'weaknesses' must be professional, supportive, and in Sentence Case.
     3. NO META: Do not say 'I think', 'I will', or 'Based on my analysis' in user-facing fields. Just provide the insight.
     4. ACTIONABLE: Frame 'weaknesses' as gaps that can be addressed, not as static failures.
+    5. VOICE: Address the reader directly as "you"/"your" in 'reasoning', 'strengths', and 'weaknesses'. Never say "the candidate" — this is a direct message to the person being evaluated, not a third-party report about them.
   `
   },
 
