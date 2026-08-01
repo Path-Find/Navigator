@@ -60,10 +60,7 @@ async function handler(req: Request): Promise<Response> {
         if (mode === 'text') {
             let text = html;
 
-            // nav/header/footer are site chrome, not job content — and on sites with a
-            // responsive layout they're often duplicated (desktop + mobile menu markup),
-            // which repeats that chrome 2-3x and can drown out the actual posting.
-            const tagsToRemove = ['script', 'style', 'iframe', 'noscript', 'canvas', 'svg', 'nav', 'header', 'footer'];
+            const tagsToRemove = ['script', 'style', 'iframe', 'noscript', 'canvas', 'svg'];
             for (const tag of tagsToRemove) {
                 const regex = new RegExp(`<${tag}\\b[^>]*>([\\s\\S]*?)<\\/${tag}>`, 'gim');
                 let prevText;
@@ -84,8 +81,29 @@ async function handler(req: Request): Promise<Response> {
                 '&quot;': '"',
                 '&#39;': "'",
             };
-            text = text.replace(/&(?:nbsp|amp|lt|gt|quot|#39);/g, (m) => entities[m])
-                .replace(/\s+/g, ' ')
+            text = text.replace(/&(?:nbsp|amp|lt|gt|quot|#39);/g, (m) => entities[m]);
+
+            // Sites with a responsive layout often ship duplicate menu markup (desktop +
+            // mobile/tablet breakpoints) that isn't wrapped in <nav>/<header> — e.g. three
+            // separate <ul class="nav..."> blocks with identical links. That's not a tag
+            // pattern we can reliably strip by name, but it does repeat verbatim, so drop
+            // any short "line" (one flattened <li>/<p>/<div>, i.e. nav-link-shaped, not a
+            // real sentence) once it's already been seen.
+            const seenShortLines = new Set<string>();
+            const lines = text.split('\n').map(line => {
+                const trimmed = line.replace(/[ \t]+/g, ' ').trim();
+                if (!trimmed) return '';
+                if (trimmed.length <= 60) {
+                    const key = trimmed.toLowerCase();
+                    if (seenShortLines.has(key)) return '';
+                    seenShortLines.add(key);
+                }
+                return trimmed;
+            });
+
+            text = lines.join('\n')
+                .replace(/\n{2,}/g, '\n')
+                .replace(/[ \t]{2,}/g, ' ')
                 .trim()
                 .substring(0, 50000);
 
