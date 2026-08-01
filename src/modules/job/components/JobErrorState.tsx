@@ -26,6 +26,10 @@ export const JobErrorState: React.FC<JobErrorStateProps> = ({
     onManualRetry
 }) => {
     const isExtractionError = !job.description || (job.progressMessage && (job.progressMessage.includes("blocked") || job.progressMessage.includes("extraction") || job.progressMessage.includes("Manual Input")));
+    // Scrape succeeded (job.description has content) and it came from a URL, but the AI
+    // rejected it as not a real job posting — different from "we couldn't reach the URL"
+    // (isExtractionError) and from "you pasted bad text yourself" (the generic fallback).
+    const isRejectedUrlContent = !isExtractionError && !!job.url && !!job.description;
     const isAiError = job.progressMessage && (
         job.progressMessage.includes("AI") ||
         job.progressMessage.includes("quota") ||
@@ -51,7 +55,7 @@ export const JobErrorState: React.FC<JobErrorStateProps> = ({
                                     {isAiError ? 'Service Interruption' : 'Incomplete Job Details'}
                                 </h2>
                                 <p className="text-neutral-700 dark:text-neutral-300 text-sm font-medium leading-relaxed">
-                                    {job.progressMessage && !job.progressMessage.toLowerCase().includes('wrong') && job.progressMessage.length < 200 ? job.progressMessage : (isExtractionError ? "We couldn't read the job details from that URL. Please paste the description manually below." : "This content doesn't look like a valid job description. Please paste the full details manually.")}
+                                    {job.progressMessage && !job.progressMessage.toLowerCase().includes('wrong') && job.progressMessage.length < 200 ? job.progressMessage : (isExtractionError ? "We couldn't read the job details from that URL. Please paste the description manually below." : isRejectedUrlContent ? "We pulled content from that link, but it doesn't look like a real job posting. Check the text below and edit or paste the actual description manually." : "This content doesn't look like a valid job description. Please paste the full details manually.")}
                                 </p>
                             </div>
                         </div>
