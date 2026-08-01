@@ -6,6 +6,9 @@ See [CHANGELOG_ARCHIVE.md](CHANGELOG_ARCHIVE.md) for earlier history.
 
 ## [Unreleased]
 
+### Changed
+- **Feed and Skills Interview marked beta**: matches Feed and Skills Interview to how Job Alerts and Interview Advisor already behave — shown as "Coming Soon" instead of open, since neither is ready for general use yet.
+
 ### Fixed
 - **Pasting a short non-URL string into Match wiped what you typed, with no explanation**: only long non-URL text was preserved when the box auto-detected it wasn't a link; short strings fell through a different path that cleared the box and set an error message nobody ever saw (the message was computed but never rendered). Now the typed text carries over into manual mode and the error actually shows as a toast.
 - **Two features were silently broken since the Neon migration (2026-07-27)**: cover letter generation's role-specific tailoring lookup, and the admin usage-outliers view, were both still querying the old, disconnected Supabase project. Failures were caught and swallowed, so nothing looked broken — cover letters just quietly lost a personalization signal, and the admin dashboard lost real data. Both now point at Neon.

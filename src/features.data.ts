@@ -207,6 +207,7 @@ export const FEATURE_REGISTRY: Record<string, FeatureDefinition> = {
         rank: 4,
         showOnHomepage: true,
         planHighlight: true,
+        stage: 'beta',
     },
     MAIL_IN: {
         id: 'mail-in',
@@ -247,6 +248,7 @@ export const FEATURE_REGISTRY: Record<string, FeatureDefinition> = {
         targetView: 'skills',
         link: '/career/skills/interview',
         rank: 17,
+        stage: 'beta',
     },
     INTERVIEW_ADVISOR: {
         id: 'interview-advisor',
