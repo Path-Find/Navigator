@@ -142,24 +142,12 @@ export const getUsageStats = async (userId: string): Promise<UsageStats> => {
                     .eq('id', userId)
                     .single();
 
-                if (error && error.code === 'PGRST204') { // PGRST204 can indicate no row found, or sometimes schema mismatch if single() fails
-                    console.warn(`Profile query failed for user ${userId} with code PGRST204. Attempting basic profile fetch.`);
-                    // Fallback to a more basic query if the initial one fails, e.g., due to missing columns
-                    const { data: basicData, error: basicError } = await dataClient
-                        .from('profiles')
-                        .select('subscription_tier,is_admin,is_tester,total_ai_calls,job_analyses_count,inbound_email_token')
-                        .eq('id', userId)
-                        .single();
-                    if (basicError) {
-                        console.error(`Basic profile query also failed for user ${userId}:`, basicError);
-                        throw basicError; // Re-throw if even basic fails
-                    }
-                    return { data: basicData, error: null };
-                } else if (error) {
-                    console.error(`Error fetching full profile for user ${userId}:`, error);
-                    throw error; // Re-throw other errors
+                // PGRST116 = no row found (e.g. a brand new user with no profile row yet) — expected, not an error.
+                if (error && error.code !== 'PGRST116') {
+                    console.error(`Error fetching profile for user ${userId}:`, error);
+                    throw error;
                 }
-                return { data, error };
+                return { data, error: null };
             })(),
             (async () => dataClient
                 .from('jobs')
