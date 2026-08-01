@@ -60,7 +60,10 @@ async function handler(req: Request): Promise<Response> {
         if (mode === 'text') {
             let text = html;
 
-            const tagsToRemove = ['script', 'style', 'iframe', 'noscript', 'canvas', 'svg'];
+            // nav/header/footer are site chrome, not job content — and on sites with a
+            // responsive layout they're often duplicated (desktop + mobile menu markup),
+            // which repeats that chrome 2-3x and can drown out the actual posting.
+            const tagsToRemove = ['script', 'style', 'iframe', 'noscript', 'canvas', 'svg', 'nav', 'header', 'footer'];
             for (const tag of tagsToRemove) {
                 const regex = new RegExp(`<${tag}\\b[^>]*>([\\s\\S]*?)<\\/${tag}>`, 'gim');
                 let prevText;
