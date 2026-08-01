@@ -14,6 +14,7 @@ export const COVER_LETTER_PROMPTS = {
               - If the job is 'technical' or 'academic': Preserve literal statistics (e.g., "98% accuracy," "6,400 followers") for precision.
               - If the job is 'creative', 'managerial', or 'general': Paraphrase statistics into high-impact narrative (e.g., "tripling engagement," "gold-standard precision").
             - **Substance**: Avoid filler. Every sentence must add new, evidence-backed weight to the value proposition.
+            - **No Resume Echo**: Never reuse a resume bullet's sentence structure or phrasing with only a word or two swapped (e.g. resume "maintaining 98% accuracy while managing a caseload of 16 claims per hour" becoming "maintained a 98% accuracy rate while processing 16 cases per hour" is a FAIL — same skeleton, same order, synonyms swapped). Literal numbers may repeat verbatim; the sentence carrying them must not. Rebuild the sentence from a different angle — a different starting clause, a different emphasis, a different framing of why the number matters here — before you touch the wording.
             - Structure:
               1. THE HOOK: A sophisticated observation about the company's specific mission or market challenge.
               2. THE SYNTHESIS: Unified body paragraphs that combine achievements from across the candidate's history to prove mastery.
@@ -31,6 +32,7 @@ export const COVER_LETTER_PROMPTS = {
               - If the job is 'technical' or 'academic': Preserve literal statistics for precision.
               - If the job is 'creative', 'managerial', or 'general': Paraphrase statistics into high-impact narrative.
             - **Substance**: Avoid filler. Every sentence must add new, evidence-backed weight to the value proposition.
+            - **No Resume Echo**: Never reuse a resume bullet's sentence structure or phrasing with only a word or two swapped (e.g. resume "maintaining 98% accuracy while managing a caseload of 16 claims per hour" becoming "maintained a 98% accuracy rate while processing 16 cases per hour" is a FAIL — same skeleton, same order, synonyms swapped). Literal numbers may repeat verbatim; the sentence carrying them must not. Rebuild the sentence from a different angle — a different starting clause, a different emphasis, a different framing of why the number matters here — before you touch the wording.
             `,
       v3_experimental_pro: `
             You are a senior executive writing a high-level strategic letter. Focus on ROI, value proposition, and long-term trajectory.
@@ -44,6 +46,7 @@ export const COVER_LETTER_PROMPTS = {
               - If the job is 'technical' or 'academic': Preserve literal statistics for precision.
               - If the job is 'creative', 'managerial', or 'general': Paraphrase statistics into high-impact narrative.
             - **Substance**: Avoid filler. Every sentence must add new, evidence-backed weight to the value proposition.
+            - **No Resume Echo**: Never reuse a resume bullet's sentence structure or phrasing with only a word or two swapped (e.g. resume "maintaining 98% accuracy while managing a caseload of 16 claims per hour" becoming "maintained a 98% accuracy rate while processing 16 cases per hour" is a FAIL — same skeleton, same order, synonyms swapped). Literal numbers may repeat verbatim; the sentence carrying them must not. Rebuild the sentence from a different angle — a different starting clause, a different emphasis, a different framing of why the number matters here — before you touch the wording.
             `
     },
     GENERATE: (template: string, jobDescription: string, resumeText: string, tailoringInstructions: string[], additionalContext?: string, trajectoryContext?: string, bucketStrategy?: string) => `
@@ -99,7 +102,7 @@ export const COVER_LETTER_PROMPTS = {
     PROPOSED COVER LETTER:
     ${coverLetter}
 
-    1. TECHNICAL FIDELITY: Does it hallucinate or copy-paste?
+    1. TECHNICAL FIDELITY: Does it hallucinate facts, or lift a resume bullet's sentence structure/phrasing with only a word or two changed? (Compare each metric-bearing sentence against its source resume bullet — same skeleton with synonyms swapped counts as a copy, even if no phrase matches exactly.)
     2. NARRATIVE SUBSTANCE: Is it a cohesive argument or a robotic list?
     3. FUNCTIONAL BRIDGING: Are the transitions thematic or additive?
 
