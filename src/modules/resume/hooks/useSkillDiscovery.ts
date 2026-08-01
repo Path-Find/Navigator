@@ -15,7 +15,10 @@ interface UseSkillDiscoveryResult {
 export function useSkillDiscovery(blocks: ExperienceBlock[], skills: CustomSkill[]): UseSkillDiscoveryResult {
     return useMemo(() => {
         const allText = blocks.flatMap(b => [...b.bullets, b.title, b.organization]).join(' ').toLowerCase();
-        const verifiedSkills = skills.filter(s => allText.includes(s.name.toLowerCase()));
+        // A skill belongs here if it's genuinely interview-verified (has evidence) OR its
+        // name happens to appear in the resume text. Gating on text-match alone would hide
+        // interview-verified skills whose exact name was never typed into a resume bullet.
+        const verifiedSkills = skills.filter(s => !!s.evidence || allText.includes(s.name.toLowerCase()));
 
         const explicitSkills = blocks
             .filter(b => b.type === 'skill')
