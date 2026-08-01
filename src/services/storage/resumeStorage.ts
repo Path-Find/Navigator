@@ -58,7 +58,9 @@ export const ResumeStorage = {
                 .delete()
                 .eq('user_id', userId)
                 .not('profile_id', 'in', `(${activeIds.map(id => `"${id}"`).join(',')})`)
-        );
+        ).then(({ error }) => {
+            if (error) console.error('[ResumeStorage] Failed to clean up removed resume profiles:', error);
+        });
 
         await Promise.all([...upserts, cleanup]);
     },

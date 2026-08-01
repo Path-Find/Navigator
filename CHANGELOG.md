@@ -7,6 +7,7 @@ See [CHANGELOG_ARCHIVE.md](CHANGELOG_ARCHIVE.md) for earlier history.
 ## [Unreleased]
 
 ### Fixed
+- **Resume cleanup could fail silently after upload or edit**: every resume save fires a background delete of old/removed profile versions, but the delete's result was never checked. When it failed (409 conflict, observed live), nothing logged it and nothing told you — stale rows would just linger. Now logs the failure instead of swallowing it.
 - **Match analysis showed a confident score with no resume behind it**: an empty resume (created automatically but never filled in) slipped past the "do we have data" check, so Gemini produced a specific score and skill list from a blank candidate profile instead of saying so. It now checks the real assembled prompt data and returns no score, with a clear message, when there's genuinely nothing to ground it in.
 - **Internal AI prompt labels leaked into the Cover Letter and Resume tabs**: the "Tailoring Strategy" panel showed raw field names like `EVIDENCE_BRIDGE_1:` and `FIT_FRAME:` instead of plain text.
 - **Saving a job could create it twice in History**: two separate code paths each inserted the job on save; consolidated to one.
