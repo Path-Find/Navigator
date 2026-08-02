@@ -204,5 +204,6 @@ Historical only — **Claude Sonnet**, not production Gemini. Sample letter file
 | 2026-06-12 | Offline Claude 6-job diagnosis (merged into §10; local sample files removed). |
 | 2026-07-31 | Prior production pairs effectively empty (old model, no tokens). |
 | 2026-08-02 | Product-path e2e works: Turso → Neon save → gemini-proxy analysis + letter. Example: Region of Waterloo student role, fit ~92, pair under `test-runs/pairs/2026-08-02/`. Runbook is cold-start; June folder folded into `pairs/`. |
+| 2026-08-02 | **≥100 complete pairs** on eval account (JD + letter via production `gemini-proxy`; count verified 103). Civic Careers bulk + incomplete-row backfill; intermittent 500/401 with retry. |
 
 Update this table as the eval progresses.
