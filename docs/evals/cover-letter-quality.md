@@ -7,7 +7,7 @@ Plan for building a real corpus of generated cover letters so quality (and cost)
 Related:
 
 - `test-runs/cover-letter-eval/` — June 2026 six-job diagnosis (local only; gitignored)
-- `scripts/test-harness.ts` + `test-runs/README.md` — offline harness
+- `scripts/test-harness.ts` + `test-runs/README.md` — offline harness (secondary; not the primary corpus path)
 - `docs/roadmap/TECHNICAL.md` — AI model strategy / provider cost table
 
 ---
@@ -26,9 +26,32 @@ Also useful for:
 
 ---
 
+## Principle: normal product path, bulk speed only
+
+This is **not** a special eval pipeline, a guard bypass, or a side harness that pretends to be production.
+
+Ryan is a normal user building a corpus on **his own Navigator account**. The only reason an agent does the clicks is that doing it ~50 times by hand is tedious.
+
+| Step | What “normal user” means | Automation allowed |
+|---|---|---|
+| Find jobs | Browse Civic Careers / real postings | Query **Turso** (Civic Careers live DB) instead of scrolling |
+| Add to profile | Save job → lands in History as `saved` with full JD | Insert into Neon `jobs` same shape as the app (`original_text`, company, title, url, status `saved`) |
+| Generate letter | Open job → Generate cover letter | Call **`/api/gemini-proxy`** as Ryan (Neon Auth JWT) with `feature: 'cover_letter'` — same tier gates, quota, models, and `logs` as the UI |
+| Later: grade | — | Separate step; can use a different model. Does **not** rewrite how letters were produced |
+
+**Do not:**
+
+- Call Gemini with a raw `GEMINI_API_KEY` for corpus letters (bypasses proxy, tier, usage, and product logging)
+- Use a parallel prompt stack that doesn’t match `src/prompts/coverLetter.ts` + `jobAiService`
+- Mark jobs as fake eval fixtures in a way that changes generation behavior (optional internal note is fine; generation must still be product-path)
+
+Proof of add path (2026-08-02): Metrolinx *Junior Project Coordinator, Environmental Programs and Assessment (EPA)* saved on Ryan’s account from Turso → Neon. Letter generation for that row still to do via proxy.
+
+---
+
 ## Data source (already exists)
 
-No new logging pipeline. `aiCore.logToSupabase` (name is historical — writes to Neon) records every AI call in the `logs` table:
+No new logging pipeline. `aiCore.logToSupabase` (name is historical — writes to Neon) records every AI call in the `logs` table when the **product proxy** runs:
 
 | Field | Use |
 |---|---|
@@ -39,7 +62,7 @@ No new logging pipeline. `aiCore.logToSupabase` (name is historical — writes t
 
 Redaction strips only emails and phone numbers, so letters and job descriptions survive intact **in Neon**. Treat that as private product data, same as the rest of the account.
 
-**Do not rely on `jobs.description` for pairing.** It has been NULL on rows that still have a cover letter. Use `logs.prompt_text`.
+**Do not rely on `jobs.description` for pairing.** It has been NULL on rows that still have a cover letter. Prefer `jobs.original_text` for the JD on the job row, and `logs.prompt_text` + `logs.response_text` for the generation pair.
 
 **Do not rely on `daily_usage.token_count`.** Stuck at 0 across rows; real per-call numbers are in `logs.metadata`.
 
@@ -47,84 +70,68 @@ Not built yet: convert token counts → dollars (price table + per-feature cost 
 
 ---
 
-## Where to put downloaded / generated files
+## Where jobs and letters live
 
-**Rule: a letter alone is not a corpus entry.** Every unit is a **pair** — job description + cover letter (optional: score, critique, tokens). You cannot judge quality without the JD that drove the letter.
+### On the account (source of truth while building)
 
-Reuse gitignored `test-runs/` (and `samples/` for hand-curated pairs):
+- **Jobs:** Neon `jobs` for Ryan’s `user_id` — full JD in `original_text`, letter in `cover_letter` once generated
+- **AI trail:** Neon `logs` for each proxy call (prompt + response + tokens)
+
+### Optional local export (gitignored)
+
+**Rule: a letter alone is not a corpus entry.** Every unit is a **pair** — job description + cover letter.
 
 ```
 test-runs/
   cover-letter-eval/              ← existing June writeup (paired per job)
-  corpus/                         ← bulk corpus (create when exporting)
+  corpus/                         ← bulk export when grading offline
     2026-08-02/
       001-employer-role/
         job-description.txt       ← required
         cover-letter.txt          ← required
-        meta.json                 ← optional: score, model, variant, tokens, log id
-      002-...
-  2026-06-09-ttc-.../             ← harness run (already this shape)
-    job-description.txt
-    cover-letter.txt
-    review.json
+        meta.json                 ← optional: score, model, tokens, log id, job id
 ```
 
-Same idea as `samples/[date]-[company]-[role]/` (`job-description.txt` + `cover-letter.txt`).
+Export from Neon (`original_text` / `cover_letter` and/or `logs`) when ready to grade offline. Until then, the account + `logs` are enough.
 
-| Source | How pairing works |
+---
+
+## Job sourcing (Civic Careers / Turso)
+
+Live Civic Careers data is **Turso** (`TURSO_URL` + `TURSO_AUTH_TOKEN`), not Vercel Blob. Local `jobs.sqlite` in the Civic Careers repo is stale — don’t use it for seeding.
+
+| Filter | Intent |
 |---|---|
-| **In-app → Neon `logs`** | `prompt_text` has the JD; `response_text` is the letter. Keep them together when exporting — never export `response_text` only. Prefer extracting the JD section from the prompt (or re-fetch job text if still on the job row). **Do not trust `jobs.description` alone** (often NULL). |
-| **Harness** | Already writes both files into one run folder. |
-| **Manual / bulk seed** | Save cleaned JD when the job is added; after generation, write letter into the same pair folder. |
+| Active, non-inventory, has description | Usable JDs |
+| Mild fit for Ryan | Transit-adjacent, coordination, policy-ish, student/co-op, municipal generalist — not pure trades / pure engineering / pure finance where resume has no anchor |
+| Prefer GTHA employers when possible | TTC, Metrolinx, City of Toronto, regional municipalities, etc. |
 
-Optional one-file form for bulk dumps (still one pair per line/object):
+Bias toward medium–good fit so the corpus answers “is the letter good?” not “was the job a bad match?” (June eval: 2/6 jobs were unsolvable poor fits).
 
-```jsonl
-{"id":"001","employer":"...","role":"...","job_description":"...","cover_letter":"...","score":72,"model":"gemini-flash-latest"}
-```
+---
+
+## How to grow the corpus (ordered)
+
+1. **Pull** mild-fit listings from Turso (title + source + full `description` + url).
+2. **Add** each as a normal saved job on Ryan’s Navigator profile (same fields the app writes).
+3. **Generate** cover letter (and match analysis if that’s what the UI would run first) via **production `gemini-proxy` as Ryan** — not a direct API key.
+4. **Confirm** letter is on the job row and a `logs` row exists with `event_type` for cover letter + token usage.
+5. Repeat until ≥50 (stretch 100).
+6. **Later:** export pairs if needed → AI grade → aggregate → decide prompt vs provider.
+
+### Offline harness (optional only)
+
+`scripts/test-harness.ts` can generate letters offline for prompt A/B. It is **not** the primary path for this corpus and currently still leans on old Supabase auth wiring. Prefer the real proxy + account so the corpus matches production.
 
 ---
 
 ## Status
 
-| Date | Corpus |
+| Date | Notes |
 |---|---|
-| 2026-07-31 | 11 letters, all early February, all on retired `gemini-2.0-flash`, none with token data. Effectively starting from zero. |
-| 2026-06-12 | Manual 6-job eval in `test-runs/cover-letter-eval/` (Claude Sonnet 4.6 against `v1_direct`; not production Gemini path) |
-
----
-
-## How to grow the corpus
-
-### Preferred: generate in-app on real jobs
-
-1. Seed ~50–100 realistic job postings onto Ryan's Navigator account (mild fit preferred — poor-fit jobs only prove "fit is bad," not letter quality; see June diagnosis).
-2. Run cover letter generation (and optionally match analysis) through the normal product path.
-3. Letters land in `logs` automatically with full prompt + response + tokens.
-4. Export to `test-runs/corpus/` only if you want offline review — **always as JD + letter pairs**, not letters alone. Otherwise score from Neon using `prompt_text` + `response_text` together.
-
-### Job sourcing (bulk, not hand-paste)
-
-Pain: manually finding and adding 50–100 jobs one-by-one.
-
-Plan:
-
-1. Query stored listings from **GovJobs / Feeds / Civic-Careers**.
-2. Filter to roles Ryan is at least **mildly** qualified for (transit, policy-adjacent, coordination, student/co-op where relevant, generalist municipal/admin — not pure civil engineering / pure construction cost controls).
-3. Insert those jobs into the Navigator `jobs` table for Ryan's account (or dump cleaned JD text into `test-runs/` for the harness).
-4. Generate letters in batch or interactively from the UI.
-
-Prior eval already showed 2/6 hand-picked jobs were unsolvable poor fits; bulk pick should bias toward medium–good fit so the corpus answers "is the letter good?" not "was the job a bad match?"
-
-### Alternative: offline harness
-
-```bash
-# .env: TEST_EMAIL, TEST_PASSWORD (+ auth vars the harness expects)
-bun scripts/test-harness.ts path/to/job-description.txt
-bun scripts/test-harness.ts path/to/job-description.txt --variant=v2_storytelling
-```
-
-Outputs under `test-runs/[date]-[company]-[role]/`. Good for controlled A/B on a fixed JD set; does not replace the live `logs` corpus for production-path quality.
+| 2026-07-31 | 11 letters, early February, retired `gemini-2.0-flash`, no token data. Effectively starting from zero. |
+| 2026-06-12 | Manual 6-job eval in `test-runs/cover-letter-eval/` (Claude, not production Gemini path). |
+| 2026-08-02 | Confirmed Turso → Neon job add works (1 Metrolinx junior coordinator saved). Generation via product proxy still to prove on that row, then bulk. |
 
 ---
 
@@ -132,50 +139,47 @@ Outputs under `test-runs/[date]-[company]-[role]/`. Good for controlled A/B on a
 
 **Plan: use AI as the primary grader** over the pair corpus, not hand-scoring 50–100 letters.
 
+Grading is a **separate** step from generation. Generation stays on production Navigator AI; the grader can be a stronger/cheaper model if useful.
+
 ### Input per item
 
-- `job-description.txt` (required)
-- `cover-letter.txt` (required)
-- Optional: resume snapshot / block list used at generation time, compatibility score, prompt variant, model id — improves fit and hallucination checks
+- Job description (required)
+- Cover letter (required)
+- Optional: resume snapshot, compatibility score, prompt variant, model id
 
-### Output per item (grader writes)
+### Output per item
 
-Suggested fields (store next to the pair, e.g. `grade.json`, still under `test-runs/`):
+Suggested fields (e.g. `grade.json` under `test-runs/corpus/`, gitignored):
 
 | Field | Purpose |
 |---|---|
-| `verdict` | e.g. Strong / Average / Weak (same rough scale as June eval) |
-| `scores` | optional 1–5 dimensions (see criteria below) |
+| `verdict` | Strong / Average / Weak (same rough scale as June) |
+| `scores` | optional 1–5 dimensions |
 | `failure_modes` | tags: `model` / `prompt` / `fit` / `hallucination` / `generic` / `bullet_echo` / … |
 | `rationale` | short why (for spot-checking the grader) |
 
-### Criteria (what the grader is told to look for)
-
-From the June diagnosis and later product fixes:
+### Criteria
 
 - **Fit honesty** — low-fit jobs shouldn't read as strong fit
 - **Evidence variety** — different resume anchors across paragraphs; not the same 3 blocks every letter
-- **No invented tools** — only skills/tools present on the resume (needs resume context if available)
+- **No invented tools** — only skills/tools present on the resume
 - **No bullet echo** — prose, not reshuffled resume sentences
-- **JD relevance** — claims map to requirements in *this* posting, not a generic career letter
+- **JD relevance** — claims map to *this* posting
 - **Readable for a real hiring manager** — not generic AI sludge
 
-### Process sketch (not built yet)
+### Process sketch
 
-1. Build corpus of pairs (this doc).
-2. Run a grading prompt over each pair → `grade.json` / one jsonl of grades.
-3. Aggregate: pass rate, common failure modes, slice by fit score / variant / model.
-4. Spot-check a sample of AI grades by hand so the grader isn’t quietly wrong.
-5. Decide: prompt fix vs model/provider switch vs “fit filtering” product change.
-
-Grader model choice is TBD — can be a stronger model than production (e.g. grade with a better model than the one that wrote the letter) so cost of grading stays small vs the corpus size.
+1. Build corpus on account via product path (above).
+2. Grade each pair → aggregate pass rate and failure modes.
+3. Spot-check a sample of AI grades by hand.
+4. Decide: prompt fix vs model/provider switch vs fit filtering.
 
 ---
 
 ## Done when
 
-- [ ] ≥50 (stretch 100) production-path **pairs** (JD + letter) in `logs` with token usage
-- [ ] Any local export under `test-runs/corpus/` keeps both files (or one jsonl object with both fields) per entry
-- [ ] AI grading pass over the corpus + aggregate summary (pass rate, main failure modes)
-- [ ] Spot-check sample of grades; decision note: prompt fix / provider switch / neither (summary can live in docs; raw pairs + grades stay local)
+- [ ] ≥50 (stretch 100) **production-path** pairs: jobs on Ryan’s account + letters generated via `gemini-proxy` (visible in `logs` with token usage)
+- [ ] Any local export keeps JD + letter together per entry
+- [ ] AI grading pass + aggregate summary
+- [ ] Spot-check sample of grades; decision note: prompt fix / provider switch / neither
 - [ ] Optional: admin cost rollup from `metadata.token_usage`

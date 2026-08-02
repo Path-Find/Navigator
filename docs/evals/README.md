@@ -4,7 +4,7 @@ Methodology and plans for judging AI quality. Versioned in git. **No personal le
 
 | Doc | What |
 |---|---|
-| [cover-letter-quality.md](./cover-letter-quality.md) | 50–100 JD+letter pairs, then AI grading; Neon `logs`, job sourcing |
+| [cover-letter-quality.md](./cover-letter-quality.md) | 50–100 pairs via **normal product path** (bulk add + generate as Ryan), then AI grading |
 
 ## Where stuff lives
 
