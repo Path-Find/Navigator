@@ -14,7 +14,9 @@ Related:
 
 ## Goal
 
-Collect **50–100** generated cover letters **paired with the job descriptions that produced them**, then judge how good the output actually is before spending anything on a provider switch (see cost table in TECHNICAL.md).
+Collect **50–100** **pairs** (job description + generated cover letter), then **grade them with AI** (plus spot human checks) to decide good vs bad before spending anything on a provider switch (see cost table in TECHNICAL.md).
+
+Pairs are the unit of work because a grader model needs the JD to judge fit honesty, evidence relevance, and generic sludge — a letter alone is not gradable.
 
 Also useful for:
 
@@ -126,18 +128,47 @@ Outputs under `test-runs/[date]-[company]-[role]/`. Good for controlled A/B on a
 
 ---
 
-## Review criteria (when judging the corpus)
+## Grading (later)
 
-Pull from the June diagnosis and later product fixes:
+**Plan: use AI as the primary grader** over the pair corpus, not hand-scoring 50–100 letters.
 
-- **Fit honesty** — low scores shouldn't read as strong fit
-- **Evidence variety** — different resume blocks across paragraphs / across letters
-- **No invented tools** — only skills/tools present on the resume
+### Input per item
+
+- `job-description.txt` (required)
+- `cover-letter.txt` (required)
+- Optional: resume snapshot / block list used at generation time, compatibility score, prompt variant, model id — improves fit and hallucination checks
+
+### Output per item (grader writes)
+
+Suggested fields (store next to the pair, e.g. `grade.json`, still under `test-runs/`):
+
+| Field | Purpose |
+|---|---|
+| `verdict` | e.g. Strong / Average / Weak (same rough scale as June eval) |
+| `scores` | optional 1–5 dimensions (see criteria below) |
+| `failure_modes` | tags: `model` / `prompt` / `fit` / `hallucination` / `generic` / `bullet_echo` / … |
+| `rationale` | short why (for spot-checking the grader) |
+
+### Criteria (what the grader is told to look for)
+
+From the June diagnosis and later product fixes:
+
+- **Fit honesty** — low-fit jobs shouldn't read as strong fit
+- **Evidence variety** — different resume anchors across paragraphs; not the same 3 blocks every letter
+- **No invented tools** — only skills/tools present on the resume (needs resume context if available)
 - **No bullet echo** — prose, not reshuffled resume sentences
-- **Strategy vs retrospective** — tailoring advice is forward-looking
+- **JD relevance** — claims map to requirements in *this* posting, not a generic career letter
 - **Readable for a real hiring manager** — not generic AI sludge
 
-Rough rubrics from June: Strong / Average / Weak, plus note if failure mode is **model**, **prompt**, or **fit**.
+### Process sketch (not built yet)
+
+1. Build corpus of pairs (this doc).
+2. Run a grading prompt over each pair → `grade.json` / one jsonl of grades.
+3. Aggregate: pass rate, common failure modes, slice by fit score / variant / model.
+4. Spot-check a sample of AI grades by hand so the grader isn’t quietly wrong.
+5. Decide: prompt fix vs model/provider switch vs “fit filtering” product change.
+
+Grader model choice is TBD — can be a stronger model than production (e.g. grade with a better model than the one that wrote the letter) so cost of grading stays small vs the corpus size.
 
 ---
 
@@ -145,5 +176,6 @@ Rough rubrics from June: Strong / Average / Weak, plus note if failure mode is *
 
 - [ ] ≥50 (stretch 100) production-path **pairs** (JD + letter) in `logs` with token usage
 - [ ] Any local export under `test-runs/corpus/` keeps both files (or one jsonl object with both fields) per entry
-- [ ] Written quality summary: pass rate, main failure modes, whether a provider switch is justified (summary can live here in docs; raw letters stay local)
+- [ ] AI grading pass over the corpus + aggregate summary (pass rate, main failure modes)
+- [ ] Spot-check sample of grades; decision note: prompt fix / provider switch / neither (summary can live in docs; raw pairs + grades stay local)
 - [ ] Optional: admin cost rollup from `metadata.token_usage`

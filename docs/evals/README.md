@@ -4,7 +4,7 @@ Methodology and plans for judging AI quality. Versioned in git. **No personal le
 
 | Doc | What |
 |---|---|
-| [cover-letter-quality.md](./cover-letter-quality.md) | 50–100 letter corpus plan, Neon `logs`, job sourcing, review criteria |
+| [cover-letter-quality.md](./cover-letter-quality.md) | 50–100 JD+letter pairs, then AI grading; Neon `logs`, job sourcing |
 
 ## Where stuff lives
 
