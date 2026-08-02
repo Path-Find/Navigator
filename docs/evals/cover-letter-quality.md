@@ -176,7 +176,7 @@ Verdict scale: **Strong / Average / Weak** (align with June 2026 eval). Tag fail
 
 ## 10. Prior offline diagnosis (2026-06-12)
 
-Historical only — **Claude Sonnet**, not production Gemini. Full writeup + sample letters: `test-runs/pairs/2026-06-12-claude-offline/` (local, gitignored).
+Historical only — **Claude Sonnet**, not production Gemini. Sample letter files deleted 2026-08-02 (findings kept here only).
 
 **Verdict:** both prompts and fit matter; model gap is real on narrative tasks, but half the batch was unsolvable poor fit.
 
@@ -205,7 +205,7 @@ Historical only — **Claude Sonnet**, not production Gemini. Full writeup + sam
 
 | Date | Notes |
 |---|---|
-| 2026-06-12 | Offline Claude 6-job diagnosis (merged into §10; files under `test-runs/pairs/2026-06-12-claude-offline/`). |
+| 2026-06-12 | Offline Claude 6-job diagnosis (merged into §10; local sample files removed). |
 | 2026-07-31 | Prior production pairs effectively empty (old model, no tokens). |
 | 2026-08-02 | Product-path e2e works: Turso → Neon save → gemini-proxy analysis + letter. Example: Region of Waterloo student role, fit ~92, pair under `test-runs/pairs/2026-08-02/`. Runbook is cold-start; June folder folded into `pairs/`. |
 
