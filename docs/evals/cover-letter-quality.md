@@ -23,7 +23,11 @@ A letter without its JD is **not** a valid pair for this eval. A letter produced
 1. **Normal user path only.** The account owner is the user under test. Automation is allowed **only** to avoid doing the same UI steps 50 times by hand. Behavior must match: save job → generate cover letter in Navigator.
 2. **Same AI stack as production.** Generation must go through Navigator’s **`/api/gemini-proxy`** (authenticated as that user). Same models, tier gates, quota, prompts (`src/prompts/coverLetter.ts`, `jobAiService`), and Neon `logs` writing.
 3. **Do not bypass guards** when generating these pairs: no direct `GEMINI_API_KEY` to Gemini, no offline-only harness as the primary path, no alternate prompts “for speed.”
-4. **Mild fit jobs.** Prefer roles the resume can at least partially support. Poor-fit jobs measure “fit is bad,” not letter quality (see June 2026 diagnosis in local `test-runs/cover-letter-eval/`).
+4. **Fit mix, not only mild.** Intentionally sample across the spectrum so grading can separate **model/prompt quality** from **fit**:
+   - **Strong fit** — clear resume anchors (e.g. transit customer/comms, planning student, claims/admin where relevant)
+   - **Mid fit** — transferable but imperfect (general municipal coordinator/assistant, adjacent policy)
+   - **Poor fit** — known gaps (specialist engineering, pure clinical, senior-only, wrong program) — *include some*, not a majority; letters should not overclaim
+   - Rough bulk target: ~40% strong / ~40% mid / ~20% poor (adjust once scores exist)
 5. **Pairs always.** Export, grade, and count only JD + letter together.
 6. **No secrets or personal pair dumps in git.** Plans in `docs/evals/`; dumps in `test-runs/`.
 
@@ -64,22 +68,19 @@ If a box fails, fix that blocker — do not switch to direct Gemini.
 
 ---
 
-## 5. Job selection criteria (mild fit)
+## 5. Job selection criteria (fit mix)
 
-**Include** (title/tags/employer heuristics; refine with resume if needed):
+Bucket each pick before generate (heuristic is fine; Navigator `fit_score` after analysis refines the label).
 
-- Student / co-op / intern roles when the user is in that market
-- Transit-adjacent coordination, engagement, policy-ish, program/admin, analyst (non-specialist)
-- Employers such as TTC, Metrolinx, City of Toronto, GTHA municipalities/regions, similar public sector
+| Bucket | Intent | Examples for this user (resume: TTC CIR, TransitCon comms, planning student, Canada Life claims, journalism) |
+|---|---|---|
+| **Strong** | Letter should be competitive if product works | Transit customer/info/service; Metrolinx/TTC student/co-op/coordinator (non-engineering); planning-adjacent junior; customer relations |
+| **Mid** | Transferable story, honest gaps OK | Municipal admin/assistant, events coordinator, general policy/program support, HR/student admin |
+| **Poor** | Stress-test fit calibration (must not overclaim) | Specialist engineering, senior manager-only, pure clinical, wrong-trade, heavy construction cost controls |
 
-**Exclude or deprioritize:**
+**Always skip:** inventory/boilerplate, empty/short descriptions, closed postings, already-imported Civic Careers id / same URL.
 
-- Pure trades, pure engineering (civil/electrical/rail tech without matching resume), pure clinical, pure accounting/payroll unless resume supports it
-- Inventory/boilerplate postings, empty/short descriptions
-- Closed jobs (past `closing_date` when present)
-- Duplicates of jobs already on the user’s account (same company + title)
-
-**Volume:** aim **50** solid pairs; stretch **100**. Quality of fit beats padding with nonsense roles.
+**Volume:** aim **50** pairs; stretch **100**. Prefer a **balanced mix** over 50 clones of one student admin role.
 
 ---
 
