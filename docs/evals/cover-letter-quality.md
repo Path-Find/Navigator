@@ -129,7 +129,7 @@ For each saved job **without** a letter yet:
 
 Grading is **separate** from generation. Grader model may differ from production writer.
 
-1. Export pairs (from `jobs.original_text` + `jobs.cover_letter`, and/or `logs`) into gitignored `tests/runs/pairs/<date>/` as either:
+1. Export pairs (from `jobs.original_text` + `jobs.cover_letter`, and/or `logs`) into gitignored `tests/runs/pairs/<date>-<suite>/` (e.g. `2026-08-02-civic-careers`, `2026-08-02-web-planning`) as either:
    - per-entry folders: `job-description.txt` + `cover-letter.txt` (+ optional `meta.json`), or
    - jsonl with both fields per line
 2. Run an AI grader per pair with criteria below → `grade.json` / grades jsonl.
@@ -203,7 +203,7 @@ Historical only — **Claude Sonnet**, not production Gemini. Sample letter file
 |---|---|
 | 2026-06-12 | Offline Claude 6-job diagnosis (merged into §10; local sample files removed). |
 | 2026-07-31 | Prior production pairs effectively empty (old model, no tokens). |
-| 2026-08-02 | Product-path e2e works: Turso → Neon save → gemini-proxy analysis + letter. Example: Region of Waterloo student role, fit ~92, pair under `tests/runs/pairs/` (formerly `test-runs/pairs/`). Runbook is cold-start; June folder folded into `pairs/`. |
-| 2026-08-02 | **≥100 complete pairs** on eval account (JD + letter via production `gemini-proxy`; count verified 103). Civic Careers bulk + incomplete-row backfill; intermittent 500/401 with retry. |
+| 2026-08-02 | Product-path e2e works: Turso → Neon save → gemini-proxy analysis + letter. Runbook cold-start. |
+| 2026-08-02 | **≥100 complete pairs** on eval account (JD + letter via production `gemini-proxy`). Local dumps split by suite: `tests/runs/pairs/2026-08-02-civic-careers/` (~97) and `…-web-planning/` (~16). |
 
 Update this table as the eval progresses.
