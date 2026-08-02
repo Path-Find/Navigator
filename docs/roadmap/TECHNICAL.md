@@ -52,6 +52,17 @@ Earlier evaluation: **DeepSeek** was considered for extraction and not adopted, 
 - [ ] **Inconsistent error message localization**: Raw API/Supabase error strings shown to users in some flows. Route all user-facing errors through the `errorMessages` utility.
 - [ ] **In-app URL scraper fails ~99% of the time** (`scraperService.ts` / `api/scrape-jobs.ts`, `mode: 'text'`): plain server-side fetch + regex, no JS execution — fails on anything beyond the hardcoded ATS blocklist (most modern career pages, bot detection). The browser extension's `content/extractor.ts` already solves this correctly (reads the rendered DOM client-side, has a working Workday selector) but is a separate, opt-in flow. Options: add a headless-browser backend (Playwright, same approach as GovJobs/Feed's scraper), or lean into steering users toward the extension instead of fixing the backend path. Undecided — tabled 2026-07-18.
 
+## Data model
+
+- [ ] **External job identity on `jobs`**: Keep Navigator `id` as the user-owned UUID (status, letter, analysis). Add optional provenance so the same *posting* can be recognized across saves:
+  - `source` — e.g. `civic-careers` | `url` | `manual` | `extension` | `email`
+  - `external_id` — stable id from the origin when known (Civic Careers / Turso `jobs.id`, ATS requisition id from URL, etc.)
+  - Keep `url` as best-effort canonical link
+  - Unique per user when present: `(user_id, source, external_id)` where `external_id` is not null
+  - Manual paste without a portal id stays UUID-only (`external_id` null)
+  - **Why:** dedupe (extension + paste + Feed don’t create clones), re-import updates the same History row, bulk/eval seeding can skip already-imported listings, future Civic Careers / email ingestion deep-links cleanly
+  - **Not** the primary key — postings get re-posted under new ids; the UUID row still owns the application lifecycle
+
 ## Data Retention
 
 - [ ] **Job record tiering**: Active jobs store full record (description, AI analysis, screening scores). Expired jobs are tombstoned — title, company, status, notes only. Reduces storage as pipeline grows.

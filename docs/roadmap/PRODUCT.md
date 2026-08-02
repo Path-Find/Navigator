@@ -19,6 +19,7 @@ Immediate focus on expanding active workflow tools and solidifying platform trus
 
 - [ ] **Accessibility**: Complete WCAG 2.1 pass for keyboard and screen reader support.
 - [ ] **Data Portability**: Export application history and analyzed job data to CSV/JSON.
+- [ ] **Job dedupe across entry points**: Same posting saved via extension, paste, Feed/Civic Careers, or email should land on one History row (see Technical — external job identity), not duplicates with split cover letters.
 
 ---
 
