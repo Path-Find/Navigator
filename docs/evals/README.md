@@ -16,4 +16,4 @@ Methodology and plans for judging AI quality. Versioned in git. **No personal le
 | `tests/` | yes | Automated product tests (Playwright, etc.) |
 | `scripts/test-harness.ts` | yes | Offline generation harness → writes into `test-runs/` |
 
-If you pull letters out of Neon for offline review, drop them under `test-runs/corpus/` (or any dated subfolder). They stay local.
+If you export for offline review, drop **pairs** under `test-runs/corpus/` — each entry needs `job-description.txt` + `cover-letter.txt` (or one jsonl row with both fields). Letters without JDs are not usable for quality judging.

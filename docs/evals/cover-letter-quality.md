@@ -47,25 +47,39 @@ Not built yet: convert token counts → dollars (price table + per-feature cost 
 
 ## Where to put downloaded / generated files
 
-You do **not** need a second private folder — reuse what's already ignored:
+**Rule: a letter alone is not a corpus entry.** Every unit is a **pair** — job description + cover letter (optional: score, critique, tokens). You cannot judge quality without the JD that drove the letter.
+
+Reuse gitignored `test-runs/` (and `samples/` for hand-curated pairs):
 
 ```
 test-runs/
-  cover-letter-eval/     ← existing June writeup + sample letters
-  corpus/                ← optional: bulk export from Neon (create when needed)
+  cover-letter-eval/              ← existing June writeup (paired per job)
+  corpus/                         ← bulk corpus (create when exporting)
     2026-08-02/
-      letter-001.md      # or .jsonl dump
-  2026-06-09-ttc-.../    ← harness run folders
+      001-employer-role/
+        job-description.txt       ← required
+        cover-letter.txt          ← required
+        meta.json                 ← optional: score, model, variant, tokens, log id
+      002-...
+  2026-06-09-ttc-.../             ← harness run (already this shape)
     job-description.txt
     cover-letter.txt
     review.json
 ```
 
-- **In-app generation** → already stored in Neon `logs` (no local folder required until you want offline review).
-- **Harness** → writes under `test-runs/[date]-[company]-[role]/` automatically.
-- **Bulk export from Neon** → dump into `test-runs/corpus/[date]/` when you want files on disk; keep gitignored.
+Same idea as `samples/[date]-[company]-[role]/` (`job-description.txt` + `cover-letter.txt`).
 
-`samples/` is the same idea for a few hand-curated pairs (also gitignored).
+| Source | How pairing works |
+|---|---|
+| **In-app → Neon `logs`** | `prompt_text` has the JD; `response_text` is the letter. Keep them together when exporting — never export `response_text` only. Prefer extracting the JD section from the prompt (or re-fetch job text if still on the job row). **Do not trust `jobs.description` alone** (often NULL). |
+| **Harness** | Already writes both files into one run folder. |
+| **Manual / bulk seed** | Save cleaned JD when the job is added; after generation, write letter into the same pair folder. |
+
+Optional one-file form for bulk dumps (still one pair per line/object):
+
+```jsonl
+{"id":"001","employer":"...","role":"...","job_description":"...","cover_letter":"...","score":72,"model":"gemini-flash-latest"}
+```
 
 ---
 
@@ -85,7 +99,7 @@ test-runs/
 1. Seed ~50–100 realistic job postings onto Ryan's Navigator account (mild fit preferred — poor-fit jobs only prove "fit is bad," not letter quality; see June diagnosis).
 2. Run cover letter generation (and optionally match analysis) through the normal product path.
 3. Letters land in `logs` automatically with full prompt + response + tokens.
-4. Export to `test-runs/corpus/` only if you want offline review; otherwise score from Neon.
+4. Export to `test-runs/corpus/` only if you want offline review — **always as JD + letter pairs**, not letters alone. Otherwise score from Neon using `prompt_text` + `response_text` together.
 
 ### Job sourcing (bulk, not hand-paste)
 
@@ -129,7 +143,7 @@ Rough rubrics from June: Strong / Average / Weak, plus note if failure mode is *
 
 ## Done when
 
-- [ ] ≥50 (stretch 100) production-path letters in `logs` with token usage
-- [ ] Each letter scorable against a known JD (from `prompt_text` or stored job text)
+- [ ] ≥50 (stretch 100) production-path **pairs** (JD + letter) in `logs` with token usage
+- [ ] Any local export under `test-runs/corpus/` keeps both files (or one jsonl object with both fields) per entry
 - [ ] Written quality summary: pass rate, main failure modes, whether a provider switch is justified (summary can live here in docs; raw letters stay local)
 - [ ] Optional: admin cost rollup from `metadata.token_usage`
