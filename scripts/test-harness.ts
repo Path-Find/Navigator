@@ -14,7 +14,7 @@
  *   TEST_EMAIL       ← your Navigator account email
  *   TEST_PASSWORD    ← your Navigator account password
  *
- * Outputs to: test-runs/[date]-[company]-[role]/
+ * Outputs to: tests/runs/[date]-[company]-[role]/
  */
 
 import { createClient } from "@supabase/supabase-js";
@@ -461,11 +461,11 @@ async function main() {
   const company = slugify(distilledJob?.companyName ?? "unknown-company");
   const role = slugify(distilledJob?.roleTitle ?? "unknown-role");
   const folderName = `${timestamp}-${company}-${role}`;
-  const outDir = path.join(path.dirname(path.dirname(path.resolve(jobFilePath))), "test-runs", folderName);
+  const outDir = path.join(path.dirname(path.dirname(path.resolve(jobFilePath))), "tests", "runs", folderName);
 
-  // If run from scripts/, go up to Navigator root, then test-runs/
+  // If run from scripts/, go up to Navigator root, then tests/runs/
   const projectRoot = path.resolve(import.meta.dir, "..");
-  const runDir = path.join(projectRoot, "test-runs", folderName);
+  const runDir = path.join(projectRoot, "tests", "runs", folderName);
   fs.mkdirSync(runDir, { recursive: true });
 
   // Save cover letter
@@ -493,7 +493,7 @@ async function main() {
   fs.writeFileSync(path.join(runDir, "job-description.txt"), jobDescription, "utf-8");
 
   // Append to summary log
-  const summaryPath = path.join(projectRoot, "test-runs", "results-summary.jsonl");
+  const summaryPath = path.join(projectRoot, "tests", "runs", "results-summary.jsonl");
   const summaryEntry = {
     timestamp: result.timestamp,
     folder: folderName,
@@ -507,7 +507,7 @@ async function main() {
   };
   fs.appendFileSync(summaryPath, JSON.stringify(summaryEntry) + "\n", "utf-8");
 
-  console.log(`\n✅ Done! Saved to test-runs/${folderName}/`);
+  console.log(`\n✅ Done! Saved to tests/runs/${folderName}/`);
   console.log(`   cover-letter.txt  — ${coverLetter.length} chars`);
   console.log(`   review.json       — full analysis + critique`);
   console.log(`   job-description.txt`);

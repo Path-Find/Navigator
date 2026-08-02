@@ -2,7 +2,7 @@
 
 Self-contained instructions for building and judging a set of production cover letters (JD + letter pairs). Read this end-to-end before acting. Do **not** invent a parallel pipeline or ask the user to re-explain the method unless a prerequisite is actually missing.
 
-**Privacy:** this file is process only. Never commit real letters, full JDs, or resume text into `docs/`. Raw outputs stay under gitignored `test-runs/` (and `samples/`).
+**Privacy:** this file is process only. Never commit real letters, full JDs, or resume text into `docs/`. Raw outputs stay under gitignored `tests/runs/` (and `samples/`).
 
 ---
 
@@ -25,7 +25,7 @@ A letter without its JD is **not** a valid pair for this eval. A letter produced
 3. **Do not bypass guards** when generating these pairs: no direct `GEMINI_API_KEY` to Gemini, no offline-only harness as the primary path, no alternate prompts “for speed.”
 4. **Variety of fit is fine — don’t over-curate.** Real applications aren’t pre-sorted into perfect matches. A mid/low score (e.g. ~38) can still benefit from a strong letter if it frames transferable evidence honestly and doesn’t invent fit. Include whatever you’d actually open on Civic Careers; only skip junk (empty JD, closed, pure inventory) and hard duplicates. When grading, still note fit score so “bad letter” isn’t confused with “hard job.”
 5. **Pairs always.** Export, grade, and count only JD + letter together.
-6. **No secrets or personal pair dumps in git.** Plans in `docs/evals/`; dumps in `test-runs/`.
+6. **No secrets or personal pair dumps in git.** Plans in `docs/evals/`; dumps in `tests/runs/`.
 
 ---
 
@@ -129,7 +129,7 @@ For each saved job **without** a letter yet:
 
 Grading is **separate** from generation. Grader model may differ from production writer.
 
-1. Export pairs (from `jobs.original_text` + `jobs.cover_letter`, and/or `logs`) into gitignored `test-runs/pairs/<date>/` as either:
+1. Export pairs (from `jobs.original_text` + `jobs.cover_letter`, and/or `logs`) into gitignored `tests/runs/pairs/<date>/` as either:
    - per-entry folders: `job-description.txt` + `cover-letter.txt` (+ optional `meta.json`), or
    - jsonl with both fields per line
 2. Run an AI grader per pair with criteria below → `grade.json` / grades jsonl.
@@ -203,7 +203,7 @@ Historical only — **Claude Sonnet**, not production Gemini. Sample letter file
 |---|---|
 | 2026-06-12 | Offline Claude 6-job diagnosis (merged into §10; local sample files removed). |
 | 2026-07-31 | Prior production pairs effectively empty (old model, no tokens). |
-| 2026-08-02 | Product-path e2e works: Turso → Neon save → gemini-proxy analysis + letter. Example: Region of Waterloo student role, fit ~92, pair under `test-runs/pairs/2026-08-02/`. Runbook is cold-start; June folder folded into `pairs/`. |
+| 2026-08-02 | Product-path e2e works: Turso → Neon save → gemini-proxy analysis + letter. Example: Region of Waterloo student role, fit ~92, pair under `tests/runs/pairs/` (formerly `test-runs/pairs/`). Runbook is cold-start; June folder folded into `pairs/`. |
 | 2026-08-02 | **≥100 complete pairs** on eval account (JD + letter via production `gemini-proxy`; count verified 103). Civic Careers bulk + incomplete-row backfill; intermittent 500/401 with retry. |
 
 Update this table as the eval progresses.

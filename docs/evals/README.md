@@ -11,8 +11,9 @@ Self-contained runbooks for judging AI quality. Versioned in git. **No personal 
 | Path | Git? | Purpose |
 |---|---|---|
 | `docs/evals/` | yes | Runbooks only |
-| `test-runs/` | **no** | Optional local pair exports + grades |
+| `tests/e2e/` | yes | Playwright specs |
+| `tests/results/` | **no** | Playwright output |
+| `tests/runs/` | **no** | Eval/manual pair dumps (JD + letters) |
 | `samples/` | **no** | Hand-curated sample pairs |
-| `tests/` | yes | Automated product tests (unrelated) |
 
 An agent should be able to open `cover-letter-quality.md` and execute without re-deriving the method from chat history.
