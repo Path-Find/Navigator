@@ -25,10 +25,15 @@ dist-ssr
 .env
 
 # Sample / evaluation data (real cover letters, jobs, feedback, etc.)
+# Never commit personal JDs, letters, resumes, or grades.
 samples/
 tests/runs/**
 !tests/runs/.gitkeep
+!tests/runs/README.md
 tests/results/
+tests/results/**
+*.grade.json
+**/grades.jsonl
 
 # Legacy paths (if anything still writes here)
 test-runs/

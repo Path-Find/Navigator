@@ -4,7 +4,8 @@ Self-contained runbooks for judging AI quality. Versioned in git. **No personal 
 
 | Doc | What |
 |---|---|
-| [cover-letter-quality.md](./cover-letter-quality.md) | **Start here** for cover letter quality: full cold-start runbook (systems, non-negotiables, job filters, add → generate → grade) |
+| [cover-letter-quality.md](./cover-letter-quality.md) | Build the pair set (product path, sources, export layout) |
+| [cover-letter-grading.md](./cover-letter-grading.md) | **How to grade** letters (verdict, dimensions, tags, process) |
 
 ## Where stuff lives
 

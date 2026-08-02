@@ -127,26 +127,15 @@ For each saved job **without** a letter yet:
 
 ## 7. Procedure — Phase B: grade (after pairs exist)
 
-Grading is **separate** from generation. Grader model may differ from production writer.
+Grading is **separate** from generation. Full rubric, dimensions, tags, and process: **[cover-letter-grading.md](./cover-letter-grading.md)**.
 
-1. Export pairs (from `jobs.original_text` + `jobs.cover_letter`, and/or `logs`) into gitignored `tests/runs/pairs/<date>-<suite>/` (e.g. `2026-08-02-civic-careers`, `2026-08-02-web-planning`) as either:
-   - per-entry folders: `job-description.txt` + `cover-letter.txt` (+ optional `meta.json`), or
-   - jsonl with both fields per line
-2. Run an AI grader per pair with criteria below → `grade.json` / grades jsonl.
-3. Aggregate: pass rate, failure-mode histogram, slices by fit score if available.
-4. Human spot-check a sample of grades.
-5. Write a short decision note (can land in this doc under Status, without pasting letters): prompt fix / provider switch / neither / need more data.
+Short version:
 
-### Grading criteria
-
-- Fit honesty (low fit must not read as strong fit)
-- Evidence variety across paragraphs and across letters
-- No invented tools/skills not on resume
-- No resume bullet echo
-- Claims map to **this** JD
-- Readable, non-generic prose
-
-Verdict scale: **Strong / Average / Weak** (align with June 2026 eval). Tag failure modes: `model` | `prompt` | `fit` | `hallucination` | `generic` | `bullet_echo`.
+1. Export pairs into gitignored `tests/runs/pairs/<date>-<suite>/` (JD + letter + suite `resume.txt`).
+2. AI grade each pair → `grade.json` (verdict Strong/Average/Weak + optional 1–5 dimensions + failure tags).
+3. Aggregate pass rate / failure modes / optional fit-band slices.
+4. Spot-check ~10–15% by hand.
+5. Decision note: prompt fix vs provider switch vs neither.
 
 ---
 
