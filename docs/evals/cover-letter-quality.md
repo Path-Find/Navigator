@@ -23,11 +23,7 @@ A letter without its JD is **not** a valid pair for this eval. A letter produced
 1. **Normal user path only.** The account owner is the user under test. Automation is allowed **only** to avoid doing the same UI steps 50 times by hand. Behavior must match: save job → generate cover letter in Navigator.
 2. **Same AI stack as production.** Generation must go through Navigator’s **`/api/gemini-proxy`** (authenticated as that user). Same models, tier gates, quota, prompts (`src/prompts/coverLetter.ts`, `jobAiService`), and Neon `logs` writing.
 3. **Do not bypass guards** when generating these pairs: no direct `GEMINI_API_KEY` to Gemini, no offline-only harness as the primary path, no alternate prompts “for speed.”
-4. **Fit mix, not only mild.** Intentionally sample across the spectrum so grading can separate **model/prompt quality** from **fit**:
-   - **Strong fit** — clear resume anchors (e.g. transit customer/comms, planning student, claims/admin where relevant)
-   - **Mid fit** — transferable but imperfect (general municipal coordinator/assistant, adjacent policy)
-   - **Poor fit** — known gaps (specialist engineering, pure clinical, senior-only, wrong program) — *include some*, not a majority; letters should not overclaim
-   - Rough bulk target: ~40% strong / ~40% mid / ~20% poor (adjust once scores exist)
+4. **Variety of fit is fine — don’t over-curate.** Real applications aren’t pre-sorted into perfect matches. A mid/low score (e.g. ~38) can still benefit from a strong letter if it frames transferable evidence honestly and doesn’t invent fit. Include whatever you’d actually open on Civic Careers; only skip junk (empty JD, closed, pure inventory) and hard duplicates. When grading, still note fit score so “bad letter” isn’t confused with “hard job.”
 5. **Pairs always.** Export, grade, and count only JD + letter together.
 6. **No secrets or personal pair dumps in git.** Plans in `docs/evals/`; dumps in `test-runs/`.
 
@@ -68,19 +64,18 @@ If a box fails, fix that blocker — do not switch to direct Gemini.
 
 ---
 
-## 5. Job selection criteria (fit mix)
+## 5. Job selection criteria
 
-Bucket each pick before generate (heuristic is fine; Navigator `fit_score` after analysis refines the label).
+**Goal of selection:** enough different postings that letters have to do real work — not a carefully stratified sample set.
 
-| Bucket | Intent | Examples for this user (resume: TTC CIR, TransitCon comms, planning student, Canada Life claims, journalism) |
-|---|---|---|
-| **Strong** | Letter should be competitive if product works | Transit customer/info/service; Metrolinx/TTC student/co-op/coordinator (non-engineering); planning-adjacent junior; customer relations |
-| **Mid** | Transferable story, honest gaps OK | Municipal admin/assistant, events coordinator, general policy/program support, HR/student admin |
-| **Poor** | Stress-test fit calibration (must not overclaim) | Specialist engineering, senior manager-only, pure clinical, wrong-trade, heavy construction cost controls |
+- Pull from Civic Careers / whatever the user would browse; mild preference for roles with *some* resume anchor is optional, not required.
+- **Do not** reject a job because analysis scored ~30–50. That’s a normal application; a good letter can still help by leading with transferable evidence and being honest about gaps (fit calibration), not by pretending it’s a 90.
+- Prefer not to spam 50 near-identical student admin clones if broader titles are available — variety helps the later grade, not because low-fit jobs are “invalid.”
+- **Always skip:** inventory/boilerplate, empty/short descriptions, closed postings, already-imported Civic Careers id / same URL.
 
-**Always skip:** inventory/boilerplate, empty/short descriptions, closed postings, already-imported Civic Careers id / same URL.
+**Volume:** aim **50** pairs; stretch **100**.
 
-**Volume:** aim **50** pairs; stretch **100**. Prefer a **balanced mix** over 50 clones of one student admin role.
+Resume anchors for this user (when useful, not a filter): TTC CIR, TransitCon comms, planning student, Canada Life claims, journalism.
 
 ---
 
