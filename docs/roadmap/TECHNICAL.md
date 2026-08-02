@@ -30,28 +30,9 @@ Per million tokens, input / output:
 | Anthropic | Haiku 4.5 | $1 / $5 |
 | Anthropic | Sonnet 5 | $3 / $15 |
 
-OpenAI cut Luna 80% on 2026-07-30, which makes it roughly 6x cheaper than what extraction currently runs on. **Not adopted** — switching providers means a new SDK, a different response shape, and retuning every prompt, and there is currently no quality data to justify it. Revisit once the cover-letter corpus below is large enough to judge output quality against cost.
+OpenAI cut Luna 80% on 2026-07-30, which makes it roughly 6x cheaper than what extraction currently runs on. **Not adopted** — switching providers means a new SDK, a different response shape, and retuning every prompt, and there is currently no quality data to justify it. Revisit once the cover-letter corpus is large enough to judge output quality against cost — full plan in [`docs/COVER_LETTER_QUALITY.md`](../COVER_LETTER_QUALITY.md).
 
 Earlier evaluation: **DeepSeek** was considered for extraction and not adopted, on the same single-provider-simplicity reasoning.
-
-### Cover letter quality monitoring
-
-Goal: collect 50–100 generated cover letters paired with the job descriptions that produced them, then judge how good the output actually is before spending anything on a provider switch.
-
-The mechanism already exists and needs no new code. `aiCore.logToSupabase` (name is historical — it writes to Neon) records every AI call in the `logs` table:
-
-- `event_type` — which feature made the call, so cover letters separate from parsing
-- `prompt_text` — the full prompt, with the job description embedded in it
-- `response_text` — the generated letter
-- `metadata.token_usage` — input and output tokens separately, which is what turns usage into cost
-
-Redaction strips only emails and phone numbers, so the letters and job descriptions survive intact.
-
-Status as of 2026-07-31: 11 letters, all from early February, all on the retired `gemini-2.0-flash`, none with token data (capture was added later). Effectively starting from zero.
-
-Two known gaps: `jobs.description` is NULL on the one row that has a cover letter, so the `jobs` table is not a reliable source for job-description pairing — use `logs.prompt_text`. And `daily_usage.token_count` is stuck at 0 across all rows; the real per-call numbers are in `logs.metadata`.
-
-Not built yet: nothing converts token counts into dollar amounts. A price table plus a per-feature cost rollup on the admin dashboard would close that.
 
 ---
 
