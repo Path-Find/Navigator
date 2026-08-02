@@ -119,7 +119,7 @@ export const INTERVIEW_PROMPTS = {
     ${resumeContext}
 
     TASK:
-    Generate 10 behavioral interview questions that cover:
+    Generate 9 behavioral interview questions that cover:
     - Overcoming a challenge or setback
     - Working in or leading a team
     - Handling conflict or a difficult person
@@ -130,6 +130,7 @@ export const INTERVIEW_PROMPTS = {
     - Career goals and motivation
 
     RULES:
+    - Do NOT include "Tell me about yourself" or a close variant — that opener is already added separately.
     - Questions must sound like a real interviewer — natural, open-ended, not candidate-specific. Do NOT reference the candidate's employers, roles, or experiences in the question text.
     - Use the candidate's background to calibrate which questions to ask and at what level. For example: if they have management experience, include a leadership question; if they are early-career, focus on learning and teamwork; match the seniority and industry context.
     - Tips should be general coaching advice (STAR method, what a strong answer includes) — not references to their specific background, since the UI already surfaces that separately.

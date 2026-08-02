@@ -6,6 +6,9 @@ See [CHANGELOG_ARCHIVE.md](CHANGELOG_ARCHIVE.md) for earlier history.
 
 ## [Unreleased]
 
+### Changed
+- **General mock interview now always opens with "Tell me about yourself"**: previously left entirely to the AI's pick of 10 questions, so the single most common real interview opener wasn't guaranteed to appear. Now fixed as question 1, with the AI generating 9 more behind it.
+
 ### Fixed
 - **Production deploys were failing after a routine dependency bump**: TypeScript 7 (a ground-up compiler rewrite) broke Vercel's own build pipeline (`Cannot read properties of undefined (reading 'readFile')`) even though the app's own build succeeded locally. Pinned back to TypeScript 6 until Vercel's tooling supports 7.
 

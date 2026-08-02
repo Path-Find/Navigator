@@ -57,6 +57,13 @@ export const analyzeUnifiedResponse = async (
     }, { event_type: 'unified_skill_interview_analysis', prompt, model: 'dynamic' });
 };
 
+const TELL_ME_ABOUT_YOURSELF: InterviewQuestion = {
+    id: crypto.randomUUID(),
+    question: "Tell me about yourself.",
+    category: 'behavioral',
+    tips: "Keep it professional and relevant: a brief present-to-past-to-future arc — what you do now, the experience that led here, and what you're looking for next. Aim for under two minutes.",
+};
+
 export const generateGeneralBehavioralQuestions = async (resumeContext: string): Promise<InterviewQuestion[]> => {
     const prompt = INTERVIEW_PROMPTS.GENERAL_BEHAVIORAL(resumeContext);
 
@@ -65,7 +72,10 @@ export const generateGeneralBehavioralQuestions = async (resumeContext: string):
         const response = await model.generateContent({ contents: [{ role: "user", parts: [{ text: prompt }] }] });
         metadata.token_usage = response.response.usageMetadata;
         const questions = JSON.parse(cleanJsonOutput(response.response.text()));
-        return (questions as InterviewQuestion[]).map(q => ({ ...q, id: crypto.randomUUID() }));
+        return [
+            { ...TELL_ME_ABOUT_YOURSELF, id: crypto.randomUUID() },
+            ...(questions as InterviewQuestion[]).map(q => ({ ...q, id: crypto.randomUUID() })),
+        ];
     }, { event_type: 'interview_generation_general', prompt, model: AI_MODELS.EXTRACTION });
 };
 
