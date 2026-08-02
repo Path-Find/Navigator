@@ -1,12 +1,14 @@
 # Cover Letter Quality Monitoring
 
-Standalone plan for building a real corpus of generated cover letters so quality (and cost) can be judged before any provider switch. Moved out of `docs/roadmap/TECHNICAL.md` so it isn't buried under roadmap maintenance items.
+Plan for building a real corpus of generated cover letters so quality (and cost) can be judged before any provider switch.
 
-Related prior work:
+Lives under `evals/` (methodology / plans), not the product roadmap. Run outputs stay in `test-runs/`; automated product tests stay in `tests/`.
+
+Related:
 
 - `test-runs/cover-letter-eval/` — June 2026 six-job diagnosis (Claude vs prompts vs fit)
 - `scripts/test-harness.ts` + `test-runs/README.md` — offline harness (one JD → analysis → letter → critique)
-- `docs/roadmap/TECHNICAL.md` — AI model strategy / provider cost table (points here for the corpus goal)
+- `docs/roadmap/TECHNICAL.md` — AI model strategy / provider cost table
 
 ---
 
