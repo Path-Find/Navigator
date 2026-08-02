@@ -174,12 +174,39 @@ Verdict scale: **Strong / Average / Weak** (align with June 2026 eval). Tag fail
 
 ---
 
-## 10. Status log
+## 10. Prior offline diagnosis (2026-06-12)
+
+Historical only — **Claude Sonnet**, not production Gemini. Full writeup + sample letters: `test-runs/pairs/2026-06-12-claude-offline/` (local, gitignored).
+
+**Verdict:** both prompts and fit matter; model gap is real on narrative tasks, but half the batch was unsolvable poor fit.
+
+| Job | Fit | Letter | Note |
+|---|---|---|---|
+| Simcoe Transit | ★★★★ | Strong | Good fit + transit evidence |
+| Aecon Proposals | ★★★ | Average | Coordination works; construction gap |
+| Metrolinx PRESTO | ★★★ | Average | Transit helps; program gap |
+| Metrolinx Commercial | ★★★ | Average | Thin on procurement |
+| HDR Traffic | ★★ | Weak | Engineering tools absent |
+| Aecon Cost Controls | ★ | Weak | Wrong program entirely |
+
+**Root causes still relevant to this eval:**
+
+1. **Poor-fit jobs** — grounding to resume means no prompt can invent missing domain; filter mild fit when building pairs; product should fit-gate / pivot-frame low scores.
+2. **Same 3 resume blocks every letter** — force requirement→evidence variety (partially addressed later in product prompts).
+3. **Missing best evidence** — TTC was unsynced then; always generate with full resume.
+4. **Empty optional context** — trajectory / career goals / style empty → generic voice.
+5. **Model gap** — Claude Strong on best-fit job; if production Gemini is still mediocre on good-fit jobs after prompt/fit fixes, provider switch is on the table.
+
+**One-liner:** fix fit selection, full resume, and context before blaming the model.
+
+---
+
+## 11. Status log
 
 | Date | Notes |
 |---|---|
+| 2026-06-12 | Offline Claude 6-job diagnosis (merged into §10; files under `test-runs/pairs/2026-06-12-claude-offline/`). |
 | 2026-07-31 | Prior production pairs effectively empty (old model, no tokens). |
-| 2026-06-12 | Offline Claude 6-job diagnosis only — not production path. |
-| 2026-08-02 | Confirmed Turso → Neon **job add** (1 Metrolinx junior coordinator). **Generation via proxy still to prove**, then bulk to 50–100. Doc rewritten as cold-start runbook. |
+| 2026-08-02 | Product-path e2e works: Turso → Neon save → gemini-proxy analysis + letter. Example: Region of Waterloo student role, fit ~92, pair under `test-runs/pairs/2026-08-02/`. Runbook is cold-start; June folder folded into `pairs/`. |
 
 Update this table as the eval progresses.
