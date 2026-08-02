@@ -6,6 +6,9 @@ See [CHANGELOG_ARCHIVE.md](CHANGELOG_ARCHIVE.md) for earlier history.
 
 ## [Unreleased]
 
+### Fixed
+- **Production deploys were failing after a routine dependency bump**: TypeScript 7 (a ground-up compiler rewrite) broke Vercel's own build pipeline (`Cannot read properties of undefined (reading 'readFile')`) even though the app's own build succeeded locally. Pinned back to TypeScript 6 until Vercel's tooling supports 7.
+
 ### Changed
 - **History has a filter for jobs that need attention**: failed analyses already got a distinct "Action Required" badge on their card, but were otherwise bucketed inside "Saved" with no way to isolate them in a long list. Added a dedicated filter tab.
 - **Feed and Skills Interview marked beta**: matches Feed and Skills Interview to how Job Alerts and Interview Advisor already behave — shown as "Coming Soon" instead of open, since neither is ready for general use yet.
