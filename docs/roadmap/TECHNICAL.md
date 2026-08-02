@@ -30,7 +30,7 @@ Per million tokens, input / output:
 | Anthropic | Haiku 4.5 | $1 / $5 |
 | Anthropic | Sonnet 5 | $3 / $15 |
 
-OpenAI cut Luna 80% on 2026-07-30, which makes it roughly 6x cheaper than what extraction currently runs on. **Not adopted** — switching providers means a new SDK, a different response shape, and retuning every prompt, and there is currently no quality data to justify it. Revisit once the cover-letter corpus is large enough to judge output quality against cost — full plan in [`docs/evals/cover-letter-quality.md`](../evals/cover-letter-quality.md).
+OpenAI cut Luna 80% on 2026-07-30, which makes it roughly 6x cheaper than what extraction currently runs on. **Not adopted** — switching providers means a new SDK, a different response shape, and retuning every prompt, and there is currently no quality data to justify it. Revisit once the cover-letter pair set is large enough to judge output quality against cost — full plan in [`docs/evals/cover-letter-quality.md`](../evals/cover-letter-quality.md).
 
 Earlier evaluation: **DeepSeek** was considered for extraction and not adopted, on the same single-provider-simplicity reasoning.
 

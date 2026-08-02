@@ -1,6 +1,6 @@
 # Cover Letter Quality Eval — Runbook
 
-Self-contained instructions for building and judging a production cover-letter corpus. Read this end-to-end before acting. Do **not** invent a parallel pipeline or ask the user to re-explain the method unless a prerequisite is actually missing.
+Self-contained instructions for building and judging a set of production cover letters (JD + letter pairs). Read this end-to-end before acting. Do **not** invent a parallel pipeline or ask the user to re-explain the method unless a prerequisite is actually missing.
 
 **Privacy:** this file is process only. Never commit real letters, full JDs, or resume text into `docs/`. Raw outputs stay under gitignored `test-runs/` (and `samples/`).
 
@@ -14,7 +14,7 @@ Collect **50–100** real **(job description + cover letter)** pairs produced th
 - Failure modes: model vs prompt vs bad fit?
 - Is a **provider switch** justified? (cost context: `docs/roadmap/TECHNICAL.md`)
 
-A letter without its JD is **not** a corpus entry. A letter produced outside the product AI path is **not** a corpus entry for this eval.
+A letter without its JD is **not** a valid pair for this eval. A letter produced outside the product AI path is **not** a valid pair for this eval for this eval.
 
 ---
 
@@ -22,10 +22,10 @@ A letter without its JD is **not** a corpus entry. A letter produced outside the
 
 1. **Normal user path only.** The account owner is the user under test. Automation is allowed **only** to avoid doing the same UI steps 50 times by hand. Behavior must match: save job → generate cover letter in Navigator.
 2. **Same AI stack as production.** Generation must go through Navigator’s **`/api/gemini-proxy`** (authenticated as that user). Same models, tier gates, quota, prompts (`src/prompts/coverLetter.ts`, `jobAiService`), and Neon `logs` writing.
-3. **Do not bypass guards** for corpus generation: no direct `GEMINI_API_KEY` to Gemini, no offline-only harness as the primary path, no alternate prompts “for speed.”
+3. **Do not bypass guards** when generating these pairs: no direct `GEMINI_API_KEY` to Gemini, no offline-only harness as the primary path, no alternate prompts “for speed.”
 4. **Mild fit jobs.** Prefer roles the resume can at least partially support. Poor-fit jobs measure “fit is bad,” not letter quality (see June 2026 diagnosis in local `test-runs/cover-letter-eval/`).
 5. **Pairs always.** Export, grade, and count only JD + letter together.
-6. **No secrets or personal corpus in git.** Plans in `docs/evals/`; dumps in `test-runs/`.
+6. **No secrets or personal pair dumps in git.** Plans in `docs/evals/`; dumps in `test-runs/`.
 
 ---
 
@@ -83,7 +83,7 @@ If a box fails, fix that blocker — do not switch to direct Gemini.
 
 ---
 
-## 6. Procedure — Phase A: build corpus
+## 6. Procedure — Phase A: build the pair set
 
 Execute in order. Idempotent where possible (skip duplicates).
 
@@ -129,11 +129,11 @@ For each saved job **without** a letter yet:
 
 ---
 
-## 7. Procedure — Phase B: grade (after corpus exists)
+## 7. Procedure — Phase B: grade (after pairs exist)
 
 Grading is **separate** from generation. Grader model may differ from production writer.
 
-1. Export pairs (from `jobs.original_text` + `jobs.cover_letter`, and/or `logs`) into gitignored `test-runs/corpus/<date>/` as either:
+1. Export pairs (from `jobs.original_text` + `jobs.cover_letter`, and/or `logs`) into gitignored `test-runs/pairs/<date>/` as either:
    - per-entry folders: `job-description.txt` + `cover-letter.txt` (+ optional `meta.json`), or
    - jsonl with both fields per line
 2. Run an AI grader per pair with criteria below → `grade.json` / grades jsonl.
@@ -167,7 +167,7 @@ Verdict scale: **Strong / Average / Weak** (align with June 2026 eval). Tag fail
 ## 9. Explicitly out of scope for this eval
 
 - Redesigning Navigator UI
-- Switching production providers mid-corpus
+- Switching production providers mid-eval
 - Building a permanent bulk-import product feature (one-off automation scripts are fine)
 - Grading without JDs
 - Using Civic Careers UI scraping when Turso already has structured descriptions
@@ -178,7 +178,7 @@ Verdict scale: **Strong / Average / Weak** (align with June 2026 eval). Tag fail
 
 | Date | Notes |
 |---|---|
-| 2026-07-31 | Prior production corpus effectively empty (old model, no tokens). |
+| 2026-07-31 | Prior production pairs effectively empty (old model, no tokens). |
 | 2026-06-12 | Offline Claude 6-job diagnosis only — not production path. |
 | 2026-08-02 | Confirmed Turso → Neon **job add** (1 Metrolinx junior coordinator). **Generation via proxy still to prove**, then bulk to 50–100. Doc rewritten as cold-start runbook. |
 
