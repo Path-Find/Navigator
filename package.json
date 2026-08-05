@@ -66,7 +66,7 @@
     "tailwindcss": "^4.1.18",
     "typescript": "~6.0.3",
     "typescript-eslint": "^8.65.0",
-    "undici": "8.9.0",
+    "undici": "8.10.0",
     "vite": "^8.1.5",
     "vitest": "^4.1.10"
   },
@@ -76,7 +76,7 @@
     "brace-expansion": ">=5.0.8",
     "better-auth": "1.6.25",
     "@better-auth/passkey": "1.6.25",
-    "undici": "8.9.0",
+    "undici": "8.10.0",
     "jsdom": {
       "undici": "7.28.0"
     },
