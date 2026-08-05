@@ -78,7 +78,7 @@
     "@better-auth/passkey": "1.6.25",
     "undici": "8.10.0",
     "jsdom": {
-      "undici": "7.28.0"
+      "undici": "7.29.0"
     },
     "@babel/core": ">=7.29.6",
     "picomatch": ">=4.0.4"

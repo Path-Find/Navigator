@@ -6,6 +6,9 @@ See [CHANGELOG_ARCHIVE.md](CHANGELOG_ARCHIVE.md) for earlier history.
 
 ## [Unreleased]
 
+### Fixed
+- **Patched 5 undici vulnerabilities (1 high, 4 medium)**: a nested copy of undici pulled in via jsdom was pinned to a vulnerable version (7.28.0) separately from the top-level dependency, so bumping the top-level package alone didn't close the alerts. Both copies now patched.
+
 ### Changed
 - **General mock interview now always opens with "Tell me about yourself"**: previously left entirely to the AI's pick of 10 questions, so the single most common real interview opener wasn't guaranteed to appear. Now fixed as question 1, with the AI generating 9 more behind it.
 
