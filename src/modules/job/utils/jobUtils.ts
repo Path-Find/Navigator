@@ -57,12 +57,23 @@ export const stripInternalLabelPrefix = (str: string): string => {
 // block via "[Requirement] → [Block ID]: [explanation]", where Block ID is the raw
 // crypto.randomUUID() resume block id (see stringifyProfile's "BLOCK_ID: <id>" context
 // lines in jobAiService.ts) — a meaningless internal identifier if it leaks through.
-// Collapse "→ <uuid>:" down to a plain ":" so the label disappears without breaking the
-// surrounding sentence.
-const UUID_ARROW_PATTERN = /\s*→\s*[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\s*:/gi;
+// The model doesn't reliably follow the instructed "→ <uuid>:" shape — it sometimes
+// tacks the raw id on in parentheses instead (e.g. "...regulatory guidelines
+// (5b6d7208-0ce0-4863-844f-9e2307731216)."), which the arrow-only pattern misses.
+// Strip the arrow form first, then any parenthesized id, then any bare id left over
+// in other punctuation, so a leak can't survive regardless of the shape the model used.
+const UUID = '[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}';
+const UUID_ARROW_PATTERN = new RegExp(`\\s*→\\s*${UUID}\\s*:`, 'gi');
+const UUID_PAREN_PATTERN = new RegExp(`\\s*\\(${UUID}\\)`, 'gi');
+const UUID_BARE_PATTERN = new RegExp(`\\s*${UUID}`, 'gi');
 export const stripInternalIds = (str: string): string => {
     if (!str) return '';
-    return str.replace(UUID_ARROW_PATTERN, ':');
+    return str
+        .replace(UUID_ARROW_PATTERN, ':')
+        .replace(UUID_PAREN_PATTERN, '')
+        .replace(UUID_BARE_PATTERN, '')
+        .replace(/[ \t]{2,}/g, ' ')
+        .trim();
 };
 
 export const getBestResume = (resumes: ResumeProfile[], analysis?: JobAnalysis) => {

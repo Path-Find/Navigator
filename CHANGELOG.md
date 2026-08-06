@@ -7,6 +7,10 @@ See [CHANGELOG_ARCHIVE.md](CHANGELOG_ARCHIVE.md) for earlier history.
 ## [Unreleased]
 
 ### Fixed
+- **Cover letters sometimes ended with no sign-off at all, or a placeholder like "Sincerely, Candidate"**: the model wasn't given the candidate's real name as its own field, and nothing told it a closing signature was required rather than trimmable filler. Now passes the name explicitly and requires a "Sincerely, [Name]" close every time.
+- **Raw internal resume-block IDs could leak into the Tailoring Strategy panel** (e.g. "...regulatory guidelines (5b6d7208-0ce0-4863-844f-9e2307731216)."): the existing cleanup only caught one exact output format; broadened it to strip a leaked ID in any format.
+
+### Fixed
 - **Patched 5 undici vulnerabilities (1 high, 4 medium)**: a nested copy of undici pulled in via jsdom was pinned to a vulnerable version (7.28.0) separately from the top-level dependency, so bumping the top-level package alone didn't close the alerts. Both copies now patched.
 - **Patched a high-severity brace-expansion DoS vulnerability**: the existing override (`>=5.0.8`) predated a new advisory showing that version's mitigation was incomplete. Bumped to the actually-patched `5.0.9`.
 

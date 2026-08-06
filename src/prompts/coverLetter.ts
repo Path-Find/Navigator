@@ -49,7 +49,7 @@ export const COVER_LETTER_PROMPTS = {
             - **No Resume Echo**: Never reuse a resume bullet's sentence structure or phrasing with only a word or two swapped (e.g. resume "maintaining 98% accuracy while managing a caseload of 16 claims per hour" becoming "maintained a 98% accuracy rate while processing 16 cases per hour" is a FAIL — same skeleton, same order, synonyms swapped). Literal numbers may repeat verbatim; the sentence carrying them must not. Rebuild the sentence from a different angle — a different starting clause, a different emphasis, a different framing of why the number matters here — before you touch the wording.
             `
     },
-    GENERATE: (template: string, jobDescription: string, resumeText: string, tailoringInstructions: string[], additionalContext?: string, trajectoryContext?: string, bucketStrategy?: string) => `
+    GENERATE: (template: string, jobDescription: string, resumeText: string, tailoringInstructions: string[], additionalContext?: string, trajectoryContext?: string, bucketStrategy?: string, candidateName?: string) => `
     ${template}
  
     ${bucketStrategy ? `CANDIDATE NARRATIVE STRATEGY:
@@ -80,12 +80,14 @@ export const COVER_LETTER_PROMPTS = {
     (Note: The text above is the critique feedback, not personal context in this case).
     ` : ''}
     
+    ${candidateName ? `REQUIRED CLOSING: End the letter with a sign-off on its own line: "Sincerely," followed by "${candidateName}" on the next line. This is a required structural element of a cover letter, not generic filler — always include it exactly once, even while trimming filler elsewhere.` : ''}
+
     FINAL CHECK:
     - Ensure no (BLOCK_ID) tags remain in the output.
     - REFLECT: Is this a list or a narrative? If it feels like a list, use a functional bridge to connect two thoughts.
     - REFLECT: Did I handle the metrics correctly for this role category?
-    - REFLECT: Does this sound like an AI? Remove generic filler like "I am excited to apply."
-    
+    - REFLECT: Does this sound like an AI? Remove generic filler like "I am excited to apply." (the closing sign-off above is exempt from this — never remove it)
+
     IMPORTANT: Provide the cover letter as RAW TEXT ONLY. Do NOT wrap in JSON, Markdown code blocks, or any other formatting.
   `
   },
