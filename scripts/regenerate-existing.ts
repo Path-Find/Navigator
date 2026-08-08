@@ -201,12 +201,19 @@ async function processOne(
   }
 
   const template = COVER_LETTER_PROMPTS.COVER_LETTER.VARIANTS.v1_direct;
+  // Mirrors jobAiService.ts: for an extreme mismatch, go straight to an honestly-framed
+  // first draft instead of burning retry attempts on persuasion that's unlikely to work.
+  const EXTREME_MISMATCH_THRESHOLD = 20;
+  const isExtremeMismatch = typeof score === "number" && score < EXTREME_MISMATCH_THRESHOLD;
+  const initialInstruction = isExtremeMismatch
+    ? `STRICT INSTRUCTION: This role's compatibility score is extremely low (${score}/100) — a large, hard-to-bridge gap exists. Do not attempt to persuade past it. Include one clear, plain-language sentence that honestly names the specific gap (e.g. missing credential, licence, or years of direct experience) rather than glossing over it. Lead with genuine transferable strengths, but stay honest about the mismatch.`
+    : undefined;
   let letterPrompt = COVER_LETTER_PROMPTS.COVER_LETTER.GENERATE(
     template,
     focusedJd,
     stringifyProfile(letterResume),
     tailoring,
-    undefined,
+    initialInstruction,
     undefined,
     undefined,
     candidateName
@@ -220,6 +227,19 @@ async function processOne(
   let attempts = 1;
   let decision = "Average";
 
+  if (isExtremeMismatch) {
+    // Mirrors jobAiService.ts: an honest admission of an extreme mismatch will
+    // essentially never score Strong/Exceptional, so skip the retry loop entirely.
+    const critRaw = await callProxy(
+      jwt,
+      COVER_LETTER_PROMPTS.CRITIQUE_COVER_LETTER(focusedJd, letter, stringifyProfile(letterResume)),
+      "analysis",
+      "cover_letter",
+      { responseMimeType: "application/json" }
+    );
+    critique = JSON.parse(cleanJson(critRaw));
+    decision = String(critique.decision || "Average");
+  } else {
   while (attempts <= AGENT_LOOP.MAX_RETRIES + 1) {
     const critRaw = await callProxy(
       jwt,
@@ -263,6 +283,7 @@ async function processOne(
     );
     letter = cleanLetter(await callProxy(jwt, rewrite, "analysis", "cover_letter"));
     attempts++;
+  }
   }
 
   const company = analysis.distilledJob?.companyName || job.company;

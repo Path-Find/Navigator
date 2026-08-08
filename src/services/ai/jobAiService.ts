@@ -380,7 +380,8 @@ export const generateCoverLetterWithQuality = async (
     jobId?: string,
     canonicalTitle?: string,
     personalizedStyle?: string,
-    candidateName?: string
+    candidateName?: string,
+    fitScore?: number
 ): Promise<{
     text: string;
     promptVersion: string;
@@ -393,19 +394,37 @@ export const generateCoverLetterWithQuality = async (
     if (onProgress) onProgress("Researching");
     // Simul-Research and Contextualize
     if (onProgress) onProgress("Contextualizing");
-    
+
     // Resume/Job alignment
     if (onProgress) onProgress("Mapping");
 
     if (onProgress) onProgress("Drafting");
-    let result = await generateCoverLetter(jobDescription, selectedResume, tailoringInstructions, additionalContext, undefined, trajectoryContext, jobId, canonicalTitle, personalizedStyle, candidateName);
+    // For an extreme mismatch, don't burn retry attempts on persuasion that's very
+    // unlikely to work — go straight to an honestly-framed first draft instead of
+    // waiting for the loop to exhaust retries before admitting the gap (see #197).
+    const EXTREME_MISMATCH_THRESHOLD = 20;
+    const isExtremeMismatch = typeof fitScore === 'number' && fitScore < EXTREME_MISMATCH_THRESHOLD;
+    const initialContext = isExtremeMismatch
+        ? `${additionalContext ? `${additionalContext}\n\n` : ''}STRICT INSTRUCTION: This role's compatibility score is extremely low (${fitScore}/100) — a large, hard-to-bridge gap exists. Do not attempt to persuade past it. Include one clear, plain-language sentence that honestly names the specific gap (e.g. missing credential, licence, or years of direct experience) rather than glossing over it. Lead with genuine transferable strengths, but stay honest about the mismatch.`
+        : additionalContext;
+    let result = await generateCoverLetter(jobDescription, selectedResume, tailoringInstructions, initialContext, undefined, trajectoryContext, jobId, canonicalTitle, personalizedStyle, candidateName);
     let attempts = 1;
 
     // Fast Path for Free and Plus tiers (No iterative loop to protect margins)
     if (userTier === USER_TIERS.FREE || userTier === USER_TIERS.PLUS) {
         return { ...result, decision: 'Average', attempts };
     }
- 
+
+    // Extreme mismatch: an honest admission of a ~5/100-fit gap will essentially
+    // never score Strong/Exceptional no matter how it's rewritten, so looping through
+    // full retries just burns cost for no realistic gain. Critique once for a real
+    // decision label, then stop.
+    if (isExtremeMismatch) {
+        if (onProgress) onProgress('Critiquing');
+        const critique = await critiqueCoverLetter(jobDescription, result.text, stringifyProfile(selectedResume), jobId);
+        return { ...result, decision: critique.decision, attempts, critique };
+    }
+
     // 2. The Agent Loop (Pro/Admin only)
     let finalCritique: any = null;
     let currentDecision: 'Reject' | 'Weak' | 'Average' | 'Strong' | 'Exceptional' = 'Average';

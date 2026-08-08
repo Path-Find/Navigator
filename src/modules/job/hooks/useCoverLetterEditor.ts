@@ -178,7 +178,8 @@ export const useCoverLetterEditor = ({
                     localJob.id,
                     canonicalTitle,
                     personalizedStyle,
-                    fullName || undefined
+                    fullName || undefined,
+                    score
                 );
 
                 const updated = {
