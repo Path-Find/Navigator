@@ -423,8 +423,19 @@ export const generateCoverLetterWithQuality = async (
             break;
         }
 
-        // Failure condition (Max retries reached)
+        // Failure condition (Max retries reached): rather than silently shipping the
+        // last unacknowledged draft, force one final rewrite that must honestly name
+        // the gap the critique keeps flagging, instead of another persuasion attempt.
         if (attempts > AGENT_LOOP.MAX_RETRIES) {
+            if (onProgress) onProgress(`Finalizing`);
+            const honestyInstruction = `
+                FINAL ATTEMPT: this draft has not met the internal quality bar after ${attempts} attempts.
+                CRITIQUE FEEDBACK: ${critique.feedback.join('; ')}
+                STRICT INSTRUCTION: Stop attempting further persuasion. Include one clear, plain-language sentence that honestly names the specific gap identified above (e.g. a missing credential, licence, or years of direct experience) rather than glossing over it. The letter should read as self-aware about the gap, not falsely confident. Keep everything else about the letter's real strengths intact.
+            `;
+            const honestyContext = additionalContext ? `${additionalContext}\n\n${honestyInstruction}` : honestyInstruction;
+            result = await generateCoverLetter(jobDescription, selectedResume, tailoringInstructions, honestyContext, undefined, trajectoryContext, jobId, canonicalTitle, personalizedStyle, candidateName);
+            attempts++;
             break;
         }
 
