@@ -45,7 +45,7 @@ export const useCoverLetterEditor = ({
     const isGenerating = generating;
     const { showError } = useToast();
     const isNextGen = useNextGen();
-    const { user } = useUser();
+    const { user, fullName } = useUser();
 
     // Sync with parent when job prop changes
     useEffect(() => {
@@ -153,7 +153,7 @@ export const useCoverLetterEditor = ({
                 const variants = Object.keys(COVER_LETTER_PROMPTS.COVER_LETTER.VARIANTS).slice(0, 2);
 
                 const results = await Promise.all(variants.map(v =>
-                    generateCoverLetter(textToUse, focusedResume, instructions || [], finalContext, v, trajectoryContext, localJob.id, canonicalTitle, personalizedStyle)
+                    generateCoverLetter(textToUse, focusedResume, instructions || [], finalContext, v, trajectoryContext, localJob.id, canonicalTitle, personalizedStyle, fullName || undefined)
                 ));
 
                 setComparisonVersions(results);
@@ -177,7 +177,8 @@ export const useCoverLetterEditor = ({
                     trajectoryContext,
                     localJob.id,
                     canonicalTitle,
-                    personalizedStyle
+                    personalizedStyle,
+                    fullName || undefined
                 );
 
                 const updated = {
@@ -221,7 +222,9 @@ export const useCoverLetterEditor = ({
                     undefined,
                     trajectoryContext,
                     localJob.id,
-                    canonicalTitle
+                    canonicalTitle,
+                    undefined,
+                    fullName || undefined
                 );
 
                 const updated = {

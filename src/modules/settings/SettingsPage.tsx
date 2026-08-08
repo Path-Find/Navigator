@@ -13,7 +13,7 @@ import { useNavigate } from 'react-router';
 import { NextGenCalibration } from './components/NextGenCalibration';
 
 export const SettingsPage: React.FC = () => {
-    const { user, userTier, isTester, isAdmin, simulatedTier, journey, updateProfile } = useUser();
+    const { user, userTier, isTester, isAdmin, simulatedTier, journey, fullName, updateProfile } = useUser();
     const { usageStats } = useJobContext();
     const { openModal } = useModal();
     const { showInfo, showError } = useToast();
@@ -21,6 +21,16 @@ export const SettingsPage: React.FC = () => {
 
     const [isCopyingToken, setIsCopyingToken] = React.useState(false);
     const [isCopyingEmail, setIsCopyingEmail] = React.useState(false);
+    const [nameInput, setNameInput] = React.useState(fullName || '');
+
+    React.useEffect(() => { setNameInput(fullName || ''); }, [fullName]);
+
+    const handleSaveName = () => {
+        const trimmed = nameInput.trim();
+        if (trimmed !== (fullName || '')) {
+            updateProfile({ full_name: trimmed }).catch(() => showError('Failed to save name.'));
+        }
+    };
 
     const handleResetPassword = async () => {
         if (user?.email) {
@@ -77,6 +87,15 @@ export const SettingsPage: React.FC = () => {
                             </div>
 
                             <div className="flex flex-col gap-1 mb-6">
+                                <label className="text-[10px] font-bold text-neutral-400 mb-1">Full Name</label>
+                                <input
+                                    type="text"
+                                    value={nameInput}
+                                    onChange={(e) => setNameInput(e.target.value)}
+                                    onBlur={handleSaveName}
+                                    placeholder="Used to sign your cover letters"
+                                    className="w-full bg-neutral-50 dark:bg-neutral-800/50 border border-neutral-100 dark:border-neutral-800 rounded-xl px-3 py-2 text-sm font-bold text-neutral-900 dark:text-white focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all mb-3"
+                                />
                                 <div className="text-sm font-bold text-neutral-900 dark:text-white truncate">
                                     {user?.email || 'Not Signed In'}
                                 </div>

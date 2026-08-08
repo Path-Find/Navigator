@@ -7,7 +7,7 @@ See [CHANGELOG_ARCHIVE.md](CHANGELOG_ARCHIVE.md) for earlier history.
 ## [Unreleased]
 
 ### Fixed
-- **Cover letters sometimes ended with no sign-off at all, or a placeholder like "Sincerely, Candidate"**: the model wasn't given the candidate's real name as its own field, and nothing told it a closing signature was required rather than trimmable filler. Now passes the name explicitly and requires a "Sincerely, [Name]" close every time.
+- **Cover letters sometimes ended with no sign-off at all, or a placeholder like "Sincerely, Candidate"**: nothing told the model a closing signature was required rather than trimmable filler, and there was no reliable source for the candidate's actual name to close with (an interim fix wrongly assumed the resume profile's own label was the person's name — briefly caused every letter to close "Sincerely, Resume," now corrected). Added a proper name field to the account profile (Settings → Full Name) and require a real "Sincerely, [Name]" close every time it's set.
 - **Raw internal resume-block IDs could leak into the Tailoring Strategy panel** (e.g. "...regulatory guidelines (5b6d7208-0ce0-4863-844f-9e2307731216)."): the existing cleanup only caught one exact output format; broadened it to strip a leaked ID in any format.
 
 ### Fixed

@@ -320,7 +320,8 @@ export const generateCoverLetter = async (
     trajectoryContext?: string,
     jobId?: string,
     canonicalTitle?: string,
-    personalizedStyle?: string
+    personalizedStyle?: string,
+    candidateName?: string
 ): Promise<{ text: string; promptVersion: string }> => {
     const resumeText = stringifyProfile(selectedResume);
     const variants = COVER_LETTER_PROMPTS.COVER_LETTER.VARIANTS;
@@ -340,7 +341,10 @@ export const generateCoverLetter = async (
         ? `${additionalContext || ''}\n\n[USER PERSONAL STYLE MODEL]: ${personalizedStyle}`
         : additionalContext;
 
-    const prompt = COVER_LETTER_PROMPTS.COVER_LETTER.GENERATE(template, jobDescription, resumeText, tailoringInstructions, finalPersonalizedContext, trajectoryContext, bucketStrategy, selectedResume.name);
+    // candidateName must be the person's real name (e.g. from their profile), not
+    // selectedResume.name — that field is a resume/document label ("Resume", "Primary
+    // Experience"), not the candidate's own name. See #192/#194.
+    const prompt = COVER_LETTER_PROMPTS.COVER_LETTER.GENERATE(template, jobDescription, resumeText, tailoringInstructions, finalPersonalizedContext, trajectoryContext, bucketStrategy, candidateName || undefined);
 
     return callWithRetry(async (metadata) => {
         const model = await getModel({ task: 'analysis', feature: 'cover_letter' });
@@ -375,11 +379,12 @@ export const generateCoverLetterWithQuality = async (
     trajectoryContext?: string,
     jobId?: string,
     canonicalTitle?: string,
-    personalizedStyle?: string
-): Promise<{ 
-    text: string; 
-    promptVersion: string; 
-    decision: string; 
+    personalizedStyle?: string,
+    candidateName?: string
+): Promise<{
+    text: string;
+    promptVersion: string;
+    decision: string;
     attempts: number;
     critique?: { feedback: string[]; strengths: string[]; hallucinationAlerts: string[] }
 }> => {
@@ -393,7 +398,7 @@ export const generateCoverLetterWithQuality = async (
     if (onProgress) onProgress("Mapping");
 
     if (onProgress) onProgress("Drafting");
-    let result = await generateCoverLetter(jobDescription, selectedResume, tailoringInstructions, additionalContext, undefined, trajectoryContext, jobId, canonicalTitle, personalizedStyle);
+    let result = await generateCoverLetter(jobDescription, selectedResume, tailoringInstructions, additionalContext, undefined, trajectoryContext, jobId, canonicalTitle, personalizedStyle, candidateName);
     let attempts = 1;
 
     // Fast Path for Free and Plus tiers (No iterative loop to protect margins)
@@ -435,7 +440,7 @@ export const generateCoverLetterWithQuality = async (
         // We append the critique to any existing context
         const newContext = additionalContext ? `${additionalContext}\n\n${improvementContext}` : improvementContext;
 
-        result = await generateCoverLetter(jobDescription, selectedResume, tailoringInstructions, newContext, undefined, trajectoryContext, jobId, canonicalTitle, personalizedStyle);
+        result = await generateCoverLetter(jobDescription, selectedResume, tailoringInstructions, newContext, undefined, trajectoryContext, jobId, canonicalTitle, personalizedStyle, candidateName);
         attempts++;
     }
 

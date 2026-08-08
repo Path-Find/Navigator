@@ -13,6 +13,7 @@ const ALLOWED_UPDATE_FIELDS = [
     'last_archetype_update',
     'accepted_tos_version',
     'next_gen_enabled',
+    'full_name',
 ] as const;
 
 async function handler(req: Request): Promise<Response> {
@@ -28,7 +29,7 @@ async function handler(req: Request): Promise<Response> {
         if (req.method === 'GET') {
             const rows = await sql`
                 SELECT email, subscription_tier, is_admin, is_tester, next_gen_enabled,
-                       journey, device_id, last_archetype_update, accepted_tos_version
+                       journey, device_id, last_archetype_update, accepted_tos_version, full_name
                 FROM profiles WHERE id = ${userId}
             `;
             const profile = rows[0];
