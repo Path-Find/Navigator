@@ -1,10 +1,20 @@
 import { getModel, callWithRetry, cleanJsonOutput } from "./aiCore";
 import { INTERVIEW_PROMPTS } from "../../prompts/index";
 import { AI_MODELS } from "../../constants";
-import type { InterviewQuestion, InterviewResponseAnalysis, ResumeProfile } from "../../types";
+import type { ExperienceBlock, InterviewQuestion, InterviewResponseAnalysis, ResumeProfile } from "../../types";
 
 const stringifyProfile = (profile: ResumeProfile): string => {
-    return JSON.stringify(profile, null, 2);
+    const blocks = profile.blocks
+        .filter((block: ExperienceBlock) => block.isVisible && ['work', 'volunteer', 'project', 'education'].includes(block.type))
+        .map(({ type, title, organization, dateRange, bullets, narrativeContext }) => ({
+            type,
+            title,
+            organization,
+            dateRange,
+            bullets,
+            ...(narrativeContext ? { narrativeContext } : {}),
+        }));
+    return JSON.stringify(blocks);
 };
 
 export const generateTailoredInterviewQuestions = async (

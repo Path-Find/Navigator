@@ -7,6 +7,7 @@ See [CHANGELOG_ARCHIVE.md](CHANGELOG_ARCHIVE.md) for earlier history.
 ## [Unreleased]
 
 ### Fixed
+- **Job-specific summaries and tailored interviews now receive only the selected resume evidence**: previously they could resend every stored resume or every visible block, adding irrelevant context to the prompt.
 - **Older saved job analyses now upgrade automatically**: analyses are versioned, and opening a stale one sends it through the current parser/scorer once so new requirement priorities and cover-letter hooks are saved for future use.
 - **Cover-letter context retains specific employer hooks after removing raw job text**: parsing now preserves a few supported mission, product, team, or role-challenge details for focused downstream writing.
 - **Tailored interview calls no longer resend the full raw job posting**: they reuse the parsed job context and only fall back to the original description for older jobs without an analysis.

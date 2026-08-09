@@ -82,6 +82,30 @@ export const getBestResume = (resumes: ResumeProfile[], analysis?: JobAnalysis) 
     return resumes.find(r => r.id === analysis.bestResumeProfileId) || resumes[0];
 };
 
+/**
+ * Select the smallest resume context needed for job-specific AI calls.
+ * Keep the summary block as baseline context, then use the analysis-selected
+ * blocks when available. Older analyses without recommendations keep all
+ * visible blocks for backwards compatibility.
+ */
+export const getJobRelevantResume = (
+    resumes: ResumeProfile[],
+    analysis?: JobAnalysis
+): ResumeProfile | undefined => {
+    const bestResume = getBestResume(resumes, analysis);
+    if (!bestResume) return undefined;
+
+    const recommendedIds = analysis?.recommendedBlockIds;
+    const hasRecommendations = Boolean(recommendedIds?.length);
+
+    return {
+        ...bestResume,
+        blocks: bestResume.blocks.filter(block =>
+            block.isVisible && (block.type === 'summary' || !hasRecommendations || recommendedIds?.includes(block.id) === true)
+        ),
+    };
+};
+
 const buildResumeClipboardText = (job: SavedJob, bestResume: ResumeProfile): string => {
     const analysis = job.analysis;
     const lines: string[] = [];

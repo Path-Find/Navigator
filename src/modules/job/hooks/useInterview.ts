@@ -5,12 +5,15 @@ import {
     analyzeAndFollowUp,
     formatParsedJobContext
 } from '../../../services/geminiService';
+import { getJobRelevantResume } from '../utils/jobUtils';
 import type {
     InterviewQuestion,
     InterviewResponseAnalysis,
     SavedJob
 } from '../types';
 import type { ResumeProfile } from '../../resume/types';
+
+const INTERVIEW_BLOCK_TYPES = new Set(['work', 'volunteer', 'project', 'education']);
 
 const stringifyForInterview = (resumes: ResumeProfile[]): string => {
     if (!resumes.length) return '';
@@ -29,6 +32,17 @@ export const getInterviewJobContext = (job: SavedJob): string => {
         );
     }
     return job.description;
+};
+
+/** Keep tailored interview calls focused on the job-relevant resume evidence. */
+export const getInterviewResumes = (job: SavedJob, resumes: ResumeProfile[]): ResumeProfile[] => {
+    const relevantResume = getJobRelevantResume(resumes, job.analysis);
+    if (!relevantResume) return [];
+
+    return [{
+        ...relevantResume,
+        blocks: relevantResume.blocks.filter(block => INTERVIEW_BLOCK_TYPES.has(block.type)),
+    }];
 };
 
 export const useInterview = () => {
@@ -58,7 +72,7 @@ export const useInterview = () => {
         setIsLoading(true);
         setError(null);
         try {
-            const result = await generateTailoredInterviewQuestions(getInterviewJobContext(job), resumes, job.id, job.position);
+            const result = await generateTailoredInterviewQuestions(getInterviewJobContext(job), getInterviewResumes(job, resumes), job.id, job.position);
             setQuestions(result);
             setCurrentQuestionIndex(0);
             setResponses({});
