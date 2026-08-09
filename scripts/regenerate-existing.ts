@@ -15,7 +15,7 @@ import { neon } from "@neondatabase/serverless";
 import { readFileSync, writeFileSync, mkdirSync } from "fs";
 import { join } from "path";
 import { JOB_ANALYSIS_PROMPTS, COVER_LETTER_PROMPTS } from "../src/prompts/index.ts";
-import { AGENT_LOOP } from "../src/constants.ts";
+import { AGENT_LOOP, AI_TEMPERATURE } from "../src/constants.ts";
 
 const ROOT = join(import.meta.dir, "..");
 const PAIRS_DIR = join(ROOT, "tests/runs/pairs/2026-08-08-realistic-fit-pilot");
@@ -176,7 +176,7 @@ async function processOne(
   const resumeCtx = stringifyProfile(resume);
 
   const analysisPrompt = JOB_ANALYSIS_PROMPTS.JOB_FIT_ANALYSIS.DEFAULT(cleaned, resumeCtx);
-  const analysisRaw = await callProxy(jwt, analysisPrompt, "analysis", undefined, { responseMimeType: "application/json" });
+  const analysisRaw = await callProxy(jwt, analysisPrompt, "analysis", undefined, { responseMimeType: "application/json", temperature: AI_TEMPERATURE.STRICT });
   const analysis = JSON.parse(cleanJson(analysisRaw));
   const score = analysis.compatibilityScore ?? null;
   const tailoring: string[] = analysis.coverLetterTailoringInstructions || [

@@ -289,7 +289,11 @@ export const analyzeJobFit = async (
     if (onProgress) onProgress("Benchmarking", 4, 6);
 
     const analysis = await callWithRetry(async (metadata) => {
-        const model = await getModel({ task: 'analysis', generationConfig: { responseMimeType: "application/json" }, signal: abortSignal });
+        // compatibilityScore is meant to be a consistent, comparable judgment across
+        // postings — unlike cover letter generation/critique (which share this same
+        // 'analysis' task tier and need creative variance), so it gets its own strict
+        // temperature here rather than inheriting the tier default.
+        const model = await getModel({ task: 'analysis', generationConfig: { responseMimeType: "application/json", temperature: AI_TEMPERATURE.STRICT }, signal: abortSignal });
         const response = await model.generateContent({ contents: [{ role: "user", parts: [{ text: analysisPrompt }] }] });
         metadata.token_usage = response.response.usageMetadata;
         return JSON.parse(sanitizeInput(cleanJsonOutput(response.response.text())));
