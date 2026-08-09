@@ -62,7 +62,7 @@ export const useResumeTailoring = (
                     outputContent: block.bullets,
                     userCorrection: tailoredBullets,
                     metadata: { blockId: block.id, job_id: job.id }
-                });
+                }, [job.company, analysis.distilledJob?.canonicalTitle, block.organization]);
 
                 // Phase 2: Professional Latent Space
                 // Silently vectorize this tailored block to build the user's trajectory map

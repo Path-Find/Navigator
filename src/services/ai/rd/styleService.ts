@@ -24,7 +24,7 @@ export class RdStyleService {
 
             const winningJobIds = new Set(
                 outcomes
-                    .filter(o => ['interview', 'offer', 'applied'].includes(String(o.metadata?.outcome)))
+                    .filter(o => ['interview', 'offer'].includes(String(o.metadata?.outcome)))
                     .map(o => o.metadata?.job_id)
                     .filter((jobId): jobId is string => typeof jobId === 'string')
             );

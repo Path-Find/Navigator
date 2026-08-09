@@ -17,7 +17,7 @@ describe('RdFeedbackService', () => {
         vi.stubGlobal('fetch', mockFetch);
     });
 
-    it('records positive application outcomes through the Neon API', async () => {
+    it('records an interview as a positive outcome through the Neon API', async () => {
         mockFetch.mockResolvedValue(new Response(JSON.stringify({ success: true }), { status: 201 }));
 
         const result = await RdFeedbackService.captureOutcome('user-1', 'job-1', 'interview');
@@ -32,6 +32,64 @@ describe('RdFeedbackService', () => {
             context: 'match_logic',
             impactScore: 5,
             metadata: { job_id: 'job-1', outcome: 'interview' },
+        });
+    });
+
+    it('redacts known personal values and common identifiers from modeling content', async () => {
+        mockFetch.mockResolvedValue(new Response(JSON.stringify({ success: true }), { status: 201 }));
+
+        await RdFeedbackService.captureSignal('user-1', {
+            signalType: 'explicit_approval',
+            context: 'cover_letter',
+            outputContent: 'Contact Ryan at ryan@example.com or https://example.com/123.',
+            userCorrection: 'Call 416-555-1234.',
+        }, ['Ryan']);
+
+        expect(JSON.parse(mockFetch.mock.calls[0][1].body)).toMatchObject({
+            outputContent: 'Contact [PRIVATE] at [EMAIL] or [URL]',
+            userCorrection: 'Call [PHONE].',
+        });
+    });
+
+    it('treats an offer as the strongest positive outcome', async () => {
+        mockFetch.mockResolvedValue(new Response(JSON.stringify({ success: true }), { status: 201 }));
+
+        await RdFeedbackService.captureOutcome('user-1', 'job-1', 'offer');
+
+        expect(JSON.parse(mockFetch.mock.calls[0][1].body)).toMatchObject({
+            signalType: 'explicit_approval',
+            impactScore: 8,
+            metadata: { job_id: 'job-1', outcome: 'offer' },
+        });
+    });
+
+    it('keeps applied and ghosted outcomes neutral', async () => {
+        mockFetch.mockResolvedValue(new Response(JSON.stringify({ success: true }), { status: 201 }));
+
+        await RdFeedbackService.captureOutcome('user-1', 'job-1', 'applied');
+        await RdFeedbackService.captureOutcome('user-1', 'job-2', 'ghosted');
+
+        expect(JSON.parse(mockFetch.mock.calls[0][1].body)).toMatchObject({
+            signalType: 'implicit_usage',
+            impactScore: 0,
+            metadata: { outcome: 'applied' },
+        });
+        expect(JSON.parse(mockFetch.mock.calls[1][1].body)).toMatchObject({
+            signalType: 'implicit_usage',
+            impactScore: 0,
+            metadata: { outcome: 'ghosted' },
+        });
+    });
+
+    it('records a rejection as a weak negative outcome', async () => {
+        mockFetch.mockResolvedValue(new Response(JSON.stringify({ success: true }), { status: 201 }));
+
+        await RdFeedbackService.captureOutcome('user-1', 'job-1', 'rejected');
+
+        expect(JSON.parse(mockFetch.mock.calls[0][1].body)).toMatchObject({
+            signalType: 'explicit_correction',
+            impactScore: -1,
+            metadata: { outcome: 'rejected' },
         });
     });
 

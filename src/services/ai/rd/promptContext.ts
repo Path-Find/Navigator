@@ -13,7 +13,7 @@ export const buildStyleDistillerPrompt = (signalSummary: string): string => `
 ${MODELING_DISTILLER}
 
 CONTEXT:
-Signals marked as WINNING PATTERNS directly resulted in an interview, offer, or application. Prioritize those stylistic choices.
+Signals marked as WINNING PATTERNS are associated with an interview or offer. Prioritize those stylistic choices. Applications and ghosted outcomes are neutral, not evidence that a style succeeded or failed.
 
 USER SIGNALS DATA:
 ${anchorData('USER_SIGNALS', signalSummary)}

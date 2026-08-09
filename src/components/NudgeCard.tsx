@@ -1,10 +1,10 @@
 import React from 'react';
-import { Sparkles, CheckCircle2, Ghost, Clock, X, ShieldAlert } from 'lucide-react';
+import { Sparkles, CheckCircle2, Ghost, Clock, X, ShieldAlert, Briefcase } from 'lucide-react';
 import type { SavedJob } from '../types';
 
 interface NudgeCardProps {
     job: SavedJob;
-    onUpdateStatus: (status: 'interview' | 'rejected' | 'ghosted') => void;
+    onUpdateStatus: (status: 'interview' | 'offer' | 'rejected' | 'ghosted') => void;
     onDismiss: () => void;
 }
 
@@ -56,6 +56,14 @@ export const NudgeCard: React.FC<NudgeCardProps> = ({ job, onUpdateStatus, onDis
                             >
                                 <CheckCircle2 className="w-3.5 h-3.5" />
                                 Got an Interview
+                            </button>
+
+                            <button
+                                onClick={() => onUpdateStatus('offer')}
+                                className="flex items-center gap-2 px-4 py-2.5 bg-amber-50 dark:bg-amber-500/10 hover:bg-amber-100 dark:hover:bg-amber-500/20 text-amber-700 dark:text-amber-400 border border-amber-200 dark:border-amber-500/20 rounded-xl text-xs font-black transition-all hover:-translate-y-0.5"
+                            >
+                                <Briefcase className="w-3.5 h-3.5" />
+                                Got an Offer
                             </button>
 
                             <button

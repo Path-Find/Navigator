@@ -207,7 +207,7 @@ export const useCoverLetterEditor = ({
                         inputPromptVersion: result.promptVersion,
                         outputContent: { text: result.text, decision: result.decision },
                         metadata: { job_id: localJob.id }
-                    });
+                    }, [fullName, localJob.company, canonicalTitle]);
                 }
             } else {
                 const { text: letter, promptVersion } = await generateCoverLetter(
@@ -278,12 +278,12 @@ export const useCoverLetterEditor = ({
                 inputPromptVersion: variant.promptVersion,
                 outputContent: variant.text,
                 impactScore: 3, // Choice is a stronger signal than just a save
-                        metadata: {
-                            job_id: localJob.id,
-                            ab_test: true,
-                            ...(other ? { comparison_variant: other.promptVersion } : {})
-                        }
-            });
+                metadata: {
+                    job_id: localJob.id,
+                    ab_test: true,
+                    ...(other ? { comparison_variant: other.promptVersion } : {})
+                }
+            }, [fullName, localJob.company, analysis.distilledJob?.canonicalTitle]);
 
             // Log the Loser (implicit distance)
             if (other) {
@@ -296,10 +296,10 @@ export const useCoverLetterEditor = ({
                     userCorrection: variant.text, // The winner is effectively the "correction" of the loser
                     impactScore: -1,
                     metadata: { job_id: localJob.id, ab_test_loss: true, winner: variant.promptVersion }
-                });
+                }, [fullName, localJob.company, analysis.distilledJob?.canonicalTitle]);
             }
         }
-    }, [isNextGen, user, analysis, comparisonVersions, localJob, onJobUpdate, showError]);
+    }, [isNextGen, user, analysis, comparisonVersions, localJob, onJobUpdate, showError, fullName]);
 
     const handleRejectVariants = useCallback(() => {
         setComparisonVersions(null);
@@ -325,13 +325,13 @@ export const useCoverLetterEditor = ({
                         userCorrection: newText,
                         impactScore: 2, // Manual edit implies the AI was close but needed refinement
                         metadata: { job_id: localJob.id }
-                    });
+                    }, [fullName, localJob.company, analysis.distilledJob?.canonicalTitle]);
                 }
             } catch {
                 showError('Failed to save cover letter edits');
             }
         }
-    }, [localJob, onJobUpdate, showError, isNextGen, user, analysis]);
+    }, [localJob, onJobUpdate, showError, isNextGen, user, analysis, fullName]);
 
     // Auto-Generate on Mount if no letter exists — skipped for AI-banned employers
     useEffect(() => {

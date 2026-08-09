@@ -17,6 +17,12 @@ We capture "Signals" when a user:
 2. Corrects or edits a version (explicit_correction)
 3. Saves a generated item without changes (implicit_usage)
 
+OUTCOME INTERPRETATION:
+- An interview is a positive signal.
+- An offer is the strongest positive signal.
+- A rejection is only a weak negative signal; do not assume one rejection identifies a bad writing pattern.
+- An application or ghosted status is neutral because it does not tell you whether the output worked.
+
 INPUT DATA:
 You will receive a list of recent signals, including the content the user liked or changed.
 
