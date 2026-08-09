@@ -9,6 +9,7 @@ import type { CustomSkill } from '../../skills/types';
 import { useNextGen } from '../../../hooks/useNextGen';
 import { RdTrajectoryService } from '../../../services/ai/rd/trajectoryService';
 import { useUser } from '../../../contexts/UserContext';
+import { CURRENT_JOB_ANALYSIS_VERSION } from '../../../constants';
 
 type AnalysisProgress = string | null;
 
@@ -108,7 +109,14 @@ export const useJobAnalysis = (
     useEffect(() => {
         if (!job) return;
 
-        const isHollow = job.status === 'saved' && (!job.analysis || !job.analysis.compatibilityScore);
+        const isStale = Boolean(
+            job.analysis && job.analysis.analysisVersion !== CURRENT_JOB_ANALYSIS_VERSION
+        );
+        const isHollow = job.status === 'saved' && (
+            !job.analysis ||
+            !job.analysis.compatibilityScore ||
+            isStale
+        );
         if (job.status !== 'analyzing' && !isHollow) {
             hasStartedAnalysis.current = false;
             return;

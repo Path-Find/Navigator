@@ -5,6 +5,7 @@
 import { version } from '../package.json';
 
 export const APP_VERSION = version;
+export const CURRENT_JOB_ANALYSIS_VERSION = 1;
 export const LATEST_TOS_VERSION = 20240221; // Match implementation date
 
 // API & Retry Configuration

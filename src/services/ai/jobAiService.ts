@@ -10,7 +10,7 @@ import type {
     UserTier,
     Transcript
 } from "../../types";
-import { AI_MODELS, AI_TEMPERATURE, AGENT_LOOP, USER_TIERS } from "../../constants";
+import { AI_MODELS, AI_TEMPERATURE, AGENT_LOOP, CURRENT_JOB_ANALYSIS_VERSION, USER_TIERS } from "../../constants";
 import { JOB_ANALYSIS_PROMPTS, COVER_LETTER_PROMPTS } from "../../prompts/index";
 import { BucketStorage } from "../storage/bucketStorage";
 
@@ -450,6 +450,7 @@ export const analyzeJobFit = async (
 
     if (!candidateContext.hasGrounding) {
         return {
+            analysisVersion: CURRENT_JOB_ANALYSIS_VERSION,
             distilledJob: {
                 ...parsed.distilledJob,
                 keySkills: parsed.distilledJob.keySkills || [],
@@ -501,6 +502,7 @@ export const analyzeJobFit = async (
 
     return {
         ...analysis,
+        analysisVersion: CURRENT_JOB_ANALYSIS_VERSION,
         distilledJob: parsed.distilledJob,
         cleanedDescription: parsed.cleanedDescription,
         selectedAcademicEvidence: candidateContext.academicEvidence,

@@ -40,8 +40,10 @@ vi.mock('../../../services/ai/rd/trajectoryService', () => ({
 
 import { analyzeJobFit } from '../../../services/geminiService';
 import { Storage } from '../../../services/storageService';
+import { CURRENT_JOB_ANALYSIS_VERSION } from '../../../constants';
 
 const mockAnalysis = {
+    analysisVersion: CURRENT_JOB_ANALYSIS_VERSION,
     compatibilityScore: 85,
     distilledJob: { roleTitle: 'Software Engineer', companyName: 'Acme' },
     strengths: ['TypeScript'],
@@ -83,6 +85,20 @@ describe('useJobAnalysis', () => {
         );
 
         expect(analyzeJobFit).not.toHaveBeenCalled();
+    });
+
+    it('re-analyzes a saved job with an older analysis version', async () => {
+        vi.mocked(analyzeJobFit).mockResolvedValue(mockAnalysis as any);
+        const job = {
+            ...makeJob('saved', true),
+            analysis: { ...mockAnalysis, analysisVersion: CURRENT_JOB_ANALYSIS_VERSION - 1 } as any,
+        };
+
+        renderHook(() =>
+            useJobAnalysis(job, [], [], noopUpdate, noopError, undefined)
+        );
+
+        await waitFor(() => expect(analyzeJobFit).toHaveBeenCalledOnce());
     });
 
     it('calls onAnalyzeJob instead of analyzeJobFit when provided', async () => {

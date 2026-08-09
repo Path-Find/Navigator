@@ -39,6 +39,7 @@ export interface CoverLetterCritique {
 }
 
 export interface JobAnalysis {
+    analysisVersion?: number;
     compatibilityScore?: number;
     bestResumeProfileId?: string;
     reasoning?: string;

@@ -7,6 +7,7 @@ See [CHANGELOG_ARCHIVE.md](CHANGELOG_ARCHIVE.md) for earlier history.
 ## [Unreleased]
 
 ### Fixed
+- **Older saved job analyses now upgrade automatically**: analyses are versioned, and opening a stale one sends it through the current parser/scorer once so new requirement priorities and cover-letter hooks are saved for future use.
 - **Cover-letter context retains specific employer hooks after removing raw job text**: parsing now preserves a few supported mission, product, team, or role-challenge details for focused downstream writing.
 - **Tailored interview calls no longer resend the full raw job posting**: they reuse the parsed job context and only fall back to the original description for older jobs without an analysis.
 - **Embedded text can no longer redefine the job-analysis task as easily**: job postings, resumes, candidate responses, and other evidence are now clearly delimited as data, while user and tailoring instructions remain bounded guidance.
