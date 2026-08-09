@@ -11,6 +11,7 @@ vi.mock('../../../services/geminiService', () => ({
 
 vi.mock('../../../services/storageService', () => ({
     Storage: {
+        getTranscript: vi.fn().mockResolvedValue(null),
         updateJob: vi.fn(),
     },
 }));

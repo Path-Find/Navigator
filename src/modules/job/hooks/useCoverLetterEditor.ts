@@ -4,13 +4,12 @@ import { Logger } from '../../../utils/logger';
 import { Storage } from '../../../services/storageService';
 import { JobStorage } from '../../../services/storage/jobStorage';
 import type { UserTier } from '../../../types/app';
-import { generateCoverLetter, generateCoverLetterWithQuality } from '../../../services/geminiService';
+import { formatParsedJobContext, generateCoverLetter, generateCoverLetterWithQuality } from '../../../services/geminiService';
 import { COVER_LETTER_PROMPTS } from '../../../prompts/coverLetter';
 import { ArchetypeUtils } from '../../../utils/archetypeUtils';
 import { TRACKING_EVENTS } from '../../../constants';
 import { useToast } from '../../../contexts/ToastContext';
 import { EventService } from '../../../services/eventService';
-import { toTitleCase } from '../../../utils/stringUtils';
 import { useNextGen } from '../../../hooks/useNextGen';
 import { RdFeedbackService } from '../../../services/ai/rd/feedbackService';
 import { RdStyleService } from '../../../services/ai/rd/styleService';
@@ -78,18 +77,12 @@ export const useCoverLetterEditor = ({
         setGenerating(true);
         setAnalysisProgress("Generating cover letter...");
         try {
-            // Build a focused job context: distilled signal upfront, short raw excerpt for tone.
-            // This replaces dumping the full 12k-char raw JD into the prompt.
-            const d = analysis.distilledJob;
-            const distilledLines = [
-                `Role: ${toTitleCase(d.roleTitle)} at ${toTitleCase(d.companyName)}`,
-                d.keySkills?.length ? `Key Skills Required: ${d.keySkills.join(', ')}` : '',
-                d.coreResponsibilities?.length
-                    ? `Core Responsibilities:\n${d.coreResponsibilities.map(r => `- ${r}`).join('\n')}`
-                    : '',
-            ].filter(Boolean).join('\n');
-            const rawExcerpt = (analysis.cleanedDescription || localJob.description || '').substring(0, 2000);
-            const textToUse = `${distilledLines}\n\n---\n${rawExcerpt}`;
+            // Build the smallest job context needed for writing. The parser already
+            // extracted the job signal, so do not resend the raw posting by default.
+            const textToUse = formatParsedJobContext(
+                analysis.distilledJob,
+                analysis.selectedAcademicEvidence || []
+            );
 
             let finalContext = localJob.contextNotes;
             let instructions = analysis.coverLetterTailoringInstructions || analysis.tailoringInstructions || [];
@@ -250,7 +243,7 @@ export const useCoverLetterEditor = ({
             setGenerationStatus(null);
             setGenerationProgress(0);
         }
-    }, [bestResume, analysis, localJob, targetJobs, userTier, onJobUpdate, showError, isNextGen, user]);
+    }, [bestResume, analysis, localJob, targetJobs, userTier, onJobUpdate, showError, isNextGen, user, fullName]);
 
     const handleSelectVariant = useCallback(async (variant: { text: string; promptVersion: string }) => {
         const other = comparisonVersions?.find(v => v.promptVersion !== variant.promptVersion);

@@ -2,6 +2,87 @@ import { CONTENT_VALIDATION } from '../constants';
 
 export const JOB_ANALYSIS_PROMPTS = {
   JOB_FIT_ANALYSIS: {
+    PARSE: (jobDescription: string) => `
+    You are a job-posting parser. Extract only facts supported by the supplied job posting.
+
+    JOB POSTING:
+    "${jobDescription.substring(0, CONTENT_VALIDATION.MAX_JOB_DESCRIPTION_LENGTH)}"
+
+    Return ONLY valid JSON matching this structure:
+    {
+      "roleTitle": "Official title",
+      "companyName": "Company name",
+      "location": "City, State or Remote, otherwise null",
+      "referenceCode": "Job ID or reference number, otherwise null",
+      "category": "technical" | "managerial" | "trades" | "healthcare" | "creative" | "general",
+      "canonicalTitle": "Most standard high-level name for this role",
+      "keySkills": ["5-8 actual skills required by the posting"],
+      "requiredSkills": [{ "name": "Skill Name", "level": "learning" | "comfortable" | "expert" }],
+      "coreResponsibilities": ["4-6 primary duties"],
+      "applicationDeadline": "YYYY-MM-DD or null",
+      "salaryRange": "Salary or wage range or null",
+      "educationRequirements": ["Required or preferred degrees, programs, credentials, or education wording"],
+      "courseworkRequirements": ["Specific courses or academic subjects mentioned as relevant"],
+      "experienceRequirements": ["Required experience, seniority, or years of experience"],
+      "hardGates": ["Mandatory licences, certifications, credentials, or eligibility conditions"],
+      "preferredRequirements": ["Requirements explicitly described as preferred, assets, or nice-to-have"]
+    }
+
+    Rules:
+    - Use empty arrays when a category is not present.
+    - Do not turn administrative instructions, application steps, or generic website text into requirements.
+    - Preserve the distinction between mandatory and preferred requirements.
+    - Do not infer a requirement that is not present in the posting.
+    `,
+    SCORE: (parsedJob: string, candidateContext: string, trajectoryContext?: string) => `
+    You are a Strategic Career Architect and Hiring Expert. Score the candidate against the already-parsed job requirements with professional objectivity.
+
+    PARSED JOB REQUIREMENTS:
+    ${parsedJob}
+
+    CANDIDATE EVIDENCE:
+    ${candidateContext}
+
+    ${trajectoryContext ? `OPTIONAL CAREER CONTEXT:
+    ${trajectoryContext}
+    ` : ''}
+
+    Rules:
+    - Only credit skills, education, and experience explicitly present in CANDIDATE EVIDENCE.
+    - Do not treat omitted transcript or trajectory data as missing qualifications; it was simply not selected as relevant to this call.
+    - Treat "preferred", "asset", and "nice to have" requirements as bonuses, not mandatory gates.
+    - Treat "or related program/field/diploma" as allowing genuinely adjacent programs.
+    - Treat a mandatory licence, credential, or eligibility condition as a hard gate.
+
+    SCORE CALIBRATION:
+    - 0-19: A mandatory credential, licence, or fundamental qualification is missing.
+    - 20-39: Several major required gaps remain; transferable strengths do not overcome them.
+    - 40-59: Mixed fit with meaningful gaps.
+    - 60-79: Most important requirements are directly supported; remaining gaps are manageable.
+    - 80-100: Nearly all required qualifications are explicitly supported; do not award 80+ when a material required gap remains.
+    - Do not use 50 as a default. Base the score on the most important requirements and hard evidence.
+
+    TASK:
+    1. Identify the candidate's strongest matches and honest gaps.
+    2. Rate compatibility from 0-100 using the calibration above.
+    3. Produce concise, user-facing results in second person.
+
+    Return ONLY valid JSON matching this structure:
+    {
+      "compatibilityScore": number,
+      "reasoning": "Ultra-concise professional insight, maximum 1 sentence",
+      "strengths": ["3 specific match points"],
+      "weaknesses": ["3 specific gaps or missing qualifications"],
+      "resumeTailoringInstructions": ["3 concise instructions"],
+      "coverLetterTailoringInstructions": [
+        "EVIDENCE_BRIDGE_1: Forward-looking instruction using the strongest relevant resume block",
+        "EVIDENCE_BRIDGE_2: Forward-looking instruction using a different relevant resume block",
+        "FIT_FRAME: Honest framing instruction for the fit level"
+      ],
+      "recommendedBlockIds": ["Relevant resume block IDs"],
+      "internalAnalysis": "Private scratchpad only; do not put meta-commentary in user-facing fields"
+    }
+    `,
     DEFAULT: (jobDescription: string, resumeContext: string, bucketAdvice?: string[], trajectoryContext?: string) => `
     You are a Strategic Career Architect and Hiring Expert. Your job is to analyze this candidate's fit for the role with absolute professional objectivity.
     

@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react';
-import { tailorExperienceBlock } from '../../../services/geminiService';
+import { formatParsedJobContext, tailorExperienceBlock } from '../../../services/geminiService';
 import { Storage } from '../../../services/storageService';
 import { RESUME_TAILORING } from '../../../constants';
 import type { SavedJob } from '../types';
@@ -32,7 +32,10 @@ export const useResumeTailoring = (
 
         setTailoringBlockId(block.id);
         try {
-            const textToUse = analysis.cleanedDescription || job.description || `Role: ${analysis.distilledJob?.roleTitle}`;
+            const textToUse = formatParsedJobContext(
+                analysis.distilledJob,
+                analysis.selectedAcademicEvidence || []
+            );
             const instructions = analysis.resumeTailoringInstructions || analysis.tailoringInstructions || [];
             const tailoredBullets = await tailorExperienceBlock(block, textToUse, instructions, job.id);
 
@@ -101,7 +104,10 @@ export const useResumeTailoring = (
                 setBulkTailoringProgress({ current: i + 1, total: untailored.length });
                 setTailoringBlockId(block.id);
 
-                const textToUse = analysis.cleanedDescription || currentJob.description || `Role: ${analysis.distilledJob?.roleTitle}`;
+                const textToUse = formatParsedJobContext(
+                    analysis.distilledJob,
+                    analysis.selectedAcademicEvidence || []
+                );
                 const instructions = analysis.resumeTailoringInstructions || analysis.tailoringInstructions || [];
                 const tailoredBullets = await tailorExperienceBlock(block, textToUse, instructions, currentJob.id);
 

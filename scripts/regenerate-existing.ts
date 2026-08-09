@@ -175,9 +175,15 @@ async function processOne(
   if (!cleaned) throw new Error(`No description/original_text for job ${jobId}`);
   const resumeCtx = stringifyProfile(resume);
 
-  const analysisPrompt = JOB_ANALYSIS_PROMPTS.JOB_FIT_ANALYSIS.DEFAULT(cleaned, resumeCtx);
-  const analysisRaw = await callProxy(jwt, analysisPrompt, "analysis", undefined, { responseMimeType: "application/json", temperature: AI_TEMPERATURE.STRICT });
-  const analysis = JSON.parse(cleanJson(analysisRaw));
+  const parsePrompt = JOB_ANALYSIS_PROMPTS.JOB_FIT_ANALYSIS.PARSE(cleaned);
+  const parsedRaw = await callProxy(jwt, parsePrompt, "extraction", undefined, { responseMimeType: "application/json", temperature: AI_TEMPERATURE.STRICT });
+  const parsedJob = JSON.parse(cleanJson(parsedRaw));
+  const scorePrompt = JOB_ANALYSIS_PROMPTS.JOB_FIT_ANALYSIS.SCORE(
+    JSON.stringify(parsedJob, null, 2),
+    `VISIBLE RESUME EVIDENCE:\n${resumeCtx}`
+  );
+  const scoreRaw = await callProxy(jwt, scorePrompt, "analysis", undefined, { responseMimeType: "application/json", temperature: AI_TEMPERATURE.STRICT });
+  const analysis = { ...JSON.parse(cleanJson(scoreRaw)), distilledJob: parsedJob };
   const score = analysis.compatibilityScore ?? null;
   const tailoring: string[] = analysis.coverLetterTailoringInstructions || [
     "Lead with the strongest transferable evidence from the resume.",

@@ -1,5 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { cleanCoverLetterOutput } from './jobAiService';
+import { analyzeJobFit, buildJobCandidateContext, cleanCoverLetterOutput, formatParsedJobContext } from './jobAiService';
+import { callWithRetry, getModel } from './aiCore';
+import { JOB_ANALYSIS_PROMPTS } from '../../prompts/index';
 
 // Heavy AI/external deps — isolate so we can test pure logic without network calls
 vi.mock('./aiCore', () => ({
@@ -14,7 +16,11 @@ vi.mock('../storage/bucketStorage', () => ({
 
 vi.mock('../../prompts/index', () => ({
     JOB_ANALYSIS_PROMPTS: {
-        JOB_FIT_ANALYSIS: { DEFAULT: vi.fn(() => 'mock-prompt') },
+        JOB_FIT_ANALYSIS: {
+            DEFAULT: vi.fn(() => 'mock-prompt'),
+            PARSE: vi.fn(() => 'mock-parse-prompt'),
+            SCORE: vi.fn(() => 'mock-score-prompt'),
+        },
         TAILORED_SUMMARY: vi.fn(() => 'mock-summary-prompt'),
     },
     COVER_LETTER_PROMPTS: {
@@ -80,5 +86,183 @@ describe('cleanCoverLetterOutput', () => {
     it('trims surrounding whitespace', () => {
         const input = '  \n  Dear Manager,\n  \n  ';
         expect(cleanCoverLetterOutput(input)).toBe('Dear Manager,');
+    });
+});
+
+describe('job context assembly', () => {
+    const resume = {
+        id: 'resume-1',
+        name: 'Primary Resume',
+        blocks: [{
+            id: 'work-1',
+            type: 'work',
+            title: 'Planning Assistant',
+            organization: 'City of Toronto',
+            dateRange: '2022 - Present',
+            bullets: ['Used ArcGIS to support transportation planning projects.'],
+            isVisible: true,
+        }],
+    } as any;
+
+    const parsedJob = {
+        roleTitle: 'Student Transportation Planner',
+        companyName: 'Transit Co.',
+        keySkills: ['ArcGIS', 'Data analysis'],
+        requiredSkills: [],
+        coreResponsibilities: ['Analyze transportation data'],
+        applicationDeadline: null,
+        courseworkRequirements: ['Statistics'],
+        educationRequirements: [],
+        experienceRequirements: [],
+        hardGates: [],
+        preferredRequirements: [],
+    } as any;
+
+    const transcript = {
+        id: 'transcript-1',
+        program: 'Urban Planning',
+        university: 'University of Waterloo',
+        semesters: [{
+            term: 'Fall 2024',
+            year: 2024,
+            courses: [
+                { code: 'PLAN 302', title: 'Statistics for Planning', grade: '86', credits: 0.5 },
+                { code: 'HIST 101', title: 'Canadian History', grade: '90', credits: 0.5 },
+            ],
+        }],
+        dateUploaded: Date.now(),
+    } as any;
+
+    const skill = (name: string) => ({
+        id: name,
+        user_id: 'user-1',
+        name,
+        proficiency: 'comfortable',
+        created_at: '',
+        updated_at: '',
+    } as any);
+
+    it('includes only job-relevant skills and academic evidence', () => {
+        const context = buildJobCandidateContext(
+            [resume],
+            [skill('ArcGIS'), skill('Baking')],
+            transcript,
+            parsedJob,
+        );
+
+        expect(context.prompt).toContain('ArcGIS');
+        expect(context.prompt).not.toContain('Baking');
+        expect(context.prompt).toContain('Statistics for Planning');
+        expect(context.prompt).not.toContain('Canadian History');
+        expect(context.academicEvidence).toEqual(['Statistics for Planning (PLAN 302) — 86']);
+    });
+
+    it('omits transcripts when the parsed job has no education or coursework need', () => {
+        const context = buildJobCandidateContext(
+            [resume],
+            [],
+            transcript,
+            { ...parsedJob, courseworkRequirements: [] },
+        );
+
+        expect(context.prompt).not.toContain('ACADEMIC EVIDENCE');
+        expect(context.academicEvidence).toEqual([]);
+    });
+
+    it('uses a matching resume education block before adding transcript program evidence', () => {
+        const context = buildJobCandidateContext(
+            [{
+                ...resume,
+                blocks: [{
+                    id: 'education-1',
+                    type: 'education',
+                    title: 'Bachelor of Urban Planning',
+                    organization: 'University of Waterloo',
+                    dateRange: '2021 - 2025',
+                    bullets: [],
+                    isVisible: true,
+                }],
+            } as any],
+            [],
+            transcript,
+            { ...parsedJob, courseworkRequirements: [], educationRequirements: ['Urban Planning degree'] },
+        );
+
+        expect(context.prompt).toContain('Bachelor of Urban Planning');
+        expect(context.prompt).not.toContain('ACADEMIC EVIDENCE');
+        expect(context.academicEvidence).toEqual([]);
+    });
+
+    it('formats downstream context from parsed job data without the raw posting', () => {
+        const context = formatParsedJobContext(parsedJob, ['Statistics for Planning (PLAN 302) — 86']);
+
+        expect(context).toContain('Role: Student Transportation Planner at Transit Co.');
+        expect(context).toContain('Coursework Requirements: Statistics');
+        expect(context).toContain('Statistics for Planning (PLAN 302) — 86');
+        expect(context).not.toContain('RAW JOB DESCRIPTION');
+    });
+});
+
+describe('parse and score call boundaries', () => {
+    beforeEach(() => {
+        vi.mocked(callWithRetry).mockImplementation(async (fn: any) => fn({}));
+        vi.mocked(getModel).mockImplementation(async (params: any) => ({
+            generateContent: vi.fn().mockResolvedValue({
+                response: {
+                    usageMetadata: {},
+                    text: () => params.task === 'extraction'
+                        ? JSON.stringify({
+                            roleTitle: 'Planner',
+                            companyName: 'Transit Co.',
+                            location: null,
+                            keySkills: ['ArcGIS'],
+                            requiredSkills: [],
+                            coreResponsibilities: ['Plan projects'],
+                            applicationDeadline: null,
+                            educationRequirements: [],
+                            courseworkRequirements: [],
+                            experienceRequirements: [],
+                            hardGates: [],
+                            preferredRequirements: [],
+                        })
+                        : JSON.stringify({
+                            compatibilityScore: 72,
+                            reasoning: 'Strong evidence match.',
+                            strengths: ['ArcGIS'],
+                            weaknesses: [],
+                            recommendedBlockIds: ['work-1'],
+                        }),
+                },
+            }),
+        } as any));
+    });
+
+    it('parses the raw posting first and scores using parsed data instead of raw text', async () => {
+        const parsePrompt = vi.mocked(JOB_ANALYSIS_PROMPTS.JOB_FIT_ANALYSIS.PARSE);
+        const scorePrompt = vi.mocked(JOB_ANALYSIS_PROMPTS.JOB_FIT_ANALYSIS.SCORE);
+        const rawJob = 'RAW JOB DESCRIPTION THAT MUST NOT REACH THE SCORE PROMPT';
+        parsePrompt.mockImplementation((text: string) => `PARSE:${text}`);
+        scorePrompt.mockImplementation((parsed: string, candidate: string) => `SCORE:${parsed}\n${candidate}`);
+
+        const result = await analyzeJobFit(rawJob, [{
+            id: 'resume-1',
+            name: 'Primary Resume',
+            blocks: [{
+                id: 'work-1',
+                type: 'work',
+                title: 'Planner',
+                organization: 'Transit Co.',
+                dateRange: '2022 - Present',
+                bullets: ['Used ArcGIS.'],
+                isVisible: true,
+            }],
+        } as any]);
+
+        expect(parsePrompt).toHaveBeenCalledWith(rawJob);
+        expect(scorePrompt).toHaveBeenCalledOnce();
+        expect(scorePrompt.mock.calls[0][0]).toContain('"roleTitle": "Planner"');
+        expect(scorePrompt.mock.calls[0][1]).not.toContain(rawJob);
+        expect(result.compatibilityScore).toBe(72);
+        expect(result.distilledJob.roleTitle).toBe('Planner');
     });
 });

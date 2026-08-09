@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react';
-import { generateTailoredSummary } from '../../../services/geminiService';
+import { formatParsedJobContext, generateTailoredSummary } from '../../../services/geminiService';
 import { Storage } from '../../../services/storageService';
 import type { SavedJob } from '../types';
 import type { ResumeProfile } from '../../resume/types';
@@ -18,7 +18,10 @@ export const useSummaryGeneration = (
 
         setGeneratingSummary(true);
         try {
-            const textToUse = analysis.cleanedDescription || job.description || '';
+            const textToUse = formatParsedJobContext(
+                analysis.distilledJob,
+                analysis.selectedAcademicEvidence || []
+            );
             const summary = await generateTailoredSummary(textToUse, resumes, job.id);
 
             const updatedJob: SavedJob = { ...job, tailoredSummary: summary };

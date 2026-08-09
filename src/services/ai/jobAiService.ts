@@ -7,9 +7,7 @@ import type {
     CustomSkill,
     DistilledJob,
     UserTier,
-    Transcript,
-    Semester,
-    Course
+    Transcript
 } from "../../types";
 import { AI_MODELS, AI_TEMPERATURE, AGENT_LOOP, USER_TIERS } from "../../constants";
 import { JOB_ANALYSIS_PROMPTS, COVER_LETTER_PROMPTS } from "../../prompts/index";
@@ -28,6 +26,119 @@ const sanitizeInput = (text: string): string => {
     return text.replace(/BLOCK_ID:\s*[a-zA-Z0-9-]+/g, '')
         .replace(/\(BLOCK_ID:\s*[a-zA-Z0-9-]+\)/g, '');
 };
+
+const normalizeForContextMatch = (value: string): string => value
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+
+const contextMatchTerms = (values: string[]): string[] => {
+    const stopWords = new Set(['and', 'the', 'with', 'for', 'from', 'that', 'this', 'role', 'required', 'preferred', 'experience']);
+    return [...new Set(values
+        .flatMap(value => normalizeForContextMatch(value).split(' '))
+        .filter(term => term.length >= 4 && !stopWords.has(term)))];
+};
+
+const matchesContextRequirement = (value: string, requirements: string[]): boolean => {
+    const normalizedValue = normalizeForContextMatch(value);
+    const terms = contextMatchTerms(requirements);
+    return terms.length > 0 && terms.some(term => normalizedValue.includes(term));
+};
+
+export interface JobCandidateContext {
+    prompt: string;
+    academicEvidence: string[];
+    hasGrounding: boolean;
+}
+
+/**
+ * Select only candidate context that answers a requirement raised by the parsed job.
+ * The visible resume remains baseline scoring evidence because omitted resume text
+ * must not be treated as proof that the candidate lacks something.
+ */
+export const buildJobCandidateContext = (
+    resumes: ResumeProfile[],
+    userSkills: CustomSkill[],
+    transcript: Transcript | null | undefined,
+    parsedJob: DistilledJob
+): JobCandidateContext => {
+    const resumeContext = resumes.map(stringifyProfile).filter(Boolean).join('\n---\n');
+    const jobSkillText = [
+        ...(parsedJob.keySkills || []),
+        ...(parsedJob.requiredSkills || []).map(skill => skill.name),
+        ...(parsedJob.coreResponsibilities || []),
+        ...(parsedJob.experienceRequirements || []),
+    ].join(' ');
+
+    const relevantSkills = userSkills.filter(skill =>
+        matchesContextRequirement(skill.name, [jobSkillText])
+    );
+    const skillsContext = relevantSkills.length > 0
+        ? `ADDITIONAL SKILLS RELEVANT TO THIS JOB:\n${relevantSkills.map(skill => `- ${skill.name}: ${skill.proficiency}`).join('\n')}`
+        : '';
+
+    const educationBlocks = resumes
+        .flatMap(resume => resume.blocks)
+        .filter(block => block.isVisible && block.type === 'education')
+        .map(block => `${block.title} at ${block.organization} (${block.dateRange})\n${block.bullets.join('\n')}`);
+    const hasMatchingEducationBlock = educationBlocks.some(block =>
+        matchesContextRequirement(block, parsedJob.educationRequirements || [])
+    );
+    const academicEvidence: string[] = [];
+
+    if (transcript && parsedJob.courseworkRequirements?.length) {
+        const matchingCourses = transcript.semesters
+            .flatMap(semester => semester.courses)
+            .filter(course => matchesContextRequirement(`${course.code} ${course.title}`, parsedJob.courseworkRequirements || []))
+            .map(course => `${course.title} (${course.code})${course.grade ? ` — ${course.grade}` : ''}`);
+        academicEvidence.push(...matchingCourses);
+    }
+
+    if (transcript && parsedJob.educationRequirements?.length && !hasMatchingEducationBlock) {
+        const programText = [transcript.credentialType, transcript.program, transcript.university]
+            .filter(Boolean)
+            .join(' at ');
+        if (programText && matchesContextRequirement(programText, parsedJob.educationRequirements)) {
+            academicEvidence.push(programText);
+        }
+    }
+
+    const academicContext = academicEvidence.length > 0
+        ? `ACADEMIC EVIDENCE SELECTED FOR THIS JOB:\n${academicEvidence.map(item => `- ${item}`).join('\n')}`
+        : '';
+    const sections = [
+        resumeContext ? `VISIBLE RESUME EVIDENCE:\n${resumeContext}` : '',
+        skillsContext,
+        academicContext,
+    ].filter(Boolean);
+
+    return {
+        prompt: sections.join('\n\n'),
+        academicEvidence: [...new Set(academicEvidence)],
+        hasGrounding: Boolean(resumeContext || skillsContext || academicContext),
+    };
+};
+
+/** Format the parsed job signal for downstream prompts without re-sending the raw posting. */
+export const formatParsedJobContext = (
+    parsedJob: DistilledJob,
+    academicEvidence: string[] = []
+): string => [
+    `Role: ${parsedJob.roleTitle} at ${parsedJob.companyName}`,
+    parsedJob.keySkills?.length ? `Key Skills Required: ${parsedJob.keySkills.join(', ')}` : '',
+    parsedJob.coreResponsibilities?.length
+        ? `Core Responsibilities:\n${parsedJob.coreResponsibilities.map(item => `- ${item}`).join('\n')}`
+        : '',
+    parsedJob.educationRequirements?.length ? `Education Requirements: ${parsedJob.educationRequirements.join('; ')}` : '',
+    parsedJob.courseworkRequirements?.length ? `Coursework Requirements: ${parsedJob.courseworkRequirements.join('; ')}` : '',
+    parsedJob.experienceRequirements?.length ? `Experience Requirements: ${parsedJob.experienceRequirements.join('; ')}` : '',
+    parsedJob.hardGates?.length ? `Mandatory Requirements: ${parsedJob.hardGates.join('; ')}` : '',
+    parsedJob.preferredRequirements?.length ? `Preferred Requirements: ${parsedJob.preferredRequirements.join('; ')}` : '',
+    academicEvidence.length
+        ? `Relevant Academic Evidence:\n${academicEvidence.map(item => `- ${item}`).join('\n')}`
+        : '',
+].filter(Boolean).join('\n');
 
 // Deterministic AI-ban check — runs before any AI call so it can't be missed.
 // Add patterns here as new employer policies are discovered.
@@ -165,7 +276,7 @@ export const cleanCoverLetterOutput = (text: string): string => {
     return cleaned.trim();
 };
 
-const extractJobInfo = async (
+const parseJobInfo = async (
     rawJobText: string,
     onProgress?: RetryProgressCallback
 ): Promise<{ distilledJob: DistilledJob; cleanedDescription: string }> => {
@@ -175,28 +286,7 @@ const extractJobInfo = async (
     // isAiBanned is detected deterministically before this call — no need to ask the AI.
     const aiBan = detectAiBan(cleanedText);
 
-    // NOTE: Everything asked for here is derived purely from the job posting text — none
-    // of it requires a candidate resume, so this prompt is safe to use as the fallback
-    // path when there's no (or no usable) resume to score a candidate against. It must
-    // stay resume-independent; do not add anything here that implies a match/score.
-    const extractionPrompt = `
-    Analyze this job posting:
-    ${cleanedText}
-
-    1. ROLE: What is the official role title?
-    2. COMPANY: What is the company name?
-    3. LOCATION: City, State/Province, or "Remote" (strictly geographical, exclude internal IDs).
-    4. REFERENCE CODE: Is there a job ID or reference number? (Set as 'referenceCode')
-    5. CATEGORY: Classify into 'technical', 'managerial', 'trades', 'healthcare', 'creative', or 'general'.
-    6. CANONICAL TITLE: What is the most standard, high-level name for this role? (e.g. "Junior React Dev" -> "Software Engineer").
-    7. KEY SKILLS: 5-8 actual skills required by the posting — technical skills, soft skills, tools, and domain knowledge ONLY. Do NOT include enrollment/eligibility requirements. Keep each 1-4 words (e.g. 'Problem-solving', 'Microsoft Office'). Set as 'keySkills'.
-    8. REQUIRED SKILLS: Same skills as an array of { "name": string, "level": "learning" | "comfortable" | "expert" } reflecting how deeply the posting expects the skill. Set as 'requiredSkills'.
-    9. CORE RESPONSIBILITIES: 4-6 primary duties from the posting. Set as 'coreResponsibilities'.
-    10. APPLICATION DEADLINE: Closing date in YYYY-MM-DD format if stated, otherwise null. Set as 'applicationDeadline'.
-    11. SALARY RANGE: Salary/wage range as stated (e.g. '$55,000-$65,000/yr'), otherwise null. Set as 'salaryRange'.
-
-    Return JSON with 'roleTitle', 'companyName', 'location', 'referenceCode', 'category', 'canonicalTitle', 'keySkills', 'requiredSkills', 'coreResponsibilities', 'applicationDeadline', and 'salaryRange' fields.
-    `;
+    const extractionPrompt = JOB_ANALYSIS_PROMPTS.JOB_FIT_ANALYSIS.PARSE(cleanedText);
 
     return callWithRetry(async (metadata) => {
         const model = await getModel({ task: 'extraction' });
@@ -214,6 +304,11 @@ const extractJobInfo = async (
         const finalBan = aiBan.isBanned ? aiBan : employerBan;
         const distilledJob: DistilledJob = {
             ...result,
+            educationRequirements: result.educationRequirements || [],
+            courseworkRequirements: result.courseworkRequirements || [],
+            experienceRequirements: result.experienceRequirements || [],
+            hardGates: result.hardGates || [],
+            preferredRequirements: result.preferredRequirements || [],
             isAiBanned: finalBan.isBanned,
             aiBanReason: finalBan.reason,
         };
@@ -233,49 +328,31 @@ export const analyzeJobFit = async (
 ): Promise<JobAnalysis> => {
     if (onProgress) onProgress("Researching", 1, 6);
 
-    // 1. Basic cleanup to prevent AI confusion
-    const cleanedDescription = preCleanJobText(jobDescription);
-
     if (onProgress) onProgress("Contextualizing", 2, 6);
 
-    // Build the exact candidate-context payload the prompt will receive, then gate on
-    // that — not on resumes.length or blocks.length — so the check can't drift from what
-    // the model actually sees. A resume row can exist (the primary profile is created as
-    // an empty shell, blocks: [], before the user fills anything in) while still
-    // contributing nothing: stringifyProfile also drops any block with isVisible === false.
-    const resumeContext = resumes.map(stringifyProfile).join('\n---\n');
-    const skillsContext = userSkills.length > 0
-        ? `\nADDITIONAL SKILLS:\n${userSkills.map(s => `- ${s.name}: ${s.proficiency}`).join('\n')}`
-        : '';
-
-    const educationContext = transcript
-        ? `\nACADEMIC BACKGROUND (Transcript):\nProgram: ${transcript.program} at ${transcript.university}\nCourses:\n${transcript.semesters.flatMap((s: Semester) => s.courses).map((c: Course) => `- ${c.title} (${c.code}): ${c.grade}`).join('\n')}`
-        : '';
-
-    // Skills and transcript data are legitimate grounding on their own (the prompt is
-    // explicitly told to use transcript in place of missing work experience) — only
-    // refuse to score when there is truly nothing to ground a match against.
-    const hasGroundingData = Boolean(
-        resumeContext.trim() || skillsContext.trim() || educationContext.trim()
+    const parsed = await parseJobInfo(jobDescription, onProgress);
+    const candidateContext = buildJobCandidateContext(
+        resumes,
+        userSkills,
+        transcript,
+        parsed.distilledJob
     );
 
-    if (!hasGroundingData) {
-        // Job-only distillation still runs — none of it depends on candidate data —
-        // but we do not attempt a compatibility score against blank candidate context.
-        const { distilledJob } = await extractJobInfo(cleanedDescription, onProgress);
+    if (!candidateContext.hasGrounding) {
         return {
             distilledJob: {
-                ...distilledJob,
-                keySkills: distilledJob.keySkills || [],
-                coreResponsibilities: distilledJob.coreResponsibilities || [],
-                applicationDeadline: distilledJob.applicationDeadline || null
+                ...parsed.distilledJob,
+                keySkills: parsed.distilledJob.keySkills || [],
+                coreResponsibilities: parsed.distilledJob.coreResponsibilities || [],
+                applicationDeadline: parsed.distilledJob.applicationDeadline || null
             },
-            cleanedDescription,
+            cleanedDescription: parsed.cleanedDescription,
             compatibilityScore: undefined,
             reasoning: "Resume required for compatibility analysis. Please upload one to see strengths, weaknesses, and a match score.",
             strengths: [],
             weaknesses: [],
-            bestResumeProfileId: undefined
+            bestResumeProfileId: undefined,
+            selectedAcademicEvidence: candidateContext.academicEvidence,
         } as JobAnalysis;
     }
 
@@ -284,7 +361,11 @@ export const analyzeJobFit = async (
     // 2. Fetch Bucket Guidelines - Skipping for now to keep performance high
     // We can re-integrate this if it's critical, but we'd want to do it inside the main prompt or via parallel fetch.
 
-    const analysisPrompt = JOB_ANALYSIS_PROMPTS.JOB_FIT_ANALYSIS.DEFAULT(cleanedDescription, (resumeContext + skillsContext + educationContext), undefined, trajectoryContext);
+    const analysisPrompt = JOB_ANALYSIS_PROMPTS.JOB_FIT_ANALYSIS.SCORE(
+        JSON.stringify(parsed.distilledJob, null, 2),
+        candidateContext.prompt,
+        trajectoryContext?.trim() || undefined
+    );
 
     if (onProgress) onProgress("Benchmarking", 4, 6);
 
@@ -301,8 +382,8 @@ export const analyzeJobFit = async (
 
     if (onProgress) onProgress("Synthesizing", 5, 6);
 
-    // Validation: If we have no score and no skills, something went wrong
-    if (!analysis.compatibilityScore && (!analysis.distilledJob?.keySkills?.length)) {
+    // Validation: If neither scoring nor parsing produced useful output, something went wrong.
+    if (analysis.compatibilityScore == null && !parsed.distilledJob.keySkills?.length) {
         throw new Error("NOT_A_JOB: Analysis failed to generate meaningful insights. Please check if the source content is a valid job description.");
     }
 
@@ -310,7 +391,9 @@ export const analyzeJobFit = async (
 
     return {
         ...analysis,
-        cleanedDescription,
+        distilledJob: parsed.distilledJob,
+        cleanedDescription: parsed.cleanedDescription,
+        selectedAcademicEvidence: candidateContext.academicEvidence,
         bestResumeProfileId: analysis.bestResumeProfileId || resumes[0]?.id
     };
 };

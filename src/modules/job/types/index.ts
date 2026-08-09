@@ -13,6 +13,11 @@ export interface DistilledJob {
     isAiBanned?: boolean; // New: Safety flag
     aiBanReason?: string; // New: Context for the ban
     referenceCode?: string | null; // New: Capture job ID/reference number
+    educationRequirements?: string[];
+    courseworkRequirements?: string[];
+    experienceRequirements?: string[];
+    hardGates?: string[];
+    preferredRequirements?: string[];
 }
 
 export interface CoverLetterCritique {
@@ -37,6 +42,7 @@ export interface JobAnalysis {
     coverLetterTailoringInstructions?: string[];
     recommendedBlockIds?: string[]; // New: AI tells us exactly which blocks to keep
     internalAnalysis?: string; // New: Private scratchpad for AI "thinking" & logic checks
+    selectedAcademicEvidence?: string[]; // Relevant transcript facts selected for downstream writing
 }
 
 export interface SavedJob {
