@@ -11,6 +11,7 @@ See [CHANGELOG_ARCHIVE.md](CHANGELOG_ARCHIVE.md) for earlier history.
 
 ### Changed
 - **Application status reminders now explain why outcomes matter**: the reminder uses calmer pastel controls and connects status updates to better future job guidance and cover letters.
+- **NextGen feedback now uses the current Neon backend**: application outcomes, cover-letter edits, and other learning signals are stored and read reliably instead of depending on the retired Supabase path.
 
 ### Fixed
 - **NextGen style and trajectory modeling now uses bounded context**: feedback signals, visible resume evidence, target roles, and historical signals are labeled as data, while hidden resume blocks and unnecessary metadata stay out of these prompts.

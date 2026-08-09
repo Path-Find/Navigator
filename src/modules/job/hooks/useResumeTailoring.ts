@@ -61,7 +61,7 @@ export const useResumeTailoring = (
                     context: 'tailoring',
                     outputContent: block.bullets,
                     userCorrection: tailoredBullets,
-                    metadata: { blockId: block.id }
+                    metadata: { blockId: block.id, job_id: job.id }
                 });
 
                 // Phase 2: Professional Latent Space

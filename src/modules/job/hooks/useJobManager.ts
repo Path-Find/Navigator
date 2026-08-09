@@ -108,7 +108,7 @@ export const useJobManager = (): UseJobManagerReturn => {
             await Storage.updateJob(updatedJob);
 
             if (isNextGen && user && statusChanged) {
-                if (['applied', 'interview', 'offer', 'rejected'].includes(updatedJob.status || '')) {
+                if (['applied', 'interview', 'offer', 'rejected', 'ghosted'].includes(updatedJob.status || '')) {
                     RdFeedbackService.captureOutcome(user.id, updatedJob.id, updatedJob.status!);
                 }
             }

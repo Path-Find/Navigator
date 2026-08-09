@@ -205,7 +205,8 @@ export const useCoverLetterEditor = ({
                         signalType: 'implicit_usage',
                         context: 'cover_letter',
                         inputPromptVersion: result.promptVersion,
-                        outputContent: { text: result.text, decision: result.decision }
+                        outputContent: { text: result.text, decision: result.decision },
+                        metadata: { job_id: localJob.id }
                     });
                 }
             } else {
@@ -277,7 +278,11 @@ export const useCoverLetterEditor = ({
                 inputPromptVersion: variant.promptVersion,
                 outputContent: variant.text,
                 impactScore: 3, // Choice is a stronger signal than just a save
-                metadata: { ab_test: true, comparison_variant: other?.promptVersion }
+                        metadata: {
+                            job_id: localJob.id,
+                            ab_test: true,
+                            ...(other ? { comparison_variant: other.promptVersion } : {})
+                        }
             });
 
             // Log the Loser (implicit distance)
@@ -290,7 +295,7 @@ export const useCoverLetterEditor = ({
                     outputContent: other.text,
                     userCorrection: variant.text, // The winner is effectively the "correction" of the loser
                     impactScore: -1,
-                    metadata: { ab_test_loss: true, winner: variant.promptVersion }
+                    metadata: { job_id: localJob.id, ab_test_loss: true, winner: variant.promptVersion }
                 });
             }
         }
@@ -318,7 +323,8 @@ export const useCoverLetterEditor = ({
                         inputPromptVersion: localJob.promptVersion,
                         outputContent: localJob.initialCoverLetter || localJob.coverLetter,
                         userCorrection: newText,
-                        impactScore: 2 // Manual edit implies the AI was close but needed refinement
+                        impactScore: 2, // Manual edit implies the AI was close but needed refinement
+                        metadata: { job_id: localJob.id }
                     });
                 }
             } catch {

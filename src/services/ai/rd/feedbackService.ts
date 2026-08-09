@@ -1,106 +1,127 @@
-import { supabase } from '../../supabase';
+import { getAccessToken } from '../../../lib/auth-client';
 
 export type SignalType = 'explicit_approval' | 'explicit_correction' | 'implicit_usage';
 export type FeedbackContext = 'tailoring' | 'match_logic' | 'cover_letter';
 
-interface ModelingFeedback {
-    roleModelId?: string;
+type JsonPrimitive = string | number | boolean | null;
+export type JsonValue = JsonPrimitive | JsonValue[] | { [key: string]: JsonValue };
+
+export interface ModelingFeedback {
+    roleModelId?: string | null;
     signalType: SignalType;
     context: FeedbackContext;
-    inputPromptVersion?: string;
-    outputContent: any;
-    userCorrection?: any;
+    inputPromptVersion?: string | null;
+    outputContent?: JsonValue;
+    userCorrection?: JsonValue | null;
     impactScore?: number;
-    metadata?: Record<string, any>;
+    metadata?: Record<string, JsonValue> | null;
 }
 
+export interface ModelingSignal extends ModelingFeedback {
+    roleModelId: string | null;
+    inputPromptVersion: string | null;
+    outputContent: JsonValue;
+    userCorrection: JsonValue | null;
+    impactScore: number;
+    metadata: Record<string, JsonValue> | null;
+    createdAt?: string;
+}
+
+interface FeedbackStats {
+    total: number;
+    breakdown: Record<string, number>;
+}
+
+const getAuthHeaders = async (): Promise<HeadersInit | null> => {
+    const token = await getAccessToken();
+    return token ? { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' } : null;
+};
+
+const readError = async (response: Response): Promise<string> => {
+    const body = await response.json().catch(() => null) as { error?: unknown } | null;
+    return typeof body?.error === 'string' ? body.error : `Feedback request failed (${response.status}).`;
+};
+
 /**
- * Service for capturing high-fidelity R&D feedback.
- * This service is intended to be sequestered from production usage.
+ * NextGen's feedback transport. R&D signals use the same Neon Auth + Vercel
+ * Function boundary as the rest of the migrated application.
  */
 export class RdFeedbackService {
-    /**
-     * Captures a success or correction signal for the Modeling Engine.
-     */
-    static async captureSignal(userId: string, feedback: ModelingFeedback) {
+    static async captureSignal(_userId: string, feedback: ModelingFeedback): Promise<{ success: boolean; error?: string }> {
+        void _userId;
         try {
-            const { error } = await supabase
-                .from('rd_modeling_feedback')
-                .insert({
-                    user_id: userId,
-                    role_model_id: feedback.roleModelId,
-                    signal_type: feedback.signalType,
-                    context: feedback.context,
-                    input_prompt_version: feedback.inputPromptVersion,
-                    output_content: feedback.outputContent,
-                    user_correction: feedback.userCorrection,
-                    impact_score: feedback.impactScore || 0,
-                    metadata: feedback.metadata || {}
-                });
+            const headers = await getAuthHeaders();
+            if (!headers) return { success: false, error: 'Authentication required.' };
 
-            if (error) {
+            const response = await fetch('/api/rd-feedback', {
+                method: 'POST',
+                headers,
+                body: JSON.stringify(feedback),
+            });
+            if (!response.ok) {
+                const error = await readError(response);
                 console.error('[RdFeedbackService] Error capturing signal:', error);
                 return { success: false, error };
             }
-
             return { success: true };
-        } catch (err) {
-            console.error('[RdFeedbackService] Unexpected error:', err);
-            return { success: false, error: err };
+        } catch (error) {
+            console.error('[RdFeedbackService] Unexpected error:', error);
+            return { success: false, error: error instanceof Error ? error.message : String(error) };
         }
     }
 
-    /**
-     * Convenience method to log implicit success when a user saves something.
-     */
-    /**
-     * Convenience method to log implicit success when a user saves something.
-     */
-    static async logImplicitSuccess(userId: string, roleModelId: string, context: FeedbackContext, content: any) {
+    static async logImplicitSuccess(userId: string, roleModelId: string, context: FeedbackContext, content: JsonValue) {
         return this.captureSignal(userId, {
             roleModelId,
             context,
             signalType: 'implicit_usage',
             outputContent: content,
-            impactScore: 1
+            impactScore: 1,
         });
     }
 
-    /**
-     * Captures an outcome signal (Success/Failure) to correlate with modeling data.
-     */
     static async captureOutcome(userId: string, jobId: string, outcome: string) {
-        const { error } = await supabase
-            .from('rd_modeling_feedback')
-            .insert({
-                user_id: userId,
-                signal_type: outcome === 'rejected' ? 'explicit_correction' : 'explicit_approval',
-                context: 'match_logic',
-                impact_score: outcome === 'rejected' ? -1 : 5,
-                metadata: { job_id: jobId, outcome }
-            });
-
-        return { success: !error, error };
+        const isNegative = outcome === 'rejected' || outcome === 'ghosted';
+        return this.captureSignal(userId, {
+            signalType: isNegative ? 'explicit_correction' : 'explicit_approval',
+            context: 'match_logic',
+            impactScore: isNegative ? -1 : 5,
+            metadata: { job_id: jobId, outcome },
+        });
     }
-    /**
-     * Fetches counts of signals captured for a user.
-     */
-    static async getSignalStats(userId: string) {
-        const { data, error } = await supabase
-            .from('rd_modeling_feedback')
-            .select('signal_type', { count: 'exact' })
-            .eq('user_id', userId);
 
-        if (error) return { total: 0, breakdown: {} };
+    static async getRecentSignals(_userId: string, limit = 50): Promise<ModelingSignal[]> {
+        void _userId;
+        try {
+            const headers = await getAuthHeaders();
+            if (!headers) return [];
+            const response = await fetch(`/api/rd-feedback?limit=${encodeURIComponent(String(limit))}`, { headers });
+            if (!response.ok) {
+                console.error('[RdFeedbackService] Error loading signals:', await readError(response));
+                return [];
+            }
+            const body = await response.json() as { signals?: ModelingSignal[] };
+            return body.signals || [];
+        } catch (error) {
+            console.error('[RdFeedbackService] Unexpected error loading signals:', error);
+            return [];
+        }
+    }
 
-        const stats = (data || []).reduce((acc: any, signal: any) => {
-            acc[signal.signal_type] = (acc[signal.signal_type] || 0) + 1;
-            return acc;
-        }, {});
-
-        return {
-            total: data.length,
-            breakdown: stats
-        };
+    static async getSignalStats(_userId: string): Promise<FeedbackStats> {
+        void _userId;
+        try {
+            const headers = await getAuthHeaders();
+            if (!headers) return { total: 0, breakdown: {} };
+            const response = await fetch('/api/rd-feedback?mode=stats', { headers });
+            if (!response.ok) {
+                console.error('[RdFeedbackService] Error loading signal stats:', await readError(response));
+                return { total: 0, breakdown: {} };
+            }
+            return await response.json() as FeedbackStats;
+        } catch (error) {
+            console.error('[RdFeedbackService] Unexpected error loading signal stats:', error);
+            return { total: 0, breakdown: {} };
+        }
     }
 }
