@@ -2,7 +2,8 @@ import { useState, useCallback } from 'react';
 import {
     generateTailoredInterviewQuestions,
     generateGeneralBehavioralQuestions,
-    analyzeAndFollowUp
+    analyzeAndFollowUp,
+    formatParsedJobContext
 } from '../../../services/geminiService';
 import type {
     InterviewQuestion,
@@ -17,6 +18,17 @@ const stringifyForInterview = (resumes: ResumeProfile[]): string => {
         .filter(b => b.isVisible && (b.type === 'work' || b.type === 'volunteer' || b.type === 'project' || b.type === 'education'))
         .map(b => `${b.title} at ${b.organization} (${b.dateRange}):\n${b.bullets.map(bull => `- ${bull}`).join('\n')}`)
         .join('\n\n');
+};
+
+/** Reuse parsed job facts for interview calls; raw text is only for legacy unanalyzed jobs. */
+export const getInterviewJobContext = (job: SavedJob): string => {
+    if (job.analysis?.distilledJob) {
+        return formatParsedJobContext(
+            job.analysis.distilledJob,
+            job.analysis.selectedAcademicEvidence || []
+        );
+    }
+    return job.description;
 };
 
 export const useInterview = () => {
@@ -46,7 +58,7 @@ export const useInterview = () => {
         setIsLoading(true);
         setError(null);
         try {
-            const result = await generateTailoredInterviewQuestions(job.description, resumes, job.id, job.position);
+            const result = await generateTailoredInterviewQuestions(getInterviewJobContext(job), resumes, job.id, job.position);
             setQuestions(result);
             setCurrentQuestionIndex(0);
             setResponses({});
@@ -74,7 +86,12 @@ export const useInterview = () => {
         try {
             // 2. One call: analyze the response and optionally get a follow-up question.
             // If this is already a follow-up, we pass a flag so the AI skips the follow-up decision.
-            const result = await analyzeAndFollowUp(question.question, responseText, job?.description, job?.id);
+            const result = await analyzeAndFollowUp(
+                question.question,
+                responseText,
+                job ? getInterviewJobContext(job) : undefined,
+                job?.id
+            );
             const { followUp: followUpResult, ...analysis } = result;
 
             // 3. Save analysis
