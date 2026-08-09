@@ -7,6 +7,7 @@ See [CHANGELOG_ARCHIVE.md](CHANGELOG_ARCHIVE.md) for earlier history.
 ## [Unreleased]
 
 ### Fixed
+- **NextGen style and trajectory modeling now uses bounded context**: feedback signals, visible resume evidence, target roles, and historical signals are labeled as data, while hidden resume blocks and unnecessary metadata stay out of these prompts.
 - **Career and education AI calls now send clearly labeled, compact context**: role models, resumes, skills, and optional transcripts are separated; irrelevant stored metadata is removed; and extracted PDF text is no longer sent twice.
 - **Job-specific summaries and tailored interviews now receive only the selected resume evidence**: previously they could resend every stored resume or every visible block, adding irrelevant context to the prompt.
 - **Older saved job analyses now upgrade automatically**: analyses are versioned, and opening a stale one sends it through the current parser/scorer once so new requirement priorities and cover-letter hooks are saved for future use.

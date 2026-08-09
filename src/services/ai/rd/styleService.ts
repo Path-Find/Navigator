@@ -1,6 +1,6 @@
 import { supabase } from '../../supabase';
 import { getModel } from '../aiCore';
-import { MODELING_DISTILLER } from '../../../prompts/modeling';
+import { buildStyleDistillerPrompt } from './promptContext';
 
 /**
  * Service for managing Personal Style Vectors (R&D).
@@ -62,17 +62,7 @@ export class RdStyleService {
                 }
             });
 
-            const prompt = `
-${MODELING_DISTILLER}
-
-CONTEXT:
-Some of the patterns below are marked as "WINNING PATTERNS." These correspond to resume/CL versions that directly resulted in an Interview or Offer. Prioritize these stylistic choices heavily.
-
-USER SIGNALS:
-${signalSummary}
-
-STYLE GUIDE:
-`.trim();
+            const prompt = buildStyleDistillerPrompt(signalSummary);
 
             const response = await engine.generateContent({
                 contents: [{ role: 'user', parts: [{ text: prompt }] }]

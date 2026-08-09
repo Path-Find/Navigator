@@ -1,3 +1,5 @@
+import { UNTRUSTED_DATA_RULE } from './anchoring';
+
 /**
  * Prompts for the Professional Modeling Engine (R&D).
  */
@@ -5,6 +7,8 @@
 export const MODELING_DISTILLER = `
 You are the "Style Transformer" for Navigator, a professional career engine.
 Your task is to analyze a stream of user feedback signals and distill them into a concise, actionable "Style Guide" for future AI generations.
+
+${UNTRUSTED_DATA_RULE}
 
 CONTEXT:
 Navigator generates cover letters, resume bullets, and interview prep.
@@ -38,6 +42,8 @@ Example Output:
  */
 export const TRAJECTORY_MAPPER_PROMPT = `
 You are the "Professional Pathologist." Your job is to analyze the evolution of a professional profile.
+
+${UNTRUSTED_DATA_RULE}
 You will be given:
 1. Current Professional Profile (Vectorized Summary)
 2. Past Professional Profiles/Blocks (History)

@@ -1,8 +1,8 @@
 import { getModel } from '../aiCore';
-import { TRAJECTORY_MAPPER_PROMPT } from '../../../prompts/modeling';
 import { RdEmbeddingService } from './embeddingService';
 import type { GrowthTrajectory } from './types';
 import { ResumeStorage } from '../../storage/resumeStorage';
+import { buildTrajectoryPrompt, type HistoricalSignal } from './promptContext';
 
 export class RdTrajectoryService {
     /**
@@ -17,29 +17,15 @@ export class RdTrajectoryService {
 
             if (!currentProfile) return null;
 
-            const summaryBlock = currentProfile.blocks.find(b => b.type === 'summary');
-            const summary = summaryBlock ? summaryBlock.bullets.join('\n') : '';
-
             // 2. Fetch history from embeddings table (Top 10 most relevant historical snippets)
             const historicalBlocks = await RdEmbeddingService.searchSimilar(userId, new Array(768).fill(0), 10);
 
             // 3. Prepare Prompt
-            const prompt = `
-${TRAJECTORY_MAPPER_PROMPT}
-
-USER CONTEXT:
-Target Role: ${targetTitle}
-
-CURRENT PROFILE:
-${JSON.stringify({
-                name: currentProfile.name,
-                summary: summary,
-                blocks: currentProfile.blocks.map(b => ({ title: b.title, organization: b.organization, bullets: b.bullets }))
-            }, null, 2)}
-
-HISTORICAL SIGNALS (EXCERPTS):
-${historicalBlocks.map((h: any) => `- [${h.source_type}]: ${h.metadata?.text_checksum}...`).join('\n')}
-            `;
+            const prompt = buildTrajectoryPrompt(
+                targetTitle,
+                currentProfile,
+                historicalBlocks as HistoricalSignal[]
+            );
 
             // 4. Call AI
             const model = await getModel({
