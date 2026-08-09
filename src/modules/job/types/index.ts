@@ -79,7 +79,6 @@ export interface SavedJob {
     // Application Assets
     contextNotes?: string;
     coverLetter?: string;
-    customInstructions?: string; // "Make it punchy"
     coverLetterCritique?: string | CoverLetterCritique;
 
     // Hyper-Tailored Resume (Ephemeral)

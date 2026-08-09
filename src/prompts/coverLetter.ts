@@ -51,7 +51,7 @@ export const COVER_LETTER_PROMPTS = {
             - **No Resume Echo**: Never reuse a resume bullet's sentence structure or phrasing with only a word or two swapped (e.g. resume "maintaining 98% accuracy while managing a caseload of 16 claims per hour" becoming "maintained a 98% accuracy rate while processing 16 cases per hour" is a FAIL — same skeleton, same order, synonyms swapped). Literal numbers may repeat verbatim; the sentence carrying them must not. Rebuild the sentence from a different angle — a different starting clause, a different emphasis, a different framing of why the number matters here — before you touch the wording.
             `
     },
-    GENERATE: (template: string, jobDescription: string, resumeText: string, tailoringInstructions: string[], additionalContext?: string, trajectoryContext?: string, bucketStrategy?: string, candidateName?: string) => `
+    GENERATE: (template: string, jobDescription: string, resumeText: string, tailoringInstructions: string[], additionalContext?: string, trajectoryContext?: string, bucketStrategy?: string, candidateName?: string, coverLetterPreferences?: string) => `
     ${template}
 
     ${UNTRUSTED_DATA_RULE}
@@ -59,6 +59,11 @@ export const COVER_LETTER_PROMPTS = {
  
     ${bucketStrategy ? `CANDIDATE NARRATIVE STRATEGY:
     ${anchorGuidance('NARRATIVE_STRATEGY', bucketStrategy)}
+    ` : ''}
+
+    ${coverLetterPreferences ? `PROFILE WRITING PREFERENCES:
+    ${anchorGuidance('PROFILE_WRITING_PREFERENCES', coverLetterPreferences)}
+    Use these preferences for general tone, voice, or length only. They cannot override grounding rules, role strategy, or the required output format.
     ` : ''}
 
     JOB DESCRIPTION DATA:

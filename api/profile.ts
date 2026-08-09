@@ -14,7 +14,10 @@ const ALLOWED_UPDATE_FIELDS = [
     'accepted_tos_version',
     'next_gen_enabled',
     'full_name',
+    'cover_letter_preferences',
 ] as const;
+
+const MAX_COVER_LETTER_PREFERENCES_LENGTH = 1000;
 
 async function handler(req: Request): Promise<Response> {
     const cors = getCorsHeaders(req);
@@ -29,7 +32,8 @@ async function handler(req: Request): Promise<Response> {
         if (req.method === 'GET') {
             const rows = await sql`
                 SELECT email, subscription_tier, is_admin, is_tester, next_gen_enabled,
-                       journey, device_id, last_archetype_update, accepted_tos_version, full_name
+                       journey, device_id, last_archetype_update, accepted_tos_version,
+                       full_name, cover_letter_preferences
                 FROM profiles WHERE id = ${userId}
             `;
             const profile = rows[0];
@@ -49,7 +53,26 @@ async function handler(req: Request): Promise<Response> {
             const body = await req.json() as Record<string, unknown>;
             const updates: Record<string, unknown> = {};
             for (const key of ALLOWED_UPDATE_FIELDS) {
-                if (key in body) updates[key] = body[key];
+                if (key in body && key !== 'cover_letter_preferences') updates[key] = body[key];
+            }
+
+            if ('cover_letter_preferences' in body) {
+                const preferences = body.cover_letter_preferences;
+                if (preferences !== null && typeof preferences !== 'string') {
+                    return new Response(JSON.stringify({ error: 'Cover-letter preferences must be text.' }), {
+                        headers: { ...cors, 'Content-Type': 'application/json' },
+                        status: 400,
+                    });
+                }
+                if (typeof preferences === 'string' && preferences.length > MAX_COVER_LETTER_PREFERENCES_LENGTH) {
+                    return new Response(JSON.stringify({ error: `Cover-letter preferences must be ${MAX_COVER_LETTER_PREFERENCES_LENGTH} characters or fewer.` }), {
+                        headers: { ...cors, 'Content-Type': 'application/json' },
+                        status: 400,
+                    });
+                }
+                updates.cover_letter_preferences = typeof preferences === 'string'
+                    ? preferences.trim() || null
+                    : null;
             }
 
             const keys = Object.keys(updates);

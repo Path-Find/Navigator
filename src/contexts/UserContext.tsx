@@ -21,6 +21,7 @@ interface ProfileRow {
     last_archetype_update: number | null;
     accepted_tos_version: number | null;
     full_name: string | null;
+    cover_letter_preferences: string | null;
 }
 
 const getTestUser = (): User | null => {
@@ -63,12 +64,13 @@ interface UserCoreContextType {
     isAdmin: boolean;
     isNextGenEnabled: boolean;
     fullName: string | null;
+    coverLetterPreferences: string | null;
     isLoading: boolean;
     isEmailVerified: boolean;
     signOut: () => Promise<void>;
     setSimulatedTier: (tier: UserTier | null) => void;
     simulatedTier: UserTier | null;
-    updateProfile: (updates: Partial<{ first_name: string; last_name: string; full_name: string; device_id: string; journey: string; last_archetype_update: number; accepted_tos_version: number; next_gen_enabled: boolean }>) => Promise<void>;
+    updateProfile: (updates: Partial<{ first_name: string; last_name: string; full_name: string; device_id: string; journey: string; last_archetype_update: number; accepted_tos_version: number; next_gen_enabled: boolean; cover_letter_preferences: string | null }>) => Promise<void>;
     refreshUser: () => Promise<void>;
     resendVerificationEmail: () => Promise<{ success: boolean; error?: unknown }>;
 }
@@ -89,6 +91,7 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const [isAdmin, setIsAdmin] = useState(false);
     const [isNextGenEnabled, setIsNextGenEnabled] = useState(false);
     const [fullName, setFullName] = useState<string | null>(null);
+    const [coverLetterPreferences, setCoverLetterPreferences] = useState<string | null>(null);
     const [isEmailVerified, setIsEmailVerified] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
 
@@ -105,6 +108,7 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
             setIsNextGenEnabled(false);
             setSimulatedTier(null);
             setFullName(null);
+            setCoverLetterPreferences(null);
             setIsLoading(false);
             return;
         }
@@ -130,6 +134,7 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
                 setIsTester(profileData.is_tester || false);
                 setIsNextGenEnabled(profileData.next_gen_enabled || false);
                 setFullName(profileData.full_name || null);
+                setCoverLetterPreferences(profileData.cover_letter_preferences || null);
 
                 // If they have an account, they've implicitly accepted privacy/terms
                 LocalStorage.set(STORAGE_KEYS.PRIVACY_ACCEPTED, 'true');
@@ -185,7 +190,7 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
         window.location.href = '/';
     };
 
-    const updateProfile = async (updates: Partial<{ first_name: string; last_name: string; full_name: string; device_id: string; journey: string; last_archetype_update: number; accepted_tos_version: number; next_gen_enabled: boolean }>) => {
+    const updateProfile = async (updates: Partial<{ first_name: string; last_name: string; full_name: string; device_id: string; journey: string; last_archetype_update: number; accepted_tos_version: number; next_gen_enabled: boolean; cover_letter_preferences: string | null }>) => {
         if (!user) {
             if (updates.journey) prefs.setJourney(updates.journey);
             if (updates.last_archetype_update) prefs.setLastArchetypeUpdate(updates.last_archetype_update);
@@ -199,6 +204,7 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
         const oldAcceptedTosVersion = prefs.acceptedTosVersion;
         const oldNextGenEnabled = isNextGenEnabled;
         const oldFullName = fullName;
+        const oldCoverLetterPreferences = coverLetterPreferences;
 
         // Optimistically update local state
         if (updates.full_name !== undefined) setFullName(updates.full_name);
@@ -210,6 +216,9 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
         if (updates.last_archetype_update) prefs.setLastArchetypeUpdate(updates.last_archetype_update);
         if (updates.accepted_tos_version) prefs.setAcceptedTosVersion(updates.accepted_tos_version);
         if (updates.next_gen_enabled !== undefined) setIsNextGenEnabled(updates.next_gen_enabled);
+        if (updates.cover_letter_preferences !== undefined) {
+            setCoverLetterPreferences(updates.cover_letter_preferences);
+        }
 
         try {
             await patchProfile(updates);
@@ -222,6 +231,7 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
             prefs.setAcceptedTosVersion(oldAcceptedTosVersion);
             setIsNextGenEnabled(oldNextGenEnabled);
             setFullName(oldFullName);
+            setCoverLetterPreferences(oldCoverLetterPreferences);
 
             throw error;
         }
@@ -252,6 +262,7 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
             isAdmin,
             isNextGenEnabled,
             fullName,
+            coverLetterPreferences,
             isLoading,
             isEmailVerified,
             signOut,

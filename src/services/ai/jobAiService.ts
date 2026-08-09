@@ -520,7 +520,8 @@ export const generateCoverLetter = async (
     jobId?: string,
     canonicalTitle?: string,
     personalizedStyle?: string,
-    candidateName?: string
+    candidateName?: string,
+    coverLetterPreferences?: string
 ): Promise<{ text: string; promptVersion: string }> => {
     const resumeText = stringifyProfile(selectedResume);
     const variants = COVER_LETTER_PROMPTS.COVER_LETTER.VARIANTS;
@@ -543,7 +544,7 @@ export const generateCoverLetter = async (
     // candidateName must be the person's real name (e.g. from their profile), not
     // selectedResume.name — that field is a resume/document label ("Resume", "Primary
     // Experience"), not the candidate's own name. See #192/#194.
-    const prompt = COVER_LETTER_PROMPTS.COVER_LETTER.GENERATE(template, jobDescription, resumeText, tailoringInstructions, finalPersonalizedContext, trajectoryContext, bucketStrategy, candidateName || undefined);
+    const prompt = COVER_LETTER_PROMPTS.COVER_LETTER.GENERATE(template, jobDescription, resumeText, tailoringInstructions, finalPersonalizedContext, trajectoryContext, bucketStrategy, candidateName || undefined, coverLetterPreferences || undefined);
 
     return callWithRetry(async (metadata) => {
         const model = await getModel({ task: 'analysis', feature: 'cover_letter' });
@@ -580,7 +581,8 @@ export const generateCoverLetterWithQuality = async (
     canonicalTitle?: string,
     personalizedStyle?: string,
     candidateName?: string,
-    fitScore?: number
+    fitScore?: number,
+    coverLetterPreferences?: string
 ): Promise<{
     text: string;
     promptVersion: string;
@@ -606,7 +608,7 @@ export const generateCoverLetterWithQuality = async (
     const initialContext = isExtremeMismatch
         ? `${additionalContext ? `${additionalContext}\n\n` : ''}STRICT INSTRUCTION: This role's compatibility score is extremely low (${fitScore}/100) — a large, hard-to-bridge gap exists. Do not attempt to persuade past it. Include one clear, plain-language sentence that honestly names the specific gap (e.g. missing credential, licence, or years of direct experience) rather than glossing over it. Lead with genuine transferable strengths, but stay honest about the mismatch.`
         : additionalContext;
-    let result = await generateCoverLetter(jobDescription, selectedResume, tailoringInstructions, initialContext, undefined, trajectoryContext, jobId, canonicalTitle, personalizedStyle, candidateName);
+    let result = await generateCoverLetter(jobDescription, selectedResume, tailoringInstructions, initialContext, undefined, trajectoryContext, jobId, canonicalTitle, personalizedStyle, candidateName, coverLetterPreferences);
     let attempts = 1;
 
     // Fast Path for Free and Plus tiers (No iterative loop to protect margins)
@@ -652,7 +654,7 @@ export const generateCoverLetterWithQuality = async (
                 STRICT INSTRUCTION: Stop attempting further persuasion. Include one clear, plain-language sentence that honestly names the specific gap identified above (e.g. a missing credential, licence, or years of direct experience) rather than glossing over it. The letter should read as self-aware about the gap, not falsely confident. Keep everything else about the letter's real strengths intact.
             `;
             const honestyContext = additionalContext ? `${additionalContext}\n\n${honestyInstruction}` : honestyInstruction;
-            result = await generateCoverLetter(jobDescription, selectedResume, tailoringInstructions, honestyContext, undefined, trajectoryContext, jobId, canonicalTitle, personalizedStyle, candidateName);
+            result = await generateCoverLetter(jobDescription, selectedResume, tailoringInstructions, honestyContext, undefined, trajectoryContext, jobId, canonicalTitle, personalizedStyle, candidateName, coverLetterPreferences);
             attempts++;
             break;
         }
@@ -669,7 +671,7 @@ export const generateCoverLetterWithQuality = async (
         // We append the critique to any existing context
         const newContext = additionalContext ? `${additionalContext}\n\n${improvementContext}` : improvementContext;
 
-        result = await generateCoverLetter(jobDescription, selectedResume, tailoringInstructions, newContext, undefined, trajectoryContext, jobId, canonicalTitle, personalizedStyle, candidateName);
+        result = await generateCoverLetter(jobDescription, selectedResume, tailoringInstructions, newContext, undefined, trajectoryContext, jobId, canonicalTitle, personalizedStyle, candidateName, coverLetterPreferences);
         attempts++;
     }
 

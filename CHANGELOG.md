@@ -6,6 +6,9 @@ See [CHANGELOG_ARCHIVE.md](CHANGELOG_ARCHIVE.md) for earlier history.
 
 ## [Unreleased]
 
+### Added
+- **Cover-letter style preferences now follow the user across applications**: account settings can define general tone, voice, or length preferences, while job-specific facts remain in each job's personal context.
+
 ### Fixed
 - **NextGen style and trajectory modeling now uses bounded context**: feedback signals, visible resume evidence, target roles, and historical signals are labeled as data, while hidden resume blocks and unnecessary metadata stay out of these prompts.
 - **Career and education AI calls now send clearly labeled, compact context**: role models, resumes, skills, and optional transcripts are separated; irrelevant stored metadata is removed; and extracted PDF text is no longer sent twice.

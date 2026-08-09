@@ -44,7 +44,7 @@ export const useCoverLetterEditor = ({
     const isGenerating = generating;
     const { showError } = useToast();
     const isNextGen = useNextGen();
-    const { user, fullName } = useUser();
+    const { user, fullName, coverLetterPreferences } = useUser();
 
     // Sync with parent when job prop changes
     useEffect(() => {
@@ -146,7 +146,7 @@ export const useCoverLetterEditor = ({
                 const variants = Object.keys(COVER_LETTER_PROMPTS.COVER_LETTER.VARIANTS).slice(0, 2);
 
                 const results = await Promise.all(variants.map(v =>
-                    generateCoverLetter(textToUse, focusedResume, instructions || [], finalContext, v, trajectoryContext, localJob.id, canonicalTitle, personalizedStyle, fullName || undefined)
+                    generateCoverLetter(textToUse, focusedResume, instructions || [], finalContext, v, trajectoryContext, localJob.id, canonicalTitle, personalizedStyle, fullName || undefined, coverLetterPreferences || undefined)
                 ));
 
                 setComparisonVersions(results);
@@ -172,7 +172,8 @@ export const useCoverLetterEditor = ({
                     canonicalTitle,
                     personalizedStyle,
                     fullName || undefined,
-                    score
+                    score,
+                    coverLetterPreferences || undefined
                 );
 
                 const updated = {
@@ -218,7 +219,8 @@ export const useCoverLetterEditor = ({
                     localJob.id,
                     canonicalTitle,
                     undefined,
-                    fullName || undefined
+                    fullName || undefined,
+                    coverLetterPreferences || undefined
                 );
 
                 const updated = {
@@ -243,7 +245,7 @@ export const useCoverLetterEditor = ({
             setGenerationStatus(null);
             setGenerationProgress(0);
         }
-    }, [bestResume, analysis, localJob, targetJobs, userTier, onJobUpdate, showError, isNextGen, user, fullName]);
+    }, [bestResume, analysis, localJob, targetJobs, userTier, onJobUpdate, showError, isNextGen, user, fullName, coverLetterPreferences]);
 
     const handleSelectVariant = useCallback(async (variant: { text: string; promptVersion: string }) => {
         const other = comparisonVersions?.find(v => v.promptVersion !== variant.promptVersion);

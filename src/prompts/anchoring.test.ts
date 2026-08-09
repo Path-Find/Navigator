@@ -44,13 +44,15 @@ describe('prompt data anchoring', () => {
             'additional data',
             'trajectory data',
             'bucket data',
-            'Candidate Name'
+            'Candidate Name',
+            'Keep it concise and confident.'
         );
         const interviewPrompt = INTERVIEW_PROMPTS.GENERATE_QUESTIONS('job data', 'resume data', 'job title');
 
         expect(coverLetterPrompt).toContain('<<<JOB_DESCRIPTION_START>>>');
         expect(coverLetterPrompt).toContain('<<<RESUME_START>>>');
         expect(coverLetterPrompt).toContain('<<<CANDIDATE_NAME_START>>>');
+        expect(coverLetterPrompt).toContain('<<<PROFILE_WRITING_PREFERENCES_GUIDANCE_START>>>');
         expect(interviewPrompt).toContain('<<<JOB_DESCRIPTION_START>>>');
         expect(interviewPrompt).toContain('<<<RESUME_START>>>');
         expect(COVER_LETTER_PROMPTS.COVER_LETTER.GENERATE('template', 'job', 'resume', ['strategy']))
