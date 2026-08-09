@@ -1,8 +1,11 @@
 import { describe, expect, it } from 'vitest';
 import { anchorData, anchorGuidance, GUIDANCE_RULE, UNTRUSTED_DATA_RULE } from './anchoring';
 import { COVER_LETTER_PROMPTS } from './coverLetter';
+import { EDUCATION_PROMPTS } from './education';
 import { INTERVIEW_PROMPTS } from './interview';
 import { JOB_ANALYSIS_PROMPTS } from './jobAnalysis';
+import { CAREER_PROMPTS } from './career';
+import { PARSING_PROMPTS } from './parsing';
 
 describe('prompt data anchoring', () => {
     it('wraps untrusted input in labelled boundaries and neutralizes fake delimiters', () => {
@@ -52,5 +55,23 @@ describe('prompt data anchoring', () => {
         expect(interviewPrompt).toContain('<<<RESUME_START>>>');
         expect(COVER_LETTER_PROMPTS.COVER_LETTER.GENERATE('template', 'job', 'resume', ['strategy']))
             .toContain(GUIDANCE_RULE.trim());
+    });
+
+    it('anchors Career, Education, and parsing inputs as data', () => {
+        const gapPrompt = CAREER_PROMPTS.GAP_ANALYSIS('role models', 'profile', 'skills', 'transcript');
+        const educationPrompt = EDUCATION_PROMPTS.PROGRAM_REQUIREMENTS_ANALYSIS('transcript', 'program', 'university');
+        const resumePrompt = PARSING_PROMPTS.RESUME_PARSE('resume text');
+        const transcriptPrompt = PARSING_PROMPTS.TRANSCRIPT_PARSE('transcript text');
+
+        expect(gapPrompt).toContain(UNTRUSTED_DATA_RULE.trim());
+        expect(gapPrompt).toContain('<<<ROLE_MODEL_PATTERNS_START>>>');
+        expect(gapPrompt).toContain('<<<CURRENT_PROFILE_START>>>');
+        expect(gapPrompt).toContain('<<<SKILLS_START>>>');
+        expect(gapPrompt).toContain('<<<ACADEMIC_BACKGROUND_START>>>');
+        expect(educationPrompt).toContain('<<<TRANSCRIPT_START>>>');
+        expect(educationPrompt).toContain('<<<PROGRAM_START>>>');
+        expect(educationPrompt).toContain('<<<UNIVERSITY_START>>>');
+        expect(resumePrompt).toContain('<<<RESUME_CONTENT_START>>>');
+        expect(transcriptPrompt).toContain('<<<TRANSCRIPT_CONTENT_START>>>');
     });
 });

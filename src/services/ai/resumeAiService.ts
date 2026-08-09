@@ -5,6 +5,7 @@ import type {
     ResumeProfile
 } from "../../types";
 import { PARSING_PROMPTS, JOB_ANALYSIS_PROMPTS, CAREER_PROMPTS } from "../../prompts/index";
+import { anchorData, UNTRUSTED_DATA_RULE } from "../../prompts/anchoring";
 import { AI_MODELS } from "../../constants";
 import { extractPdfText } from "../../utils/pdfExtractor";
 
@@ -20,13 +21,14 @@ export const parseResumeFile = async (
     mimeType: string
 ): Promise<ExperienceBlock[]> => {
     let promptParts: ({ text: string } | { inlineData: { mimeType: string; data: string } })[] = [];
+    let extractedText = '';
     if (mimeType === 'application/pdf') {
-        const extractedText = await extractPdfText(fileBase64);
-        promptParts = [{ text: `RESUME CONTENT:\n${extractedText}` }];
+        extractedText = await extractPdfText(fileBase64);
+        promptParts = [];
     } else {
         promptParts = [{ inlineData: { mimeType, data: fileBase64 } }];
     }
-    const prompt = PARSING_PROMPTS.RESUME_PARSE();
+    const prompt = PARSING_PROMPTS.RESUME_PARSE(extractedText || null);
     promptParts.push({ text: prompt });
 
     return callWithRetry(async (metadata) => {
@@ -59,10 +61,18 @@ export const inferProficiencyFromResponse = async (
     userAnswer: string
 ): Promise<{ proficiency: CustomSkill['proficiency']; evidence: string; feedback: string; passed: boolean }> => {
     const prompt = `
-        You are an expert interviewer for ${skillName}.
+        You are an expert interviewer evaluating a candidate's answer.
+
+        ${UNTRUSTED_DATA_RULE}
         
-        Question asked: "${question}"
-        User's answer: "${userAnswer}"
+        SKILL NAME DATA:
+        ${anchorData('SKILL_NAME', skillName)}
+
+        QUESTION DATA:
+        ${anchorData('QUESTION', question)}
+
+        USER ANSWER DATA:
+        ${anchorData('USER_ANSWER', userAnswer)}
         
         Analyze the user's answer. 
         1. Determine if the answer is correct and demonstrates proficiency.

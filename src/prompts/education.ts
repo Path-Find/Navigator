@@ -1,13 +1,17 @@
+import { anchorData, UNTRUSTED_DATA_RULE } from './anchoring';
+
 export const EDUCATION_PROMPTS = {
     GRAD_SCHOOL_ELIGIBILITY: (transcriptText: string, targetProgram: string) => `
     You are a Graduate Admissions Consultant. Analyze this transcript for eligibility into a specific university program.
     You must be extremely specific to the named institution.
 
+    ${UNTRUSTED_DATA_RULE}
+
     TRANSCRIPT SUMMARY:
-    ${transcriptText}
+    ${anchorData('TRANSCRIPT', transcriptText)}
 
     TARGET PROGRAM & UNIVERSITY:
-    ${targetProgram}
+    ${anchorData('TARGET_PROGRAM', targetProgram)}
 
     TASK:
     1. MAPPING: Match the user's transcript courses against the standard requirements for this program.
@@ -40,11 +44,13 @@ export const EDUCATION_PROMPTS = {
 
     COURSE_SKILL_EXTRACTION: (coursesList: string) => `
     You are a Skills Taxonomist. Analyze this list of university courses and extract skills.
+
+    ${UNTRUSTED_DATA_RULE}
     
     CRITICAL: Distinguish between "Hard Skills" (Technical, Tools, Subject Matter) and "Soft Skills" (Transferable, Interpersonal).
 
     COURSES:
-    ${coursesList}
+    ${anchorData('COURSES', coursesList)}
 
     TASK:
     1. Infer skills based on course titles & level.
@@ -64,8 +70,12 @@ export const EDUCATION_PROMPTS = {
 
     PROGRAM_REQUIREMENTS_ANALYSIS: (transcriptText: string, program: string, university: string) => `
     You are an Academic Advisor. Analyze the user's transcript against standard degree requirements for:
-    Program: ${program}
-    University: ${university}
+    ${UNTRUSTED_DATA_RULE}
+
+    Program Data:
+    ${anchorData('PROGRAM', program)}
+    University Data:
+    ${anchorData('UNIVERSITY', university)}
 
     TASK:
     1. Map the user's transcript courses against the requirements for this degree.
@@ -92,16 +102,18 @@ export const EDUCATION_PROMPTS = {
     }
 
     TRANSCRIPT:
-    ${transcriptText}
+    ${anchorData('TRANSCRIPT', transcriptText)}
   `,
 
     COURSE_PROJECT_EXTRACTION: (coursesList: string) => `
     You are a Career Portfolio Specialist. Your task is to look at a student's university courses and propose 2-3 "Portfolio Blocks" or "Projects" that they can highlight on their resume or GitHub.
+
+    ${UNTRUSTED_DATA_RULE}
     
     RATIONALE: We want to turn academic success (an 'A' in a class) into a tangible asset.
     
     COURSES:
-    ${coursesList}
+    ${anchorData('COURSES', coursesList)}
     
     TASK:
     1. Identify courses that likely involve significant project work (e.g. "Capstone", "Advanced Design", "Database Systems").

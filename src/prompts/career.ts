@@ -1,9 +1,13 @@
+import { anchorData, UNTRUSTED_DATA_RULE } from './anchoring';
+
 export const CAREER_PROMPTS = {
     SUGGEST_SKILLS: (resumeContext: string) => `
     You are an expert career consultant. Based on your resume profiles below, extract a comprehensive list of professional skills.
+
+    ${UNTRUSTED_DATA_RULE}
     
     YOUR EXPERIENCE PROFILES:
-    ${resumeContext}
+    ${anchorData('EXPERIENCE_PROFILES', resumeContext)}
     
     TASK:
     - Identify technical skills, soft skills, tools, and methodologies mentioned or implied.
@@ -17,9 +21,17 @@ export const CAREER_PROMPTS = {
     `,
 
     SKILL_VERIFICATION: (skillName: string, proficiency: string) => `
-    You are a technical interviewer verifying a candidate's claim of being "${proficiency}" in "${skillName}".
+    You are a technical interviewer verifying a candidate's claimed skill and proficiency.
+
+    ${UNTRUSTED_DATA_RULE}
+
+    SKILL NAME DATA:
+    ${anchorData('SKILL_NAME', skillName)}
+
+    PROFICIENCY DATA:
+    ${anchorData('PROFICIENCY', proficiency)}
     
-    Generate 3 specific, falsifiable "I have..." statements that a VALID ${proficiency} user would agree with.
+    Generate 3 specific, falsifiable "I have..." statements that a valid user at the supplied proficiency level would agree with.
     
     CONSTRAINTS:
     - Write in **PLAIN ENGLISH** (geared to commoners).
@@ -39,21 +51,26 @@ export const CAREER_PROMPTS = {
     - "I have set up server-side rendering to make the app load faster."
     
     TASK:
-    Generate 3 statements for "${skillName}" at "${proficiency}" level.
+    Generate 3 statements for the supplied skill at the supplied proficiency level.
     Return ONLY a JSON array of strings.
     `,
 
-    GAP_ANALYSIS: (roleModelContext: string, userProfileContext: string, academicContext?: string) => `
+    GAP_ANALYSIS: (roleModelContext: string, userProfileContext: string, skillsContext: string, academicContext?: string) => `
     You are a Strategic Career Architect. Your task is to perform a high-resolution Gap Analysis between your current profile and the collective patterns of your "Role Models".
 
+    ${UNTRUSTED_DATA_RULE}
+
     ROLE MODEL PATTERNS:
-    ${roleModelContext}
+    ${anchorData('ROLE_MODEL_PATTERNS', roleModelContext)}
 
     YOUR PROFILE (Current):
-    ${userProfileContext}
+    ${anchorData('CURRENT_PROFILE', userProfileContext)}
 
-    ${academicContext ? `ACADEMIC BACKGROUND (Transcript):
-    ${academicContext}` : ''}
+    SKILLS DATA:
+    ${anchorData('SKILLS', skillsContext)}
+
+    ${academicContext ? `ACADEMIC BACKGROUND DATA (Optional Transcript):
+    ${anchorData('ACADEMIC_BACKGROUND', academicContext)}` : ''}
     
     TASK:
     1. IDENTIFY GAPS: Compare the Role Models' career paths and top skills to your experience.
@@ -95,15 +112,20 @@ export const CAREER_PROMPTS = {
     }
   `,
 
-    ROLE_MODEL_GAP_ANALYSIS: (roleModelContext: string, userProfileContext: string) => `
+    ROLE_MODEL_GAP_ANALYSIS: (roleModelContext: string, userProfileContext: string, skillsContext: string) => `
     You are a Strategic Career Architect analyzing a "Role Model Emulation" path.
     You are NOT comparing the user to a generic job description. You are comparing them to a specific person's actual history.
 
+    ${UNTRUSTED_DATA_RULE}
+
     ROLE MODEL PROFILE (The Goal):
-    ${roleModelContext}
+    ${anchorData('ROLE_MODEL_PROFILE', roleModelContext)}
 
     YOUR PROFILE (Current):
-    ${userProfileContext}
+    ${anchorData('CURRENT_PROFILE', userProfileContext)}
+
+    YOUR SKILLS DATA:
+    ${anchorData('SKILLS', skillsContext)}
 
     TASK:
     Compare the User's qualifications against the Role Model's achievements to create an actionable "Emulation Plan".
@@ -141,8 +163,10 @@ export const CAREER_PROMPTS = {
     GENERATE_ROADMAP: (gapAnalysis: string) => `
     You are a Strategic Career Architect. Your task is to transform a Gap Analysis into a structured 12-month Roadmap.
 
+    ${UNTRUSTED_DATA_RULE}
+
     GAP ANALYSIS DATA:
-    ${gapAnalysis}
+    ${anchorData('GAP_ANALYSIS', gapAnalysis)}
 
     TASK:
     1. DISTRIBUTE: Take the "Actionable Evidence" items from the Gap Analysis and distribute them across a 12-month timeline.

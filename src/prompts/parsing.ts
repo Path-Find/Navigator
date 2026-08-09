@@ -1,10 +1,14 @@
 
 
+import { anchorData, UNTRUSTED_DATA_RULE } from './anchoring';
+
 export const PARSING_PROMPTS = {
   RESUME_PARSE: (extractedText: string | null = null) => `
     Analyze this resume content. 
     Break it down into discrete "Experience Blocks". 
     For each job, education, or project, create a block.
+
+    ${UNTRUSTED_DATA_RULE}
 
     CRITICAL SAFETY CHECK:
     If this document is NOT a resume/CV (e.g. it is a receipt, a random photo, spam, hate speech, or offensive content), 
@@ -18,17 +22,22 @@ export const PARSING_PROMPTS = {
       "dateRange": "e.g. 2020-2022",
       "bullets": ["bullet point 1", "bullet point 2"]
     }
-  ${extractedText ? `\nRESUME CONTENT:\n${extractedText}` : ''}`,
+  ${extractedText ? `\nRESUME CONTENT:\n${anchorData('RESUME_CONTENT', extractedText)}` : ''}`,
 
   JOB_LISTING_PARSE: (cleanHtml: string, baseUrl: string) => `
     You are a smart scraper. Extract job listings from this HTML. 
+
+    ${UNTRUSTED_DATA_RULE}
     
     CRITICAL INSTRUCTIONS:
     1. Look for lists of jobs, tables, or repeated "card" elements.
     2. Identify the structure of the specific jobs site (e.g. search results table, grid labels).
     3. Tables often have "Job Title", "Date", "Location" columns.
     4. If you see a "Search Jobs" button but NO results, return an empty array (do not hallucinate).
-    5. Extract the REAL link (href). Resolving relative URLs against "${baseUrl}".
+    5. Extract the REAL link (href). Resolve relative URLs against the supplied base URL data.
+
+    BASE URL DATA:
+    ${anchorData('BASE_URL', baseUrl)}
     
     Return ONLY a JSON array. No markdown.
     
@@ -44,12 +53,14 @@ export const PARSING_PROMPTS = {
     ]
 
     HTML Content:
-    ${cleanHtml}
+    ${anchorData('HTML_CONTENT', cleanHtml)}
   `,
 
   ROLE_MODEL_METADATA: () => `
     You are a Career Path Analyst. Analyze this LinkedIn profile (or resume) of a "Role Model".
     Extract their core career progression, top skills, and industry patterns.
+
+    ${UNTRUSTED_DATA_RULE}
 
     TASK:
     1. EXTRACT: 
@@ -74,6 +85,8 @@ export const PARSING_PROMPTS = {
     Analyze this LinkedIn profile or resume. 
     Break it down into discrete "Experience Blocks" representing their chronological career path.
     For each job or education entry, create a block.
+
+    ${UNTRUSTED_DATA_RULE}
     
     Return a JSON Array of objects with this schema:
     {
@@ -87,6 +100,8 @@ export const PARSING_PROMPTS = {
 
   TRANSCRIPT_PARSE: (extractedText: string) => `
     You are an Academic Transcript Analyzer. Extract structured data from this transcript text.
+
+    ${UNTRUSTED_DATA_RULE}
 
     CRITICAL SAFETY:
     If this is NOT a transcript (e.g. receipt, essay, random text), return a JSON object with { "error": "Invalid Document Type" }.
@@ -126,6 +141,6 @@ export const PARSING_PROMPTS = {
     }
 
     TRANSCRIPT CONTENT:
-    ${extractedText}
+    ${anchorData('TRANSCRIPT_CONTENT', extractedText)}
   `
 };
