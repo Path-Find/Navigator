@@ -1,3 +1,5 @@
+import { anchorData, anchorGuidance, GUIDANCE_RULE, UNTRUSTED_DATA_RULE } from './anchoring';
+
 export const COVER_LETTER_PROMPTS = {
   COVER_LETTER: {
     VARIANTS: {
@@ -51,36 +53,39 @@ export const COVER_LETTER_PROMPTS = {
     },
     GENERATE: (template: string, jobDescription: string, resumeText: string, tailoringInstructions: string[], additionalContext?: string, trajectoryContext?: string, bucketStrategy?: string, candidateName?: string) => `
     ${template}
+
+    ${UNTRUSTED_DATA_RULE}
+    ${GUIDANCE_RULE}
  
     ${bucketStrategy ? `CANDIDATE NARRATIVE STRATEGY:
-    ${bucketStrategy}
+    ${anchorGuidance('NARRATIVE_STRATEGY', bucketStrategy)}
     ` : ''}
 
-    JOB DESCRIPTION:
-    ${jobDescription}
+    JOB DESCRIPTION DATA:
+    ${anchorData('JOB_DESCRIPTION', jobDescription)}
  
-    MY EXPERIENCE (Full Resume for Context):
-    ${resumeText}
+    MY EXPERIENCE DATA (Full Resume for Context):
+    ${anchorData('RESUME', resumeText)}
  
     ${trajectoryContext ? `MY CAREER CONTEXT (Goals & Patterns):
-    ${trajectoryContext}
+    ${anchorData('CAREER_CONTEXT', trajectoryContext)}
     (Context: This includes my 12-month goals and established application patterns. Use this to ensure the letter aligns with my professional identity.)` : ''}
 
-    STRATEGY:
-    ${tailoringInstructions.join("\n")}
+    STRATEGY GUIDANCE:
+    ${anchorGuidance('TAILORING_STRATEGY', tailoringInstructions.join("\n"))}
 
     ${additionalContext ? `MY ADDITIONAL CONTEXT (Important):
-    ${additionalContext}
+    ${anchorGuidance('ADDITIONAL_CONTEXT', additionalContext)}
     Include this context naturally if relevant to the job requirements.` : ''}
 
     ${tailoringInstructions.includes("CRITIQUE_FIX") ? `
     IMPORTANT - REVISION INSTRUCTIONS:
     The previous draft was reviewed by a hiring manager. Fix these specific issues:
-    ${additionalContext} 
+    ${anchorGuidance('CRITIQUE_FEEDBACK', additionalContext || '')}
     (Note: The text above is the critique feedback, not personal context in this case).
     ` : ''}
     
-    ${candidateName ? `REQUIRED CLOSING: End the letter with a sign-off on its own line: "Sincerely," followed by "${candidateName}" on the next line. This is a required structural element of a cover letter, not generic filler — always include it exactly once, even while trimming filler elsewhere.` : ''}
+    ${candidateName ? `REQUIRED CLOSING: End the letter with a sign-off on its own line: "Sincerely," followed by the exact candidate name contained in ${anchorData('CANDIDATE_NAME', candidateName)} on the next line. This is a required structural element of a cover letter, not generic filler — always include it exactly once, even while trimming filler elsewhere.` : ''}
 
     FINAL CHECK:
     - Ensure no (BLOCK_ID) tags remain in the output.
@@ -94,15 +99,17 @@ export const COVER_LETTER_PROMPTS = {
 
   CRITIQUE_COVER_LETTER: (jobDescription: string, coverLetter: string, resumeContext: string) => `
     You are a strict technical hiring manager. Review this cover letter for technical fidelity and narrative cohesion against the candidate's resume and the job description.
+
+    ${UNTRUSTED_DATA_RULE}
     
-    JOB DESCRIPTION:
-    ${jobDescription}
+    JOB DESCRIPTION DATA:
+    ${anchorData('JOB_DESCRIPTION', jobDescription)}
 
-    CANDIDATE RESUME:
-    ${resumeContext}
+    CANDIDATE RESUME DATA:
+    ${anchorData('RESUME', resumeContext)}
 
-    PROPOSED COVER LETTER:
-    ${coverLetter}
+    PROPOSED COVER LETTER DATA:
+    ${anchorData('COVER_LETTER', coverLetter)}
 
     1. TECHNICAL FIDELITY: List every specific tool, software, platform, certification, or technology named in the letter, then check each one appears verbatim in the resume. Any that don't (even a plausible-sounding one that fits the theme, e.g. adding "QGIS" to a real "ArcGIS Pro, ArcGIS Online" list) is a hallucination — put it in hallucinationAlerts and this cannot score above "Weak", regardless of whether the tool might genuinely be true of the candidate; this check is about what the resume can verify, not what's actually true. Also check: does it lift a resume bullet's sentence structure/phrasing with only a word or two changed? (Compare each metric-bearing sentence against its source resume bullet — same skeleton with synonyms swapped counts as a copy, even if no phrase matches exactly.)
     2. NARRATIVE SUBSTANCE: Is it a cohesive argument or a robotic list?

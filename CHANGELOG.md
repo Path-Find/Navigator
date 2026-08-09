@@ -7,6 +7,7 @@ See [CHANGELOG_ARCHIVE.md](CHANGELOG_ARCHIVE.md) for earlier history.
 ## [Unreleased]
 
 ### Fixed
+- **Embedded text can no longer redefine the job-analysis task as easily**: job postings, resumes, candidate responses, and other evidence are now clearly delimited as data, while user and tailoring instructions remain bounded guidance.
 - **Job requirements now preserve whether each item is required, preferred, or a hard gate**: scoring and downstream prompts no longer have to infer priority from separate, ambiguous lists, while older saved analyses remain readable.
 - **Job analysis no longer resends the full posting to every downstream AI call**: parsing and scoring are separate, and cover letters, summaries, and resume tailoring reuse compact parsed requirements while adding only relevant skills, coursework, academic evidence, and the candidate's real name where needed.
 - **The same job could get a noticeably different fit score on back-to-back analyses of identical input**: the scoring call had no randomness control, unlike the neighboring fact-extraction call which already ran deterministically. Confirmed via repeated testing (e.g. one posting swinging 48-68/100 across runs); pinning the scoring call to the same strict setting cut most of that spread substantially (that same job: 48, 52, 48 afterward).

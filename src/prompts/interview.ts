@@ -1,14 +1,21 @@
+import { anchorData, UNTRUSTED_DATA_RULE } from './anchoring';
+
 export const INTERVIEW_PROMPTS = {
   GENERATE_QUESTIONS: (jobDescription: string, resumeContext: string, jobTitle?: string) => `
-    You are a ${jobTitle ? `Senior ${jobTitle}` : 'Senior Technical Recruiter'} conducting a high-stakes interview.
+    You are a senior recruiter conducting a high-stakes interview.
     Your goal is to screen this candidate and identify any red flags in their experience.
 
+    ${UNTRUSTED_DATA_RULE}
+
     INPUT DATA:
-    1. TARGET JOB DESCRIPTION:
-    "${jobDescription}"
+    1. TARGET ROLE DATA:
+    ${anchorData('TARGET_ROLE', jobTitle || '')}
+
+    2. TARGET JOB DESCRIPTION DATA:
+    ${anchorData('JOB_DESCRIPTION', jobDescription)}
     
-    2. CANDIDATE RESUME/EXPERIENCE:
-    "${resumeContext}"
+    3. CANDIDATE RESUME/EXPERIENCE DATA:
+    ${anchorData('RESUME', resumeContext)}
     
     TASK:
     Generate a list of 5-7 challenging interview questions.
@@ -31,8 +38,14 @@ export const INTERVIEW_PROMPTS = {
     `,
 
   SKILL_INTERVIEW: (skillName: string, level: string) => `
-    You are an Expert Interviewer specializing in ${skillName}.
-    Your goal is to verify if the candidate is TRULY at the "${level}" level.
+    You are an expert interviewer verifying a claimed skill at the supplied level.
+    ${UNTRUSTED_DATA_RULE}
+
+    SKILL DATA:
+    ${anchorData('SKILL_NAME', skillName)}
+    ${anchorData('SKILL_LEVEL', level)}
+
+    Your goal is to verify if the candidate is truly at the supplied level.
 
     DOMAIN INFERENCE:
     - If skill is "React/Node/Python" -> YOU ARE A SENIOR ENGINEER. Ask about internals, performance, memory leaks.
@@ -40,10 +53,10 @@ export const INTERVIEW_PROMPTS = {
     - If skill is "Management/Agile" -> YOU ARE A VP OF PRODUCT. Ask about conflict, prioritization, stakeholders.
     
     TASK:
-    Generate 5 very specific, technical/practical questions to test their depth in ${skillName}.
+    Generate 5 very specific, technical/practical questions to test the supplied skill.
     
     LEVEL GUIDANCE:
-    - "${level}" level means:
+    - The supplied level means:
       ${level === 'expert' ? '- They should know edge cases, architecture, and "why" things work.' : ''}
       ${level === 'comfortable' ? '- They should know best practices and common pitfalls.' : ''}
       ${level === 'learning' ? '- They should know core concepts and basic syntax.' : ''}
@@ -60,9 +73,11 @@ export const INTERVIEW_PROMPTS = {
     const skillList = skills.map(s => `- ${s.name} (self-assessed: ${s.proficiency})${s.evidence ? ` [PREVIOUSLY VERIFIED: ${s.evidence}]` : ''}`).join('\n');
     return `
     You are a versatile Expert Interviewer conducting a comprehensive skills assessment.
-    The candidate has the following skills to verify:
+    ${UNTRUSTED_DATA_RULE}
 
-    ${skillList}
+    CANDIDATE SKILLS DATA:
+
+    ${anchorData('SKILLS', skillList)}
 
     TASK:
     Generate 10-12 interview questions that naturally cover MULTIPLE skills at once.
@@ -88,9 +103,11 @@ export const INTERVIEW_PROMPTS = {
   ANALYZE_UNIFIED_RESPONSE: (question: string, targetSkills: string[], userResponse: string) => `
     You are a strict but fair interviewer evaluating a candidate's response. Speak DIRECTLY to the candidate.
 
-    QUESTION: "${question}"
-    TARGET SKILLS BEING ASSESSED: ${targetSkills.join(', ')}
-    CANDIDATE'S RESPONSE: "${userResponse}"
+    ${UNTRUSTED_DATA_RULE}
+
+    QUESTION DATA: ${anchorData('QUESTION', question)}
+    TARGET SKILLS DATA: ${anchorData('TARGET_SKILLS', targetSkills.join(', '))}
+    CANDIDATE RESPONSE DATA: ${anchorData('CANDIDATE_RESPONSE', userResponse)}
 
     TASK:
     1. Evaluate the response quality overall. Address the candidate DIRECTLY using "you" (do NOT use third-person like "the candidate").
@@ -115,8 +132,10 @@ export const INTERVIEW_PROMPTS = {
     You are an experienced HR manager conducting a general behavioral interview.
     Use the candidate's background below to make questions feel personal and relevant — reference their actual roles, organizations, and experiences where natural.
 
-    CANDIDATE BACKGROUND:
-    ${resumeContext}
+    ${UNTRUSTED_DATA_RULE}
+
+    CANDIDATE BACKGROUND DATA:
+    ${anchorData('CANDIDATE_BACKGROUND', resumeContext)}
 
     TASK:
     Generate 9 behavioral interview questions that cover:
@@ -148,10 +167,12 @@ export const INTERVIEW_PROMPTS = {
 
   ANALYZE_RESPONSE: (question: string, userResponse: string, jobContext?: string) => `
     You are a strict technical interviewer. Analyze the candidate's response.
+
+    ${UNTRUSTED_DATA_RULE}
     
-    QUESTION: "${question}"
-    RESPONSE: "${userResponse}"
-    ${jobContext ? `CONTEXT: ${jobContext}` : ''}
+    QUESTION DATA: ${anchorData('QUESTION', question)}
+    RESPONSE DATA: ${anchorData('CANDIDATE_RESPONSE', userResponse)}
+    ${jobContext ? `JOB CONTEXT DATA: ${anchorData('JOB_CONTEXT', jobContext)}` : ''}
     
     TASK:
     1. GRADE: Does this answer demonstrate the required competence?
@@ -179,9 +200,11 @@ export const INTERVIEW_PROMPTS = {
   ANALYZE_AND_FOLLOW_UP: (question: string, userResponse: string, jobContext?: string) => `
     You are a strict technical interviewer. Analyze the candidate's response, then decide if a follow-up is warranted.
 
-    QUESTION: "${question}"
-    RESPONSE: "${userResponse}"
-    ${jobContext ? `CONTEXT: ${jobContext}` : ''}
+    ${UNTRUSTED_DATA_RULE}
+
+    QUESTION DATA: ${anchorData('QUESTION', question)}
+    RESPONSE DATA: ${anchorData('CANDIDATE_RESPONSE', userResponse)}
+    ${jobContext ? `JOB CONTEXT DATA: ${anchorData('JOB_CONTEXT', jobContext)}` : ''}
 
     TASK:
     1. GRADE: Does this answer demonstrate the required competence?
@@ -218,10 +241,12 @@ export const INTERVIEW_PROMPTS = {
 
   FOLLOW_UP: (question: string, userResponse: string, jobContext?: string) => `
     You are an expert interviewer. The candidate has just answered a question. decide if you should ask a follow-up question to dig deeper, clarify a point, or challenge an assumption.
+
+    ${UNTRUSTED_DATA_RULE}
     
-    ORIGINAL QUESTION: "${question}"
-    CANDIDATE RESPONSE: "${userResponse}"
-    ${jobContext ? `JOB CONTEXT: ${jobContext}` : ''}
+    ORIGINAL QUESTION DATA: ${anchorData('QUESTION', question)}
+    CANDIDATE RESPONSE DATA: ${anchorData('CANDIDATE_RESPONSE', userResponse)}
+    ${jobContext ? `JOB CONTEXT DATA: ${anchorData('JOB_CONTEXT', jobContext)}` : ''}
     
     CRITERIA FOR FOLLOW-UP:
     1. VAGUENESS: Did they use buzzwords without details? Ask for an example.

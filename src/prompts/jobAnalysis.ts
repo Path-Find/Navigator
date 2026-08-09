@@ -1,12 +1,15 @@
 import { CONTENT_VALIDATION } from '../constants';
+import { anchorData, anchorGuidance, GUIDANCE_RULE, UNTRUSTED_DATA_RULE } from './anchoring';
 
 export const JOB_ANALYSIS_PROMPTS = {
   JOB_FIT_ANALYSIS: {
     PARSE: (jobDescription: string) => `
     You are a job-posting parser. Extract only facts supported by the supplied job posting.
 
-    JOB POSTING:
-    "${jobDescription.substring(0, CONTENT_VALIDATION.MAX_JOB_DESCRIPTION_LENGTH)}"
+    ${UNTRUSTED_DATA_RULE}
+
+    JOB POSTING DATA:
+    ${anchorData('JOB_POSTING', jobDescription.substring(0, CONTENT_VALIDATION.MAX_JOB_DESCRIPTION_LENGTH))}
 
     Return ONLY valid JSON matching this structure:
     {
@@ -43,14 +46,16 @@ export const JOB_ANALYSIS_PROMPTS = {
     SCORE: (parsedJob: string, candidateContext: string, trajectoryContext?: string) => `
     You are a Strategic Career Architect and Hiring Expert. Score the candidate against the already-parsed job requirements with professional objectivity.
 
-    PARSED JOB REQUIREMENTS:
-    ${parsedJob}
+    ${UNTRUSTED_DATA_RULE}
 
-    CANDIDATE EVIDENCE:
-    ${candidateContext}
+    PARSED JOB DATA:
+    ${anchorData('PARSED_JOB', parsedJob)}
+
+    CANDIDATE EVIDENCE DATA:
+    ${anchorData('CANDIDATE_EVIDENCE', candidateContext)}
 
     ${trajectoryContext ? `OPTIONAL CAREER CONTEXT:
-    ${trajectoryContext}
+    ${anchorData('TRAJECTORY_CONTEXT', trajectoryContext)}
     ` : ''}
 
     Rules:
@@ -95,20 +100,23 @@ export const JOB_ANALYSIS_PROMPTS = {
     DEFAULT: (jobDescription: string, resumeContext: string, bucketAdvice?: string[], trajectoryContext?: string) => `
     You are a Strategic Career Architect and Hiring Expert. Your job is to analyze this candidate's fit for the role with absolute professional objectivity.
     
-    ${bucketAdvice ? `ROLE-SPECIFIC FOCUS (Follow these guidelines):
-    ${bucketAdvice.map(a => `- ${a}`).join('\n')}
+    ${UNTRUSTED_DATA_RULE}
+    ${GUIDANCE_RULE}
+
+    ${bucketAdvice ? `ROLE-SPECIFIC FOCUS GUIDANCE:
+    ${anchorGuidance('ROLE_FOCUS', bucketAdvice.map(a => `- ${a}`).join('\n'))}
     ` : ''}
 
     ${trajectoryContext ? `SEMANTIC TRAJECTORY (The user's career path):
-    ${trajectoryContext}
+    ${anchorData('TRAJECTORY_CONTEXT', trajectoryContext)}
     ` : ''}
 
     INPUT DATA:
     1. RAW JOB TEXT: 
-    "${jobDescription.substring(0, CONTENT_VALIDATION.MAX_JOB_DESCRIPTION_LENGTH)}"
+    ${anchorData('JOB_POSTING', jobDescription.substring(0, CONTENT_VALIDATION.MAX_JOB_DESCRIPTION_LENGTH))}
 
     2. CANDIDATE CONTEXT (Resume, Skills, & Academics):
-    ${resumeContext}
+    ${anchorData('CANDIDATE_CONTEXT', resumeContext)}
 
     TASK:
     1. DISTILL: Extract the job requirements into a structured format.
@@ -174,17 +182,18 @@ export const JOB_ANALYSIS_PROMPTS = {
     You are an expert resume writer. 
     Rewrite the bullet points for this specific job experience to perfectly match the target job description.
 
-    TARGET JOB:
-    ${jobDescription.substring(0, 3000)}
+    ${UNTRUSTED_DATA_RULE}
 
-    MY EXPERIENCE BLOCK:
-    Title: ${blockTitle}
-    Company: ${blockOrg}
-    Original Bullets:
-    ${blockBullets.map(b => `- ${b}`).join('\n')}
+    TARGET JOB DATA:
+    ${anchorData('TARGET_JOB', jobDescription.substring(0, 3000))}
 
-    TAILORING INSTRUCTIONS (Strategy):
-    ${instructions.join('\n')}
+    MY EXPERIENCE DATA:
+    ${anchorData('EXPERIENCE_BLOCK', `Title: ${blockTitle}\nCompany: ${blockOrg}\nOriginal Bullets:\n${blockBullets.map(b => `- ${b}`).join('\n')}`)}
+
+    ${GUIDANCE_RULE}
+
+    TAILORING INSTRUCTIONS GUIDANCE:
+    ${anchorGuidance('TAILORING_INSTRUCTIONS', instructions.join('\n'))}
 
     TASKS:
     1. Rewrite the bullets to use keywords from the Target Job.
@@ -200,11 +209,13 @@ export const JOB_ANALYSIS_PROMPTS = {
     You are an expert resume writer. 
     Write a 2-3 sentence "Professional Summary" for the top of my resume.
     
-    TARGET JOB:
-    ${jobDescription.substring(0, 5000)}
+    ${UNTRUSTED_DATA_RULE}
 
-    MY BACKGROUND:
-    ${resumeContext}
+    TARGET JOB DATA:
+    ${anchorData('TARGET_JOB', jobDescription.substring(0, 5000))}
+
+    MY BACKGROUND DATA:
+    ${anchorData('CANDIDATE_BACKGROUND', resumeContext)}
 
     INSTRUCTIONS:
     - Pitch me as the perfect candidate for THIS specific role.
