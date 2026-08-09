@@ -6,6 +6,7 @@ import type {
     ResumeProfile,
     CustomSkill,
     DistilledJob,
+    JobRequirement,
     UserTier,
     Transcript
 } from "../../types";
@@ -33,18 +34,107 @@ const normalizeForContextMatch = (value: string): string => value
     .replace(/\s+/g, ' ')
     .trim();
 
-const contextMatchTerms = (values: string[]): string[] => {
+type RequirementInput = JobRequirement | string;
+
+const requirementText = (value: RequirementInput): string =>
+    typeof value === 'string' ? value : value.text;
+
+const contextMatchTerms = (values: RequirementInput[]): string[] => {
     const stopWords = new Set(['and', 'the', 'with', 'for', 'from', 'that', 'this', 'role', 'required', 'preferred', 'experience']);
     return [...new Set(values
-        .flatMap(value => normalizeForContextMatch(value).split(' '))
+        .flatMap(value => normalizeForContextMatch(requirementText(value)).split(' '))
         .filter(term => term.length >= 4 && !stopWords.has(term)))];
 };
 
-const matchesContextRequirement = (value: string, requirements: string[]): boolean => {
+const matchesContextRequirement = (value: string, requirements: RequirementInput[]): boolean => {
     const normalizedValue = normalizeForContextMatch(value);
     const terms = contextMatchTerms(requirements);
     return terms.length > 0 && terms.some(term => normalizedValue.includes(term));
 };
+
+const REQUIREMENT_CATEGORIES = new Set<JobRequirement['category']>([
+    'skill', 'education', 'coursework', 'experience', 'hard_gate', 'other'
+]);
+const REQUIREMENT_PRIORITIES = new Set<JobRequirement['priority']>([
+    'required', 'preferred', 'hard_gate'
+]);
+
+const normalizeRequirement = (
+    value: unknown,
+    fallbackCategory: JobRequirement['category'],
+    fallbackPriority: JobRequirement['priority']
+): JobRequirement | null => {
+    const rawText = typeof value === 'string'
+        ? value
+        : value && typeof value === 'object' && typeof (value as { text?: unknown }).text === 'string'
+            ? (value as { text: string }).text
+            : '';
+    const text = rawText.trim();
+    if (!text) return null;
+
+    const rawCategory = value && typeof value === 'object' ? (value as { category?: unknown }).category : undefined;
+    const rawPriority = value && typeof value === 'object' ? (value as { priority?: unknown }).priority : undefined;
+    const category = typeof rawCategory === 'string' && REQUIREMENT_CATEGORIES.has(rawCategory as JobRequirement['category'])
+        ? rawCategory as JobRequirement['category']
+        : fallbackCategory;
+    const priority = category === 'hard_gate'
+        ? 'hard_gate'
+        : typeof rawPriority === 'string' && REQUIREMENT_PRIORITIES.has(rawPriority as JobRequirement['priority'])
+            ? rawPriority as JobRequirement['priority']
+            : fallbackPriority;
+
+    return { text, category, priority };
+};
+
+const normalizeJobRequirements = (rawJob: Record<string, unknown>): Pick<DistilledJob, 'requirements' | 'educationRequirements' | 'courseworkRequirements' | 'experienceRequirements' | 'hardGates' | 'preferredRequirements'> => {
+    const requirements: JobRequirement[] = [];
+    const add = (value: unknown, category: JobRequirement['category'], priority: JobRequirement['priority']) => {
+        const normalized = normalizeRequirement(value, category, priority);
+        if (normalized) requirements.push(normalized);
+    };
+
+    if (Array.isArray(rawJob.requirements)) {
+        rawJob.requirements.forEach(value => add(value, 'other', 'required'));
+    }
+    if (Array.isArray(rawJob.educationRequirements)) {
+        rawJob.educationRequirements.forEach(value => add(value, 'education', 'required'));
+    }
+    if (Array.isArray(rawJob.courseworkRequirements)) {
+        rawJob.courseworkRequirements.forEach(value => add(value, 'coursework', 'required'));
+    }
+    if (Array.isArray(rawJob.experienceRequirements)) {
+        rawJob.experienceRequirements.forEach(value => add(value, 'experience', 'required'));
+    }
+    if (Array.isArray(rawJob.hardGates)) {
+        rawJob.hardGates.forEach(value => add(value, 'hard_gate', 'hard_gate'));
+    }
+    if (Array.isArray(rawJob.preferredRequirements)) {
+        rawJob.preferredRequirements.forEach(value => add(value, 'other', 'preferred'));
+    }
+
+    const uniqueRequirements = [...new Map(requirements.map(requirement => [
+        `${requirement.category}|${requirement.priority}|${requirement.text.toLowerCase()}`,
+        requirement
+    ])).values()];
+    const textFor = (predicate: (requirement: JobRequirement) => boolean) => uniqueRequirements
+        .filter(predicate)
+        .map(requirement => requirement.text);
+
+    return {
+        requirements: uniqueRequirements,
+        educationRequirements: textFor(requirement => requirement.category === 'education'),
+        courseworkRequirements: textFor(requirement => requirement.category === 'coursework'),
+        experienceRequirements: textFor(requirement => requirement.category === 'experience'),
+        hardGates: textFor(requirement => requirement.priority === 'hard_gate'),
+        preferredRequirements: textFor(requirement => requirement.priority === 'preferred'),
+    };
+};
+
+const getJobRequirements = (parsedJob: DistilledJob): JobRequirement[] =>
+    normalizeJobRequirements(parsedJob as unknown as Record<string, unknown>).requirements || [];
+
+const getRequirementTexts = (parsedJob: DistilledJob, category: JobRequirement['category']): JobRequirement[] =>
+    getJobRequirements(parsedJob).filter(requirement => requirement.category === category);
 
 export interface JobCandidateContext {
     prompt: string;
@@ -64,11 +154,14 @@ export const buildJobCandidateContext = (
     parsedJob: DistilledJob
 ): JobCandidateContext => {
     const resumeContext = resumes.map(stringifyProfile).filter(Boolean).join('\n---\n');
+    const jobRequirements = getJobRequirements(parsedJob);
     const jobSkillText = [
         ...(parsedJob.keySkills || []),
         ...(parsedJob.requiredSkills || []).map(skill => skill.name),
         ...(parsedJob.coreResponsibilities || []),
-        ...(parsedJob.experienceRequirements || []),
+        ...jobRequirements
+            .filter(requirement => requirement.category === 'skill' || requirement.category === 'experience')
+            .map(requirement => requirement.text),
     ].join(' ');
 
     const relevantSkills = userSkills.filter(skill =>
@@ -83,23 +176,26 @@ export const buildJobCandidateContext = (
         .filter(block => block.isVisible && block.type === 'education')
         .map(block => `${block.title} at ${block.organization} (${block.dateRange})\n${block.bullets.join('\n')}`);
     const hasMatchingEducationBlock = educationBlocks.some(block =>
-        matchesContextRequirement(block, parsedJob.educationRequirements || [])
+        matchesContextRequirement(block, getRequirementTexts(parsedJob, 'education'))
     );
     const academicEvidence: string[] = [];
 
-    if (transcript && parsedJob.courseworkRequirements?.length) {
+    const courseworkRequirements = getRequirementTexts(parsedJob, 'coursework');
+    const educationRequirements = getRequirementTexts(parsedJob, 'education');
+
+    if (transcript && courseworkRequirements.length) {
         const matchingCourses = transcript.semesters
             .flatMap(semester => semester.courses)
-            .filter(course => matchesContextRequirement(`${course.code} ${course.title}`, parsedJob.courseworkRequirements || []))
+            .filter(course => matchesContextRequirement(`${course.code} ${course.title}`, courseworkRequirements))
             .map(course => `${course.title} (${course.code})${course.grade ? ` — ${course.grade}` : ''}`);
         academicEvidence.push(...matchingCourses);
     }
 
-    if (transcript && parsedJob.educationRequirements?.length && !hasMatchingEducationBlock) {
+    if (transcript && educationRequirements.length && !hasMatchingEducationBlock) {
         const programText = [transcript.credentialType, transcript.program, transcript.university]
             .filter(Boolean)
             .join(' at ');
-        if (programText && matchesContextRequirement(programText, parsedJob.educationRequirements)) {
+        if (programText && matchesContextRequirement(programText, educationRequirements)) {
             academicEvidence.push(programText);
         }
     }
@@ -124,21 +220,24 @@ export const buildJobCandidateContext = (
 export const formatParsedJobContext = (
     parsedJob: DistilledJob,
     academicEvidence: string[] = []
-): string => [
+): string => {
+    const requirements = getJobRequirements(parsedJob);
+    const requirementLines = requirements.map(requirement =>
+        `- [${requirement.priority}] ${requirement.category}: ${requirement.text}`
+    );
+
+    return [
     `Role: ${parsedJob.roleTitle} at ${parsedJob.companyName}`,
     parsedJob.keySkills?.length ? `Key Skills Required: ${parsedJob.keySkills.join(', ')}` : '',
     parsedJob.coreResponsibilities?.length
         ? `Core Responsibilities:\n${parsedJob.coreResponsibilities.map(item => `- ${item}`).join('\n')}`
         : '',
-    parsedJob.educationRequirements?.length ? `Education Requirements: ${parsedJob.educationRequirements.join('; ')}` : '',
-    parsedJob.courseworkRequirements?.length ? `Coursework Requirements: ${parsedJob.courseworkRequirements.join('; ')}` : '',
-    parsedJob.experienceRequirements?.length ? `Experience Requirements: ${parsedJob.experienceRequirements.join('; ')}` : '',
-    parsedJob.hardGates?.length ? `Mandatory Requirements: ${parsedJob.hardGates.join('; ')}` : '',
-    parsedJob.preferredRequirements?.length ? `Preferred Requirements: ${parsedJob.preferredRequirements.join('; ')}` : '',
+    requirementLines.length ? `Structured Requirements:\n${requirementLines.join('\n')}` : '',
     academicEvidence.length
         ? `Relevant Academic Evidence:\n${academicEvidence.map(item => `- ${item}`).join('\n')}`
         : '',
-].filter(Boolean).join('\n');
+    ].filter(Boolean).join('\n');
+};
 
 // Deterministic AI-ban check — runs before any AI call so it can't be missed.
 // Add patterns here as new employer policies are discovered.
@@ -298,19 +397,24 @@ const parseJobInfo = async (
             }
         });
         metadata.token_usage = response.response.usageMetadata;
-        const result = JSON.parse(cleanJsonOutput(response.response.text()));
+        const result = JSON.parse(cleanJsonOutput(response.response.text())) as Partial<DistilledJob> & Record<string, unknown>;
         // Text scan + known-employer list — text scan wins if both fire
-        const employerBan = checkKnownEmployerBan(result.companyName);
+        const employerBan = checkKnownEmployerBan(typeof result.companyName === 'string' ? result.companyName : '');
         const finalBan = aiBan.isBanned ? aiBan : employerBan;
         const distilledJob: DistilledJob = {
             ...result,
-            educationRequirements: result.educationRequirements || [],
-            courseworkRequirements: result.courseworkRequirements || [],
-            experienceRequirements: result.experienceRequirements || [],
-            hardGates: result.hardGates || [],
-            preferredRequirements: result.preferredRequirements || [],
+            companyName: typeof result.companyName === 'string' ? result.companyName : '',
+            roleTitle: typeof result.roleTitle === 'string' ? result.roleTitle : '',
+            applicationDeadline: typeof result.applicationDeadline === 'string' ? result.applicationDeadline : null,
+            keySkills: Array.isArray(result.keySkills)
+                ? result.keySkills.filter((skill): skill is string => typeof skill === 'string')
+                : [],
+            coreResponsibilities: Array.isArray(result.coreResponsibilities)
+                ? result.coreResponsibilities.filter((responsibility): responsibility is string => typeof responsibility === 'string')
+                : [],
+            ...normalizeJobRequirements(result),
             isAiBanned: finalBan.isBanned,
-            aiBanReason: finalBan.reason,
+            aiBanReason: finalBan.reason || undefined,
         };
         return { distilledJob, cleanedDescription: cleanedText };
     }, { event_type: 'job_extraction', prompt: extractionPrompt, model: AI_MODELS.EXTRACTION, job_id: undefined }, undefined, undefined, onProgress);

@@ -16,20 +16,26 @@ export const JOB_ANALYSIS_PROMPTS = {
       "referenceCode": "Job ID or reference number, otherwise null",
       "category": "technical" | "managerial" | "trades" | "healthcare" | "creative" | "general",
       "canonicalTitle": "Most standard high-level name for this role",
-      "keySkills": ["5-8 actual skills required by the posting"],
+      "keySkills": ["5-8 concise skill labels mentioned by the posting; priority comes from requirements"],
       "requiredSkills": [{ "name": "Skill Name", "level": "learning" | "comfortable" | "expert" }],
       "coreResponsibilities": ["4-6 primary duties"],
       "applicationDeadline": "YYYY-MM-DD or null",
       "salaryRange": "Salary or wage range or null",
-      "educationRequirements": ["Required or preferred degrees, programs, credentials, or education wording"],
-      "courseworkRequirements": ["Specific courses or academic subjects mentioned as relevant"],
-      "experienceRequirements": ["Required experience, seniority, or years of experience"],
-      "hardGates": ["Mandatory licences, certifications, credentials, or eligibility conditions"],
-      "preferredRequirements": ["Requirements explicitly described as preferred, assets, or nice-to-have"]
+      "requirements": [
+        {
+          "text": "Exact concise requirement",
+          "category": "skill" | "education" | "coursework" | "experience" | "hard_gate" | "other",
+          "priority": "required" | "preferred" | "hard_gate"
+        }
+      ]
     }
 
     Rules:
-    - Use empty arrays when a category is not present.
+    - Use an empty requirements array when no explicit requirement is present.
+    - Add every requirement to exactly one structured entry. Use "hard_gate" only for a mandatory licence, credential, legal eligibility condition, or equivalent non-negotiable gate.
+    - Treat keySkills as a compact display/search summary, not a second priority system; put the actual priority in requirements.
+    - Mark education, coursework, experience, and skills as "required" only when the posting makes them mandatory. Use "preferred" for assets, nice-to-haves, and explicitly preferred qualifications.
+    - Keep the requirement text concise but specific enough to score; do not collapse distinct requirements into one vague sentence.
     - Do not turn administrative instructions, application steps, or generic website text into requirements.
     - Preserve the distinction between mandatory and preferred requirements.
     - Do not infer a requirement that is not present in the posting.
@@ -48,6 +54,9 @@ export const JOB_ANALYSIS_PROMPTS = {
     ` : ''}
 
     Rules:
+    - Treat the structured requirements array as the source of truth. Each entry includes its category and priority.
+    - A "required" entry affects the fit score; a "preferred" entry is a bonus only; a "hard_gate" entry is non-negotiable.
+    - Do not promote a preferred requirement to mandatory, and do not treat a missing preferred item as a weakness unless it is useful context for the user.
     - Only credit skills, education, and experience explicitly present in CANDIDATE EVIDENCE.
     - Do not treat omitted transcript or trajectory data as missing qualifications; it was simply not selected as relevant to this call.
     - Treat "preferred", "asset", and "nice to have" requirements as bonuses, not mandatory gates.

@@ -1,3 +1,12 @@
+export type JobRequirementCategory = 'skill' | 'education' | 'coursework' | 'experience' | 'hard_gate' | 'other';
+export type JobRequirementPriority = 'required' | 'preferred' | 'hard_gate';
+
+export interface JobRequirement {
+    text: string;
+    category: JobRequirementCategory;
+    priority: JobRequirementPriority;
+}
+
 export interface DistilledJob {
     companyName: string;
     roleTitle: string;
@@ -13,6 +22,7 @@ export interface DistilledJob {
     isAiBanned?: boolean; // New: Safety flag
     aiBanReason?: string; // New: Context for the ban
     referenceCode?: string | null; // New: Capture job ID/reference number
+    requirements?: JobRequirement[]; // Structured source of truth; legacy arrays below remain for compatibility.
     educationRequirements?: string[];
     courseworkRequirements?: string[];
     experienceRequirements?: string[];

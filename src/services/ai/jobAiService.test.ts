@@ -197,9 +197,27 @@ describe('job context assembly', () => {
         const context = formatParsedJobContext(parsedJob, ['Statistics for Planning (PLAN 302) — 86']);
 
         expect(context).toContain('Role: Student Transportation Planner at Transit Co.');
-        expect(context).toContain('Coursework Requirements: Statistics');
+        expect(context).toContain('[required] coursework: Statistics');
         expect(context).toContain('Statistics for Planning (PLAN 302) — 86');
         expect(context).not.toContain('RAW JOB DESCRIPTION');
+    });
+
+    it('keeps preferred requirements visibly separate from mandatory requirements', () => {
+        const context = formatParsedJobContext({
+            ...parsedJob,
+            requirements: [
+                { text: 'Bachelor degree', category: 'education', priority: 'required' },
+                { text: 'Master degree', category: 'education', priority: 'preferred' },
+                { text: 'Professional licence', category: 'hard_gate', priority: 'hard_gate' },
+            ],
+            educationRequirements: [],
+            hardGates: [],
+            preferredRequirements: [],
+        });
+
+        expect(context).toContain('[required] education: Bachelor degree');
+        expect(context).toContain('[preferred] education: Master degree');
+        expect(context).toContain('[hard_gate] hard_gate: Professional licence');
     });
 });
 
@@ -208,7 +226,7 @@ describe('parse and score call boundaries', () => {
         vi.mocked(callWithRetry).mockImplementation(async (fn: any) => fn({}));
         vi.mocked(getModel).mockImplementation(async (params: any) => ({
             generateContent: vi.fn().mockResolvedValue({
-                response: {
+                        response: {
                     usageMetadata: {},
                     text: () => params.task === 'extraction'
                         ? JSON.stringify({
@@ -219,6 +237,10 @@ describe('parse and score call boundaries', () => {
                             requiredSkills: [],
                             coreResponsibilities: ['Plan projects'],
                             applicationDeadline: null,
+                            requirements: [
+                                { text: 'ArcGIS', category: 'skill', priority: 'required' },
+                                { text: 'Statistics', category: 'coursework', priority: 'preferred' },
+                            ],
                             educationRequirements: [],
                             courseworkRequirements: [],
                             experienceRequirements: [],
@@ -261,8 +283,13 @@ describe('parse and score call boundaries', () => {
         expect(parsePrompt).toHaveBeenCalledWith(rawJob);
         expect(scorePrompt).toHaveBeenCalledOnce();
         expect(scorePrompt.mock.calls[0][0]).toContain('"roleTitle": "Planner"');
+        expect(scorePrompt.mock.calls[0][0]).toContain('"priority": "required"');
         expect(scorePrompt.mock.calls[0][1]).not.toContain(rawJob);
         expect(result.compatibilityScore).toBe(72);
         expect(result.distilledJob.roleTitle).toBe('Planner');
+        expect(result.distilledJob.requirements).toEqual([
+            { text: 'ArcGIS', category: 'skill', priority: 'required' },
+            { text: 'Statistics', category: 'coursework', priority: 'preferred' },
+        ]);
     });
 });
