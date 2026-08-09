@@ -110,6 +110,7 @@ describe('job context assembly', () => {
         keySkills: ['ArcGIS', 'Data analysis'],
         requiredSkills: [],
         coreResponsibilities: ['Analyze transportation data'],
+        coverLetterHooks: ['Transit Co. is modernizing regional mobility through data-informed planning.'],
         applicationDeadline: null,
         courseworkRequirements: ['Statistics'],
         educationRequirements: [],
@@ -198,6 +199,7 @@ describe('job context assembly', () => {
 
         expect(context).toContain('Role: Student Transportation Planner at Transit Co.');
         expect(context).toContain('[required] coursework: Statistics');
+        expect(context).toContain('Transit Co. is modernizing regional mobility');
         expect(context).toContain('Statistics for Planning (PLAN 302) — 86');
         expect(context).not.toContain('RAW JOB DESCRIPTION');
     });
@@ -237,6 +239,7 @@ describe('parse and score call boundaries', () => {
                             requiredSkills: [],
                             coreResponsibilities: ['Plan projects'],
                             applicationDeadline: null,
+                            coverLetterHooks: ['Transit Co. is modernizing regional mobility.'],
                             requirements: [
                                 { text: 'ArcGIS', category: 'skill', priority: 'required' },
                                 { text: 'Statistics', category: 'coursework', priority: 'preferred' },
@@ -287,6 +290,7 @@ describe('parse and score call boundaries', () => {
         expect(scorePrompt.mock.calls[0][1]).not.toContain(rawJob);
         expect(result.compatibilityScore).toBe(72);
         expect(result.distilledJob.roleTitle).toBe('Planner');
+        expect(result.distilledJob.coverLetterHooks).toEqual(['Transit Co. is modernizing regional mobility.']);
         expect(result.distilledJob.requirements).toEqual([
             { text: 'ArcGIS', category: 'skill', priority: 'required' },
             { text: 'Statistics', category: 'coursework', priority: 'preferred' },

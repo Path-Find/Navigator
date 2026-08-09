@@ -232,6 +232,9 @@ export const formatParsedJobContext = (
     parsedJob.coreResponsibilities?.length
         ? `Core Responsibilities:\n${parsedJob.coreResponsibilities.map(item => `- ${item}`).join('\n')}`
         : '',
+    parsedJob.coverLetterHooks?.length
+        ? `Cover Letter Hooks:\n${parsedJob.coverLetterHooks.map(item => `- ${item}`).join('\n')}`
+        : '',
     requirementLines.length ? `Structured Requirements:\n${requirementLines.join('\n')}` : '',
     academicEvidence.length
         ? `Relevant Academic Evidence:\n${academicEvidence.map(item => `- ${item}`).join('\n')}`
@@ -411,6 +414,9 @@ const parseJobInfo = async (
                 : [],
             coreResponsibilities: Array.isArray(result.coreResponsibilities)
                 ? result.coreResponsibilities.filter((responsibility): responsibility is string => typeof responsibility === 'string')
+                : [],
+            coverLetterHooks: Array.isArray(result.coverLetterHooks)
+                ? result.coverLetterHooks.filter((hook): hook is string => typeof hook === 'string')
                 : [],
             ...normalizeJobRequirements(result),
             isAiBanned: finalBan.isBanned,

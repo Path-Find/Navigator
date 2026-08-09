@@ -16,6 +16,7 @@ export interface DistilledJob {
     requiredSkills?: { name: string; level: 'learning' | 'comfortable' | 'expert' }[];
     coreResponsibilities: string[];
     salaryRange?: string | null;
+    coverLetterHooks?: string[]; // Employer/role-specific details worth referencing in a letter.
     source?: string | null;
     category?: 'technical' | 'general' | 'managerial' | 'trades' | 'healthcare' | 'creative'; // AI-determined category
     canonicalTitle?: string; // New: Standardized title for farming

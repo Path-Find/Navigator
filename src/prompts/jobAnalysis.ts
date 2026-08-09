@@ -24,6 +24,7 @@ export const JOB_ANALYSIS_PROMPTS = {
       "coreResponsibilities": ["4-6 primary duties"],
       "applicationDeadline": "YYYY-MM-DD or null",
       "salaryRange": "Salary or wage range or null",
+      "coverLetterHooks": ["1-3 specific employer, team, product, mission, or role challenges worth referencing in a cover letter"],
       "requirements": [
         {
           "text": "Exact concise requirement",
@@ -39,6 +40,7 @@ export const JOB_ANALYSIS_PROMPTS = {
     - Treat keySkills as a compact display/search summary, not a second priority system; put the actual priority in requirements.
     - Mark education, coursework, experience, and skills as "required" only when the posting makes them mandatory. Use "preferred" for assets, nice-to-haves, and explicitly preferred qualifications.
     - Keep the requirement text concise but specific enough to score; do not collapse distinct requirements into one vague sentence.
+    - Extract no more than 3 coverLetterHooks. Include only specific details supported by the posting that could make a letter's opening or motivation specific; omit generic statements like "commitment to excellence".
     - Do not turn administrative instructions, application steps, or generic website text into requirements.
     - Preserve the distinction between mandatory and preferred requirements.
     - Do not infer a requirement that is not present in the posting.
