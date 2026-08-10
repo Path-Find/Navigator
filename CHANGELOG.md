@@ -14,6 +14,7 @@ See [CHANGELOG_ARCHIVE.md](CHANGELOG_ARCHIVE.md) for earlier history.
 - **Reusable application context can now be managed in Settings**: users can review or remove saved signals and stories, while refreshing the profile interview replaces duplicate signals instead of accumulating them.
 
 ### Changed
+- **Homepage feature cards now fit into one row on desktop**: the five-card layout no longer leaves an unnecessary second row at common desktop widths.
 - **Navigator observations now expire when their resume evidence changes**: confirmed insights are marked for review and stop affecting AI calls until they are confirmed against the updated resume.
 - **Profile settings can clear saved observation decisions**: users can reset confirmed or dismissed observations without deleting their resumes, stories, or writing preferences.
 - **Profile settings now keep writing preferences beside Current Focus and reusable context**: users have one place to manage how Navigator understands and represents them, while account security remains separate.
