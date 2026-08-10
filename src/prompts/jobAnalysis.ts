@@ -15,6 +15,8 @@ export const JOB_ANALYSIS_PROMPTS = {
     {
       "roleTitle": "Official title",
       "companyName": "Company name",
+      "recipientName": "Clearly named hiring contact or addressee, otherwise null",
+      "recipientTitle": "Clearly stated addressee title or hiring group, otherwise null",
       "location": "City, State or Remote, otherwise null",
       "referenceCode": "Job ID or reference number, otherwise null",
       "category": "technical" | "managerial" | "trades" | "healthcare" | "creative" | "general",
@@ -42,6 +44,8 @@ export const JOB_ANALYSIS_PROMPTS = {
     - Keep the requirement text concise but specific enough to score; do not collapse distinct requirements into one vague sentence.
     - Extract no more than 3 coverLetterHooks. Include only specific details supported by the posting that could make a letter's opening or motivation specific; omit generic statements like "commitment to excellence".
     - Do not turn administrative instructions, application steps, or generic website text into requirements.
+    - Extract recipientName only when the posting clearly identifies a person as the hiring contact or addressee. Do not use names of executives, authors, recruiters mentioned incidentally, or names found only in unrelated website text.
+    - Extract recipientTitle only when the posting clearly states an addressee such as "Hiring Manager", "Hiring Committee", or a named hiring team. Otherwise use null.
     - Preserve the distinction between mandatory and preferred requirements.
     - Do not infer a requirement that is not present in the posting.
     `,

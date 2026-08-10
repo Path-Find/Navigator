@@ -65,7 +65,7 @@ describe('prompt data anchoring', () => {
         expect(COVER_LETTER_STYLE_METADATA.v3_experimental_pro.category).toBe('strategic');
 
         const prompt = COVER_LETTER_PROMPTS.COVER_LETTER.GENERATE('template', 'job', 'resume', ['strategy']);
-        expect(prompt).toContain('Start with exactly "Dear Hiring Manager,"');
+        expect(prompt).toContain('Do not add a salutation, sign-off, candidate name, or placeholder name.');
         expect(prompt).toContain('exactly 3 body paragraphs');
         expect(prompt).toContain('between 300 and 375 words');
 

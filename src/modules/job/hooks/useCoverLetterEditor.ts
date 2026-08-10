@@ -53,7 +53,7 @@ export const useCoverLetterEditor = ({
     // Sync with parent when job prop changes
     useEffect(() => {
         const normalizedCoverLetter = job.coverLetter && fullName
-            ? finalizeCoverLetterOutput(job.coverLetter, fullName)
+            ? finalizeCoverLetterOutput(job.coverLetter, fullName, analysis.distilledJob)
             : job.coverLetter;
         const normalizedJob = normalizedCoverLetter && normalizedCoverLetter !== job.coverLetter
             ? { ...job, coverLetter: normalizedCoverLetter }
@@ -63,7 +63,7 @@ export const useCoverLetterEditor = ({
             void Storage.updateJob(normalizedJob).catch(() => undefined);
             onJobUpdate(normalizedJob);
         }
-    }, [job, fullName, onJobUpdate]);
+    }, [analysis.distilledJob, job, fullName, onJobUpdate]);
 
     const handleCopy = useCallback(async (text: string) => {
         await navigator.clipboard.writeText(text);
@@ -188,7 +188,7 @@ export const useCoverLetterEditor = ({
                 const variants = Object.keys(COVER_LETTER_PROMPTS.COVER_LETTER.STYLE_MODULES).slice(0, 2);
 
                 const results = await Promise.all(variants.map(v =>
-                    generateCoverLetter(textToUse, focusedResume, instructions || [], finalContext, v, trajectoryContext, localJob.id, canonicalTitle, personalizedStyle, fullName || undefined, coverLetterPreferences || undefined, candidateSignals, candidateProfileContext)
+                    generateCoverLetter(textToUse, focusedResume, instructions || [], finalContext, v, trajectoryContext, localJob.id, canonicalTitle, personalizedStyle, fullName || undefined, coverLetterPreferences || undefined, candidateSignals, candidateProfileContext, analysis.distilledJob)
                 ));
 
                 setComparisonVersions(results);
@@ -217,7 +217,8 @@ export const useCoverLetterEditor = ({
                     score,
                     coverLetterPreferences || undefined,
                     candidateSignals,
-                    candidateProfileContext
+                    candidateProfileContext,
+                    analysis.distilledJob
                 );
 
                 const updated = {
@@ -273,7 +274,8 @@ export const useCoverLetterEditor = ({
                     fullName || undefined,
                     coverLetterPreferences || undefined,
                     candidateSignals,
-                    candidateProfileContext
+                    candidateProfileContext,
+                    analysis.distilledJob
                 );
 
                 const updated = {
@@ -373,7 +375,7 @@ export const useCoverLetterEditor = ({
     }, []);
 
     const handleEditCoverLetter = useCallback(async (newText: string) => {
-        const finalizedText = finalizeCoverLetterOutput(newText, fullName || undefined);
+        const finalizedText = finalizeCoverLetterOutput(newText, fullName || undefined, analysis.distilledJob);
         if (finalizedText !== localJob.coverLetter) {
             const updated = { ...localJob, coverLetter: finalizedText };
             setLocalJob(updated);

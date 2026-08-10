@@ -109,6 +109,31 @@ describe('finalizeCoverLetterOutput', () => {
         expect(finalizeCoverLetterOutput('Dear Ms. Chen,\n\nBody.', 'Ryan Hanna'))
             .toBe('Dear Ms. Chen,\n\nBody.\n\nSincerely,\nRyan Hanna');
     });
+
+    it('uses a clearly named recipient when the parser found one', () => {
+        expect(finalizeCoverLetterOutput('Body.', 'Ryan Hanna', { recipientName: 'Jane Smith' }))
+            .toBe('Dear Jane Smith,\n\nBody.\n\nSincerely,\nRyan Hanna');
+    });
+
+    it('updates an older generic greeting when a named recipient is available', () => {
+        expect(finalizeCoverLetterOutput('Dear Hiring Manager,\n\nBody.', 'Ryan Hanna', { recipientName: 'Jane Smith' }))
+            .toBe('Dear Jane Smith,\n\nBody.\n\nSincerely,\nRyan Hanna');
+    });
+
+    it('uses a clearly stated hiring group when no person was named', () => {
+        expect(finalizeCoverLetterOutput('Body.', 'Ryan Hanna', { recipientTitle: 'Hiring Committee' }))
+            .toBe('Dear Hiring Committee,\n\nBody.\n\nSincerely,\nRyan Hanna');
+    });
+
+    it('keeps the generic greeting when recipient data is absent or uncertain', () => {
+        expect(finalizeCoverLetterOutput('Body.', 'Ryan Hanna', { recipientName: 'Hiring Team' }))
+            .toBe('Dear Hiring Manager,\n\nBody.\n\nSincerely,\nRyan Hanna');
+    });
+
+    it('preserves legacy hiring-management salutations instead of duplicating them', () => {
+        expect(finalizeCoverLetterOutput('To Hiring Management, City of Richmond Hill\n\nBody.', 'Ryan Hanna'))
+            .toBe('To Hiring Management, City of Richmond Hill\n\nBody.\n\nSincerely,\nRyan Hanna');
+    });
 });
 
 describe('cover-letter candidate signals', () => {

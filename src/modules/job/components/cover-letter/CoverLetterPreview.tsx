@@ -28,7 +28,7 @@ export const CoverLetterPreview: React.FC<CoverLetterPreviewProps> = ({
     companyName,
     userProfile
 }) => {
-    const finalizedContent = finalizeCoverLetterOutput(content, userProfile.name);
+    const finalizedContent = finalizeCoverLetterOutput(content, userProfile.name, { recipientName, recipientTitle });
 
     return (
         <div 

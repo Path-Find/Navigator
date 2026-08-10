@@ -449,8 +449,39 @@ export const cleanCoverLetterOutput = (text: string): string => {
     return cleaned.trim();
 };
 
+export type CoverLetterRecipient = Pick<DistilledJob, 'recipientName' | 'recipientTitle'>;
+
+const normalizeRecipientValue = (value: unknown): string =>
+    typeof value === 'string' ? value.replace(/\s+/g, ' ').trim().slice(0, 120) : '';
+
+const isLikelyRecipientName = (value: string): boolean => {
+    const words = value.split(' ');
+    if (words.length < 2 || words.length > 5) return false;
+    if (/\b(?:hiring|selection|recruitment|search|talent|human resources|hr|committee|team|manager|management|department|office)\b/i.test(value)) {
+        return false;
+    }
+    return /^[\p{L}][\p{L}'’.-]*(?:\s+[\p{L}][\p{L}'’.-]*){1,4}$/u.test(value);
+};
+
+const isLikelyRecipientTitle = (value: string): boolean =>
+    /^(?:the\s+)?(?:hiring|selection|recruitment|search|talent|human resources|hr|department|committee|team|management|manager|director|supervisor|dean|faculty|office)\b/i.test(value);
+
+const getCoverLetterGreeting = (recipient?: CoverLetterRecipient): string => {
+    const name = normalizeRecipientValue(recipient?.recipientName);
+    if (isLikelyRecipientName(name)) return `Dear ${name},`;
+
+    const title = normalizeRecipientValue(recipient?.recipientTitle);
+    if (isLikelyRecipientTitle(title)) return `Dear ${title},`;
+
+    return 'Dear Hiring Manager,';
+};
+
 /** The application owns the salutation and closing for consistent saved output. */
-export const finalizeCoverLetterOutput = (text: string, candidateName?: string): string => {
+export const finalizeCoverLetterOutput = (
+    text: string,
+    candidateName?: string,
+    recipient?: CoverLetterRecipient
+): string => {
     const cleaned = cleanCoverLetterOutput(text);
     const lines = cleaned.split(/\r?\n/);
     let closingIndex = -1;
@@ -465,11 +496,14 @@ export const finalizeCoverLetterOutput = (text: string, candidateName?: string):
         .join('\n')
         .replace(/\s*\[(?:your\s+)?name\]\s*$/i, '')
         .trim();
-    const normalizedBody = body && /^(dear\b|to whom it may concern\b)/i.test(body)
-        ? body
-        : body
-            ? `Dear Hiring Manager,\n\n${body}`
-            : body;
+    const greeting = getCoverLetterGreeting(recipient);
+    const normalizedBody = body && /^dear\s+hiring\s+manager,?\s*/i.test(body)
+        ? `${greeting}\n\n${body.replace(/^dear\s+hiring\s+manager,?\s*/i, '').trim()}`
+        : body && /^(dear\b|to whom it may concern\b|to\s+(?:the\s+)?(?:hiring|selection|recruitment|search|management|committee|team)\b)/i.test(body)
+            ? body
+            : body
+                ? `${greeting}\n\n${body}`
+                : body;
     const name = candidateName?.trim();
     return name ? `${normalizedBody}\n\nSincerely,\n${name}` : normalizedBody;
 };
@@ -504,6 +538,8 @@ const parseJobInfo = async (
             ...result,
             companyName: typeof result.companyName === 'string' ? result.companyName : '',
             roleTitle: typeof result.roleTitle === 'string' ? result.roleTitle : '',
+            recipientName: normalizeRecipientValue(result.recipientName) || null,
+            recipientTitle: normalizeRecipientValue(result.recipientTitle) || null,
             applicationDeadline: typeof result.applicationDeadline === 'string' ? result.applicationDeadline : null,
             keySkills: Array.isArray(result.keySkills)
                 ? result.keySkills.filter((skill): skill is string => typeof skill === 'string')
@@ -619,7 +655,8 @@ export const generateCoverLetter = async (
     candidateName?: string,
     coverLetterPreferences?: string,
     candidateSignals: string[] = [],
-    candidateProfileContext?: string
+    candidateProfileContext?: string,
+    recipient?: CoverLetterRecipient
 ): Promise<{
     text: string;
     promptVersion: string;
@@ -655,7 +692,7 @@ export const generateCoverLetter = async (
         const response = await model.generateContent({ contents: [{ role: "user", parts: [{ text: prompt }] }] });
         metadata.token_usage = response.response.usageMetadata;
         return {
-            text: finalizeCoverLetterOutput(sanitizeInput(response.response.text()), candidateName),
+            text: finalizeCoverLetterOutput(sanitizeInput(response.response.text()), candidateName, recipient),
             promptVersion: selectedPromptVersion,
             styleCategory: styleMetadata.category,
             styleLabel: styleMetadata.label,
@@ -694,7 +731,8 @@ export const generateCoverLetterWithQuality = async (
     fitScore?: number,
     coverLetterPreferences?: string,
     candidateSignals: string[] = [],
-    candidateProfileContext?: string
+    candidateProfileContext?: string,
+    recipient?: CoverLetterRecipient
 ): Promise<{
     text: string;
     promptVersion: string;
@@ -723,7 +761,7 @@ export const generateCoverLetterWithQuality = async (
     const initialContext = isExtremeMismatch
         ? `${additionalContext ? `${additionalContext}\n\n` : ''}STRICT INSTRUCTION: This role's compatibility score is extremely low (${fitScore}/100) — a large, hard-to-bridge gap exists. Do not attempt to persuade past it. Include one clear, plain-language sentence that honestly names the specific gap (e.g. missing credential, licence, or years of direct experience) rather than glossing over it. Lead with genuine transferable strengths, but stay honest about the mismatch.`
         : additionalContext;
-    let result = await generateCoverLetter(jobDescription, selectedResume, tailoringInstructions, initialContext, undefined, trajectoryContext, jobId, canonicalTitle, personalizedStyle, candidateName, coverLetterPreferences, candidateSignals, candidateProfileContext);
+    let result = await generateCoverLetter(jobDescription, selectedResume, tailoringInstructions, initialContext, undefined, trajectoryContext, jobId, canonicalTitle, personalizedStyle, candidateName, coverLetterPreferences, candidateSignals, candidateProfileContext, recipient);
     let attempts = 1;
 
     // Fast Path for Free and Plus tiers (No iterative loop to protect margins)
@@ -769,7 +807,7 @@ export const generateCoverLetterWithQuality = async (
                 STRICT INSTRUCTION: Stop attempting further persuasion. Include one clear, plain-language sentence that honestly names the specific gap identified above (e.g. a missing credential, licence, or years of direct experience) rather than glossing over it. The letter should read as self-aware about the gap, not falsely confident. Keep everything else about the letter's real strengths intact.
             `;
             const honestyContext = additionalContext ? `${additionalContext}\n\n${honestyInstruction}` : honestyInstruction;
-            result = await generateCoverLetter(jobDescription, selectedResume, tailoringInstructions, honestyContext, undefined, trajectoryContext, jobId, canonicalTitle, personalizedStyle, candidateName, coverLetterPreferences, candidateSignals, candidateProfileContext);
+            result = await generateCoverLetter(jobDescription, selectedResume, tailoringInstructions, honestyContext, undefined, trajectoryContext, jobId, canonicalTitle, personalizedStyle, candidateName, coverLetterPreferences, candidateSignals, candidateProfileContext, recipient);
             attempts++;
             break;
         }
@@ -786,7 +824,7 @@ export const generateCoverLetterWithQuality = async (
         // We append the critique to any existing context
         const newContext = additionalContext ? `${additionalContext}\n\n${improvementContext}` : improvementContext;
 
-        result = await generateCoverLetter(jobDescription, selectedResume, tailoringInstructions, newContext, undefined, trajectoryContext, jobId, canonicalTitle, personalizedStyle, candidateName, coverLetterPreferences, candidateSignals, candidateProfileContext);
+        result = await generateCoverLetter(jobDescription, selectedResume, tailoringInstructions, newContext, undefined, trajectoryContext, jobId, canonicalTitle, personalizedStyle, candidateName, coverLetterPreferences, candidateSignals, candidateProfileContext, recipient);
         attempts++;
     }
 

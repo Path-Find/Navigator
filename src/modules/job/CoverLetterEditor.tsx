@@ -194,6 +194,8 @@ export const CoverLetterEditor: React.FC<CoverLetterEditorProps> = (props) => {
                         content={localJob.coverLetter}
                         date={new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}
                         roleTitle={job.analysis?.distilledJob.roleTitle || job.position}
+                        recipientName={job.analysis?.distilledJob.recipientName || undefined}
+                        recipientTitle={job.analysis?.distilledJob.recipientTitle || undefined}
                         companyName={job.analysis?.distilledJob.companyName || job.company}
                         userProfile={{
                             name: fullName || user?.user_metadata?.full_name || 'User',

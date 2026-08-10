@@ -86,7 +86,9 @@ export const CoverLetters: React.FC = () => {
                     </div>
                 ) : (
                     letters.map((job) => {
-                        const displayLetter = fullName ? finalizeCoverLetterOutput(job.coverLetter!, fullName) : job.coverLetter!;
+                        const displayLetter = fullName
+                            ? finalizeCoverLetterOutput(job.coverLetter!, fullName, job.analysis?.distilledJob)
+                            : job.coverLetter!;
                         return (
                             <LocalizedErrorBoundary key={job.id} componentName="Cover Letter Card">
                             <div

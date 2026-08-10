@@ -12,6 +12,10 @@ export interface JobRequirement {
 export interface DistilledJob {
     companyName: string;
     roleTitle: string;
+    /** A clearly named person the application should address, when the posting states one. */
+    recipientName?: string | null;
+    /** A clearly stated addressee title or hiring group, when the posting states one. */
+    recipientTitle?: string | null;
     location?: string | null;
     applicationDeadline: string | null;
     keySkills: string[];

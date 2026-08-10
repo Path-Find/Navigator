@@ -108,10 +108,9 @@ export const COVER_LETTER_PROMPTS = {
     ` : ''}
 
     REQUIRED LETTER STRUCTURE:
-    - Start with exactly "Dear Hiring Manager," on its own line, followed by a blank line.
     - Write exactly 3 body paragraphs: (1) role motivation and fit, (2) the strongest evidence from the resume, and (3) transferable value, honest gap framing when needed, and interest in contributing.
     - Keep the full letter between 300 and 375 words. Remove repetition before adding detail.
-    - Do not add a sign-off, candidate name, or placeholder name. The application will add the exact closing after generation.
+    - Do not add a salutation, sign-off, candidate name, or placeholder name. The application will add the exact greeting and closing after generation.
     - Do not include headings, labels, bullets, markdown, or multiple closing signatures.
 
     FINAL CHECK:
