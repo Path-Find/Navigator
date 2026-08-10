@@ -11,6 +11,7 @@ import { SharedPageLayout } from '../../components/common/SharedPageLayout';
 import { PageHeader } from '../../components/ui/PageHeader';
 import { useNavigate } from 'react-router';
 import { NextGenCalibration } from './components/NextGenCalibration';
+import { CandidateProfileContextManager } from './components/CandidateProfileContextManager';
 
 export const SettingsPage: React.FC = () => {
     const { user, userTier, isTester, isAdmin, simulatedTier, journey, fullName, coverLetterPreferences, updateProfile } = useUser();
@@ -334,6 +335,8 @@ export const SettingsPage: React.FC = () => {
                     </div>
                 </div>
             </div>
+
+            <CandidateProfileContextManager />
 
             {isAdmin && (
                 <div className="mt-12">

@@ -146,12 +146,16 @@ export const CandidateProfileInterview: React.FC<CandidateProfileInterviewProps>
             .filter(story => story.text.trim())
             .map(story => createCandidateStory(story.text, 'profile_interview', story.tags));
         const existing = primaryResume.candidateProfile;
+        const signalsByKey = new Map((existing?.signals || []).map(signal => [signal.key, signal]));
+        newSignals.forEach(signal => signalsByKey.set(signal.key, signal));
+        const existingStoryText = new Set((existing?.stories || []).map(story => story.text.trim().toLowerCase()));
+        const storiesToAdd = newStories.filter(story => !existingStoryText.has(story.text.toLowerCase()));
 
         await handleUpdateResume({
             ...primaryResume,
             candidateProfile: {
-                signals: [...(existing?.signals || []), ...newSignals],
-                stories: [...(existing?.stories || []), ...newStories],
+                signals: [...signalsByKey.values()],
+                stories: [...(existing?.stories || []), ...storiesToAdd],
                 completedAt: approvedAt,
             },
         });

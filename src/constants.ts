@@ -152,6 +152,7 @@ export const ROUTES = {
   JOB_HOME: '/jobs',
   RESUMES: '/jobs/resumes',
   INTERVIEWS: '/jobs/interviews',
+  PROFILE_INTERVIEW: '/jobs/interviews/profile',
   FEED: '/jobs/feed',
   HISTORY: '/jobs/history',
   COVER_LETTERS: '/jobs/cover-letters',

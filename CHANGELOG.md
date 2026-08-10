@@ -10,6 +10,7 @@ See [CHANGELOG_ARCHIVE.md](CHANGELOG_ARCHIVE.md) for earlier history.
 - **Cover-letter style preferences now follow the user across applications**: account settings can define general tone, voice, or length preferences, while job-specific facts remain in each job's personal context.
 - **Cover-letter generation now composes one core prompt from named style and candidate-situation modules**: style choices and cautious signals such as possible first-role or current-education context are injected only when supported, then saved for future style learning.
 - **Candidate stories and profile signals can now be reused with consent**: resume stories, verified skills, and optional profile-interview answers are saved with the primary resume, reviewed before profile save, and injected only when relevant to an application or interview.
+- **Reusable application context can now be managed in Settings**: users can review or remove saved signals and stories, while refreshing the profile interview replaces duplicate signals instead of accumulating them.
 
 ### Changed
 - **Application status reminders now explain why outcomes matter**: the reminder uses calmer pastel controls and connects status updates to better future job guidance and cover letters.

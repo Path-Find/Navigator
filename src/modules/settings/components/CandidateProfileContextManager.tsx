@@ -1,0 +1,149 @@
+import React from 'react';
+import { ArrowRight, BookOpen, Sparkles, Trash2 } from 'lucide-react';
+import { useNavigate } from 'react-router';
+import { Button } from '../../../components/ui/Button';
+import { useToast } from '../../../contexts/ToastContext';
+import { useResumeContext } from '../../resume/context/ResumeContext';
+import { ROUTES } from '../../../constants';
+import type { CandidateProfileSignal, CandidateStory } from '../../resume/types';
+
+const SIGNAL_LABELS: Record<CandidateProfileSignal['key'], string> = {
+    career_stage: 'Career stage',
+    career_direction: 'Career direction',
+    education_status: 'Education',
+    preferred_emphasis: 'What to emphasize',
+    boundary: 'Boundary',
+};
+
+const SOURCE_LABELS: Record<CandidateStory['source'], string> = {
+    resume_interview: 'Resume interview',
+    general_interview: 'General interview',
+    profile_interview: 'Profile interview',
+};
+
+export const CandidateProfileContextManager: React.FC = () => {
+    const navigate = useNavigate();
+    const { resumes, handleUpdateResume, isLoading } = useResumeContext();
+    const { showSuccess } = useToast();
+    const primaryResume = resumes[0];
+    const signals = primaryResume?.candidateProfile?.signals || [];
+    const stories = primaryResume?.candidateProfile?.stories || [];
+    const hasContext = signals.length > 0 || stories.length > 0;
+
+    const removeContext = async (type: 'signal' | 'story', id: string) => {
+        if (!primaryResume) return;
+
+        const context = primaryResume.candidateProfile;
+        const nextSignals = type === 'signal'
+            ? signals.filter(signal => signal.id !== id)
+            : signals;
+        const nextStories = type === 'story'
+            ? stories.filter(story => story.id !== id)
+            : stories;
+
+        await handleUpdateResume({
+            ...primaryResume,
+            candidateProfile: nextSignals.length || nextStories.length
+                ? {
+                    signals: nextSignals,
+                    stories: nextStories,
+                    completedAt: context?.completedAt,
+                }
+                : undefined,
+        });
+        showSuccess('Removed from your reusable profile.');
+    };
+
+    return (
+        <section className="mt-12 bg-white dark:bg-neutral-900/50 rounded-3xl border border-indigo-100 dark:border-indigo-500/20 p-8 shadow-sm">
+            <div className="flex flex-col gap-5 sm:flex-row sm:items-start sm:justify-between">
+                <div className="flex items-start gap-3">
+                    <div className="p-2 bg-violet-500/10 rounded-xl">
+                        <Sparkles className="w-5 h-5 text-violet-500" />
+                    </div>
+                    <div>
+                        <h4 className="font-bold text-neutral-900 dark:text-white tracking-tight">Reusable application context</h4>
+                        <p className="text-xs text-neutral-400 leading-relaxed mt-2 max-w-2xl">
+                            These are details you approved for Navigator to reuse in interviews and applications when they fit. You can remove any item at any time.
+                        </p>
+                    </div>
+                </div>
+                <Button
+                    variant="subtle"
+                    size="sm"
+                    onClick={() => navigate(ROUTES.PROFILE_INTERVIEW)}
+                    icon={<ArrowRight className="w-3.5 h-3.5" />}
+                    className="shrink-0 !text-indigo-600 dark:!text-indigo-400 !border-indigo-100 dark:!border-indigo-500/20"
+                >
+                    Build or refresh profile
+                </Button>
+            </div>
+
+            {isLoading ? (
+                <p className="text-sm text-neutral-400 mt-8">Loading your saved context…</p>
+            ) : !hasContext ? (
+                <div className="mt-8 rounded-2xl bg-violet-50/70 dark:bg-violet-500/10 border border-violet-100 dark:border-violet-500/20 px-5 py-4">
+                    <div className="flex items-start gap-3">
+                        <BookOpen className="w-4 h-4 text-violet-500 mt-0.5 shrink-0" />
+                        <p className="text-sm text-neutral-600 dark:text-neutral-300">
+                            Nothing saved yet. Build your profile once and Navigator can use the useful pieces only when an application calls for them.
+                        </p>
+                    </div>
+                </div>
+            ) : (
+                <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mt-8">
+                    {signals.length > 0 && (
+                        <div>
+                            <h5 className="text-[10px] font-black uppercase tracking-widest text-neutral-400 mb-3">Signals</h5>
+                            <div className="space-y-3">
+                                {signals.map(signal => (
+                                    <div key={signal.id} className="flex items-start gap-3 rounded-2xl bg-indigo-50/70 dark:bg-indigo-500/10 border border-indigo-100 dark:border-indigo-500/20 px-4 py-3">
+                                        <div className="min-w-0 flex-1">
+                                            <p className="text-[10px] font-black uppercase tracking-wide text-indigo-500 dark:text-indigo-300">{SIGNAL_LABELS[signal.key]}</p>
+                                            <p className="text-sm text-neutral-700 dark:text-neutral-200 mt-1">{signal.value}</p>
+                                        </div>
+                                        <button
+                                            type="button"
+                                            onClick={() => { void removeContext('signal', signal.id); }}
+                                            aria-label={`Remove ${SIGNAL_LABELS[signal.key]} signal`}
+                                            className="p-1.5 rounded-lg text-neutral-400 hover:text-rose-500 hover:bg-white/70 dark:hover:bg-neutral-900/50 transition-colors shrink-0"
+                                        >
+                                            <Trash2 className="w-3.5 h-3.5" />
+                                        </button>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    )}
+
+                    {stories.length > 0 && (
+                        <div>
+                            <h5 className="text-[10px] font-black uppercase tracking-widest text-neutral-400 mb-3">Stories</h5>
+                            <div className="space-y-3">
+                                {stories.map(story => (
+                                    <div key={story.id} className="flex items-start gap-3 rounded-2xl bg-amber-50/70 dark:bg-amber-500/10 border border-amber-100 dark:border-amber-500/20 px-4 py-3">
+                                        <div className="min-w-0 flex-1">
+                                            <p className="text-sm text-neutral-700 dark:text-neutral-200">{story.text}</p>
+                                            <div className="flex flex-wrap items-center gap-1.5 mt-2">
+                                                <span className="text-[10px] font-bold text-amber-600 dark:text-amber-300">{SOURCE_LABELS[story.source]}</span>
+                                                {story.tags.map(tag => <span key={tag} className="text-[10px] text-neutral-400">· {tag}</span>)}
+                                            </div>
+                                        </div>
+                                        <button
+                                            type="button"
+                                            onClick={() => { void removeContext('story', story.id); }}
+                                            aria-label="Remove saved story"
+                                            className="p-1.5 rounded-lg text-neutral-400 hover:text-rose-500 hover:bg-white/70 dark:hover:bg-neutral-900/50 transition-colors shrink-0"
+                                        >
+                                            <Trash2 className="w-3.5 h-3.5" />
+                                        </button>
+                                    </div>
+                                ))}
+                            </div>
+                        </div>
+                    )}
+                </div>
+            )}
+        </section>
+    );
+};
