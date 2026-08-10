@@ -57,6 +57,8 @@ export class RdStyleService {
                 const ctx = s.context;
                 const artifactHash = typeof s.metadata?.artifact_hash === 'string' ? s.metadata.artifact_hash : null;
                 const winningOutcome = artifactHash ? winningArtifacts.get(artifactHash) : undefined;
+                const styleCategory = typeof s.metadata?.style_category === 'string' ? s.metadata.style_category : null;
+                const styleLabel = typeof s.metadata?.style_label === 'string' ? s.metadata.style_label : null;
 
                 const content = typeof s.outputContent === 'string'
                     ? s.outputContent.substring(0, 200)
@@ -67,8 +69,11 @@ export class RdStyleService {
                 const weightLabel = winningOutcome
                     ? ` [ASSOCIATED WITH ${winningOutcome.toUpperCase()} - HIGH WEIGHT]`
                     : '';
+                const styleLabelText = styleCategory
+                    ? ` [STYLE: ${styleCategory}${styleLabel ? ` - ${styleLabel}` : ''}]`
+                    : '';
 
-                return `${weightLabel}[${type} in ${ctx}]: ${content}${correction}`;
+                return `${weightLabel}${styleLabelText}[${type} in ${ctx}]: ${content}${correction}`;
             }).join('\n---\n');
 
             // 4. Call the Distiller Model

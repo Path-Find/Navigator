@@ -11,7 +11,7 @@ import type {
     Transcript
 } from "../../types";
 import { AI_MODELS, AI_TEMPERATURE, AGENT_LOOP, CURRENT_JOB_ANALYSIS_VERSION, USER_TIERS } from "../../constants";
-import { JOB_ANALYSIS_PROMPTS, COVER_LETTER_PROMPTS } from "../../prompts/index";
+import { JOB_ANALYSIS_PROMPTS, COVER_LETTER_PROMPTS, COVER_LETTER_STYLE_METADATA } from "../../prompts/index";
 import { BucketStorage } from "../storage/bucketStorage";
 
 const stringifyProfile = (profile: ResumeProfile): string => {
@@ -522,12 +522,20 @@ export const generateCoverLetter = async (
     personalizedStyle?: string,
     candidateName?: string,
     coverLetterPreferences?: string
-): Promise<{ text: string; promptVersion: string }> => {
+): Promise<{
+    text: string;
+    promptVersion: string;
+    styleCategory: typeof COVER_LETTER_STYLE_METADATA[keyof typeof COVER_LETTER_STYLE_METADATA]['category'];
+    styleLabel: string;
+    styleDescription: string;
+}> => {
     const resumeText = stringifyProfile(selectedResume);
     const variants = COVER_LETTER_PROMPTS.COVER_LETTER.VARIANTS;
-    const template = forceVariant && forceVariant in variants
-        ? variants[forceVariant as keyof typeof variants]
-        : variants.v1_direct;
+    const selectedPromptVersion = forceVariant && forceVariant in variants
+        ? forceVariant as keyof typeof variants
+        : 'v1_direct';
+    const template = variants[selectedPromptVersion];
+    const styleMetadata = COVER_LETTER_STYLE_METADATA[selectedPromptVersion];
 
     // Fetch Bucket Strategy
     let bucketStrategy = undefined;
@@ -550,7 +558,13 @@ export const generateCoverLetter = async (
         const model = await getModel({ task: 'analysis', feature: 'cover_letter' });
         const response = await model.generateContent({ contents: [{ role: "user", parts: [{ text: prompt }] }] });
         metadata.token_usage = response.response.usageMetadata;
-        return { text: cleanCoverLetterOutput(sanitizeInput(response.response.text())), promptVersion: forceVariant || "v1" };
+        return {
+            text: cleanCoverLetterOutput(sanitizeInput(response.response.text())),
+            promptVersion: selectedPromptVersion,
+            styleCategory: styleMetadata.category,
+            styleLabel: styleMetadata.label,
+            styleDescription: styleMetadata.description,
+        };
     }, { event_type: 'cover_letter', prompt, model: 'dynamic', job_id: jobId });
 };
 
@@ -586,6 +600,9 @@ export const generateCoverLetterWithQuality = async (
 ): Promise<{
     text: string;
     promptVersion: string;
+    styleCategory: typeof COVER_LETTER_STYLE_METADATA[keyof typeof COVER_LETTER_STYLE_METADATA]['category'];
+    styleLabel: string;
+    styleDescription: string;
     decision: string;
     attempts: number;
     critique?: { feedback: string[]; strengths: string[]; hallucinationAlerts: string[] }

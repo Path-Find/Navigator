@@ -1,10 +1,31 @@
 import { anchorData, anchorGuidance, GUIDANCE_RULE, UNTRUSTED_DATA_RULE } from './anchoring';
 
+export const COVER_LETTER_STYLE_METADATA = {
+  v1_direct: {
+    category: 'direct',
+    label: 'Direct & Evidence-Led',
+    description: 'Clear, focused, and achievement-first.',
+  },
+  v2_storytelling: {
+    category: 'storytelling',
+    label: 'Narrative & Mission-Led',
+    description: 'Connects your career path to the employer’s mission.',
+  },
+  v3_experimental_pro: {
+    category: 'strategic',
+    label: 'Strategic & Executive',
+    description: 'Frames your experience around value, impact, and trajectory.',
+  },
+} as const;
+
+export type CoverLetterStyleCategory = typeof COVER_LETTER_STYLE_METADATA[keyof typeof COVER_LETTER_STYLE_METADATA]['category'];
+export type CoverLetterStyleMetadata = typeof COVER_LETTER_STYLE_METADATA[keyof typeof COVER_LETTER_STYLE_METADATA];
+
 export const COVER_LETTER_PROMPTS = {
   COVER_LETTER: {
     VARIANTS: {
       v1_direct: `
-            You are a Strategic Career Architect. Write a professional, high-impact cover letter (approx. 400 words).
+            You are a Strategic Career Architect. Write a professional, high-impact cover letter (300–375 words).
             
             INSTRUCTIONS:
             - **Grounding Rule**: Use ONLY evidence from the provided Resume Blocks. Do NOT invent skills. This is a hard constraint, not a style preference: before naming ANY specific tool, software, platform, certification, or technology, confirm it appears verbatim in the resume text. Do not add a plausible-sounding related tool to round out a list, even one you'd guess the candidate probably knows (e.g. resume says "ArcGIS Pro, ArcGIS Online" — writing "ArcGIS Pro, ArcGIS Online, and QGIS" is a FAIL if QGIS never appears in the resume text, regardless of how likely it is to be true). You only see the resume text, not the candidate's full skill set — an unlisted tool cannot be verified from what you have, even if it turns out to be real. If you are not certain a named tool is in the resume, leave it out.
@@ -23,7 +44,7 @@ export const COVER_LETTER_PROMPTS = {
               3. STRATEGIC ROI: How this specific trajectory makes the candidate the most reliable, high-impact choice.
             `,
       v2_storytelling: `
-            You are a Career Architect helping a candidate stand out with narrative. Write a detailed, compelling letter that tells a cohesive professional story (approx. 450 words).
+            You are a Career Architect helping a candidate stand out with narrative. Write a detailed, compelling letter that tells a cohesive professional story (300–375 words).
             
             INSTRUCTIONS:
             - **Grounding Rule**: Use ONLY evidence from the provided Resume Blocks. Do NOT invent skills. This is a hard constraint, not a style preference: before naming ANY specific tool, software, platform, certification, or technology, confirm it appears verbatim in the resume text. Do not add a plausible-sounding related tool to round out a list, even one you'd guess the candidate probably knows (e.g. resume says "ArcGIS Pro, ArcGIS Online" — writing "ArcGIS Pro, ArcGIS Online, and QGIS" is a FAIL if QGIS never appears in the resume text, regardless of how likely it is to be true). You only see the resume text, not the candidate's full skill set — an unlisted tool cannot be verified from what you have, even if it turns out to be real. If you are not certain a named tool is in the resume, leave it out.
@@ -37,7 +58,7 @@ export const COVER_LETTER_PROMPTS = {
             - **No Resume Echo**: Never reuse a resume bullet's sentence structure or phrasing with only a word or two swapped (e.g. resume "maintaining 98% accuracy while managing a caseload of 16 claims per hour" becoming "maintained a 98% accuracy rate while processing 16 cases per hour" is a FAIL — same skeleton, same order, synonyms swapped). Literal numbers may repeat verbatim; the sentence carrying them must not. Rebuild the sentence from a different angle — a different starting clause, a different emphasis, a different framing of why the number matters here — before you touch the wording.
             `,
       v3_experimental_pro: `
-            You are a senior executive writing a high-level strategic letter. Focus on ROI, value proposition, and long-term trajectory.
+            You are a senior executive writing a high-level strategic letter (300–375 words). Focus on ROI, value proposition, and long-term trajectory.
             
             INSTRUCTIONS:
             - **Grounding Rule**: Use ONLY evidence from the provided Resume Blocks. Do NOT invent skills. This is a hard constraint, not a style preference: before naming ANY specific tool, software, platform, certification, or technology, confirm it appears verbatim in the resume text. Do not add a plausible-sounding related tool to round out a list, even one you'd guess the candidate probably knows (e.g. resume says "ArcGIS Pro, ArcGIS Online" — writing "ArcGIS Pro, ArcGIS Online, and QGIS" is a FAIL if QGIS never appears in the resume text, regardless of how likely it is to be true). You only see the resume text, not the candidate's full skill set — an unlisted tool cannot be verified from what you have, even if it turns out to be real. If you are not certain a named tool is in the resume, leave it out.
@@ -89,6 +110,13 @@ export const COVER_LETTER_PROMPTS = {
     ${anchorGuidance('CRITIQUE_FEEDBACK', additionalContext || '')}
     (Note: The text above is the critique feedback, not personal context in this case).
     ` : ''}
+
+    REQUIRED LETTER STRUCTURE:
+    - Start with exactly "Dear Hiring Manager," on its own line, followed by a blank line.
+    - Write exactly 3 body paragraphs: (1) role motivation and fit, (2) the strongest evidence from the resume, and (3) transferable value, honest gap framing when needed, and interest in contributing.
+    - Keep the full letter between 300 and 375 words. Remove repetition before adding detail.
+    - End with a blank line, then "Sincerely," and, when a candidate name is provided, the exact candidate name on the next line.
+    - Do not include headings, labels, bullets, markdown, or multiple closing signatures.
     
     ${candidateName ? `REQUIRED CLOSING: End the letter with a sign-off on its own line: "Sincerely," followed by the exact candidate name contained in ${anchorData('CANDIDATE_NAME', candidateName)} on the next line. This is a required structural element of a cover letter, not generic filler — always include it exactly once, even while trimming filler elsewhere.` : ''}
 

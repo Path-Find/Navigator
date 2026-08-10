@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import type { SavedJob, ResumeProfile, JobAnalysis, TargetJob, CoverLetterCritique } from '../../../types';
+import type { SavedJob, ResumeProfile, JobAnalysis, TargetJob, CoverLetterCritique, CoverLetterVariant } from '../../../types';
 import { Logger } from '../../../utils/logger';
 import { Storage } from '../../../services/storageService';
 import { JobStorage } from '../../../services/storage/jobStorage';
@@ -37,7 +37,7 @@ export const useCoverLetterEditor = ({
     const [copiedState, setCopiedState] = useState<'cl' | null>(null);
     const [acknowledgedAiBan, setAcknowledgedAiBan] = useState(false);
     const [analysisProgress, setAnalysisProgress] = useState<string | null>(null);
-    const [comparisonVersions, setComparisonVersions] = useState<{ text: string; promptVersion: string }[] | null>(null);
+    const [comparisonVersions, setComparisonVersions] = useState<CoverLetterVariant[] | null>(null);
     const [localJob, setLocalJob] = useState(job);
     const [generationStatus, setGenerationStatus] = useState<string | null>(null);
     const [generationProgress, setGenerationProgress] = useState(0);
@@ -60,6 +60,8 @@ export const useCoverLetterEditor = ({
                 jobId: localJob.id,
                 roleModelId: analysis.distilledJob?.canonicalTitle,
                 promptVersion: localJob.promptVersion,
+                styleCategory: localJob.coverLetterStyle,
+                styleLabel: localJob.coverLetterStyleLabel,
                 content: text,
                 action: 'copy',
                 sensitiveValues: [fullName, localJob.company, analysis.distilledJob?.canonicalTitle],
@@ -191,6 +193,8 @@ export const useCoverLetterEditor = ({
                     coverLetter: result.text,
                     initialCoverLetter: result.text,
                     promptVersion: result.promptVersion,
+                    coverLetterStyle: result.styleCategory,
+                    coverLetterStyleLabel: result.styleLabel,
                     coverLetterCritique: result.critique ? {
                         decision: result.decision as CoverLetterCritique['decision'],
                         feedback: result.critique.feedback,
@@ -216,11 +220,15 @@ export const useCoverLetterEditor = ({
                         context: 'cover_letter',
                         inputPromptVersion: result.promptVersion,
                         outputContent: { text: result.text, decision: result.decision },
-                        metadata: { job_id: localJob.id }
+                        metadata: {
+                            job_id: localJob.id,
+                            style_category: result.styleCategory,
+                            style_label: result.styleLabel,
+                        }
                     }, [fullName, localJob.company, canonicalTitle]);
                 }
             } else {
-                const { text: letter, promptVersion } = await generateCoverLetter(
+                const { text: letter, promptVersion, styleCategory, styleLabel } = await generateCoverLetter(
                     textToUse,
                     focusedResume,
                     instructions,
@@ -239,6 +247,8 @@ export const useCoverLetterEditor = ({
                     coverLetter: letter,
                     initialCoverLetter: letter,
                     promptVersion: promptVersion,
+                    coverLetterStyle: styleCategory,
+                    coverLetterStyleLabel: styleLabel,
                     coverLetterCritique: undefined
                 };
 
@@ -258,14 +268,16 @@ export const useCoverLetterEditor = ({
         }
     }, [bestResume, analysis, localJob, targetJobs, userTier, onJobUpdate, showError, isNextGen, user, fullName, coverLetterPreferences]);
 
-    const handleSelectVariant = useCallback(async (variant: { text: string; promptVersion: string }) => {
+    const handleSelectVariant = useCallback(async (variant: CoverLetterVariant) => {
         const other = comparisonVersions?.find(v => v.promptVersion !== variant.promptVersion);
 
         const updated = {
             ...localJob,
             coverLetter: variant.text,
             initialCoverLetter: variant.text,
-            promptVersion: variant.promptVersion
+            promptVersion: variant.promptVersion,
+            coverLetterStyle: variant.styleCategory,
+            coverLetterStyleLabel: variant.styleLabel,
         };
 
         setLocalJob(updated);
@@ -291,6 +303,8 @@ export const useCoverLetterEditor = ({
                 metadata: {
                     job_id: localJob.id,
                     ab_test: true,
+                    style_category: variant.styleCategory,
+                    style_label: variant.styleLabel,
                     ...(other ? { comparison_variant: other.promptVersion } : {})
                 }
             }, [fullName, localJob.company, analysis.distilledJob?.canonicalTitle]);
@@ -305,7 +319,14 @@ export const useCoverLetterEditor = ({
                     outputContent: other.text,
                     userCorrection: variant.text, // The winner is effectively the "correction" of the loser
                     impactScore: -1,
-                    metadata: { job_id: localJob.id, ab_test_loss: true, winner: variant.promptVersion }
+                    metadata: {
+                        job_id: localJob.id,
+                        ab_test_loss: true,
+                        winner: variant.promptVersion,
+                        style_category: other.styleCategory,
+                        style_label: other.styleLabel,
+                        winning_style_category: variant.styleCategory,
+                    }
                 }, [fullName, localJob.company, analysis.distilledJob?.canonicalTitle]);
             }
         }
@@ -334,7 +355,11 @@ export const useCoverLetterEditor = ({
                         outputContent: localJob.initialCoverLetter || localJob.coverLetter,
                         userCorrection: newText,
                         impactScore: 2, // Manual edit implies the AI was close but needed refinement
-                        metadata: { job_id: localJob.id }
+                        metadata: {
+                            job_id: localJob.id,
+                            ...(localJob.coverLetterStyle ? { style_category: localJob.coverLetterStyle } : {}),
+                            ...(localJob.coverLetterStyleLabel ? { style_label: localJob.coverLetterStyleLabel } : {}),
+                        }
                     }, [fullName, localJob.company, analysis.distilledJob?.canonicalTitle]);
                 }
             } catch {

@@ -1,9 +1,10 @@
 import React from 'react';
 import { Sparkles } from 'lucide-react';
+import type { CoverLetterVariant } from '../../types';
 
 interface CoverLetterComparisonViewProps {
-    versions: { text: string; promptVersion: string }[];
-    handleSelectVariant: (variant: { text: string; promptVersion: string }) => void;
+    versions: CoverLetterVariant[];
+    handleSelectVariant: (variant: CoverLetterVariant) => void;
     handleRejectVariants: () => void;
 }
 
@@ -18,7 +19,10 @@ export const CoverLetterComparisonView: React.FC<CoverLetterComparisonViewProps>
             {versions.map((v, i) => (
                 <div key={i} className="flex flex-col space-y-6 p-8 bg-neutral-50 dark:bg-neutral-800/50 rounded-3xl border-2 border-dashed border-neutral-200 dark:border-neutral-700 hover:border-indigo-300 dark:hover:border-indigo-500 transition-all group relative">
                     <div className="absolute -top-4 left-1/2 -translate-x-1/2 px-4 py-1.5 bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-full text-[10px] font-black text-neutral-400 shadow-sm">
-                        Style Option {i + 1}
+                        {v.styleLabel}
+                    </div>
+                    <div className="pt-2">
+                        <p className="text-xs font-bold text-indigo-600 dark:text-indigo-300">{v.styleDescription}</p>
                     </div>
                     <div className="flex-1 text-sm text-neutral-700 dark:text-neutral-300 leading-relaxed line-clamp-[18]">
                         {v.text}

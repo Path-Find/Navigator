@@ -38,6 +38,8 @@ export const CoverLetters: React.FC = () => {
                 jobId: job.id,
                 roleModelId: job.analysis?.distilledJob?.canonicalTitle,
                 promptVersion: job.promptVersion,
+                styleCategory: job.coverLetterStyle,
+                styleLabel: job.coverLetterStyleLabel,
                 content: text,
                 action: 'copy',
                 sensitiveValues: [fullName, job.company, job.analysis?.distilledJob?.canonicalTitle],

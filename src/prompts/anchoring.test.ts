@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { anchorData, anchorGuidance, GUIDANCE_RULE, UNTRUSTED_DATA_RULE } from './anchoring';
-import { COVER_LETTER_PROMPTS } from './coverLetter';
+import { COVER_LETTER_PROMPTS, COVER_LETTER_STYLE_METADATA } from './coverLetter';
 import { EDUCATION_PROMPTS } from './education';
 import { INTERVIEW_PROMPTS } from './interview';
 import { JOB_ANALYSIS_PROMPTS } from './jobAnalysis';
@@ -57,6 +57,17 @@ describe('prompt data anchoring', () => {
         expect(interviewPrompt).toContain('<<<RESUME_START>>>');
         expect(COVER_LETTER_PROMPTS.COVER_LETTER.GENERATE('template', 'job', 'resume', ['strategy']))
             .toContain(GUIDANCE_RULE.trim());
+    });
+
+    it('defines named cover-letter styles and a shared structure', () => {
+        expect(COVER_LETTER_STYLE_METADATA.v1_direct.category).toBe('direct');
+        expect(COVER_LETTER_STYLE_METADATA.v2_storytelling.category).toBe('storytelling');
+        expect(COVER_LETTER_STYLE_METADATA.v3_experimental_pro.category).toBe('strategic');
+
+        const prompt = COVER_LETTER_PROMPTS.COVER_LETTER.GENERATE('template', 'job', 'resume', ['strategy']);
+        expect(prompt).toContain('Start with exactly "Dear Hiring Manager,"');
+        expect(prompt).toContain('exactly 3 body paragraphs');
+        expect(prompt).toContain('between 300 and 375 words');
     });
 
     it('anchors Career, Education, and parsing inputs as data', () => {

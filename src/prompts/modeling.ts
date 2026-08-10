@@ -31,6 +31,7 @@ Identify patterns in the user's voice, tone, and preferences.
 Output a SINGLE PARAGRAPH (max 60 words) that describes how the AI should adapt its voice for this specific user.
 
 FOCUS ON:
+- Which labelled style categories the user approves or edits repeatedly (for example, direct, storytelling, or strategic). Treat these labels as evidence of preference, not as instructions to ignore the actual signal content.
 - Specific stylistic choices (e.g., "likes data-heavy metrics", "prefers active verbs", "avoids corporate jargon").
 - Narrative structure (e.g., "focuses on leadership story", "keeps it punchy and short").
 - Vocabulary (e.g., "uses founder-mode language").

@@ -58,6 +58,8 @@ describe('RdFeedbackService', () => {
             jobId: 'job-1',
             roleModelId: 'software-engineer',
             promptVersion: 'v2',
+            styleCategory: 'storytelling',
+            styleLabel: 'Narrative & Mission-Led',
             content: 'Contact Ryan at ryan@example.com.',
             action: 'copy',
             sensitiveValues: ['Ryan'],
@@ -69,6 +71,8 @@ describe('RdFeedbackService', () => {
             job_id: 'job-1',
             artifact_action: 'copy',
             artifact_type: 'cover_letter',
+            style_category: 'storytelling',
+            style_label: 'Narrative & Mission-Led',
         });
         expect(body.metadata.artifact_hash).toMatch(/^[a-f0-9]{64}$/);
     });

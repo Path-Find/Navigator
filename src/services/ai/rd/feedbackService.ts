@@ -171,6 +171,8 @@ export class RdFeedbackService {
             jobId: string;
             roleModelId?: string | null;
             promptVersion?: string | null;
+            styleCategory?: string | null;
+            styleLabel?: string | null;
             content: string;
             action: ArtifactUsageAction;
             sensitiveValues?: ReadonlyArray<string | null | undefined>;
@@ -192,6 +194,8 @@ export class RdFeedbackService {
                 artifact_hash: artifactHash,
                 artifact_action: options.action,
                 artifact_type: 'cover_letter',
+                ...(options.styleCategory ? { style_category: options.styleCategory } : {}),
+                ...(options.styleLabel ? { style_label: options.styleLabel } : {}),
             },
         });
     }

@@ -8,6 +8,7 @@ See [CHANGELOG_ARCHIVE.md](CHANGELOG_ARCHIVE.md) for earlier history.
 
 ### Added
 - **Cover-letter style preferences now follow the user across applications**: account settings can define general tone, voice, or length preferences, while job-specific facts remain in each job's personal context.
+- **Cover-letter comparison choices now use named style categories**: Direct & Evidence-Led, Narrative & Mission-Led, and Strategic & Executive selections are saved and fed into future style learning.
 
 ### Changed
 - **Application status reminders now explain why outcomes matter**: the reminder uses calmer pastel controls and connects status updates to better future job guidance and cover letters.

@@ -65,6 +65,8 @@ export const CoverLetterEditor: React.FC<CoverLetterEditorProps> = (props) => {
                 jobId: localJob.id,
                 roleModelId: analysis.distilledJob?.canonicalTitle,
                 promptVersion: localJob.promptVersion,
+                styleCategory: localJob.coverLetterStyle,
+                styleLabel: localJob.coverLetterStyleLabel,
                 content: localJob.coverLetter,
                 action: 'download',
                 sensitiveValues: [fullName, localJob.company, analysis.distilledJob?.canonicalTitle],

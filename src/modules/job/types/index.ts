@@ -1,3 +1,5 @@
+import type { CoverLetterStyleCategory } from '../../../prompts/coverLetter';
+
 export type JobRequirementCategory = 'skill' | 'education' | 'coursework' | 'experience' | 'hard_gate' | 'other';
 export type JobRequirementPriority = 'required' | 'preferred' | 'hard_gate';
 
@@ -36,6 +38,14 @@ export interface CoverLetterCritique {
     feedback: string[];
     strengths: string[];
     hallucinationAlerts?: string[];
+}
+
+export interface CoverLetterVariant {
+    text: string;
+    promptVersion: string;
+    styleCategory: CoverLetterStyleCategory;
+    styleLabel: string;
+    styleDescription: string;
 }
 
 export interface JobAnalysis {
@@ -90,6 +100,8 @@ export interface SavedJob {
     // Optimization / A/B Testing
     initialCoverLetter?: string; // The raw AI output before user edits
     promptVersion?: string;      // ID of the prompt variant used
+    coverLetterStyle?: CoverLetterStyleCategory; // Stable category for the selected cover-letter style
+    coverLetterStyleLabel?: string; // Human-readable label for the selected style
     editScore?: number;          // Levenshtein distance (lower = better)
 
     // Analysis Progress (Ephemeral-ish)
