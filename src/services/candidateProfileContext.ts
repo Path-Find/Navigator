@@ -1,5 +1,16 @@
-import type { CandidateProfileContext, CandidateProfileInsight, CandidateProfileInsightSuggestion, CandidateStory, ResumeProfile } from '../modules/resume/types';
+import type {
+    CandidateEducationContext,
+    CandidateProfileContext,
+    CandidateProfileFact,
+    CandidateProfileFactStatus,
+    CandidateProfileInsight,
+    CandidateProfileInsightSuggestion,
+    CandidateStory,
+    ResumeProfile,
+} from '../modules/resume/types';
 import type { CustomSkill } from '../modules/skills/types';
+import type { Transcript } from '../modules/grad/types';
+import { getCourseCompletionStatus } from '../modules/grad/types';
 
 const STOP_WORDS = new Set([
     'about', 'after', 'also', 'before', 'between', 'candidate', 'experience',
@@ -44,10 +55,42 @@ const storyMatchesJob = (story: CandidateStory, jobContext: string): boolean => 
         || normalize(story.text).some(term => jobTerms.has(term));
 };
 
+const profileFactMatchesJob = (fact: CandidateProfileFact, jobContext: string): boolean => {
+    if (!jobContext.trim() || fact.tags.length === 0) return true;
+    const jobTerms = new Set(normalize(jobContext));
+    return fact.tags.some(tag => normalize(tag).some(term => jobTerms.has(term)))
+        || normalize(fact.value).some(term => jobTerms.has(term));
+};
+
+const EDUCATION_TERM_ALIASES: string[][] = [
+    ['geomatics', 'gis', 'geospatial', 'spatial'],
+    ['qualitative', 'research', 'interview'],
+    ['urbanization', 'urban', 'city', 'cities'],
+    ['planning', 'planner', 'land use', 'development'],
+    ['transportation', 'transit', 'mobility'],
+];
+
+const educationCourseMatchesJob = (courseText: string, jobContext: string): boolean => {
+    if (!jobContext.trim()) return true;
+    const courseTerms = normalize(courseText);
+    const jobTerms = normalize(jobContext);
+    if (courseTerms.some(term => jobTerms.includes(term))) return true;
+    return EDUCATION_TERM_ALIASES.some(aliasGroup =>
+        aliasGroup.some(term => courseText.toLowerCase().includes(term))
+        && aliasGroup.some(term => jobContext.toLowerCase().includes(term))
+    );
+};
+
 export const getCandidateProfileContext = (profile?: ResumeProfile | null): CandidateProfileContext | null => {
     const context = profile?.candidateProfile;
     if (!context) return null;
-    if (context.signals.length === 0 && context.stories.length === 0 && !(context.insights || []).some(insight => insight.status === 'confirmed')) return null;
+    if (
+        context.signals.length === 0
+        && context.stories.length === 0
+        && !(context.facts || []).some(fact => fact.status === 'confirmed')
+        && !(context.education?.courses || []).some(course => course.status !== 'withdrawn')
+        && !(context.insights || []).some(insight => insight.status === 'confirmed')
+    ) return null;
     return context;
 };
 
@@ -113,6 +156,25 @@ export const formatCandidateProfileContext = (
         .filter((insight: CandidateProfileInsight) => insight.status === 'confirmed' && insight.sourceVersion === sourceVersion)
         .map(insight => `- ${insight.key}: ${insight.value}`)
         .join('\n');
+    const confirmedFacts = (context.facts || [])
+        .filter(fact => fact.status === 'confirmed' && profileFactMatchesJob(fact, jobContext))
+        .slice(0, 8)
+        .map(fact => `- ${fact.value} [${fact.category}; source: ${fact.sourceLabel}]`)
+        .join('\n');
+    const education = context.education;
+    const educationCourses = education
+        ? education.courses
+            .filter(course => course.status !== 'withdrawn')
+            .filter(course => educationCourseMatchesJob(`${course.code} ${course.title}`, jobContext))
+            .slice(0, 5)
+            .map(course => course.status === 'completed'
+                ? `- Completed course: ${course.title} (${course.code})`
+                : `- Upcoming coursework (not yet completed): ${course.title} (${course.code})`)
+            .join('\n')
+        : '';
+    const educationContext = educationCourses
+        ? `RELEVANT EDUCATION CONTEXT:\n- ${education?.program || 'Education program'} at ${education?.university || 'university'}\n${educationCourses}`
+        : '';
     const stories = context.stories
         .filter(story => storyMatchesJob(story, jobContext))
         .slice(0, maxStories)
@@ -122,9 +184,56 @@ export const formatCandidateProfileContext = (
     return [
         signals ? `APPROVED CANDIDATE SIGNALS:\n${signals}` : '',
         confirmedInsights ? `CONFIRMED CANDIDATE INSIGHTS:\n${confirmedInsights}` : '',
+        confirmedFacts ? `APPROVED PROFILE FACTS:\n${confirmedFacts}` : '',
+        educationContext,
         stories ? `APPROVED CANDIDATE STORIES:\n${stories}` : '',
     ].filter(Boolean).join('\n\n');
 };
+
+export const createCandidateEducationContext = (
+    transcript: Transcript,
+    source: CandidateEducationContext['source'] = 'transcript'
+): CandidateEducationContext => {
+    const sourceVersion = String(transcript.dateUploaded || 0);
+    return {
+        university: transcript.university || 'University',
+        ...(transcript.program ? { program: transcript.program } : {}),
+        courses: transcript.semesters.flatMap(semester => semester.courses.map(course => ({
+            id: `${semester.year}-${course.code}-${course.title}`,
+            code: course.code,
+            title: course.title,
+            term: course.term || `${semester.term} ${semester.year}`,
+            status: getCourseCompletionStatus(course),
+            source,
+            sourceVersion,
+            ...(course.grade ? { grade: course.grade } : {}),
+        }))),
+        source,
+        sourceVersion,
+        capturedAt: Date.now(),
+    };
+};
+
+export const createCandidateProfileFact = (
+    value: string,
+    category: CandidateProfileFact['category'],
+    tags: string[],
+    source: CandidateProfileFact['source'],
+    sourceLabel: string,
+    sourceVersion: string,
+    status: CandidateProfileFactStatus = 'confirmed',
+    existingId?: string,
+): CandidateProfileFact => ({
+    id: existingId || crypto.randomUUID(),
+    category,
+    value: value.trim(),
+    tags: [...new Set(tags.map(tag => tag.trim().toLowerCase()).filter(Boolean))],
+    source,
+    sourceLabel,
+    sourceVersion,
+    status,
+    updatedAt: Date.now(),
+});
 
 export const formatVerifiedSkills = (skills: CustomSkill[], jobContext = ''): string => {
     const jobTerms = new Set(normalize(jobContext));

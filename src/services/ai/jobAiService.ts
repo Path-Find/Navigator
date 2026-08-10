@@ -14,6 +14,7 @@ import { AI_MODELS, AI_TEMPERATURE, AGENT_LOOP, CURRENT_JOB_ANALYSIS_VERSION, US
 import { JOB_ANALYSIS_PROMPTS, COVER_LETTER_PROMPTS, COVER_LETTER_STYLE_METADATA } from "../../prompts/index";
 import { BucketStorage } from "../storage/bucketStorage";
 import { formatCandidateProfileContext } from '../candidateProfileContext';
+import { getCourseCompletionStatus } from '../../modules/grad/types';
 
 const stringifyProfile = (profile: ResumeProfile): string => {
     return profile.blocks
@@ -81,6 +82,25 @@ const matchesContextRequirement = (value: string, requirements: RequirementInput
     const normalizedValue = normalizeForContextMatch(value);
     const terms = contextMatchTerms(requirements);
     return terms.length > 0 && terms.some(term => normalizedValue.includes(term));
+};
+
+const COURSE_TERM_ALIASES: string[][] = [
+    ['geomatics', 'gis', 'geospatial', 'spatial'],
+    ['qualitative', 'research', 'interview'],
+    ['urbanization', 'urban', 'city', 'cities'],
+    ['planning', 'planner', 'land use', 'development'],
+    ['transportation', 'transit', 'mobility'],
+];
+
+const matchesCourseRequirement = (courseText: string, requirements: RequirementInput[]): boolean => {
+    if (matchesContextRequirement(courseText, requirements)) return true;
+    const normalizedCourse = normalizeForContextMatch(courseText);
+    const normalizedRequirements = requirements.map(requirement => normalizeForContextMatch(requirementText(requirement)));
+    return COURSE_TERM_ALIASES.some(aliasGroup => {
+        const courseMatchesAlias = aliasGroup.some(term => normalizedCourse.includes(term));
+        const requirementMatchesAlias = normalizedRequirements.some(requirement => aliasGroup.some(term => requirement.includes(term)));
+        return courseMatchesAlias && requirementMatchesAlias;
+    });
 };
 
 const REQUIREMENT_CATEGORIES = new Set<JobRequirement['category']>([
@@ -223,9 +243,21 @@ export const buildJobCandidateContext = (
         const courseMatchRequirements = courseworkRequirements.length ? courseworkRequirements : [jobSkillText];
         const matchingCourses = transcript.semesters
             .flatMap(semester => semester.courses)
-            .filter(course => matchesContextRequirement(`${course.code} ${course.title}`, courseMatchRequirements))
+            .filter(course => matchesCourseRequirement(`${course.code} ${course.title}`, courseMatchRequirements))
+            .filter(course => getCourseCompletionStatus(course) === 'completed')
             .map(course => `${course.title} (${course.code})${course.grade ? ` — ${course.grade}` : ''}`);
         academicEvidence.push(...matchingCourses.slice(0, 5));
+
+        // Upcoming courses can show relevant preparation, but must never look
+        // like completed coursework. Withdrawn courses are omitted entirely.
+        if (matchingCourses.length < 5) {
+            const upcomingCourses = transcript.semesters
+                .flatMap(semester => semester.courses)
+                .filter(course => getCourseCompletionStatus(course) === 'upcoming')
+                .filter(course => matchesCourseRequirement(`${course.code} ${course.title}`, courseMatchRequirements))
+                .map(course => `Upcoming coursework (not yet completed): ${course.title} (${course.code})`);
+            academicEvidence.push(...upcomingCourses.slice(0, 5 - matchingCourses.length));
+        }
     }
 
     if (transcript && (educationRequirements.length || isAcademicOrEarlyCareerRole) && !hasMatchingEducationBlock) {

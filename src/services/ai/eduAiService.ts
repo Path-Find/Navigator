@@ -12,6 +12,7 @@ import type {
 import { AI_MODELS, AI_TEMPERATURE } from "../../constants";
 import { EDUCATION_PROMPTS, CAREER_PROMPTS, PARSING_PROMPTS } from "../../prompts/index";
 import { extractPdfText } from "../../utils/pdfExtractor";
+import { getCourseCompletionStatus } from '../../modules/grad/types';
 
 const stringifyResumeForCareer = (profile: ResumeProfile): string => JSON.stringify({
     name: profile.name,
@@ -59,7 +60,13 @@ const stringifyTranscriptForCareer = (transcript: Transcript): string => JSON.st
     semesters: transcript.semesters.map(({ term, year, courses }) => ({
         term,
         year,
-        courses: courses.map(({ code, title, grade, credits }) => ({ code, title, grade, credits })),
+        courses: courses.map(({ code, title, grade, credits }) => ({
+            code,
+            title,
+            grade,
+            credits,
+            status: getCourseCompletionStatus({ grade }),
+        })),
     })),
 });
 
@@ -69,6 +76,7 @@ const stringifyCourses = (transcript: Transcript): string => JSON.stringify(
         title,
         grade,
         credits,
+        status: getCourseCompletionStatus({ grade }),
     })))
 );
 

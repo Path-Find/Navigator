@@ -13,7 +13,8 @@ import type {
 } from '../types';
 import type { ResumeProfile } from '../../resume/types';
 import type { CustomSkill } from '../../skills/types';
-import { formatCandidateProfileContext, formatVerifiedSkills } from '../../../services/candidateProfileContext';
+import { Storage } from '../../../services/storageService';
+import { createCandidateEducationContext, formatCandidateProfileContext, formatVerifiedSkills } from '../../../services/candidateProfileContext';
 
 const INTERVIEW_BLOCK_TYPES = new Set(['work', 'volunteer', 'project', 'education']);
 
@@ -78,7 +79,20 @@ export const useInterview = () => {
         setIsLoading(true);
         setError(null);
         try {
-            const result = await generateTailoredInterviewQuestions(getInterviewJobContext(job), getInterviewResumes(job, resumes), job.id, job.position, skills);
+            const transcript = await Storage.getTranscript();
+            const interviewResumes = getInterviewResumes(job, resumes);
+            const resumesWithEducation = transcript && interviewResumes.length > 0
+                ? interviewResumes.map((resume, index) => index === 0
+                    ? {
+                        ...resume,
+                        candidateProfile: {
+                            ...(resume.candidateProfile || { signals: [], stories: [] }),
+                            education: createCandidateEducationContext(transcript),
+                        },
+                    }
+                    : resume)
+                : interviewResumes;
+            const result = await generateTailoredInterviewQuestions(getInterviewJobContext(job), resumesWithEducation, job.id, job.position, skills);
             setQuestions(result);
             setCurrentQuestionIndex(0);
             setResponses({});

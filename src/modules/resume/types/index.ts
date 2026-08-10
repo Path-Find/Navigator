@@ -37,6 +37,46 @@ export interface CandidateProfileSignal {
     approvedAt: number;
 }
 
+export type CandidateProfileFactSource = 'linkedin' | 'game_plan' | 'york_class_list' | 'resume' | 'profile_interview' | 'user_setting';
+export type CandidateProfileFactCategory = 'direction' | 'availability' | 'experience' | 'skill' | 'preference' | 'story' | 'education';
+export type CandidateProfileFactStatus = 'confirmed' | 'dismissed' | 'stale';
+
+/** A source-labelled fact that can be reviewed before it becomes prompt context. */
+export interface CandidateProfileFact {
+    id: string;
+    category: CandidateProfileFactCategory;
+    value: string;
+    tags: string[];
+    source: CandidateProfileFactSource;
+    sourceLabel: string;
+    sourceVersion: string;
+    status: CandidateProfileFactStatus;
+    updatedAt: number;
+}
+
+export type CandidateEducationCourseStatus = 'completed' | 'upcoming' | 'withdrawn';
+
+/** Compact course context. It intentionally does not store a raw transcript. */
+export interface CandidateEducationCourse {
+    id: string;
+    code: string;
+    title: string;
+    term: string;
+    status: CandidateEducationCourseStatus;
+    source: 'york_class_list' | 'transcript';
+    sourceVersion: string;
+    grade?: string;
+}
+
+export interface CandidateEducationContext {
+    university: string;
+    program?: string;
+    courses: CandidateEducationCourse[];
+    source: 'york_class_list' | 'transcript';
+    sourceVersion: string;
+    capturedAt: number;
+}
+
 export type CandidateProfileInsightKey = 'possible_first_role' | 'current_education';
 export type CandidateProfileInsightStatus = 'confirmed' | 'dismissed';
 
@@ -57,6 +97,8 @@ export interface CandidateProfileInsight extends CandidateProfileInsightSuggesti
 export interface CandidateProfileContext {
     signals: CandidateProfileSignal[];
     stories: CandidateStory[];
+    facts?: CandidateProfileFact[];
+    education?: CandidateEducationContext;
     insights?: CandidateProfileInsight[];
     completedAt?: number;
 }

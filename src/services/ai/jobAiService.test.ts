@@ -194,6 +194,28 @@ describe('job context assembly', () => {
         ]);
     });
 
+    it('labels upcoming coursework and omits withdrawn courses', () => {
+        const context = buildJobCandidateContext(
+            [resume],
+            [],
+            {
+                ...transcript,
+                semesters: [{
+                    term: 'Fall 2026',
+                    year: 2026,
+                    courses: [
+                        { code: 'GEOG 2340', title: 'Introduction to Geomatics', grade: '', credits: 0.5 },
+                        { code: 'GEOG 1401', title: 'Weather and Climate', grade: 'W', credits: 0.5 },
+                    ],
+                }],
+            },
+            { ...parsedJob, courseworkRequirements: ['GIS'] },
+        );
+
+        expect(context.academicEvidence).toContain('Upcoming coursework (not yet completed): Introduction to Geomatics (GEOG 2340)');
+        expect(context.academicEvidence.join('\n')).not.toContain('Weather and Climate');
+    });
+
     it('omits transcripts when the parsed job has no education or coursework need', () => {
         const context = buildJobCandidateContext(
             [resume],

@@ -7,6 +7,7 @@ See [CHANGELOG_ARCHIVE.md](CHANGELOG_ARCHIVE.md) for earlier history.
 ## [Unreleased]
 
 ### Added
+- **Profile context now keeps source-labelled facts and education reviewable**: Navigator can reuse confirmed profile details and compact course context while clearly separating completed, upcoming, and withdrawn coursework.
 - **Navigator observations are now reviewable instead of silently becoming profile facts**: Settings can show cautious resume-based patterns, and only confirmed observations become reusable AI context while rejected ones stay suppressed.
 - **Cover-letter style preferences now follow the user across applications**: account settings can define general tone, voice, or length preferences, while job-specific facts remain in each job's personal context.
 - **Cover-letter generation now composes one core prompt from named style and candidate-situation modules**: style choices and cautious signals such as possible first-role or current-education context are injected only when supported, then saved for future style learning.

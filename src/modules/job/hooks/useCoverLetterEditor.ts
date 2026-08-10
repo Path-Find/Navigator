@@ -4,7 +4,7 @@ import { Logger } from '../../../utils/logger';
 import { Storage } from '../../../services/storageService';
 import { JobStorage } from '../../../services/storage/jobStorage';
 import type { UserTier } from '../../../types/app';
-import { deriveCoverLetterSignals, formatParsedJobContext, generateCoverLetter, generateCoverLetterWithQuality } from '../../../services/geminiService';
+import { buildJobCandidateContext, deriveCoverLetterSignals, formatParsedJobContext, generateCoverLetter, generateCoverLetterWithQuality } from '../../../services/geminiService';
 import { COVER_LETTER_PROMPTS } from '../../../prompts/coverLetter';
 import { ArchetypeUtils } from '../../../utils/archetypeUtils';
 import { TRACKING_EVENTS } from '../../../constants';
@@ -13,7 +13,7 @@ import { EventService } from '../../../services/eventService';
 import { useNextGen } from '../../../hooks/useNextGen';
 import { RdFeedbackService } from '../../../services/ai/rd/feedbackService';
 import { RdStyleService } from '../../../services/ai/rd/styleService';
-import { formatCandidateProfileContext, formatJourneyContext, formatVerifiedSkills } from '../../../services/candidateProfileContext';
+import { createCandidateEducationContext, formatCandidateProfileContext, formatJourneyContext, formatVerifiedSkills } from '../../../services/candidateProfileContext';
 import { useUser } from '../../../contexts/UserContext';
 import { useSkillContext } from '../../skills/context/SkillContext';
 
@@ -94,10 +94,11 @@ export const useCoverLetterEditor = ({
         try {
             // Build the smallest job context needed for writing. The parser already
             // extracted the job signal, so do not resend the raw posting by default.
-            const textToUse = formatParsedJobContext(
-                analysis.distilledJob,
-                analysis.selectedAcademicEvidence || []
-            );
+            const transcript = await Storage.getTranscript();
+            const liveAcademicEvidence = transcript && analysis.distilledJob
+                ? buildJobCandidateContext([bestResume], skills, transcript, analysis.distilledJob).academicEvidence
+                : analysis.selectedAcademicEvidence || [];
+            const textToUse = formatParsedJobContext(analysis.distilledJob, liveAcademicEvidence);
 
             let finalContext = localJob.contextNotes;
             let instructions = analysis.coverLetterTailoringInstructions || analysis.tailoringInstructions || [];
@@ -144,8 +145,17 @@ export const useCoverLetterEditor = ({
                 ? { ...bestResume, blocks: bestResume.blocks.filter(b => b.type === 'summary' || recommendedIds.has(b.id)) }
                 : bestResume;
             const candidateSignals = deriveCoverLetterSignals(bestResume, analysis.distilledJob);
+            const profileForPrompt = transcript
+                ? {
+                    ...bestResume,
+                    candidateProfile: {
+                        ...(bestResume.candidateProfile || { signals: [], stories: [] }),
+                        education: createCandidateEducationContext(transcript),
+                    },
+                }
+                : bestResume;
             const candidateProfileContext = [
-                formatCandidateProfileContext(bestResume, textToUse),
+                formatCandidateProfileContext(profileForPrompt, textToUse),
                 formatVerifiedSkills(skills, textToUse),
                 formatJourneyContext(journey),
             ].filter(Boolean).join('\n\n');

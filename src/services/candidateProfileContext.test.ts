@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { deriveCandidateProfileInsights, formatCandidateProfileContext, formatVerifiedSkills, getCandidateProfileSourceVersion } from './candidateProfileContext';
+import { createCandidateEducationContext, deriveCandidateProfileInsights, formatCandidateProfileContext, formatVerifiedSkills, getCandidateProfileSourceVersion } from './candidateProfileContext';
 
 describe('candidate profile prompt context', () => {
     it('keeps approved signals and only job-relevant stories', () => {
@@ -92,5 +92,34 @@ describe('candidate profile prompt context', () => {
         });
 
         expect(context).not.toContain('Old observation');
+    });
+
+    it('keeps completed and upcoming course context explicitly separate', () => {
+        const education = createCandidateEducationContext({
+            id: 'transcript-1',
+            university: 'Example University',
+            program: 'Urban Planning',
+            dateUploaded: 42,
+            semesters: [{
+                term: 'Fall',
+                year: 2026,
+                courses: [
+                    { code: 'PLAN 101', title: 'Urban Planning', grade: 'A', credits: 3 },
+                    { code: 'GEOG 2340', title: 'Introduction to Geomatics', grade: '', credits: 3 },
+                    { code: 'GEOG 1401', title: 'Weather and Climate', grade: 'W', credits: 3 },
+                ],
+            }],
+        });
+
+        const context = formatCandidateProfileContext({
+            id: 'resume-1',
+            name: 'Primary',
+            blocks: [],
+            candidateProfile: { signals: [], stories: [], education },
+        }, 'GIS planning role');
+
+        expect(context).toContain('Completed course: Urban Planning');
+        expect(context).toContain('Upcoming coursework (not yet completed): Introduction to Geomatics');
+        expect(context).not.toContain('Weather and Climate');
     });
 });

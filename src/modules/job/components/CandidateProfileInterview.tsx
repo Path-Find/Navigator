@@ -156,6 +156,8 @@ export const CandidateProfileInterview: React.FC<CandidateProfileInterviewProps>
             candidateProfile: {
                 signals: [...signalsByKey.values()],
                 stories: [...(existing?.stories || []), ...storiesToAdd],
+                facts: existing?.facts || [],
+                education: existing?.education,
                 completedAt: approvedAt,
             },
         });
