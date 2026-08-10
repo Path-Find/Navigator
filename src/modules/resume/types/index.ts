@@ -45,6 +45,7 @@ export interface CandidateProfileInsightSuggestion {
     value: string;
     reason: string;
     source: 'resume';
+    sourceVersion: string;
 }
 
 export interface CandidateProfileInsight extends CandidateProfileInsightSuggestion {

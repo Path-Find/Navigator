@@ -6,7 +6,7 @@ import { useToast } from '../../../contexts/ToastContext';
 import { useUser } from '../../../contexts/UserContext';
 import { useResumeContext } from '../../resume/context/ResumeContext';
 import { ROUTES } from '../../../constants';
-import { createCandidateProfileInsight, deriveCandidateProfileInsights } from '../../../services/candidateProfileContext';
+import { createCandidateProfileInsight, deriveCandidateProfileInsights, getCandidateProfileSourceVersion } from '../../../services/candidateProfileContext';
 import type { CandidateProfileInsight, CandidateProfileInsightStatus, CandidateProfileInsightSuggestion, CandidateProfileSignal, CandidateStory } from '../../resume/types';
 
 const SIGNAL_LABELS: Record<CandidateProfileSignal['key'], string> = {
@@ -23,7 +23,8 @@ const SOURCE_LABELS: Record<CandidateStory['source'], string> = {
     profile_interview: 'Profile interview',
 };
 
-type InsightCardStatus = CandidateProfileInsightStatus | 'pending';
+type InsightCardStatus = CandidateProfileInsightStatus | 'pending' | 'needs_review';
+type InsightCard = CandidateProfileInsightSuggestion & { id: string; status: InsightCardStatus };
 
 export const CandidateProfileContextManager: React.FC = () => {
     const navigate = useNavigate();
@@ -36,13 +37,21 @@ export const CandidateProfileContextManager: React.FC = () => {
     const stories = primaryResume?.candidateProfile?.stories || [];
     const storedInsights = primaryResume?.candidateProfile?.insights || [];
     const inferredInsights = deriveCandidateProfileInsights(primaryResume);
-    const insightCards: Array<CandidateProfileInsightSuggestion & { id: string; status: InsightCardStatus }> = [
-        ...storedInsights
-            .filter(insight => insight.status === 'confirmed')
-            .map(insight => ({ id: insight.id, key: insight.key, value: insight.value, reason: insight.reason, source: insight.source, status: insight.status })),
+    const sourceVersion = getCandidateProfileSourceVersion(primaryResume);
+    const insightCards: InsightCard[] = [
         ...inferredInsights
-            .filter(insight => !storedInsights.some(saved => saved.key === insight.key))
-            .map(insight => ({ ...insight, id: `pending-${insight.key}`, status: 'pending' as const })),
+            .flatMap((insight): InsightCard[] => {
+                const saved = storedInsights.find(existing => existing.key === insight.key);
+                if (saved?.status === 'dismissed' && saved.sourceVersion === sourceVersion) return [];
+                if (saved?.status === 'confirmed' && saved.sourceVersion === sourceVersion) {
+                    return [{ ...saved, status: 'confirmed' as const }];
+                }
+                return [{ ...insight, id: saved?.id || `pending-${insight.key}`, status: saved ? 'needs_review' as const : 'pending' as const }];
+            }),
+        ...storedInsights
+            .filter(insight => insight.status === 'confirmed' && insight.sourceVersion !== sourceVersion)
+            .filter(insight => !inferredInsights.some(current => current.key === insight.key))
+            .map(insight => ({ ...insight, status: 'needs_review' as const })),
     ];
     const hasContext = signals.length > 0 || stories.length > 0 || storedInsights.some(insight => insight.status === 'confirmed');
 
@@ -64,7 +73,8 @@ export const CandidateProfileContextManager: React.FC = () => {
         const savedInsight: CandidateProfileInsight = createCandidateProfileInsight(
             insight,
             status,
-            storedInsights.find(existing => existing.key === insight.key)?.id
+            storedInsights.find(existing => existing.key === insight.key)?.id,
+            sourceVersion
         );
         const nextInsights = [...storedInsights.filter(existing => existing.key !== insight.key), savedInsight];
 
@@ -191,21 +201,21 @@ export const CandidateProfileContextManager: React.FC = () => {
                                     <div className="min-w-0">
                                         <div className="flex items-center gap-2 mb-1">
                                             <span className="text-[10px] font-black uppercase tracking-wide text-violet-500 dark:text-violet-300">
-                                                {insight.status === 'confirmed' ? 'Confirmed' : 'Suggested'}
+                                                {insight.status === 'confirmed' ? 'Confirmed' : insight.status === 'needs_review' ? 'Needs review' : 'Suggested'}
                                             </span>
                                         </div>
                                         <p className="text-sm font-bold text-neutral-800 dark:text-neutral-100">{insight.value}</p>
                                         <p className="text-xs text-neutral-500 dark:text-neutral-400 mt-2">Why: {insight.reason}</p>
                                     </div>
                                     <div className="flex items-center gap-2 shrink-0">
-                                        {insight.status === 'confirmed' ? (
+                                        {insight.status === 'confirmed' || (insight.status === 'needs_review' && insight.sourceVersion !== sourceVersion) ? (
                                             <Button
                                                 variant="ghost"
                                                 size="xs"
                                                 onClick={() => { void handleInsightDecision(insight, 'dismissed'); }}
                                                 className="!text-neutral-500 hover:!text-rose-500"
                                             >
-                                                Stop using
+                                                {insight.status === 'confirmed' ? 'Stop using' : 'Stop using'}
                                             </Button>
                                         ) : (
                                             <>

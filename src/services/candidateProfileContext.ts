@@ -12,6 +12,31 @@ const normalize = (value: string): string[] => value
     .split(/\s+/)
     .filter(term => term.length >= 4 && !STOP_WORDS.has(term));
 
+const hashContext = (value: string): string => {
+    let hash = 2166136261;
+    for (let index = 0; index < value.length; index += 1) {
+        hash ^= value.charCodeAt(index);
+        hash = Math.imul(hash, 16777619);
+    }
+    return (hash >>> 0).toString(16);
+};
+
+export const getCandidateProfileSourceVersion = (profile?: ResumeProfile | null): string => {
+    if (!profile) return 'none';
+    const source = JSON.stringify(profile.blocks
+        .filter(block => block.isVisible !== false)
+        .map(({ id, type, title, organization, dateRange, bullets, narrativeContext }) => ({
+            id,
+            type,
+            title,
+            organization,
+            dateRange,
+            bullets,
+            narrativeContext,
+        })));
+    return `${profile.importRevision || 0}:${hashContext(source)}`;
+};
+
 const storyMatchesJob = (story: CandidateStory, jobContext: string): boolean => {
     if (!jobContext.trim()) return true;
     const jobTerms = new Set(normalize(jobContext));
@@ -33,6 +58,7 @@ export const getCandidateProfileContext = (profile?: ResumeProfile | null): Cand
 export const deriveCandidateProfileInsights = (profile?: ResumeProfile | null): CandidateProfileInsightSuggestion[] => {
     if (!profile) return [];
 
+    const sourceVersion = getCandidateProfileSourceVersion(profile);
     const visibleBlocks = profile.blocks.filter(block => block.isVisible !== false);
     const hasWorkExperience = visibleBlocks.some(block => block.type === 'work');
     const hasAcademicEvidence = visibleBlocks.some(block => block.type === 'education' || block.type === 'project');
@@ -51,6 +77,7 @@ export const deriveCandidateProfileInsights = (profile?: ResumeProfile | null): 
             value: 'You may be early in your career or preparing for your first professional role.',
             reason: 'Your visible resume includes education or project evidence but no work-experience block.',
             source: 'resume',
+            sourceVersion,
         });
     }
     if (hasCurrentEducation) {
@@ -59,6 +86,7 @@ export const deriveCandidateProfileInsights = (profile?: ResumeProfile | null): 
             value: 'You may currently be studying or completing an education program.',
             reason: 'Your resume includes education dates that appear current or ongoing.',
             source: 'resume',
+            sourceVersion,
         });
     }
     return insights;
@@ -76,12 +104,13 @@ export const formatCandidateProfileContext = (
 ): string => {
     const context = getCandidateProfileContext(profile);
     if (!context) return '';
+    const sourceVersion = getCandidateProfileSourceVersion(profile);
 
     const signals = context.signals
         .map(signal => `- ${signal.key}: ${signal.value}`)
         .join('\n');
     const confirmedInsights = (context.insights || [])
-        .filter((insight: CandidateProfileInsight) => insight.status === 'confirmed')
+        .filter((insight: CandidateProfileInsight) => insight.status === 'confirmed' && insight.sourceVersion === sourceVersion)
         .map(insight => `- ${insight.key}: ${insight.value}`)
         .join('\n');
     const stories = context.stories
@@ -141,10 +170,12 @@ export const createCandidateStory = (
 export const createCandidateProfileInsight = (
     suggestion: CandidateProfileInsightSuggestion,
     status: CandidateProfileInsight['status'],
-    existingId?: string
+    existingId?: string,
+    sourceVersion = suggestion.sourceVersion
 ): CandidateProfileInsight => ({
     ...suggestion,
     id: existingId || crypto.randomUUID(),
     status,
     updatedAt: Date.now(),
+    sourceVersion,
 });

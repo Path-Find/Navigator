@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { deriveCandidateProfileInsights, formatCandidateProfileContext, formatVerifiedSkills } from './candidateProfileContext';
+import { deriveCandidateProfileInsights, formatCandidateProfileContext, formatVerifiedSkills, getCandidateProfileSourceVersion } from './candidateProfileContext';
 
 describe('candidate profile prompt context', () => {
     it('keeps approved signals and only job-relevant stories', () => {
@@ -58,7 +58,7 @@ describe('candidate profile prompt context', () => {
     });
 
     it('uses confirmed insights in prompts but excludes dismissed insights', () => {
-        const context = formatCandidateProfileContext({
+        const profile = {
             id: 'resume-1',
             name: 'Primary',
             blocks: [],
@@ -66,13 +66,31 @@ describe('candidate profile prompt context', () => {
                 signals: [],
                 stories: [],
                 insights: [
-                    { id: 'insight-1', key: 'current_education', value: 'Confirmed student context', reason: 'Resume dates', source: 'resume', status: 'confirmed', updatedAt: 1 },
-                    { id: 'insight-2', key: 'possible_first_role', value: 'Dismissed first-role context', reason: 'Resume structure', source: 'resume', status: 'dismissed', updatedAt: 1 },
+                    { id: 'insight-1', key: 'current_education', value: 'Confirmed student context', reason: 'Resume dates', source: 'resume', status: 'confirmed', sourceVersion: 'current', updatedAt: 1 },
+                    { id: 'insight-2', key: 'possible_first_role', value: 'Dismissed first-role context', reason: 'Resume structure', source: 'resume', status: 'dismissed', sourceVersion: 'current', updatedAt: 1 },
                 ],
             },
-        });
+        };
+        profile.candidateProfile.insights[0].sourceVersion = getCandidateProfileSourceVersion(profile);
+        profile.candidateProfile.insights[1].sourceVersion = profile.candidateProfile.insights[0].sourceVersion;
+        const context = formatCandidateProfileContext(profile);
 
         expect(context).toContain('Confirmed student context');
         expect(context).not.toContain('Dismissed first-role context');
+    });
+
+    it('excludes confirmed observations when their resume evidence is stale', () => {
+        const context = formatCandidateProfileContext({
+            id: 'resume-1',
+            name: 'Primary',
+            blocks: [{ id: 'work-1', type: 'work', title: 'Planner', organization: 'City', dateRange: '2025 - Present', bullets: ['Led planning work.'], isVisible: true }],
+            candidateProfile: {
+                signals: [],
+                stories: [],
+                insights: [{ id: 'insight-1', key: 'possible_first_role', value: 'Old observation', reason: 'Old resume', source: 'resume', status: 'confirmed', sourceVersion: 'old-version', updatedAt: 1 }],
+            },
+        });
+
+        expect(context).not.toContain('Old observation');
     });
 });
