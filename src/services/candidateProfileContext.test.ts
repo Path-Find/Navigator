@@ -55,6 +55,8 @@ describe('candidate profile prompt context', () => {
         expect(insights.map(insight => insight.key)).toEqual(['possible_first_role', 'current_education']);
         expect(insights[0].value).toContain('may be');
         expect(insights[0].reason).toContain('no work-experience block');
+        expect(insights[1].value).toContain('Bachelor of Planning at York University');
+        expect(insights[1].reason).toContain('Bachelor of Planning at York University');
     });
 
     it('uses confirmed insights in prompts but excludes dismissed insights', () => {
@@ -77,6 +79,37 @@ describe('candidate profile prompt context', () => {
 
         expect(context).toContain('Confirmed student context');
         expect(context).not.toContain('Dismissed first-role context');
+    });
+
+    it('turns a confirmed education observation into direct language', () => {
+        const profile = {
+            id: 'resume-education-confirmed',
+            name: 'Primary',
+            blocks: [{ id: 'education-1', type: 'education' as const, title: 'Bachelor of Planning', organization: 'York University', dateRange: '2023 - Present', bullets: [], isVisible: true }],
+            candidateProfile: {
+                signals: [],
+                stories: [],
+                insights: [{ id: 'insight-1', key: 'current_education' as const, value: 'You may currently be studying Bachelor of Planning at York University.', reason: 'Current dates', source: 'resume' as const, status: 'confirmed' as const, sourceVersion: '', updatedAt: 1 }],
+            },
+        };
+        profile.candidateProfile.insights[0].sourceVersion = getCandidateProfileSourceVersion(profile);
+
+        const context = formatCandidateProfileContext(profile);
+
+        expect(context).toContain('Currently studying Bachelor of Planning at York University.');
+        expect(context).not.toContain('You may currently be studying');
+    });
+
+    it('uses only selected resume block metadata for profile priorities', () => {
+        const context = formatCandidateProfileContext({
+            id: 'resume-priorities',
+            name: 'Primary',
+            blocks: [{ id: 'work-1', type: 'work', title: 'Planning Assistant', organization: 'Example City', dateRange: '2024 - Present', bullets: ['Sensitive resume evidence'], isVisible: true }],
+            candidateProfile: { signals: [], stories: [], currentBlockIds: ['work-1'] },
+        });
+
+        expect(context).toContain('Current: Planning Assistant at Example City (2024 - Present)');
+        expect(context).not.toContain('Sensitive resume evidence');
     });
 
     it('excludes confirmed observations when their resume evidence is stale', () => {

@@ -150,6 +150,8 @@ export const InterviewAdvisor: React.FC = () => {
                     facts: primaryResume.candidateProfile?.facts || [],
                     education: primaryResume.candidateProfile?.education,
                     availability: primaryResume.candidateProfile?.availability,
+                    featuredBlockIds: primaryResume.candidateProfile?.featuredBlockIds || [],
+                    currentBlockIds: primaryResume.candidateProfile?.currentBlockIds || [],
                     completedAt: primaryResume.candidateProfile?.completedAt,
                 },
             });

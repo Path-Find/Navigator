@@ -37,7 +37,7 @@ export interface CandidateProfileSignal {
     approvedAt: number;
 }
 
-export type CandidateProfileFactSource = 'linkedin' | 'game_plan' | 'york_class_list' | 'resume' | 'profile_interview' | 'user_setting';
+export type CandidateProfileFactSource = 'resume' | 'education_record' | 'profile_interview' | 'user_setting' | 'imported_profile';
 export type CandidateProfileFactCategory = 'direction' | 'availability' | 'experience' | 'skill' | 'preference' | 'story' | 'education';
 export type CandidateProfileFactStatus = 'confirmed' | 'dismissed' | 'stale';
 
@@ -63,7 +63,7 @@ export interface CandidateEducationCourse {
     title: string;
     term: string;
     status: CandidateEducationCourseStatus;
-    source: 'york_class_list' | 'transcript';
+    source: 'education_record' | 'transcript';
     sourceVersion: string;
     grade?: string;
 }
@@ -72,7 +72,7 @@ export interface CandidateEducationContext {
     university: string;
     program?: string;
     courses: CandidateEducationCourse[];
-    source: 'york_class_list' | 'transcript';
+    source: 'education_record' | 'transcript';
     sourceVersion: string;
     capturedAt: number;
 }
@@ -116,6 +116,8 @@ export interface CandidateProfileContext {
     facts?: CandidateProfileFact[];
     education?: CandidateEducationContext;
     availability?: CandidateAvailability;
+    featuredBlockIds?: string[];
+    currentBlockIds?: string[];
     insights?: CandidateProfileInsight[];
     completedAt?: number;
 }

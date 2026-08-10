@@ -5,18 +5,23 @@ import { InterviewChat } from '../../../components/common/InterviewChat';
 import type { ChatMessage } from '../../../components/common/InterviewChat';
 import { useResumeContext } from '../../resume/context/ResumeContext';
 import { summarizeCandidateProfile, type CandidateProfileDraft } from '../../../services/ai/interviewAiService';
-import { createCandidateStory } from '../../../services/candidateProfileContext';
+import { createCandidateProfileInsight, createCandidateStory, deriveCandidateProfileInsights, getCandidateProfileSourceVersion } from '../../../services/candidateProfileContext';
 import { ROUTES } from '../../../constants';
 import { authClient } from '../../../lib/auth-client';
 import { checkInterviewLimit } from '../../../services/usageLimits';
-import type { CandidateProfileSignal, ResumeProfile } from '../../resume/types';
+import type { CandidateProfileInsightStatus, CandidateProfileSignal, CandidateProfileInsightSuggestion, ResumeProfile } from '../../resume/types';
 
 const PROFILE_QUESTIONS = [
     'What kinds of roles are you hoping to pursue next, and what interests you about them?',
-    'Where are you in your career right now—for example, a student, early-career, established, or changing direction?',
-    'Is there education, coursework, or project work you would like applications to use when it is relevant?',
-    'What should Navigator emphasize in your applications, and is there anything it should never claim or exaggerate?',
+    'Which experience should lead applications for the roles you want next?',
+    'What should Navigator emphasize about your background when it is relevant?',
+    'Is there anything Navigator should never claim, exaggerate, or present as completed?',
 ];
+
+const REVIEW_QUESTIONS: Record<CandidateProfileInsightSuggestion['key'], string> = {
+    current_education: 'Your resume suggests that you are currently studying or completing an education program. Is that accurate?',
+    possible_first_role: 'Your resume looks like it may be preparing you for an early-career or first professional role. Is that how Navigator should frame your applications?',
+};
 
 const stringifyResume = (profile: ResumeProfile): string => profile.blocks
     .filter(block => block.isVisible)
@@ -43,9 +48,19 @@ export const CandidateProfileInterview: React.FC<CandidateProfileInterviewProps>
     const [saved, setSaved] = useState(false);
     const [isBlocked, setIsBlocked] = useState(false);
     const [isAccessChecking, setIsAccessChecking] = useState(true);
+    const [reviewedInsightKeys, setReviewedInsightKeys] = useState<CandidateProfileInsightSuggestion['key'][]>([]);
+    const [isSavingReview, setIsSavingReview] = useState(false);
 
     const close = onClose || (() => navigate(ROUTES.INTERVIEWS));
     const currentQuestion = PROFILE_QUESTIONS[questionIndex];
+    const primaryResume = resumes[0];
+    const sourceVersion = getCandidateProfileSourceVersion(primaryResume);
+    const reviewItems = useMemo(() => deriveCandidateProfileInsights(primaryResume).filter(insight => {
+        if (reviewedInsightKeys.includes(insight.key)) return false;
+        const savedInsight = primaryResume?.candidateProfile?.insights?.find(existing => existing.key === insight.key);
+        return !savedInsight || savedInsight.sourceVersion !== sourceVersion;
+    }), [primaryResume, reviewedInsightKeys, sourceVersion]);
+    const reviewItem = reviewItems[0];
 
     useEffect(() => {
         let mounted = true;
@@ -81,7 +96,7 @@ export const CandidateProfileInterview: React.FC<CandidateProfileInterviewProps>
         const result: ChatMessage[] = [{
             id: 'profile-intro',
             role: 'ai',
-            content: 'Let’s build a small reusable profile for your applications. Answer only what you are comfortable saving, and you can skip anything.',
+            content: 'Let’s review what Navigator found in your profile, then fill in only the gaps. Answer only what you are comfortable saving, and you can skip anything.',
         }];
 
         answers.forEach((item, index) => {
@@ -95,6 +110,43 @@ export const CandidateProfileInterview: React.FC<CandidateProfileInterviewProps>
 
         return result;
     }, [answers, currentQuestion, draft, isThinking, questionIndex]);
+
+    const handleReviewDecision = async (status?: CandidateProfileInsightStatus) => {
+        if (!reviewItem || !primaryResume || isSavingReview) return;
+
+        setIsSavingReview(true);
+        setError(null);
+        try {
+            if (status) {
+                const context = primaryResume.candidateProfile;
+                const savedInsight = createCandidateProfileInsight(
+                    reviewItem,
+                    status,
+                    context?.insights?.find(existing => existing.key === reviewItem.key)?.id,
+                    sourceVersion,
+                );
+                await handleUpdateResume({
+                    ...primaryResume,
+                    candidateProfile: {
+                        signals: context?.signals || [],
+                        stories: context?.stories || [],
+                        facts: context?.facts || [],
+                        education: context?.education,
+                        availability: context?.availability,
+                        featuredBlockIds: context?.featuredBlockIds || [],
+                        currentBlockIds: context?.currentBlockIds || [],
+                        insights: [...(context?.insights || []).filter(existing => existing.key !== reviewItem.key), savedInsight],
+                        completedAt: context?.completedAt,
+                    },
+                });
+            }
+            setReviewedInsightKeys(current => [...current, reviewItem.key]);
+        } catch (err: unknown) {
+            setError(err instanceof Error ? err.message : 'Unable to save that profile choice.');
+        } finally {
+            setIsSavingReview(false);
+        }
+    };
 
     const handleSubmit = async () => {
         const trimmed = answer.trim();
@@ -115,7 +167,6 @@ export const CandidateProfileInterview: React.FC<CandidateProfileInterviewProps>
         setIsThinking(true);
         setError(null);
         try {
-            const primaryResume = resumes[0];
             const summary = await summarizeCandidateProfile(
                 primaryResume ? stringifyResume(primaryResume) : '',
                 nextAnswers
@@ -159,6 +210,9 @@ export const CandidateProfileInterview: React.FC<CandidateProfileInterviewProps>
                 facts: existing?.facts || [],
                 education: existing?.education,
                 availability: existing?.availability,
+                featuredBlockIds: existing?.featuredBlockIds || [],
+                currentBlockIds: existing?.currentBlockIds || [],
+                insights: existing?.insights || [],
                 completedAt: approvedAt,
             },
         });
@@ -224,17 +278,34 @@ export const CandidateProfileInterview: React.FC<CandidateProfileInterviewProps>
     return (
         <div className="h-screen w-full flex flex-col items-center bg-neutral-50/50 dark:bg-black overflow-hidden">
             <div className="w-full max-w-4xl flex-1 min-h-0 flex flex-col pt-16">
-                <InterviewChat
-                    messages={messages}
-                    inputValue={answer}
-                    onInputChange={setAnswer}
-                    onSubmit={() => { void handleSubmit(); }}
-                    isThinking={isThinking}
-                    placeholder="Type your answer, or say skip..."
-                    inputHint={`Question ${questionIndex + 1} of ${PROFILE_QUESTIONS.length}`}
-                    inputDisabled={isThinking || isAccessChecking}
-                    accentGradient="from-indigo-500 to-violet-500"
-                />
+                {reviewItem ? (
+                    <div className="max-w-2xl w-full mx-auto px-5 py-10">
+                        <div className="bg-white dark:bg-neutral-900 rounded-3xl border border-violet-100 dark:border-violet-500/20 p-8 shadow-sm">
+                            <p className="text-[10px] font-black uppercase tracking-widest text-violet-500 dark:text-violet-300 mb-3">Profile review</p>
+                            <h1 className="text-2xl font-black text-neutral-900 dark:text-white mb-4">{REVIEW_QUESTIONS[reviewItem.key]}</h1>
+                            <p className="text-sm text-neutral-500 dark:text-neutral-400 mb-3">Navigator noticed:</p>
+                            <p className="text-sm font-bold text-neutral-800 dark:text-neutral-200 bg-violet-50 dark:bg-violet-500/10 rounded-2xl px-4 py-3">{reviewItem.value}</p>
+                            <p className="text-xs text-neutral-500 dark:text-neutral-400 mt-3">Why: {reviewItem.reason}</p>
+                            <div className="flex flex-wrap gap-3 mt-8">
+                                <button type="button" onClick={() => { void handleReviewDecision('confirmed'); }} disabled={isSavingReview} className="rounded-2xl bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 text-white px-5 py-3 text-sm font-black">That’s right</button>
+                                <button type="button" onClick={() => { void handleReviewDecision('dismissed'); }} disabled={isSavingReview} className="rounded-2xl border border-neutral-200 dark:border-neutral-700 text-neutral-700 dark:text-neutral-200 px-5 py-3 text-sm font-black">Not me</button>
+                                <button type="button" onClick={() => { void handleReviewDecision(); }} disabled={isSavingReview} className="rounded-2xl text-neutral-500 px-4 py-3 text-sm font-bold">Skip</button>
+                            </div>
+                        </div>
+                    </div>
+                ) : (
+                    <InterviewChat
+                        messages={messages}
+                        inputValue={answer}
+                        onInputChange={setAnswer}
+                        onSubmit={() => { void handleSubmit(); }}
+                        isThinking={isThinking}
+                        placeholder="Type your answer, or say skip..."
+                        inputHint={`Question ${questionIndex + 1} of ${PROFILE_QUESTIONS.length}`}
+                        inputDisabled={isThinking || isAccessChecking}
+                        accentGradient="from-indigo-500 to-violet-500"
+                    />
+                )}
                 {error && <p className="text-center text-sm text-red-600 pb-4">{error}</p>}
             </div>
         </div>

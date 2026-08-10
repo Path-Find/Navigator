@@ -90,6 +90,8 @@ export const getCandidateProfileContext = (profile?: ResumeProfile | null): Cand
         && !(context.facts || []).some(fact => fact.status === 'confirmed')
         && !(context.education?.courses || []).some(course => course.status !== 'withdrawn')
         && !context.availability
+        && !(context.featuredBlockIds || []).length
+        && !(context.currentBlockIds || []).length
         && !(context.insights || []).some(insight => insight.status === 'confirmed')
     ) return null;
     return context;
@@ -106,7 +108,7 @@ export const deriveCandidateProfileInsights = (profile?: ResumeProfile | null): 
     const visibleBlocks = profile.blocks.filter(block => block.isVisible !== false);
     const hasWorkExperience = visibleBlocks.some(block => block.type === 'work');
     const hasAcademicEvidence = visibleBlocks.some(block => block.type === 'education' || block.type === 'project');
-    const hasCurrentEducation = visibleBlocks.some(block => {
+    const currentEducationBlock = visibleBlocks.find(block => {
         if (block.type !== 'education') return false;
         const educationText = [block.dateRange, block.title, ...block.bullets].filter(Boolean).join(' ');
         const currentYear = new Date().getFullYear();
@@ -124,16 +126,33 @@ export const deriveCandidateProfileInsights = (profile?: ResumeProfile | null): 
             sourceVersion,
         });
     }
-    if (hasCurrentEducation) {
+    if (currentEducationBlock) {
+        const educationLabel = [currentEducationBlock.title, currentEducationBlock.organization].filter(Boolean).join(' at ');
         insights.push({
             key: 'current_education',
-            value: 'You may currently be studying or completing an education program.',
-            reason: 'Your resume includes education dates that appear current or ongoing.',
+            value: educationLabel
+                ? `You may currently be studying ${educationLabel}.`
+                : 'You may currently be studying or completing an education program.',
+            reason: educationLabel
+                ? `Your resume lists ${educationLabel} with dates that appear current or ongoing.`
+                : 'Your resume includes education dates that appear current or ongoing.',
             source: 'resume',
             sourceVersion,
         });
     }
     return insights;
+};
+
+const formatConfirmedInsight = (insight: CandidateProfileInsight): string => {
+    if (insight.key === 'current_education') {
+        return insight.value
+            .replace(/^You may currently be studying or completing /, 'Currently studying or completing ')
+            .replace(/^You may currently be studying /, 'Currently studying ');
+    }
+    if (insight.key === 'possible_first_role') {
+        return insight.value.replace(/^You may be /, 'The user is ');
+    }
+    return insight.value;
 };
 
 /**
@@ -155,13 +174,22 @@ export const formatCandidateProfileContext = (
         .join('\n');
     const confirmedInsights = (context.insights || [])
         .filter((insight: CandidateProfileInsight) => insight.status === 'confirmed' && insight.sourceVersion === sourceVersion)
-        .map(insight => `- ${insight.key}: ${insight.value}`)
+        .map(insight => `- ${insight.key}: ${formatConfirmedInsight(insight)}`)
         .join('\n');
     const confirmedFacts = (context.facts || [])
         .filter(fact => fact.status === 'confirmed' && profileFactMatchesJob(fact, jobContext))
         .slice(0, 8)
-        .map(fact => `- ${fact.value} [${fact.category}; source: ${fact.sourceLabel}]`)
+        .map(fact => `- ${fact.value}`)
         .join('\n');
+    const priorityBlocks = profile?.blocks
+        .filter(block => context.featuredBlockIds?.includes(block.id) || context.currentBlockIds?.includes(block.id))
+        .map(block => {
+            const isCurrent = context.currentBlockIds?.includes(block.id);
+            const isFeatured = context.featuredBlockIds?.includes(block.id);
+            const label = isCurrent && isFeatured ? 'Current and featured' : isCurrent ? 'Current' : 'Featured';
+            return `- ${label}: ${block.title}${block.organization ? ` at ${block.organization}` : ''}${block.dateRange ? ` (${block.dateRange})` : ''}`;
+        })
+        .join('\n') || '';
     const education = context.education;
     const educationCourses = education
         ? education.courses
@@ -196,6 +224,7 @@ export const formatCandidateProfileContext = (
         signals ? `APPROVED CANDIDATE SIGNALS:\n${signals}` : '',
         confirmedInsights ? `CONFIRMED CANDIDATE INSIGHTS:\n${confirmedInsights}` : '',
         confirmedFacts ? `APPROVED PROFILE FACTS:\n${confirmedFacts}` : '',
+        priorityBlocks ? `PROFILE PRIORITIES:\n${priorityBlocks}` : '',
         educationContext,
         availabilityContext ? `APPROVED AVAILABILITY:\n${availabilityContext}` : '',
         stories ? `APPROVED CANDIDATE STORIES:\n${stories}` : '',
