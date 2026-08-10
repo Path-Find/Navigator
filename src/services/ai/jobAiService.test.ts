@@ -99,6 +99,16 @@ describe('finalizeCoverLetterOutput', () => {
         expect(finalizeCoverLetterOutput('Dear Hiring Manager,\n\nBody.', 'Ryan Hanna'))
             .toBe('Dear Hiring Manager,\n\nBody.\n\nSincerely,\nRyan Hanna');
     });
+
+    it('repairs a saved letter that has no salutation', () => {
+        expect(finalizeCoverLetterOutput('Body.', 'Ryan Hanna'))
+            .toBe('Dear Hiring Manager,\n\nBody.\n\nSincerely,\nRyan Hanna');
+    });
+
+    it('preserves an existing non-default salutation', () => {
+        expect(finalizeCoverLetterOutput('Dear Ms. Chen,\n\nBody.', 'Ryan Hanna'))
+            .toBe('Dear Ms. Chen,\n\nBody.\n\nSincerely,\nRyan Hanna');
+    });
 });
 
 describe('cover-letter candidate signals', () => {

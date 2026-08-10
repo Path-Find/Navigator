@@ -449,7 +449,7 @@ export const cleanCoverLetterOutput = (text: string): string => {
     return cleaned.trim();
 };
 
-/** The application owns the closing; the model must never choose the name. */
+/** The application owns the salutation and closing for consistent saved output. */
 export const finalizeCoverLetterOutput = (text: string, candidateName?: string): string => {
     const cleaned = cleanCoverLetterOutput(text);
     const lines = cleaned.split(/\r?\n/);
@@ -465,8 +465,13 @@ export const finalizeCoverLetterOutput = (text: string, candidateName?: string):
         .join('\n')
         .replace(/\s*\[(?:your\s+)?name\]\s*$/i, '')
         .trim();
+    const normalizedBody = body && /^(dear\b|to whom it may concern\b)/i.test(body)
+        ? body
+        : body
+            ? `Dear Hiring Manager,\n\n${body}`
+            : body;
     const name = candidateName?.trim();
-    return name ? `${body}\n\nSincerely,\n${name}` : body;
+    return name ? `${normalizedBody}\n\nSincerely,\n${name}` : normalizedBody;
 };
 
 const parseJobInfo = async (
