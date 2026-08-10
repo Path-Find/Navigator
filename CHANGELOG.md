@@ -32,6 +32,7 @@ See [CHANGELOG_ARCHIVE.md](CHANGELOG_ARCHIVE.md) for earlier history.
 - **NextGen now records which cover-letter version a user actually copied or downloaded**: usage events point to the stored letter by checksum without duplicating the letter itself.
 
 ### Fixed
+- **The homepage no longer labels live cover letters as “Soon”**: the feature registry now explicitly treats cover-letter generation as public.
 - **Older cover letters now regain their required salutation when opened or reused**: saved drafts without a greeting are repaired without changing an existing personalized salutation.
 - **Cover-letter sign-offs are now application-owned**: generated and saved letters remove model placeholders and always use the account's exact name without duplicating the closing in print output.
 - **Education is no longer treated as current from a year alone**: Navigator now needs explicit wording such as “Present,” “Ongoing,” or “Expected” before making that suggestion.

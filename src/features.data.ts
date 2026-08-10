@@ -124,6 +124,7 @@ export const FEATURE_REGISTRY: Record<string, FeatureDefinition> = {
         rank: 2,
         showOnHomepage: true,
         planHighlight: true,
+        stage: 'public',
         releaseDate: '2025-01-10',
     },
     RESUME_INTERVIEW: {
