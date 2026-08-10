@@ -90,6 +90,23 @@ export const CandidateProfileContextManager: React.FC = () => {
         showSuccess(status === 'confirmed' ? 'Confirmed and added to your reusable profile.' : 'Navigator will stop suggesting this observation.');
     };
 
+    const handleClearSavedInsights = async () => {
+        if (!primaryResume || storedInsights.length === 0) return;
+
+        const context = primaryResume.candidateProfile;
+        await handleUpdateResume({
+            ...primaryResume,
+            candidateProfile: signals.length || stories.length
+                ? {
+                    signals,
+                    stories,
+                    completedAt: context?.completedAt,
+                }
+                : undefined,
+        });
+        showSuccess('Saved observation choices cleared.');
+    };
+
     const removeContext = async (type: 'signal' | 'story', id: string) => {
         if (!primaryResume) return;
 
@@ -188,8 +205,20 @@ export const CandidateProfileContextManager: React.FC = () => {
 
             {insightCards.length > 0 && (
                 <div className="mt-8 pt-6 border-t border-violet-100/70 dark:border-violet-500/10">
-                    <div className="mb-3">
+                    <div className="flex items-start justify-between gap-4 mb-3">
                         <h5 className="text-[10px] font-black uppercase tracking-widest text-neutral-400">Navigator’s observations</h5>
+                        {storedInsights.length > 0 && (
+                            <Button
+                                variant="ghost"
+                                size="xs"
+                                onClick={() => { void handleClearSavedInsights(); }}
+                                className="!text-neutral-400 hover:!text-rose-500 shrink-0"
+                            >
+                                Clear saved choices
+                            </Button>
+                        )}
+                    </div>
+                    <div className="mb-3">
                         <p className="text-xs text-neutral-400 leading-relaxed mt-2 max-w-2xl">
                             These are cautious patterns noticed in your resume—not facts. Confirm only what feels accurate; confirmed observations may be used when relevant.
                         </p>
