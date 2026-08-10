@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { formatCandidateProfileContext, formatVerifiedSkills } from './candidateProfileContext';
+import { deriveCandidateProfileInsights, formatCandidateProfileContext, formatVerifiedSkills } from './candidateProfileContext';
 
 describe('candidate profile prompt context', () => {
     it('keeps approved signals and only job-relevant stories', () => {
@@ -35,5 +35,44 @@ describe('candidate profile prompt context', () => {
 
         expect(context).toContain('ArcGIS');
         expect(context).not.toContain('Baking');
+    });
+
+    it('derives cautious observations without treating them as confirmed facts', () => {
+        const insights = deriveCandidateProfileInsights({
+            id: 'resume-1',
+            name: 'Primary',
+            blocks: [{
+                id: 'education-1',
+                type: 'education',
+                title: 'Bachelor of Planning',
+                organization: 'York University',
+                dateRange: '2023 - Present',
+                bullets: [],
+                isVisible: true,
+            }],
+        });
+
+        expect(insights.map(insight => insight.key)).toEqual(['possible_first_role', 'current_education']);
+        expect(insights[0].value).toContain('may be');
+        expect(insights[0].reason).toContain('no work-experience block');
+    });
+
+    it('uses confirmed insights in prompts but excludes dismissed insights', () => {
+        const context = formatCandidateProfileContext({
+            id: 'resume-1',
+            name: 'Primary',
+            blocks: [],
+            candidateProfile: {
+                signals: [],
+                stories: [],
+                insights: [
+                    { id: 'insight-1', key: 'current_education', value: 'Confirmed student context', reason: 'Resume dates', source: 'resume', status: 'confirmed', updatedAt: 1 },
+                    { id: 'insight-2', key: 'possible_first_role', value: 'Dismissed first-role context', reason: 'Resume structure', source: 'resume', status: 'dismissed', updatedAt: 1 },
+                ],
+            },
+        });
+
+        expect(context).toContain('Confirmed student context');
+        expect(context).not.toContain('Dismissed first-role context');
     });
 });

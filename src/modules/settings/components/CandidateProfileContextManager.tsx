@@ -6,7 +6,8 @@ import { useToast } from '../../../contexts/ToastContext';
 import { useUser } from '../../../contexts/UserContext';
 import { useResumeContext } from '../../resume/context/ResumeContext';
 import { ROUTES } from '../../../constants';
-import type { CandidateProfileSignal, CandidateStory } from '../../resume/types';
+import { createCandidateProfileInsight, deriveCandidateProfileInsights } from '../../../services/candidateProfileContext';
+import type { CandidateProfileInsight, CandidateProfileInsightStatus, CandidateProfileInsightSuggestion, CandidateProfileSignal, CandidateStory } from '../../resume/types';
 
 const SIGNAL_LABELS: Record<CandidateProfileSignal['key'], string> = {
     career_stage: 'Career stage',
@@ -22,6 +23,8 @@ const SOURCE_LABELS: Record<CandidateStory['source'], string> = {
     profile_interview: 'Profile interview',
 };
 
+type InsightCardStatus = CandidateProfileInsightStatus | 'pending';
+
 export const CandidateProfileContextManager: React.FC = () => {
     const navigate = useNavigate();
     const { resumes, handleUpdateResume, isLoading } = useResumeContext();
@@ -31,7 +34,17 @@ export const CandidateProfileContextManager: React.FC = () => {
     const primaryResume = resumes[0];
     const signals = primaryResume?.candidateProfile?.signals || [];
     const stories = primaryResume?.candidateProfile?.stories || [];
-    const hasContext = signals.length > 0 || stories.length > 0;
+    const storedInsights = primaryResume?.candidateProfile?.insights || [];
+    const inferredInsights = deriveCandidateProfileInsights(primaryResume);
+    const insightCards: Array<CandidateProfileInsightSuggestion & { id: string; status: InsightCardStatus }> = [
+        ...storedInsights
+            .filter(insight => insight.status === 'confirmed')
+            .map(insight => ({ id: insight.id, key: insight.key, value: insight.value, reason: insight.reason, source: insight.source, status: insight.status })),
+        ...inferredInsights
+            .filter(insight => !storedInsights.some(saved => saved.key === insight.key))
+            .map(insight => ({ ...insight, id: `pending-${insight.key}`, status: 'pending' as const })),
+    ];
+    const hasContext = signals.length > 0 || stories.length > 0 || storedInsights.some(insight => insight.status === 'confirmed');
 
     // The profile loads asynchronously after the Settings screen mounts.
     // eslint-disable-next-line react-hooks/set-state-in-effect
@@ -42,6 +55,29 @@ export const CandidateProfileContextManager: React.FC = () => {
         if (trimmed !== (coverLetterPreferences || '')) {
             void updateProfile({ cover_letter_preferences: trimmed || null }).catch(() => showError('Failed to save cover-letter preferences.'));
         }
+    };
+
+    const handleInsightDecision = async (insight: CandidateProfileInsightSuggestion, status: CandidateProfileInsightStatus) => {
+        if (!primaryResume) return;
+
+        const context = primaryResume.candidateProfile;
+        const savedInsight: CandidateProfileInsight = createCandidateProfileInsight(
+            insight,
+            status,
+            storedInsights.find(existing => existing.key === insight.key)?.id
+        );
+        const nextInsights = [...storedInsights.filter(existing => existing.key !== insight.key), savedInsight];
+
+        await handleUpdateResume({
+            ...primaryResume,
+            candidateProfile: {
+                signals: context?.signals || [],
+                stories: context?.stories || [],
+                insights: nextInsights,
+                completedAt: context?.completedAt,
+            },
+        });
+        showSuccess(status === 'confirmed' ? 'Confirmed and added to your reusable profile.' : 'Navigator will stop suggesting this observation.');
     };
 
     const removeContext = async (type: 'signal' | 'story', id: string) => {
@@ -140,6 +176,65 @@ export const CandidateProfileContextManager: React.FC = () => {
                 </div>
             </div>
 
+            {insightCards.length > 0 && (
+                <div className="mt-8 pt-6 border-t border-violet-100/70 dark:border-violet-500/10">
+                    <div className="mb-3">
+                        <h5 className="text-[10px] font-black uppercase tracking-widest text-neutral-400">Navigator’s observations</h5>
+                        <p className="text-xs text-neutral-400 leading-relaxed mt-2 max-w-2xl">
+                            These are cautious patterns noticed in your resume—not facts. Confirm only what feels accurate; confirmed observations may be used when relevant.
+                        </p>
+                    </div>
+                    <div className="space-y-3">
+                        {insightCards.map(insight => (
+                            <div key={insight.id} className="rounded-2xl bg-violet-50/70 dark:bg-violet-500/10 border border-violet-100 dark:border-violet-500/20 px-4 py-4">
+                                <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between">
+                                    <div className="min-w-0">
+                                        <div className="flex items-center gap-2 mb-1">
+                                            <span className="text-[10px] font-black uppercase tracking-wide text-violet-500 dark:text-violet-300">
+                                                {insight.status === 'confirmed' ? 'Confirmed' : 'Suggested'}
+                                            </span>
+                                        </div>
+                                        <p className="text-sm font-bold text-neutral-800 dark:text-neutral-100">{insight.value}</p>
+                                        <p className="text-xs text-neutral-500 dark:text-neutral-400 mt-2">Why: {insight.reason}</p>
+                                    </div>
+                                    <div className="flex items-center gap-2 shrink-0">
+                                        {insight.status === 'confirmed' ? (
+                                            <Button
+                                                variant="ghost"
+                                                size="xs"
+                                                onClick={() => { void handleInsightDecision(insight, 'dismissed'); }}
+                                                className="!text-neutral-500 hover:!text-rose-500"
+                                            >
+                                                Stop using
+                                            </Button>
+                                        ) : (
+                                            <>
+                                                <Button
+                                                    variant="subtle"
+                                                    size="xs"
+                                                    onClick={() => { void handleInsightDecision(insight, 'confirmed'); }}
+                                                    className="!text-violet-600 dark:!text-violet-300 !border-violet-200 dark:!border-violet-500/20"
+                                                >
+                                                    Confirm
+                                                </Button>
+                                                <Button
+                                                    variant="ghost"
+                                                    size="xs"
+                                                    onClick={() => { void handleInsightDecision(insight, 'dismissed'); }}
+                                                    className="!text-neutral-500 hover:!text-rose-500"
+                                                >
+                                                    Not me
+                                                </Button>
+                                            </>
+                                        )}
+                                    </div>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            )}
+
             {isLoading ? (
                 <p className="text-sm text-neutral-400 mt-8">Loading your saved context…</p>
             ) : !hasContext ? (
@@ -151,7 +246,7 @@ export const CandidateProfileContextManager: React.FC = () => {
                         </p>
                     </div>
                 </div>
-            ) : (
+            ) : !signals.length && !stories.length ? null : (
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mt-8">
                     {signals.length > 0 && (
                         <div>

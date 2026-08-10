@@ -37,9 +37,26 @@ export interface CandidateProfileSignal {
     approvedAt: number;
 }
 
+export type CandidateProfileInsightKey = 'possible_first_role' | 'current_education';
+export type CandidateProfileInsightStatus = 'confirmed' | 'dismissed';
+
+export interface CandidateProfileInsightSuggestion {
+    key: CandidateProfileInsightKey;
+    value: string;
+    reason: string;
+    source: 'resume';
+}
+
+export interface CandidateProfileInsight extends CandidateProfileInsightSuggestion {
+    id: string;
+    status: CandidateProfileInsightStatus;
+    updatedAt: number;
+}
+
 export interface CandidateProfileContext {
     signals: CandidateProfileSignal[];
     stories: CandidateStory[];
+    insights?: CandidateProfileInsight[];
     completedAt?: number;
 }
 

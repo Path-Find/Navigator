@@ -1,4 +1,4 @@
-import type { CandidateProfileContext, CandidateStory, ResumeProfile } from '../modules/resume/types';
+import type { CandidateProfileContext, CandidateProfileInsight, CandidateProfileInsightSuggestion, CandidateStory, ResumeProfile } from '../modules/resume/types';
 import type { CustomSkill } from '../modules/skills/types';
 
 const STOP_WORDS = new Set([
@@ -22,8 +22,46 @@ const storyMatchesJob = (story: CandidateStory, jobContext: string): boolean => 
 export const getCandidateProfileContext = (profile?: ResumeProfile | null): CandidateProfileContext | null => {
     const context = profile?.candidateProfile;
     if (!context) return null;
-    if (context.signals.length === 0 && context.stories.length === 0) return null;
+    if (context.signals.length === 0 && context.stories.length === 0 && !(context.insights || []).some(insight => insight.status === 'confirmed')) return null;
     return context;
+};
+
+/**
+ * Finds cautious, reusable observations from visible resume structure. These
+ * are suggestions for the user to review, not facts for an AI prompt.
+ */
+export const deriveCandidateProfileInsights = (profile?: ResumeProfile | null): CandidateProfileInsightSuggestion[] => {
+    if (!profile) return [];
+
+    const visibleBlocks = profile.blocks.filter(block => block.isVisible !== false);
+    const hasWorkExperience = visibleBlocks.some(block => block.type === 'work');
+    const hasAcademicEvidence = visibleBlocks.some(block => block.type === 'education' || block.type === 'project');
+    const hasCurrentEducation = visibleBlocks.some(block => {
+        if (block.type !== 'education') return false;
+        const educationText = [block.dateRange, block.title, ...block.bullets].filter(Boolean).join(' ');
+        const currentYear = new Date().getFullYear();
+        return /present|current|ongoing|in progress|expected/i.test(educationText)
+            || new RegExp(`\\b${currentYear}(?:[-–]\\d{4})?\\b`).test(educationText);
+    });
+
+    const insights: CandidateProfileInsightSuggestion[] = [];
+    if (!hasWorkExperience && hasAcademicEvidence) {
+        insights.push({
+            key: 'possible_first_role',
+            value: 'You may be early in your career or preparing for your first professional role.',
+            reason: 'Your visible resume includes education or project evidence but no work-experience block.',
+            source: 'resume',
+        });
+    }
+    if (hasCurrentEducation) {
+        insights.push({
+            key: 'current_education',
+            value: 'You may currently be studying or completing an education program.',
+            reason: 'Your resume includes education dates that appear current or ongoing.',
+            source: 'resume',
+        });
+    }
+    return insights;
 };
 
 /**
@@ -42,6 +80,10 @@ export const formatCandidateProfileContext = (
     const signals = context.signals
         .map(signal => `- ${signal.key}: ${signal.value}`)
         .join('\n');
+    const confirmedInsights = (context.insights || [])
+        .filter((insight: CandidateProfileInsight) => insight.status === 'confirmed')
+        .map(insight => `- ${insight.key}: ${insight.value}`)
+        .join('\n');
     const stories = context.stories
         .filter(story => storyMatchesJob(story, jobContext))
         .slice(0, maxStories)
@@ -50,6 +92,7 @@ export const formatCandidateProfileContext = (
 
     return [
         signals ? `APPROVED CANDIDATE SIGNALS:\n${signals}` : '',
+        confirmedInsights ? `CONFIRMED CANDIDATE INSIGHTS:\n${confirmedInsights}` : '',
         stories ? `APPROVED CANDIDATE STORIES:\n${stories}` : '',
     ].filter(Boolean).join('\n\n');
 };
@@ -93,4 +136,15 @@ export const createCandidateStory = (
     source,
     ...(question ? { question } : {}),
     approvedAt: Date.now(),
+});
+
+export const createCandidateProfileInsight = (
+    suggestion: CandidateProfileInsightSuggestion,
+    status: CandidateProfileInsight['status'],
+    existingId?: string
+): CandidateProfileInsight => ({
+    ...suggestion,
+    id: existingId || crypto.randomUUID(),
+    status,
+    updatedAt: Date.now(),
 });
