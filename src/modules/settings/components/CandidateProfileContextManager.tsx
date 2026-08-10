@@ -1,8 +1,9 @@
 import React from 'react';
-import { ArrowRight, BookOpen, Sparkles, Trash2 } from 'lucide-react';
+import { ArrowRight, BookOpen, ChevronDown, Sparkles, Trash2 } from 'lucide-react';
 import { useNavigate } from 'react-router';
 import { Button } from '../../../components/ui/Button';
 import { useToast } from '../../../contexts/ToastContext';
+import { useUser } from '../../../contexts/UserContext';
 import { useResumeContext } from '../../resume/context/ResumeContext';
 import { ROUTES } from '../../../constants';
 import type { CandidateProfileSignal, CandidateStory } from '../../resume/types';
@@ -24,7 +25,8 @@ const SOURCE_LABELS: Record<CandidateStory['source'], string> = {
 export const CandidateProfileContextManager: React.FC = () => {
     const navigate = useNavigate();
     const { resumes, handleUpdateResume, isLoading } = useResumeContext();
-    const { showSuccess } = useToast();
+    const { journey, updateProfile } = useUser();
+    const { showSuccess, showError } = useToast();
     const primaryResume = resumes[0];
     const signals = primaryResume?.candidateProfile?.signals || [];
     const stories = primaryResume?.candidateProfile?.stories || [];
@@ -62,9 +64,9 @@ export const CandidateProfileContextManager: React.FC = () => {
                         <Sparkles className="w-5 h-5 text-violet-500" />
                     </div>
                     <div>
-                        <h4 className="font-bold text-neutral-900 dark:text-white tracking-tight">Reusable application context</h4>
+                        <h4 className="font-bold text-neutral-900 dark:text-white tracking-tight">Your application profile</h4>
                         <p className="text-xs text-neutral-400 leading-relaxed mt-2 max-w-2xl">
-                            These are details you approved for Navigator to reuse in interviews and applications when they fit. You can remove any item at any time.
+                            Keep your direction here, along with details you approved for Navigator to reuse in interviews and applications when they fit.
                         </p>
                     </div>
                 </div>
@@ -77,6 +79,37 @@ export const CandidateProfileContextManager: React.FC = () => {
                 >
                     Build or refresh profile
                 </Button>
+            </div>
+
+            <div className="mt-8 pt-6 border-t border-indigo-100/70 dark:border-indigo-500/10">
+                <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                    <div>
+                        <h5 className="text-[10px] font-black uppercase tracking-widest text-neutral-400">Current focus</h5>
+                        <p className="text-xs text-neutral-400 leading-relaxed mt-2 max-w-xl">
+                            Helps Navigator understand the kind of support you want right now. You can change this whenever your direction changes.
+                        </p>
+                    </div>
+                    <div className="relative group sm:w-56 shrink-0">
+                        <select
+                            value={journey || ''}
+                            onChange={(event) => {
+                                void updateProfile({ journey: event.target.value }).catch(() => showError('Failed to save current focus.'));
+                            }}
+                            className="w-full appearance-none bg-indigo-50/60 dark:bg-indigo-500/10 border border-indigo-100 dark:border-indigo-500/20 rounded-xl px-4 py-3 text-sm font-bold text-neutral-900 dark:text-white focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all cursor-pointer pr-10"
+                        >
+                            {[
+                                { id: 'job-hunter', label: 'Job Search' },
+                                { id: 'career-changer', label: 'Career Change' },
+                                { id: 'exploring', label: 'Just Exploring' },
+                            ].map((option) => (
+                                <option key={option.id} value={option.id}>{option.label}</option>
+                            ))}
+                        </select>
+                        <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-neutral-400">
+                            <ChevronDown className="w-4 h-4" />
+                        </div>
+                    </div>
+                </div>
             </div>
 
             {isLoading ? (

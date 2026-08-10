@@ -1,5 +1,5 @@
 import React from 'react';
-import { Lock, Copy, Check, Star, Puzzle, Mail, Activity, ArrowRight, User as UserIcon, ChevronDown } from 'lucide-react';
+import { Lock, Copy, Check, Star, Puzzle, Mail, Activity, ArrowRight, User as UserIcon } from 'lucide-react';
 import { ROUTES } from '../../constants';
 import { useModal } from '../../contexts/ModalContext';
 import { useToast } from '../../contexts/ToastContext';
@@ -14,7 +14,7 @@ import { NextGenCalibration } from './components/NextGenCalibration';
 import { CandidateProfileContextManager } from './components/CandidateProfileContextManager';
 
 export const SettingsPage: React.FC = () => {
-    const { user, userTier, isTester, isAdmin, simulatedTier, journey, fullName, coverLetterPreferences, updateProfile } = useUser();
+    const { user, userTier, isTester, isAdmin, simulatedTier, fullName, coverLetterPreferences, updateProfile } = useUser();
     const { usageStats } = useJobContext();
     const { openModal } = useModal();
     const { showInfo, showError } = useToast();
@@ -153,30 +153,6 @@ export const SettingsPage: React.FC = () => {
                             />
                         </div>
 
-                        {/* Focus */}
-                        <div className="pt-8 border-t border-neutral-100 dark:border-neutral-800">
-                            <h4 className="font-bold text-xs text-neutral-400 mb-4">Current Focus</h4>
-                            <div className="relative group">
-                                <select
-                                    value={journey || ''}
-                                    onChange={(e) => updateProfile({ journey: e.target.value })}
-                                    className="w-full appearance-none bg-neutral-50 dark:bg-neutral-800/50 border border-neutral-100 dark:border-neutral-800 rounded-xl px-4 py-3 text-sm font-bold text-neutral-900 dark:text-white focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all cursor-pointer hover:border-neutral-200 dark:hover:border-neutral-700 pr-10"
-                                >
-                                    {[
-                                        { id: 'job-hunter', label: 'Job Search' },
-                                        { id: 'career-changer', label: 'Career Change' },
-                                        { id: 'exploring', label: 'Just Exploring' }
-                                    ].map((opt) => (
-                                        <option key={opt.id} value={opt.id}>
-                                            {opt.label}
-                                        </option>
-                                    ))}
-                                </select>
-                                <div className="absolute right-4 top-1/2 -translate-y-1/2 pointer-events-none text-neutral-400">
-                                    <ChevronDown className="w-4 h-4" />
-                                </div>
-                            </div>
-                        </div>
                     </div>
                 </div>
 
