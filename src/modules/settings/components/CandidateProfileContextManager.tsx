@@ -8,7 +8,7 @@ import { useResumeContext } from '../../resume/context/ResumeContext';
 import { ROUTES } from '../../../constants';
 import { Storage } from '../../../services/storageService';
 import { createCandidateEducationContext, createCandidateProfileFact, createCandidateProfileInsight, deriveCandidateProfileInsights, getCandidateProfileSourceVersion } from '../../../services/candidateProfileContext';
-import type { CandidateProfileFact, CandidateProfileInsight, CandidateProfileInsightStatus, CandidateProfileInsightSuggestion, CandidateProfileSignal, CandidateStory } from '../../resume/types';
+import type { CandidateAvailability, CandidateEmploymentType, CandidateProfileFact, CandidateProfileInsight, CandidateProfileInsightStatus, CandidateProfileInsightSuggestion, CandidateProfileSignal, CandidateRelocationPreference, CandidateStartTiming, CandidateStory, CandidateWorkArrangement } from '../../resume/types';
 import type { Transcript } from '../../grad/types';
 
 const SIGNAL_LABELS: Record<CandidateProfileSignal['key'], string> = {
@@ -37,6 +37,41 @@ const FACT_SOURCE_LABELS: Record<CandidateProfileFact['source'], string> = {
 type InsightCardStatus = CandidateProfileInsightStatus | 'pending' | 'needs_review';
 type InsightCard = CandidateProfileInsightSuggestion & { id: string; status: InsightCardStatus };
 
+const RELOCATION_OPTIONS: Array<{ value: CandidateRelocationPreference; label: string }> = [
+    { value: 'not_open', label: 'Not open to relocating' },
+    { value: 'within_region', label: 'Within my region' },
+    { value: 'within_country', label: 'Within my country' },
+    { value: 'open_to_relocation', label: 'Open to relocating' },
+    { value: 'depends', label: 'Depends on the role' },
+];
+
+const WORK_ARRANGEMENT_OPTIONS: Array<{ value: CandidateWorkArrangement; label: string }> = [
+    { value: 'on_site', label: 'On-site' },
+    { value: 'hybrid', label: 'Hybrid' },
+    { value: 'remote', label: 'Remote' },
+    { value: 'no_preference', label: 'No preference' },
+];
+
+const EMPLOYMENT_TYPE_OPTIONS: Array<{ value: CandidateEmploymentType; label: string }> = [
+    { value: 'full_time', label: 'Full-time' },
+    { value: 'part_time', label: 'Part-time' },
+    { value: 'contract', label: 'Contract' },
+    { value: 'internship', label: 'Internship' },
+    { value: 'co_op', label: 'Co-op' },
+    { value: 'seasonal', label: 'Seasonal' },
+];
+
+const START_TIMING_OPTIONS: Array<{ value: CandidateStartTiming; label: string }> = [
+    { value: 'immediately', label: 'Immediately' },
+    { value: 'within_one_month', label: 'Within one month' },
+    { value: 'specific_date', label: 'On a specific date' },
+    { value: 'flexible', label: 'Flexible' },
+];
+
+const toggleOption = <T,>(values: T[], value: T): T[] => values.includes(value)
+    ? values.filter(item => item !== value)
+    : [...values, value];
+
 export const CandidateProfileContextManager: React.FC = () => {
     const navigate = useNavigate();
     const { resumes, handleUpdateResume, isLoading } = useResumeContext();
@@ -48,6 +83,12 @@ export const CandidateProfileContextManager: React.FC = () => {
     const [factTagsInput, setFactTagsInput] = React.useState('');
     const [factCategory, setFactCategory] = React.useState<CandidateProfileFact['category']>('direction');
     const [factSource, setFactSource] = React.useState<CandidateProfileFact['source']>('linkedin');
+    const [availabilityCity, setAvailabilityCity] = React.useState('');
+    const [relocation, setRelocation] = React.useState<CandidateRelocationPreference>('depends');
+    const [workArrangements, setWorkArrangements] = React.useState<CandidateWorkArrangement[]>([]);
+    const [employmentTypes, setEmploymentTypes] = React.useState<CandidateEmploymentType[]>([]);
+    const [startTiming, setStartTiming] = React.useState<CandidateStartTiming>('flexible');
+    const [startDate, setStartDate] = React.useState('');
     const primaryResume = resumes[0];
     const signals = primaryResume?.candidateProfile?.signals || [];
     const stories = primaryResume?.candidateProfile?.stories || [];
@@ -80,6 +121,7 @@ export const CandidateProfileContextManager: React.FC = () => {
         || stories.length > 0
         || facts.length > 0
         || Boolean(educationContext?.courses.length)
+        || Boolean(primaryResume?.candidateProfile?.availability)
         || storedInsights.some(insight => insight.status === 'confirmed');
 
     // The profile loads asynchronously after the Settings screen mounts.
@@ -93,6 +135,17 @@ export const CandidateProfileContextManager: React.FC = () => {
         });
         return () => { mounted = false; };
     }, []);
+
+    React.useEffect(() => {
+        const saved = primaryResume?.candidateProfile?.availability;
+        if (!saved) return;
+        setAvailabilityCity(saved.city || '');
+        setRelocation(saved.relocation);
+        setWorkArrangements(saved.workArrangements);
+        setEmploymentTypes(saved.employmentTypes);
+        setStartTiming(saved.startTiming);
+        setStartDate(saved.startDate || '');
+    }, [primaryResume?.id, primaryResume?.candidateProfile?.availability]);
 
     const handleSaveCoverLetterPreferences = () => {
         const trimmed = coverLetterPreferencesInput.trim();
@@ -120,6 +173,7 @@ export const CandidateProfileContextManager: React.FC = () => {
                 stories: context?.stories || [],
                 facts: context?.facts || [],
                 education: context?.education,
+                availability: context?.availability,
                 insights: nextInsights,
                 completedAt: context?.completedAt,
             },
@@ -146,6 +200,7 @@ export const CandidateProfileContextManager: React.FC = () => {
                 stories: context?.stories || [],
                 facts: [...(context?.facts || []), fact],
                 education: context?.education,
+                availability: context?.availability,
                 insights: context?.insights || [],
                 completedAt: context?.completedAt,
             },
@@ -153,6 +208,34 @@ export const CandidateProfileContextManager: React.FC = () => {
         setFactInput('');
         setFactTagsInput('');
         showSuccess('Added to your confirmed profile facts.');
+    };
+
+    const handleSaveAvailability = async () => {
+        if (!primaryResume) return;
+
+        const context = primaryResume.candidateProfile;
+        const availability: CandidateAvailability = {
+            ...(availabilityCity.trim() ? { city: availabilityCity.trim() } : {}),
+            relocation,
+            workArrangements,
+            employmentTypes,
+            startTiming,
+            ...(startTiming === 'specific_date' && startDate ? { startDate } : {}),
+            updatedAt: Date.now(),
+        };
+        await handleUpdateResume({
+            ...primaryResume,
+            candidateProfile: {
+                signals: context?.signals || [],
+                stories: context?.stories || [],
+                facts: context?.facts || [],
+                education: context?.education,
+                availability,
+                insights: context?.insights || [],
+                completedAt: context?.completedAt,
+            },
+        });
+        showSuccess('Saved structured availability preferences.');
     };
 
     const handleClearSavedInsights = async () => {
@@ -164,11 +247,13 @@ export const CandidateProfileContextManager: React.FC = () => {
             candidateProfile: signals.length || stories.length
                 || storedFacts.length
                 || educationContext
+                || context?.availability
                 ? {
                     signals,
                     stories,
                     facts: storedFacts,
                     education: context?.education,
+                    availability: context?.availability,
                     completedAt: context?.completedAt,
                 }
                 : undefined,
@@ -192,12 +277,13 @@ export const CandidateProfileContextManager: React.FC = () => {
 
         await handleUpdateResume({
             ...primaryResume,
-            candidateProfile: nextSignals.length || nextStories.length || nextFacts.length || educationContext
+            candidateProfile: nextSignals.length || nextStories.length || nextFacts.length || educationContext || context?.availability
                 ? {
                     signals: nextSignals,
                     stories: nextStories,
                     facts: nextFacts,
                     education: context?.education,
+                    availability: context?.availability,
                     completedAt: context?.completedAt,
                 }
                 : undefined,
@@ -229,6 +315,100 @@ export const CandidateProfileContextManager: React.FC = () => {
                 >
                     Build or refresh profile
                 </Button>
+            </div>
+
+            <div className="mt-8 pt-6 border-t border-indigo-100/70 dark:border-indigo-500/10">
+                <div className="flex items-start justify-between gap-4 mb-4">
+                    <div>
+                        <h5 className="text-[10px] font-black uppercase tracking-widest text-neutral-400">Availability</h5>
+                        <p className="text-xs text-neutral-400 leading-relaxed mt-2 max-w-2xl">
+                            These choices help Navigator filter and frame applications. City is the only short text field; the rest stay structured.
+                        </p>
+                    </div>
+                    <Button
+                        variant="subtle"
+                        size="sm"
+                        onClick={() => { void handleSaveAvailability(); }}
+                        className="shrink-0 !text-indigo-600 dark:!text-indigo-300 !border-indigo-100 dark:!border-indigo-500/20"
+                    >
+                        Save availability
+                    </Button>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <label className="text-xs font-bold text-neutral-600 dark:text-neutral-300">
+                        Current city
+                        <input
+                            value={availabilityCity}
+                            onChange={event => setAvailabilityCity(event.target.value)}
+                            placeholder="e.g. Toronto"
+                            maxLength={80}
+                            className="mt-2 w-full bg-indigo-50/40 dark:bg-indigo-500/5 border border-indigo-100 dark:border-indigo-500/20 rounded-xl px-3 py-3 text-sm font-medium text-neutral-900 dark:text-white focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all"
+                        />
+                    </label>
+                    <label className="text-xs font-bold text-neutral-600 dark:text-neutral-300">
+                        Relocation
+                        <select
+                            value={relocation}
+                            onChange={event => setRelocation(event.target.value as CandidateRelocationPreference)}
+                            className="mt-2 w-full bg-indigo-50/40 dark:bg-indigo-500/5 border border-indigo-100 dark:border-indigo-500/20 rounded-xl px-3 py-3 text-sm font-bold text-neutral-900 dark:text-white focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all"
+                        >
+                            {RELOCATION_OPTIONS.map(option => <option key={option.value} value={option.value}>{option.label}</option>)}
+                        </select>
+                    </label>
+                    <fieldset>
+                        <legend className="text-xs font-bold text-neutral-600 dark:text-neutral-300 mb-2">Work arrangement</legend>
+                        <div className="flex flex-wrap gap-2">
+                            {WORK_ARRANGEMENT_OPTIONS.map(option => (
+                                <label key={option.value} className="inline-flex items-center gap-2 rounded-xl border border-indigo-100 dark:border-indigo-500/20 bg-indigo-50/40 dark:bg-indigo-500/5 px-3 py-2 text-xs text-neutral-700 dark:text-neutral-200 cursor-pointer">
+                                    <input
+                                        type="checkbox"
+                                        checked={workArrangements.includes(option.value)}
+                                        onChange={() => setWorkArrangements(current => toggleOption(current, option.value))}
+                                        className="accent-indigo-600"
+                                    />
+                                    {option.label}
+                                </label>
+                            ))}
+                        </div>
+                    </fieldset>
+                    <fieldset>
+                        <legend className="text-xs font-bold text-neutral-600 dark:text-neutral-300 mb-2">Employment type</legend>
+                        <div className="flex flex-wrap gap-2">
+                            {EMPLOYMENT_TYPE_OPTIONS.map(option => (
+                                <label key={option.value} className="inline-flex items-center gap-2 rounded-xl border border-indigo-100 dark:border-indigo-500/20 bg-indigo-50/40 dark:bg-indigo-500/5 px-3 py-2 text-xs text-neutral-700 dark:text-neutral-200 cursor-pointer">
+                                    <input
+                                        type="checkbox"
+                                        checked={employmentTypes.includes(option.value)}
+                                        onChange={() => setEmploymentTypes(current => toggleOption(current, option.value))}
+                                        className="accent-indigo-600"
+                                    />
+                                    {option.label}
+                                </label>
+                            ))}
+                        </div>
+                    </fieldset>
+                    <label className="text-xs font-bold text-neutral-600 dark:text-neutral-300">
+                        Start timing
+                        <select
+                            value={startTiming}
+                            onChange={event => setStartTiming(event.target.value as CandidateStartTiming)}
+                            className="mt-2 w-full bg-indigo-50/40 dark:bg-indigo-500/5 border border-indigo-100 dark:border-indigo-500/20 rounded-xl px-3 py-3 text-sm font-bold text-neutral-900 dark:text-white focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all"
+                        >
+                            {START_TIMING_OPTIONS.map(option => <option key={option.value} value={option.value}>{option.label}</option>)}
+                        </select>
+                    </label>
+                    {startTiming === 'specific_date' ? (
+                        <label className="text-xs font-bold text-neutral-600 dark:text-neutral-300">
+                            Available from
+                            <input
+                                type="date"
+                                value={startDate}
+                                onChange={event => setStartDate(event.target.value)}
+                                className="mt-2 w-full bg-indigo-50/40 dark:bg-indigo-500/5 border border-indigo-100 dark:border-indigo-500/20 rounded-xl px-3 py-3 text-sm font-medium text-neutral-900 dark:text-white focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all"
+                            />
+                        </label>
+                    ) : null}
+                </div>
             </div>
 
             {educationContext?.courses.length ? (

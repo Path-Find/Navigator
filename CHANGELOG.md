@@ -7,6 +7,7 @@ See [CHANGELOG_ARCHIVE.md](CHANGELOG_ARCHIVE.md) for earlier history.
 ## [Unreleased]
 
 ### Added
+- **Availability preferences now use structured choices**: users can save their city, relocation preference, work arrangement, employment type, and start timing without adding another free-form prompt field.
 - **Profile context now keeps source-labelled facts and education reviewable**: Navigator can reuse confirmed profile details and compact course context while clearly separating completed, upcoming, and withdrawn coursework.
 - **Navigator observations are now reviewable instead of silently becoming profile facts**: Settings can show cautious resume-based patterns, and only confirmed observations become reusable AI context while rejected ones stay suppressed.
 - **Cover-letter style preferences now follow the user across applications**: account settings can define general tone, voice, or length preferences, while job-specific facts remain in each job's personal context.

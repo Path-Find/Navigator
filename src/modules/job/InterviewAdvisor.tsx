@@ -149,6 +149,7 @@ export const InterviewAdvisor: React.FC = () => {
                     stories: [...existingStories, story],
                     facts: primaryResume.candidateProfile?.facts || [],
                     education: primaryResume.candidateProfile?.education,
+                    availability: primaryResume.candidateProfile?.availability,
                     completedAt: primaryResume.candidateProfile?.completedAt,
                 },
             });

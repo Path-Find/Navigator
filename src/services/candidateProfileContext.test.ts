@@ -122,4 +122,27 @@ describe('candidate profile prompt context', () => {
         expect(context).toContain('Upcoming coursework (not yet completed): Introduction to Geomatics');
         expect(context).not.toContain('Weather and Climate');
     });
+
+    it('includes structured availability only for job-relevant context', () => {
+        const profile = {
+            id: 'resume-availability',
+            name: 'Primary',
+            blocks: [],
+            candidateProfile: {
+                signals: [],
+                stories: [],
+                availability: {
+                    city: 'Toronto',
+                    relocation: 'depends' as const,
+                    workArrangements: ['hybrid' as const],
+                    employmentTypes: ['full_time' as const],
+                    startTiming: 'flexible' as const,
+                    updatedAt: 42,
+                },
+            },
+        };
+
+        expect(formatCandidateProfileContext(profile, 'Toronto planning role')).toContain('Current city: Toronto');
+        expect(formatCandidateProfileContext(profile)).not.toContain('APPROVED AVAILABILITY');
+    });
 });

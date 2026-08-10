@@ -158,6 +158,7 @@ export const CandidateProfileInterview: React.FC<CandidateProfileInterviewProps>
                 stories: [...(existing?.stories || []), ...storiesToAdd],
                 facts: existing?.facts || [],
                 education: existing?.education,
+                availability: existing?.availability,
                 completedAt: approvedAt,
             },
         });

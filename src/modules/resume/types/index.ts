@@ -77,6 +77,22 @@ export interface CandidateEducationContext {
     capturedAt: number;
 }
 
+export type CandidateRelocationPreference = 'not_open' | 'within_region' | 'within_country' | 'open_to_relocation' | 'depends';
+export type CandidateWorkArrangement = 'on_site' | 'hybrid' | 'remote' | 'no_preference';
+export type CandidateEmploymentType = 'full_time' | 'part_time' | 'contract' | 'internship' | 'co_op' | 'seasonal';
+export type CandidateStartTiming = 'immediately' | 'within_one_month' | 'specific_date' | 'flexible';
+
+/** Structured availability preferences. City is the only short user-entered field. */
+export interface CandidateAvailability {
+    city?: string;
+    relocation: CandidateRelocationPreference;
+    workArrangements: CandidateWorkArrangement[];
+    employmentTypes: CandidateEmploymentType[];
+    startTiming: CandidateStartTiming;
+    startDate?: string;
+    updatedAt: number;
+}
+
 export type CandidateProfileInsightKey = 'possible_first_role' | 'current_education';
 export type CandidateProfileInsightStatus = 'confirmed' | 'dismissed';
 
@@ -99,6 +115,7 @@ export interface CandidateProfileContext {
     stories: CandidateStory[];
     facts?: CandidateProfileFact[];
     education?: CandidateEducationContext;
+    availability?: CandidateAvailability;
     insights?: CandidateProfileInsight[];
     completedAt?: number;
 }

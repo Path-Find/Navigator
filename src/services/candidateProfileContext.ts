@@ -89,6 +89,7 @@ export const getCandidateProfileContext = (profile?: ResumeProfile | null): Cand
         && context.stories.length === 0
         && !(context.facts || []).some(fact => fact.status === 'confirmed')
         && !(context.education?.courses || []).some(course => course.status !== 'withdrawn')
+        && !context.availability
         && !(context.insights || []).some(insight => insight.status === 'confirmed')
     ) return null;
     return context;
@@ -175,6 +176,16 @@ export const formatCandidateProfileContext = (
     const educationContext = educationCourses
         ? `RELEVANT EDUCATION CONTEXT:\n- ${education?.program || 'Education program'} at ${education?.university || 'university'}\n${educationCourses}`
         : '';
+    const availability = context.availability;
+    const availabilityContext = availability && jobContext.trim()
+        ? [
+            availability.city ? `- Current city: ${availability.city}` : '',
+            availability.workArrangements.length ? `- Preferred work arrangement: ${availability.workArrangements.join(', ')}` : '',
+            availability.employmentTypes.length ? `- Employment types: ${availability.employmentTypes.join(', ')}` : '',
+            `- Relocation: ${availability.relocation.replaceAll('_', ' ')}`,
+            `- Start timing: ${availability.startTiming === 'specific_date' && availability.startDate ? `specific date ${availability.startDate}` : availability.startTiming.replaceAll('_', ' ')}`,
+        ].filter(Boolean).join('\n')
+        : '';
     const stories = context.stories
         .filter(story => storyMatchesJob(story, jobContext))
         .slice(0, maxStories)
@@ -186,6 +197,7 @@ export const formatCandidateProfileContext = (
         confirmedInsights ? `CONFIRMED CANDIDATE INSIGHTS:\n${confirmedInsights}` : '',
         confirmedFacts ? `APPROVED PROFILE FACTS:\n${confirmedFacts}` : '',
         educationContext,
+        availabilityContext ? `APPROVED AVAILABILITY:\n${availabilityContext}` : '',
         stories ? `APPROVED CANDIDATE STORIES:\n${stories}` : '',
     ].filter(Boolean).join('\n\n');
 };
