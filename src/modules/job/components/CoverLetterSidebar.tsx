@@ -54,7 +54,7 @@ export const CoverLetterSidebar: React.FC<CoverLetterSidebarProps> = ({ job }) =
                     <p className="text-[11px] text-neutral-500 font-medium leading-relaxed">
                         {isStrong 
                             ? "This draft effectively aligns your experience with the core requirements of this role."
-                            : "A solid start. Address the feedback below to make this application more impactful."
+                            : "A solid start. Review the feedback above to make this application more impactful."
                         }
                     </p>
                 </div>
