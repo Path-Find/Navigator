@@ -13,6 +13,7 @@ See [CHANGELOG_ARCHIVE.md](CHANGELOG_ARCHIVE.md) for earlier history.
 - **Reusable application context can now be managed in Settings**: users can review or remove saved signals and stories, while refreshing the profile interview replaces duplicate signals instead of accumulating them.
 
 ### Changed
+- **Profile settings now keep writing preferences beside Current Focus and reusable context**: users have one place to manage how Navigator understands and represents them, while account security remains separate.
 - **Settings now groups current focus with the application profile**: direction, account preferences, and approved reusable context are easier to find together without changing where the underlying resume, interview, skill, or education data lives.
 - **Application status reminders now explain why outcomes matter**: the reminder uses calmer pastel controls and connects status updates to better future job guidance and cover letters.
 - **NextGen feedback now uses the current Neon backend**: application outcomes, cover-letter edits, and other learning signals are stored and read reliably instead of depending on the retired Supabase path.

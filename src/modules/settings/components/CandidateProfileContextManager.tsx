@@ -25,12 +25,24 @@ const SOURCE_LABELS: Record<CandidateStory['source'], string> = {
 export const CandidateProfileContextManager: React.FC = () => {
     const navigate = useNavigate();
     const { resumes, handleUpdateResume, isLoading } = useResumeContext();
-    const { journey, updateProfile } = useUser();
+    const { journey, coverLetterPreferences, updateProfile } = useUser();
     const { showSuccess, showError } = useToast();
+    const [coverLetterPreferencesInput, setCoverLetterPreferencesInput] = React.useState(coverLetterPreferences || '');
     const primaryResume = resumes[0];
     const signals = primaryResume?.candidateProfile?.signals || [];
     const stories = primaryResume?.candidateProfile?.stories || [];
     const hasContext = signals.length > 0 || stories.length > 0;
+
+    // The profile loads asynchronously after the Settings screen mounts.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    React.useEffect(() => { setCoverLetterPreferencesInput(coverLetterPreferences || ''); }, [coverLetterPreferences]);
+
+    const handleSaveCoverLetterPreferences = () => {
+        const trimmed = coverLetterPreferencesInput.trim();
+        if (trimmed !== (coverLetterPreferences || '')) {
+            void updateProfile({ cover_letter_preferences: trimmed || null }).catch(() => showError('Failed to save cover-letter preferences.'));
+        }
+    };
 
     const removeContext = async (type: 'signal' | 'story', id: string) => {
         if (!primaryResume) return;
@@ -82,6 +94,22 @@ export const CandidateProfileContextManager: React.FC = () => {
             </div>
 
             <div className="mt-8 pt-6 border-t border-indigo-100/70 dark:border-indigo-500/10">
+                <div className="pb-6 border-b border-indigo-100/70 dark:border-indigo-500/10">
+                    <h5 className="text-[10px] font-black uppercase tracking-widest text-neutral-400 mb-2">Cover-letter style</h5>
+                    <p className="text-xs text-neutral-400 leading-relaxed mb-4 max-w-2xl">
+                        Applies to every cover letter. Use this for tone, voice, or length—not facts about a specific job.
+                    </p>
+                    <textarea
+                        value={coverLetterPreferencesInput}
+                        onChange={(event) => setCoverLetterPreferencesInput(event.target.value)}
+                        onBlur={handleSaveCoverLetterPreferences}
+                        maxLength={1000}
+                        rows={3}
+                        placeholder="e.g. Keep letters concise, confident, and warm. Use Canadian spelling."
+                        className="w-full bg-indigo-50/40 dark:bg-indigo-500/5 border border-indigo-100 dark:border-indigo-500/20 rounded-xl px-3 py-3 text-sm font-medium leading-relaxed text-neutral-900 dark:text-white focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all resize-none"
+                    />
+                </div>
+
                 <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                     <div>
                         <h5 className="text-[10px] font-black uppercase tracking-widest text-neutral-400">Current focus</h5>

@@ -14,7 +14,7 @@ import { NextGenCalibration } from './components/NextGenCalibration';
 import { CandidateProfileContextManager } from './components/CandidateProfileContextManager';
 
 export const SettingsPage: React.FC = () => {
-    const { user, userTier, isTester, isAdmin, simulatedTier, fullName, coverLetterPreferences, updateProfile } = useUser();
+    const { user, userTier, isTester, isAdmin, simulatedTier, fullName, updateProfile } = useUser();
     const { usageStats } = useJobContext();
     const { openModal } = useModal();
     const { showInfo, showError } = useToast();
@@ -23,24 +23,13 @@ export const SettingsPage: React.FC = () => {
     const [isCopyingToken, setIsCopyingToken] = React.useState(false);
     const [isCopyingEmail, setIsCopyingEmail] = React.useState(false);
     const [nameInput, setNameInput] = React.useState(fullName || '');
-    const [coverLetterPreferencesInput, setCoverLetterPreferencesInput] = React.useState(coverLetterPreferences || '');
 
     React.useEffect(() => { setNameInput(fullName || ''); }, [fullName]);
-    // The profile loads asynchronously after the settings screen mounts.
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    React.useEffect(() => { setCoverLetterPreferencesInput(coverLetterPreferences || ''); }, [coverLetterPreferences]);
 
     const handleSaveName = () => {
         const trimmed = nameInput.trim();
         if (trimmed !== (fullName || '')) {
             updateProfile({ full_name: trimmed }).catch(() => showError('Failed to save name.'));
-        }
-    };
-
-    const handleSaveCoverLetterPreferences = () => {
-        const trimmed = coverLetterPreferencesInput.trim();
-        if (trimmed !== (coverLetterPreferences || '')) {
-            updateProfile({ cover_letter_preferences: trimmed || null }).catch(() => showError('Failed to save cover-letter preferences.'));
         }
     };
 
@@ -134,23 +123,6 @@ export const SettingsPage: React.FC = () => {
                             >
                                 Change Password
                             </Button>
-                        </div>
-
-                        {/* Writing Preferences */}
-                        <div className="pt-8 border-t border-neutral-100 dark:border-neutral-800">
-                            <h4 className="font-bold text-xs text-neutral-400 mb-2">Cover-Letter Style</h4>
-                            <p className="text-xs text-neutral-400 leading-relaxed mb-4">
-                                Applies to every cover letter. Use this for tone, voice, or length—not facts about a specific job.
-                            </p>
-                            <textarea
-                                value={coverLetterPreferencesInput}
-                                onChange={(e) => setCoverLetterPreferencesInput(e.target.value)}
-                                onBlur={handleSaveCoverLetterPreferences}
-                                maxLength={1000}
-                                rows={4}
-                                placeholder="e.g. Keep letters concise, confident, and warm. Use Canadian spelling."
-                                className="w-full bg-neutral-50 dark:bg-neutral-800/50 border border-neutral-100 dark:border-neutral-800 rounded-xl px-3 py-3 text-sm font-medium leading-relaxed text-neutral-900 dark:text-white focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all resize-none"
-                            />
                         </div>
 
                     </div>
