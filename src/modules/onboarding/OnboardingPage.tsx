@@ -76,9 +76,8 @@ export const OnboardingPage: React.FC = () => {
 
     const fileInputRef = useRef<HTMLInputElement>(null);
 
-    // New State for Names
-    const [firstName, setFirstName] = useState('');
-    const [lastName, setLastName] = useState('');
+    // The name the user wants printed on applications.
+    const [applicationName, setApplicationName] = useState('');
 
     // Auto-advance from Feature Highlight (Step 5) when parsing completes
     useEffect(() => {
@@ -110,10 +109,9 @@ export const OnboardingPage: React.FC = () => {
 
     // Save state to localStorage to persist across redirects and tabs (e.g. Stripe)
     useEffect(() => {
-        if (firstName || lastName || selectedJourneys.length > 0) {
+        if (applicationName || selectedJourneys.length > 0) {
             const state = {
-                firstName,
-                lastName,
+                applicationName,
                 selectedJourneys,
                 step,
                 resumeUploaded,
@@ -121,7 +119,7 @@ export const OnboardingPage: React.FC = () => {
             };
             LocalStorage.set(STORAGE_KEYS.ONBOARDING_STATE, JSON.stringify(state));
         }
-    }, [firstName, lastName, selectedJourneys, step, resumeUploaded, transcriptUploaded]);
+    }, [applicationName, selectedJourneys, step, resumeUploaded, transcriptUploaded]);
 
     // Restore state and handle Stripe success
     useEffect(() => {
@@ -129,8 +127,7 @@ export const OnboardingPage: React.FC = () => {
         if (savedState) {
             try {
                 const parsed = JSON.parse(savedState);
-                if (parsed.firstName) setFirstName(parsed.firstName);
-                if (parsed.lastName) setLastName(parsed.lastName);
+                if (parsed.applicationName) setApplicationName(parsed.applicationName);
                 if (parsed.selectedJourneys) setSelectedJourneys(parsed.selectedJourneys);
                 if (parsed.resumeUploaded) setResumeUploaded(parsed.resumeUploaded);
                 if (parsed.transcriptUploaded) setTranscriptUploaded(parsed.transcriptUploaded);
@@ -181,7 +178,7 @@ export const OnboardingPage: React.FC = () => {
         const primaryJourney = selectedJourneys[0] || 'job-hunter';
 
         // Save profile data
-        const userData = { firstName, lastName, journey: primaryJourney, intent };
+        const userData = { applicationName, journey: primaryJourney, intent };
 
         // Store in localStorage/Session
         LocalStorage.set(STORAGE_KEYS.PRIVACY_ACCEPTED, 'true');
@@ -274,7 +271,7 @@ export const OnboardingPage: React.FC = () => {
                         {step === 3 && <JourneyStep selectedJourneys={selectedJourneys} toggleJourney={toggleJourney} handleNext={handleNext} />}
 
                         {/* Step 1.5: Name */}
-                        {step === 1.5 && <NameStep firstName={firstName} setFirstName={setFirstName} lastName={lastName} setLastName={setLastName} setStep={setStep} handleNext={handleNext} />}
+                        {step === 1.5 && <NameStep applicationName={applicationName} setApplicationName={setApplicationName} setStep={setStep} handleNext={handleNext} />}
 
                         {/* Step 1: Privacy First */}
                         {step === 1 && <PrivacyStep privacyAccepted={privacyAccepted} setPrivacyAccepted={setPrivacyAccepted} setStep={setStep} handleNext={handleNext} />}
@@ -300,8 +297,7 @@ export const OnboardingPage: React.FC = () => {
                                 <div className="card-premium p-4 md:p-10 shadow-2xl">
                                     <PlansOnboardingStep
                                         onNext={() => setStep(6)}
-                                        firstName={firstName}
-                                        lastName={lastName}
+                                        applicationName={applicationName}
                                         selectedJourneys={selectedJourneys}
                                     />
                                 </div>

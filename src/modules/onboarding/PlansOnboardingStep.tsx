@@ -9,15 +9,13 @@ import { authClient } from '../../lib/auth-client';
 
 interface PlansOnboardingStepProps {
     onNext: () => void;
-    firstName?: string;
-    lastName?: string;
+    applicationName?: string;
     selectedJourneys?: string[];
 }
 
 export const PlansOnboardingStep: React.FC<PlansOnboardingStepProps> = ({
     onNext,
-    firstName,
-    lastName,
+    applicationName,
     selectedJourneys
 }) => {
     const { user } = useUser();
@@ -48,6 +46,10 @@ export const PlansOnboardingStep: React.FC<PlansOnboardingStepProps> = ({
         };
 
         try {
+            const nameParts = (applicationName || '').trim().split(/\s+/);
+            const firstName = nameParts[0] || '';
+            const lastName = nameParts.slice(1).join(' ');
+
             // 1. Handle Auth for Guest Users
             if (!user) {
                 if (!email.trim()) {
@@ -77,6 +79,7 @@ export const PlansOnboardingStep: React.FC<PlansOnboardingStepProps> = ({
                         email,
                         options: {
                             data: {
+                                full_name: applicationName?.trim(),
                                 first_name: firstName,
                                 last_name: lastName,
                                 journey: selectedJourneys?.[0] || 'job-hunter',
@@ -108,6 +111,7 @@ export const PlansOnboardingStep: React.FC<PlansOnboardingStepProps> = ({
                     password,
                     options: {
                         data: {
+                            full_name: applicationName?.trim(),
                             first_name: firstName,
                             last_name: lastName,
                             journey: selectedJourneys?.[0] || 'job-hunter',

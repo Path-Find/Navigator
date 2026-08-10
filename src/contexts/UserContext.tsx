@@ -133,7 +133,16 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
                 setIsAdmin(profileData.is_admin || false);
                 setIsTester(profileData.is_tester || false);
                 setIsNextGenEnabled(profileData.next_gen_enabled || false);
-                setFullName(profileData.full_name || null);
+                const metadataName = typeof currentUser.user_metadata?.full_name === 'string'
+                    ? currentUser.user_metadata.full_name.trim()
+                    : '';
+                const resolvedFullName = profileData.full_name || metadataName || null;
+                setFullName(resolvedFullName);
+                if (!profileData.full_name && resolvedFullName) {
+                    patchProfile({ full_name: resolvedFullName }).catch((err: unknown) => {
+                        console.warn('Initial application name sync failed:', err);
+                    });
+                }
                 setCoverLetterPreferences(profileData.cover_letter_preferences || null);
 
                 // If they have an account, they've implicitly accepted privacy/terms

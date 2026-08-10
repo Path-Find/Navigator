@@ -7,6 +7,7 @@ See [CHANGELOG_ARCHIVE.md](CHANGELOG_ARCHIVE.md) for earlier history.
 ## [Unreleased]
 
 ### Added
+- **Signup now collects the name used on applications**: the account stores one editable application name so generated cover letters have a reliable sign-off from the start.
 - **Resume entries can now be marked current directly in the editor**: current work, volunteer, education, and project entries move to the top of their section and can be used explicitly in applications.
 - **Profile review now keeps resume observations in the interview**: users review cautious education or career-stage suggestions there, while Settings focuses on structured profile information.
 - **Application profiles can now prioritize resume blocks**: users can feature or mark current work, volunteer, education, and project entries without re-entering their details or copying their bullets into prompts.

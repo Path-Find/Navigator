@@ -196,7 +196,7 @@ export const CoverLetterEditor: React.FC<CoverLetterEditorProps> = (props) => {
                         roleTitle={job.analysis?.distilledJob.roleTitle || job.position}
                         companyName={job.analysis?.distilledJob.companyName || job.company}
                         userProfile={{
-                            name: fullName || user?.user_metadata?.full_name || user?.email || 'User',
+                            name: fullName || user?.user_metadata?.full_name || 'User',
                             email: user?.email || '',
                             phone: '', 
                             location: job.analysis?.distilledJob.location || ''
