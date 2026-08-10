@@ -68,6 +68,20 @@ describe('prompt data anchoring', () => {
         expect(prompt).toContain('Start with exactly "Dear Hiring Manager,"');
         expect(prompt).toContain('exactly 3 body paragraphs');
         expect(prompt).toContain('between 300 and 375 words');
+
+        const promptWithSignal = COVER_LETTER_PROMPTS.COVER_LETTER.GENERATE(
+            'template',
+            'job',
+            'resume',
+            ['strategy'],
+            undefined,
+            undefined,
+            undefined,
+            undefined,
+            undefined,
+            ['POSSIBLE FIRST-PROFESSIONAL-ROLE SIGNAL']
+        );
+        expect(promptWithSignal).toContain('CANDIDATE_SIGNALS');
     });
 
     it('anchors Career, Education, and parsing inputs as data', () => {

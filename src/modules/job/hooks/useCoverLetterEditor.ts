@@ -4,7 +4,7 @@ import { Logger } from '../../../utils/logger';
 import { Storage } from '../../../services/storageService';
 import { JobStorage } from '../../../services/storage/jobStorage';
 import type { UserTier } from '../../../types/app';
-import { formatParsedJobContext, generateCoverLetter, generateCoverLetterWithQuality } from '../../../services/geminiService';
+import { deriveCoverLetterSignals, formatParsedJobContext, generateCoverLetter, generateCoverLetterWithQuality } from '../../../services/geminiService';
 import { COVER_LETTER_PROMPTS } from '../../../prompts/coverLetter';
 import { ArchetypeUtils } from '../../../utils/archetypeUtils';
 import { TRACKING_EVENTS } from '../../../constants';
@@ -140,6 +140,7 @@ export const useCoverLetterEditor = ({
             const focusedResume = recommendedIds.size > 0
                 ? { ...bestResume, blocks: bestResume.blocks.filter(b => b.type === 'summary' || recommendedIds.has(b.id)) }
                 : bestResume;
+            const candidateSignals = deriveCoverLetterSignals(bestResume, analysis.distilledJob);
 
             const isPro = ['pro', 'admin', 'tester'].includes(userTier);
             const canonicalTitle = analysis.distilledJob?.canonicalTitle;
@@ -155,10 +156,10 @@ export const useCoverLetterEditor = ({
 
             if (isComparisonTriggered) {
                 setAnalysisProgress("Generating...");
-                const variants = Object.keys(COVER_LETTER_PROMPTS.COVER_LETTER.VARIANTS).slice(0, 2);
+                const variants = Object.keys(COVER_LETTER_PROMPTS.COVER_LETTER.STYLE_MODULES).slice(0, 2);
 
                 const results = await Promise.all(variants.map(v =>
-                    generateCoverLetter(textToUse, focusedResume, instructions || [], finalContext, v, trajectoryContext, localJob.id, canonicalTitle, personalizedStyle, fullName || undefined, coverLetterPreferences || undefined)
+                    generateCoverLetter(textToUse, focusedResume, instructions || [], finalContext, v, trajectoryContext, localJob.id, canonicalTitle, personalizedStyle, fullName || undefined, coverLetterPreferences || undefined, candidateSignals)
                 ));
 
                 setComparisonVersions(results);
@@ -185,7 +186,8 @@ export const useCoverLetterEditor = ({
                     personalizedStyle,
                     fullName || undefined,
                     score,
-                    coverLetterPreferences || undefined
+                    coverLetterPreferences || undefined,
+                    candidateSignals
                 );
 
                 const updated = {
@@ -239,7 +241,8 @@ export const useCoverLetterEditor = ({
                     canonicalTitle,
                     undefined,
                     fullName || undefined,
-                    coverLetterPreferences || undefined
+                    coverLetterPreferences || undefined,
+                    candidateSignals
                 );
 
                 const updated = {

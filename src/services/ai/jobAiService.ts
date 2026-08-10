@@ -23,6 +23,36 @@ const stringifyProfile = (profile: ResumeProfile): string => {
         .join('\n---\n');
 };
 
+export const deriveCoverLetterSignals = (profile: ResumeProfile, job?: DistilledJob): string[] => {
+    const visibleBlocks = profile.blocks.filter(block => block.isVisible !== false);
+    const hasWorkExperience = visibleBlocks.some(block => block.type === 'work');
+    const hasEducationEvidence = visibleBlocks.some(block => block.type === 'education' || block.type === 'project');
+    const hasCurrentEducation = visibleBlocks.some(block => {
+        if (block.type !== 'education') return false;
+        const educationText = [block.dateRange, block.title, ...block.bullets].filter(Boolean).join(' ');
+        const currentYear = new Date().getFullYear();
+        return /present|current|ongoing|in progress|expected/i.test(educationText)
+            || new RegExp(`\\b${currentYear}(?:[-–]\\d{4})?\\b`).test(educationText);
+    });
+    const roleTitle = job?.roleTitle?.toLowerCase() || '';
+    const isStudentOrEarlyCareerRole = /student|intern|co-?op|new grad|graduate|entry[- ]level|junior/.test(roleTitle);
+    const signals: string[] = [];
+
+    if (!hasWorkExperience && (hasEducationEvidence || isStudentOrEarlyCareerRole)) {
+        signals.push('POSSIBLE FIRST-PROFESSIONAL-ROLE SIGNAL: The visible resume has no work-experience block. Prioritize supported coursework, projects, volunteer leadership, and transferable evidence. Do not describe the candidate as inexperienced as a fact.');
+    }
+
+    if (isStudentOrEarlyCareerRole) {
+        signals.push('EARLY-CAREER ROLE SIGNAL: This role appears aimed at a student or early-career candidate. Make the learning trajectory and relevant academic or project evidence useful without overclaiming seniority.');
+    }
+
+    if (hasCurrentEducation) {
+        signals.push('CURRENT-EDUCATION SIGNAL: The resume dates suggest the candidate may be currently enrolled or completing an education program. Use relevant coursework or academic work when it helps, but do not imply the credential is complete unless the resume says so.');
+    }
+
+    return signals;
+};
+
 const sanitizeInput = (text: string): string => {
     return text.replace(/BLOCK_ID:\s*[a-zA-Z0-9-]+/g, '')
         .replace(/\(BLOCK_ID:\s*[a-zA-Z0-9-]+\)/g, '');
@@ -521,7 +551,8 @@ export const generateCoverLetter = async (
     canonicalTitle?: string,
     personalizedStyle?: string,
     candidateName?: string,
-    coverLetterPreferences?: string
+    coverLetterPreferences?: string,
+    candidateSignals: string[] = []
 ): Promise<{
     text: string;
     promptVersion: string;
@@ -530,11 +561,11 @@ export const generateCoverLetter = async (
     styleDescription: string;
 }> => {
     const resumeText = stringifyProfile(selectedResume);
-    const variants = COVER_LETTER_PROMPTS.COVER_LETTER.VARIANTS;
-    const selectedPromptVersion = forceVariant && forceVariant in variants
-        ? forceVariant as keyof typeof variants
+    const styles = COVER_LETTER_PROMPTS.COVER_LETTER.STYLE_MODULES;
+    const selectedPromptVersion = forceVariant && forceVariant in styles
+        ? forceVariant as keyof typeof styles
         : 'v1_direct';
-    const template = variants[selectedPromptVersion];
+    const styleModule = styles[selectedPromptVersion];
     const styleMetadata = COVER_LETTER_STYLE_METADATA[selectedPromptVersion];
 
     // Fetch Bucket Strategy
@@ -552,7 +583,7 @@ export const generateCoverLetter = async (
     // candidateName must be the person's real name (e.g. from their profile), not
     // selectedResume.name — that field is a resume/document label ("Resume", "Primary
     // Experience"), not the candidate's own name. See #192/#194.
-    const prompt = COVER_LETTER_PROMPTS.COVER_LETTER.GENERATE(template, jobDescription, resumeText, tailoringInstructions, finalPersonalizedContext, trajectoryContext, bucketStrategy, candidateName || undefined, coverLetterPreferences || undefined);
+    const prompt = COVER_LETTER_PROMPTS.COVER_LETTER.GENERATE(styleModule, jobDescription, resumeText, tailoringInstructions, finalPersonalizedContext, trajectoryContext, bucketStrategy, candidateName || undefined, coverLetterPreferences || undefined, candidateSignals);
 
     return callWithRetry(async (metadata) => {
         const model = await getModel({ task: 'analysis', feature: 'cover_letter' });
@@ -596,7 +627,8 @@ export const generateCoverLetterWithQuality = async (
     personalizedStyle?: string,
     candidateName?: string,
     fitScore?: number,
-    coverLetterPreferences?: string
+    coverLetterPreferences?: string,
+    candidateSignals: string[] = []
 ): Promise<{
     text: string;
     promptVersion: string;
@@ -625,7 +657,7 @@ export const generateCoverLetterWithQuality = async (
     const initialContext = isExtremeMismatch
         ? `${additionalContext ? `${additionalContext}\n\n` : ''}STRICT INSTRUCTION: This role's compatibility score is extremely low (${fitScore}/100) — a large, hard-to-bridge gap exists. Do not attempt to persuade past it. Include one clear, plain-language sentence that honestly names the specific gap (e.g. missing credential, licence, or years of direct experience) rather than glossing over it. Lead with genuine transferable strengths, but stay honest about the mismatch.`
         : additionalContext;
-    let result = await generateCoverLetter(jobDescription, selectedResume, tailoringInstructions, initialContext, undefined, trajectoryContext, jobId, canonicalTitle, personalizedStyle, candidateName, coverLetterPreferences);
+    let result = await generateCoverLetter(jobDescription, selectedResume, tailoringInstructions, initialContext, undefined, trajectoryContext, jobId, canonicalTitle, personalizedStyle, candidateName, coverLetterPreferences, candidateSignals);
     let attempts = 1;
 
     // Fast Path for Free and Plus tiers (No iterative loop to protect margins)
@@ -671,7 +703,7 @@ export const generateCoverLetterWithQuality = async (
                 STRICT INSTRUCTION: Stop attempting further persuasion. Include one clear, plain-language sentence that honestly names the specific gap identified above (e.g. a missing credential, licence, or years of direct experience) rather than glossing over it. The letter should read as self-aware about the gap, not falsely confident. Keep everything else about the letter's real strengths intact.
             `;
             const honestyContext = additionalContext ? `${additionalContext}\n\n${honestyInstruction}` : honestyInstruction;
-            result = await generateCoverLetter(jobDescription, selectedResume, tailoringInstructions, honestyContext, undefined, trajectoryContext, jobId, canonicalTitle, personalizedStyle, candidateName, coverLetterPreferences);
+            result = await generateCoverLetter(jobDescription, selectedResume, tailoringInstructions, honestyContext, undefined, trajectoryContext, jobId, canonicalTitle, personalizedStyle, candidateName, coverLetterPreferences, candidateSignals);
             attempts++;
             break;
         }
@@ -688,7 +720,7 @@ export const generateCoverLetterWithQuality = async (
         // We append the critique to any existing context
         const newContext = additionalContext ? `${additionalContext}\n\n${improvementContext}` : improvementContext;
 
-        result = await generateCoverLetter(jobDescription, selectedResume, tailoringInstructions, newContext, undefined, trajectoryContext, jobId, canonicalTitle, personalizedStyle, candidateName, coverLetterPreferences);
+        result = await generateCoverLetter(jobDescription, selectedResume, tailoringInstructions, newContext, undefined, trajectoryContext, jobId, canonicalTitle, personalizedStyle, candidateName, coverLetterPreferences, candidateSignals);
         attempts++;
     }
 

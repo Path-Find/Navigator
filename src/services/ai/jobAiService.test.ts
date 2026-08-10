@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { analyzeJobFit, buildJobCandidateContext, cleanCoverLetterOutput, formatParsedJobContext } from './jobAiService';
+import { analyzeJobFit, buildJobCandidateContext, cleanCoverLetterOutput, deriveCoverLetterSignals, formatParsedJobContext } from './jobAiService';
 import { callWithRetry, getModel } from './aiCore';
 import { JOB_ANALYSIS_PROMPTS } from '../../prompts/index';
 
@@ -25,7 +25,7 @@ vi.mock('../../prompts/index', () => ({
     },
     COVER_LETTER_PROMPTS: {
         COVER_LETTER: {
-            VARIANTS: { v1_direct: 'v1_direct' },
+            STYLE_MODULES: { v1_direct: 'v1_direct' },
             GENERATE: vi.fn(() => 'mock-cl-prompt'),
         },
         CRITIQUE_COVER_LETTER: vi.fn(() => 'mock-critique-prompt'),
@@ -86,6 +86,39 @@ describe('cleanCoverLetterOutput', () => {
     it('trims surrounding whitespace', () => {
         const input = '  \n  Dear Manager,\n  \n  ';
         expect(cleanCoverLetterOutput(input)).toBe('Dear Manager,');
+    });
+});
+
+describe('cover-letter candidate signals', () => {
+    it('adds cautious first-role and current-education signals when supported', () => {
+        const signals = deriveCoverLetterSignals({
+            blocks: [{
+                type: 'education',
+                title: 'Bachelor of Planning',
+                organization: 'University',
+                dateRange: '2022 - Present',
+                bullets: [],
+                isVisible: true,
+            }],
+        } as any, { roleTitle: 'Planning Intern' } as any);
+
+        expect(signals.some(signal => signal.includes('POSSIBLE FIRST-PROFESSIONAL-ROLE'))).toBe(true);
+        expect(signals.some(signal => signal.includes('CURRENT-EDUCATION'))).toBe(true);
+    });
+
+    it('does not add a first-role signal when work history is present', () => {
+        const signals = deriveCoverLetterSignals({
+            blocks: Array.from({ length: 5 }, (_, index) => ({
+                type: 'work',
+                title: `Role ${index + 1}`,
+                organization: 'Company',
+                dateRange: '2018 - 2025',
+                bullets: ['Delivered measurable results.'],
+                isVisible: true,
+            })),
+        } as any, { roleTitle: 'Project Manager' } as any);
+
+        expect(signals.some(signal => signal.includes('POSSIBLE FIRST-PROFESSIONAL-ROLE'))).toBe(false);
     });
 });
 

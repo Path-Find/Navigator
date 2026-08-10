@@ -15,7 +15,7 @@ This document serves as the architectural ledger for Navigator's AI prompt engin
 #### v2.22.0 Architectural Sweep
 - **Cover Letter Engine Rebuild**:
   - Deprecated generic "one-size-fits-all" narrative approach.
-  - Implemented High-Fidelity Cover Letters with distinct variants (`v1_direct`, `v2_storytelling`, `v3_experimental_pro`).
+  - Implemented one core cover-letter prompt with independently injected style modules (`v1_direct`, `v2_storytelling`, `v3_experimental_pro`) and cautious candidate-situation signals.
   - Standardized "Category-Aware Metrics" constraint across all variants to ensure numerical fidelity for technical/academic roles while allowing narrative interpretation for creative/managerial roles.
   - Enforced strict "Functional Connections" rule to synthesize cross-role evidence based on thematic impact rather than chronological listing.
 - **Monolithic Decoupling**:
