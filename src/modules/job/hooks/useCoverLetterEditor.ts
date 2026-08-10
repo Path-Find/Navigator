@@ -55,7 +55,17 @@ export const useCoverLetterEditor = ({
         await navigator.clipboard.writeText(text);
         setCopiedState('cl');
         setTimeout(() => setCopiedState(null), 2000);
-    }, []);
+        if (isNextGen && user) {
+            void RdFeedbackService.captureArtifactUsage(user.id, {
+                jobId: localJob.id,
+                roleModelId: analysis.distilledJob?.canonicalTitle,
+                promptVersion: localJob.promptVersion,
+                content: text,
+                action: 'copy',
+                sensitiveValues: [fullName, localJob.company, analysis.distilledJob?.canonicalTitle],
+            });
+        }
+    }, [analysis.distilledJob?.canonicalTitle, fullName, isNextGen, localJob, user]);
 
     const handleUpdateContext = useCallback(async (value: string) => {
         const updated = { ...localJob, contextNotes: value };

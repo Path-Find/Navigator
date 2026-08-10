@@ -11,30 +11,52 @@ export class RdStyleService {
      * Analyzes recent feedback to generate a "Style Instruction" string.
      * This is the bridge between raw data and LLM behavior.
      */
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    static async getPersonalizedStyle(userId: string, _context: string): Promise<string | null> {
+    static async getPersonalizedStyle(userId: string, context: string): Promise<string | null> {
         try {
             // 1. Fetch recent signals and outcomes
             const rawSignals = await RdFeedbackService.getRecentSignals(userId, 50);
             if (rawSignals.length === 0) return null;
 
-            // 2. Separate outcomes (interviews/offers) from stylistic signals
-            const outcomes = rawSignals.filter(s => typeof s.metadata?.outcome === 'string');
-            const stylisticSignals = rawSignals.filter(s => !s.metadata?.outcome).slice(0, 25);
+            const contextSignals = context === 'all'
+                ? rawSignals
+                : rawSignals.filter(s => s.context === context);
 
-            const winningJobIds = new Set(
-                outcomes
-                    .filter(o => ['interview', 'offer'].includes(String(o.metadata?.outcome)))
-                    .map(o => o.metadata?.job_id)
-                    .filter((jobId): jobId is string => typeof jobId === 'string')
-            );
+            // 2. Separate outcomes, artifact usage, and stylistic signals.
+            const outcomes = rawSignals.filter(s => typeof s.metadata?.outcome === 'string');
+            const artifactUsage = rawSignals.filter(s => s.metadata?.artifact_action && s.metadata?.artifact_hash);
+
+            const winningArtifacts = new Map<string, 'interview' | 'offer'>();
+            for (const outcome of outcomes) {
+                const outcomeType = outcome.metadata?.outcome;
+                if (outcomeType !== 'interview' && outcomeType !== 'offer') continue;
+
+                const jobId = outcome.metadata?.job_id;
+                if (typeof jobId !== 'string' || !outcome.createdAt) continue;
+
+                const latestUsage = artifactUsage
+                    .filter(signal => signal.metadata?.job_id === jobId
+                        && signal.createdAt
+                        && new Date(signal.createdAt).getTime() <= new Date(outcome.createdAt!).getTime())
+                    .sort((a, b) => new Date(b.createdAt!).getTime() - new Date(a.createdAt!).getTime())[0];
+                const artifactHash = latestUsage?.metadata?.artifact_hash;
+                if (typeof artifactHash !== 'string') continue;
+
+                const previous = winningArtifacts.get(artifactHash);
+                if (!previous || (outcomeType === 'offer' && previous === 'interview')) {
+                    winningArtifacts.set(artifactHash, outcomeType);
+                }
+            }
+
+            const stylisticSignals = contextSignals
+                .filter(s => !s.metadata?.outcome && !s.metadata?.artifact_action && s.outputContent != null)
+                .slice(0, 25);
 
             // 3. Format signals for the LLM with weighting
             const signalSummary = stylisticSignals.map(s => {
                 const type = s.signalType;
                 const ctx = s.context;
-                const jobId = typeof s.metadata?.job_id === 'string' ? s.metadata.job_id : null;
-                const isWinning = jobId && winningJobIds.has(jobId);
+                const artifactHash = typeof s.metadata?.artifact_hash === 'string' ? s.metadata.artifact_hash : null;
+                const winningOutcome = artifactHash ? winningArtifacts.get(artifactHash) : undefined;
 
                 const content = typeof s.outputContent === 'string'
                     ? s.outputContent.substring(0, 200)
@@ -42,7 +64,9 @@ export class RdStyleService {
 
                 const correction = s.userCorrection ? ` (User Edited To: ${JSON.stringify(s.userCorrection).substring(0, 200)})` : '';
 
-                const weightLabel = isWinning ? ' [WINNING PATTERN - HIGH WEIGHT]' : '';
+                const weightLabel = winningOutcome
+                    ? ` [ASSOCIATED WITH ${winningOutcome.toUpperCase()} - HIGH WEIGHT]`
+                    : '';
 
                 return `${weightLabel}[${type} in ${ctx}]: ${content}${correction}`;
             }).join('\n---\n');

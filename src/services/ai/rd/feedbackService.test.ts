@@ -51,6 +51,28 @@ describe('RdFeedbackService', () => {
         });
     });
 
+    it('records copy usage as a metadata-only pointer to the exact letter version', async () => {
+        mockFetch.mockResolvedValue(new Response(JSON.stringify({ success: true }), { status: 201 }));
+
+        await RdFeedbackService.captureArtifactUsage('user-1', {
+            jobId: 'job-1',
+            roleModelId: 'software-engineer',
+            promptVersion: 'v2',
+            content: 'Contact Ryan at ryan@example.com.',
+            action: 'copy',
+            sensitiveValues: ['Ryan'],
+        });
+
+        const body = JSON.parse(mockFetch.mock.calls[0][1].body);
+        expect(body.outputContent).toBeUndefined();
+        expect(body.metadata).toMatchObject({
+            job_id: 'job-1',
+            artifact_action: 'copy',
+            artifact_type: 'cover_letter',
+        });
+        expect(body.metadata.artifact_hash).toMatch(/^[a-f0-9]{64}$/);
+    });
+
     it('treats an offer as the strongest positive outcome', async () => {
         mockFetch.mockResolvedValue(new Response(JSON.stringify({ success: true }), { status: 201 }));
 

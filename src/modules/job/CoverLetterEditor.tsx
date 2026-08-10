@@ -3,6 +3,8 @@ import type { SavedJob, ResumeProfile, JobAnalysis, TargetJob } from '../../type
 import type { UserTier } from '../../types/app';
 import { useCoverLetterEditor } from './hooks/useCoverLetterEditor';
 import { useUser } from '../../contexts/UserContext';
+import { useNextGen } from '../../hooks/useNextGen';
+import { RdFeedbackService } from '../../services/ai/rd/feedbackService';
 import { Sparkles, PenTool, ShieldAlert } from 'lucide-react';
 import { Alert } from '../../components/ui/Alert';
 import { Button } from '../../components/ui/Button';
@@ -27,7 +29,8 @@ interface CoverLetterEditorProps {
 
 export const CoverLetterEditor: React.FC<CoverLetterEditorProps> = (props) => {
     const { bestResume, analysis, job } = props;
-    const { user } = useUser();
+    const { user, fullName } = useUser();
+    const isNextGen = useNextGen();
     const {
         generating,
         showContextInput,
@@ -57,6 +60,16 @@ export const CoverLetterEditor: React.FC<CoverLetterEditorProps> = (props) => {
 
     const handleDownload = () => {
         printElement('cover-letter-print-target', `Cover Letter - ${job.analysis?.distilledJob.roleTitle || job.position}`);
+        if (isNextGen && user && localJob.coverLetter) {
+            void RdFeedbackService.captureArtifactUsage(user.id, {
+                jobId: localJob.id,
+                roleModelId: analysis.distilledJob?.canonicalTitle,
+                promptVersion: localJob.promptVersion,
+                content: localJob.coverLetter,
+                action: 'download',
+                sensitiveValues: [fullName, localJob.company, analysis.distilledJob?.canonicalTitle],
+            });
+        }
     };
 
     return (

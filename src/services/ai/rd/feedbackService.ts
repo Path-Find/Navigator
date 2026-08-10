@@ -2,6 +2,7 @@ import { getAccessToken } from '../../../lib/auth-client';
 
 export type SignalType = 'explicit_approval' | 'explicit_correction' | 'implicit_usage';
 export type FeedbackContext = 'tailoring' | 'match_logic' | 'cover_letter';
+export type ArtifactUsageAction = 'copy' | 'download';
 
 type JsonPrimitive = string | number | boolean | null;
 export type JsonValue = JsonPrimitive | JsonValue[] | { [key: string]: JsonValue };
@@ -70,6 +71,33 @@ const anonymizeJson = (value: JsonValue | undefined | null, sensitiveValues: Rea
     return value;
 };
 
+const getArtifactText = (value: JsonValue | undefined | null): string | null => {
+    if (typeof value === 'string') return value;
+    if (value && typeof value === 'object' && !Array.isArray(value) && typeof value.text === 'string') {
+        return value.text;
+    }
+    return null;
+};
+
+const createArtifactHash = async (value: JsonValue | undefined | null): Promise<string | null> => {
+    const text = getArtifactText(value);
+    if (!text) return null;
+
+    const bytes = new TextEncoder().encode(text);
+    if (globalThis.crypto?.subtle) {
+        const digest = await globalThis.crypto.subtle.digest('SHA-256', bytes);
+        return Array.from(new Uint8Array(digest), byte => byte.toString(16).padStart(2, '0')).join('');
+    }
+
+    // Test/runtime fallback for environments without Web Crypto.
+    let hash = 2166136261;
+    for (const byte of bytes) {
+        hash ^= byte;
+        hash = Math.imul(hash, 16777619);
+    }
+    return `fnv1a-${(hash >>> 0).toString(16)}`;
+};
+
 /**
  * NextGen's feedback transport. R&D signals use the same Neon Auth + Vercel
  * Function boundary as the rest of the migrated application.
@@ -86,11 +114,17 @@ export class RdFeedbackService {
                 outputContent: anonymizeJson(feedback.outputContent, sensitiveValues),
                 userCorrection: anonymizeJson(feedback.userCorrection, sensitiveValues),
             };
+            const artifactHash = feedback.context === 'cover_letter'
+                ? await createArtifactHash(anonymizedFeedback.userCorrection ?? anonymizedFeedback.outputContent)
+                : null;
+            const metadata = artifactHash
+                ? { ...(anonymizedFeedback.metadata || {}), artifact_hash: artifactHash }
+                : anonymizedFeedback.metadata;
 
             const response = await fetch('/api/rd-feedback', {
                 method: 'POST',
                 headers,
-                body: JSON.stringify(anonymizedFeedback),
+                body: JSON.stringify({ ...anonymizedFeedback, metadata }),
             });
             if (!response.ok) {
                 const error = await readError(response);
@@ -128,6 +162,37 @@ export class RdFeedbackService {
             context: 'match_logic',
             impactScore: isPositive ? (outcome === 'offer' ? 8 : 5) : isNegative ? -1 : 0,
             metadata: { job_id: jobId, outcome },
+        });
+    }
+
+    static async captureArtifactUsage(
+        userId: string,
+        options: {
+            jobId: string;
+            roleModelId?: string | null;
+            promptVersion?: string | null;
+            content: string;
+            action: ArtifactUsageAction;
+            sensitiveValues?: ReadonlyArray<string | null | undefined>;
+        }
+    ) {
+        const sanitizedContent = anonymizeText(options.content, options.sensitiveValues || []);
+        const artifactHash = await createArtifactHash(sanitizedContent);
+        if (!artifactHash) return { success: false, error: 'Artifact content is empty.' };
+
+        return this.captureSignal(userId, {
+            roleModelId: options.roleModelId,
+            signalType: 'implicit_usage',
+            context: 'cover_letter',
+            inputPromptVersion: options.promptVersion,
+            // The stored job remains the source of truth for the letter. This
+            // event only records which version was used, without duplicating it.
+            metadata: {
+                job_id: options.jobId,
+                artifact_hash: artifactHash,
+                artifact_action: options.action,
+                artifact_type: 'cover_letter',
+            },
         });
     }
 

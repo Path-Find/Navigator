@@ -7,9 +7,14 @@ import { StandardSearchBar } from '../../components/common/StandardSearchBar';
 
 import { useJobContext } from './context/JobContext';
 import { LocalizedErrorBoundary } from '../../components/common/LocalizedErrorBoundary';
+import { useUser } from '../../contexts/UserContext';
+import { useNextGen } from '../../hooks/useNextGen';
+import { RdFeedbackService } from '../../services/ai/rd/feedbackService';
 
 export const CoverLetters: React.FC = () => {
     const { jobs, setActiveJobId: onSelectJob } = useJobContext();
+    const { user, fullName } = useUser();
+    const isNextGen = useNextGen();
     const [searchQuery, setSearchQuery] = React.useState('');
 
     const letters = useMemo(() => {
@@ -25,9 +30,19 @@ export const CoverLetters: React.FC = () => {
             .sort((a, b) => new Date(b.dateAdded).getTime() - new Date(a.dateAdded).getTime());
     }, [jobs, searchQuery]);
 
-    const handleCopy = async (e: React.MouseEvent, text: string) => {
+    const handleCopy = async (e: React.MouseEvent, job: typeof jobs[number], text: string) => {
         e.stopPropagation();
         await navigator.clipboard.writeText(text);
+        if (isNextGen && user) {
+            void RdFeedbackService.captureArtifactUsage(user.id, {
+                jobId: job.id,
+                roleModelId: job.analysis?.distilledJob?.canonicalTitle,
+                promptVersion: job.promptVersion,
+                content: text,
+                action: 'copy',
+                sensitiveValues: [fullName, job.company, job.analysis?.distilledJob?.canonicalTitle],
+            });
+        }
         // Simple visual feedback could be added here
     };
 
@@ -80,7 +95,7 @@ export const CoverLetters: React.FC = () => {
                                         </div>
                                         <div className="flex items-center gap-2">
                                             <button
-                                                onClick={(e) => handleCopy(e, job.coverLetter!)}
+                                                onClick={(e) => handleCopy(e, job, job.coverLetter!)}
                                                 className="p-2 text-neutral-400 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-900/30 rounded-xl transition-all"
                                                 title="Copy Letter"
                                             >
