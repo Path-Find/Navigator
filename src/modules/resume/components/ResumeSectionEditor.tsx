@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Plus, Trash2, Calendar, ArrowRightLeft, ChevronUp, ChevronDown, BookOpen } from 'lucide-react';
+import { Plus, Trash2, Calendar, ArrowRightLeft, ChevronUp, ChevronDown, BookOpen, Star } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import type { ExperienceBlock } from '../types';
 import type { SectionType } from '../constants';
@@ -19,9 +19,13 @@ interface ResumeSectionEditorProps {
     onMoveBullet: (blockId: string, index: number, direction: 'up' | 'down') => void;
     onRemoveBlock: (id: string) => void;
     onSetMovingBlockId: (id: string | null) => void;
+    featured: boolean;
+    current: boolean;
+    onToggleProfilePriority: (blockId: string, priority: 'featured' | 'current') => void;
 }
 
 const INTERVIEW_ELIGIBLE_TYPES: ExperienceBlock['type'][] = ['work', 'project', 'volunteer', 'other'];
+const PROFILE_PRIORITY_TYPES: ExperienceBlock['type'][] = ['work', 'volunteer', 'education', 'project'];
 
 export const ResumeSectionEditor: React.FC<ResumeSectionEditorProps> = ({
     block,
@@ -35,6 +39,9 @@ export const ResumeSectionEditor: React.FC<ResumeSectionEditorProps> = ({
     onMoveBullet,
     onRemoveBlock,
     onSetMovingBlockId,
+    featured,
+    current,
+    onToggleProfilePriority,
 }) => {
     const [showInterview, setShowInterview] = useState(false);
     const isInterviewEligible = INTERVIEW_ELIGIBLE_TYPES.includes(block.type);
@@ -47,6 +54,27 @@ export const ResumeSectionEditor: React.FC<ResumeSectionEditorProps> = ({
                 className={`group relative transition-all duration-300 border-neutral-200 dark:border-neutral-800 hover:border-indigo-200 dark:hover:border-indigo-900/50 shadow-sm hover:shadow-xl print-card ${!block.isVisible ? 'opacity-50 no-print' : ''}`}
             >
                 <div className="p-6 md:p-8">
+                    {PROFILE_PRIORITY_TYPES.includes(block.type) && (
+                        <div className="absolute right-6 top-6 flex items-center gap-2 no-print">
+                            <button
+                                type="button"
+                                onClick={() => onToggleProfilePriority(block.id, 'featured')}
+                                aria-label={featured ? `Remove ${block.title || 'entry'} from featured profile items` : `Feature ${block.title || 'entry'} in your profile`}
+                                title={featured ? 'Remove from featured profile items' : 'Feature in profile'}
+                                className={`p-2 rounded-xl border transition-colors ${featured ? 'text-amber-500 bg-amber-50 border-amber-200 dark:bg-amber-500/10 dark:border-amber-500/30' : 'text-neutral-300 border-transparent hover:text-amber-500 hover:bg-amber-50/70 dark:hover:bg-amber-500/10'}`}
+                            >
+                                <Star className="w-4 h-4" fill={featured ? 'currentColor' : 'none'} />
+                            </button>
+                            <button
+                                type="button"
+                                onClick={() => onToggleProfilePriority(block.id, 'current')}
+                                aria-pressed={current}
+                                className={`rounded-xl border px-2.5 py-1.5 text-[10px] font-black transition-colors ${current ? 'text-indigo-600 bg-indigo-50 border-indigo-200 dark:text-indigo-300 dark:bg-indigo-500/10 dark:border-indigo-500/30' : 'text-neutral-400 border-neutral-200 hover:text-indigo-600 hover:border-indigo-200 dark:border-neutral-700'}`}
+                            >
+                                {current ? 'Current' : 'Mark current'}
+                            </button>
+                        </div>
+                    )}
                     <div className="space-y-6">
                         {/* Title Area */}
                         {block.type !== 'summary' && (

@@ -50,7 +50,8 @@ export const ResumeEditor: React.FC = () => {
         removeBullet,
         moveBullet,
         handleApplySuggestion,
-        handleDismissSuggestion
+        handleDismissSuggestion,
+        toggleProfilePriority,
     } = useResumeEditor(initialResume, resumes, onSave);
 
     const [hasStartedManually, setHasStartedManually] = useState(false);
@@ -359,6 +360,9 @@ export const ResumeEditor: React.FC = () => {
                                                     onMoveBullet={moveBullet}
                                                     onRemoveBlock={removeBlock}
                                                     onSetMovingBlockId={setMovingBlockId}
+                                                    featured={initialResume.candidateProfile?.featuredBlockIds?.includes(block.id) || false}
+                                                    current={initialResume.candidateProfile?.currentBlockIds?.includes(block.id) || false}
+                                                    onToggleProfilePriority={toggleProfilePriority}
                                                 />
                                             ))}
                                         </div>

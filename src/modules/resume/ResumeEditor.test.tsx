@@ -221,6 +221,10 @@ describe('ResumeEditor — block editing', () => {
         const workAddBtn = addButtons[0];
         fireEvent.click(workAddBtn);
 
+        fireEvent.change(screen.getByPlaceholderText('e.g. Product Manager'), { target: { value: 'New Engineer' } });
+        const modalAddButtons = screen.getAllByRole('button', { name: 'Add Entry' });
+        fireEvent.click(modalAddButtons[modalAddButtons.length - 1]);
+
         const titleInputs = screen.getAllByPlaceholderText('Role / Title');
         expect(titleInputs.length).toBeGreaterThan(1);
     });

@@ -7,6 +7,7 @@ See [CHANGELOG_ARCHIVE.md](CHANGELOG_ARCHIVE.md) for earlier history.
 ## [Unreleased]
 
 ### Added
+- **Resume entries can now be marked current or featured directly in the editor**: profile priorities stay connected to the work, volunteer, education, and project entries they refer to.
 - **Profile review now keeps resume observations in the interview**: users review cautious education or career-stage suggestions there, while Settings focuses on structured profile information.
 - **Application profiles can now prioritize resume blocks**: users can feature or mark current work, volunteer, education, and project entries without re-entering their details or copying their bullets into prompts.
 - **Availability preferences now use structured choices**: users can save their city, relocation preference, work arrangement, employment type, and start timing without adding another free-form prompt field.

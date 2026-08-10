@@ -139,6 +139,34 @@ export function useResumeEditor(
         handleDismissSuggestion(suggestion.id);
     }, [blocks, addBullet, handleDismissSuggestion]);
 
+    const toggleProfilePriority = useCallback((blockId: string, priority: 'featured' | 'current') => {
+        const resume = initialResumeRef.current;
+        if (!resume) return;
+
+        const context = resume.candidateProfile;
+        const key = priority === 'featured' ? 'featuredBlockIds' : 'currentBlockIds';
+        const existingIds = context?.[key] || [];
+        const nextIds = existingIds.includes(blockId)
+            ? existingIds.filter(id => id !== blockId)
+            : [...existingIds, blockId];
+
+        onSaveRef.current([{
+            ...resume,
+            blocks,
+            candidateProfile: {
+                signals: context?.signals || [],
+                stories: context?.stories || [],
+                facts: context?.facts || [],
+                education: context?.education,
+                availability: context?.availability,
+                featuredBlockIds: priority === 'featured' ? nextIds : context?.featuredBlockIds || [],
+                currentBlockIds: priority === 'current' ? nextIds : context?.currentBlockIds || [],
+                insights: context?.insights || [],
+                completedAt: context?.completedAt,
+            },
+        }]);
+    }, [blocks]);
+
     return {
         blocks,
         movingBlockId,
@@ -151,6 +179,7 @@ export function useResumeEditor(
         removeBullet,
         moveBullet,
         handleApplySuggestion,
-        handleDismissSuggestion
+        handleDismissSuggestion,
+        toggleProfilePriority,
     };
 }
