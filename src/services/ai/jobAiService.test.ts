@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { analyzeJobFit, buildJobCandidateContext, cleanCoverLetterOutput, deriveCoverLetterSignals, formatParsedJobContext } from './jobAiService';
+import { analyzeJobFit, buildJobCandidateContext, cleanCoverLetterOutput, deriveCoverLetterSignals, finalizeCoverLetterOutput, formatParsedJobContext } from './jobAiService';
 import { callWithRetry, getModel } from './aiCore';
 import { JOB_ANALYSIS_PROMPTS } from '../../prompts/index';
 
@@ -86,6 +86,18 @@ describe('cleanCoverLetterOutput', () => {
     it('trims surrounding whitespace', () => {
         const input = '  \n  Dear Manager,\n  \n  ';
         expect(cleanCoverLetterOutput(input)).toBe('Dear Manager,');
+    });
+});
+
+describe('finalizeCoverLetterOutput', () => {
+    it('removes model-created closings and appends the account name', () => {
+        expect(finalizeCoverLetterOutput('Dear Hiring Manager,\n\nBody.\n\nSincerely,\n[Your Name]', 'Ryan Hanna'))
+            .toBe('Dear Hiring Manager,\n\nBody.\n\nSincerely,\nRyan Hanna');
+    });
+
+    it('adds the exact account name when the model omits a closing', () => {
+        expect(finalizeCoverLetterOutput('Dear Hiring Manager,\n\nBody.', 'Ryan Hanna'))
+            .toBe('Dear Hiring Manager,\n\nBody.\n\nSincerely,\nRyan Hanna');
     });
 });
 

@@ -31,6 +31,7 @@ See [CHANGELOG_ARCHIVE.md](CHANGELOG_ARCHIVE.md) for earlier history.
 - **NextGen now records which cover-letter version a user actually copied or downloaded**: usage events point to the stored letter by checksum without duplicating the letter itself.
 
 ### Fixed
+- **Cover-letter sign-offs are now application-owned**: generated and saved letters remove model placeholders and always use the account's exact name without duplicating the closing in print output.
 - **Education is no longer treated as current from a year alone**: Navigator now needs explicit wording such as “Present,” “Ongoing,” or “Expected” before making that suggestion.
 - **Manual cover-letter revisions no longer repeat the same critique twice**: the feedback is now kept as one bounded revision instruction instead of appearing both as context and as a duplicated block.
 - **Large saved job histories no longer break cloud sync or cover-letter pages**: encryption now encodes large vault values in safe chunks instead of overflowing the browser's argument stack.

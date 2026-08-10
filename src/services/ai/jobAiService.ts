@@ -449,6 +449,26 @@ export const cleanCoverLetterOutput = (text: string): string => {
     return cleaned.trim();
 };
 
+/** The application owns the closing; the model must never choose the name. */
+export const finalizeCoverLetterOutput = (text: string, candidateName?: string): string => {
+    const cleaned = cleanCoverLetterOutput(text);
+    const lines = cleaned.split(/\r?\n/);
+    let closingIndex = -1;
+    for (let index = lines.length - 1; index >= 0; index -= 1) {
+        if (/^\s*(sincerely|best regards|kind regards|regards|yours truly|respectfully)\b/i.test(lines[index])) {
+            closingIndex = index;
+            break;
+        }
+    }
+
+    const body = (closingIndex >= 0 ? lines.slice(0, closingIndex) : lines)
+        .join('\n')
+        .replace(/\s*\[(?:your\s+)?name\]\s*$/i, '')
+        .trim();
+    const name = candidateName?.trim();
+    return name ? `${body}\n\nSincerely,\n${name}` : body;
+};
+
 const parseJobInfo = async (
     rawJobText: string,
     onProgress?: RetryProgressCallback
@@ -622,18 +642,15 @@ export const generateCoverLetter = async (
         ? `${additionalContext || ''}\n\n[USER PERSONAL STYLE MODEL]: ${personalizedStyle}`
         : additionalContext;
 
-    // candidateName must be the person's real name (e.g. from their profile), not
-    // selectedResume.name — that field is a resume/document label ("Resume", "Primary
-    // Experience"), not the candidate's own name. See #192/#194.
     const selectedCandidateProfileContext = candidateProfileContext || formatCandidateProfileContext(selectedResume, jobDescription);
-    const prompt = COVER_LETTER_PROMPTS.COVER_LETTER.GENERATE(styleModule, jobDescription, resumeText, tailoringInstructions, finalPersonalizedContext, trajectoryContext, bucketStrategy, candidateName || undefined, coverLetterPreferences || undefined, candidateSignals, selectedCandidateProfileContext || undefined);
+    const prompt = COVER_LETTER_PROMPTS.COVER_LETTER.GENERATE(styleModule, jobDescription, resumeText, tailoringInstructions, finalPersonalizedContext, trajectoryContext, bucketStrategy, undefined, coverLetterPreferences || undefined, candidateSignals, selectedCandidateProfileContext || undefined);
 
     return callWithRetry(async (metadata) => {
         const model = await getModel({ task: 'analysis', feature: 'cover_letter' });
         const response = await model.generateContent({ contents: [{ role: "user", parts: [{ text: prompt }] }] });
         metadata.token_usage = response.response.usageMetadata;
         return {
-            text: cleanCoverLetterOutput(sanitizeInput(response.response.text())),
+            text: finalizeCoverLetterOutput(sanitizeInput(response.response.text()), candidateName),
             promptVersion: selectedPromptVersion,
             styleCategory: styleMetadata.category,
             styleLabel: styleMetadata.label,

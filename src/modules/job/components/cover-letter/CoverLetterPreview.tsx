@@ -1,5 +1,6 @@
 import React from 'react';
 import { PrintHeader } from '../../../../components/common/PrintHeader';
+import { finalizeCoverLetterOutput } from '../../../../services/ai/jobAiService';
 
 interface CoverLetterPreviewProps {
     id: string;
@@ -27,6 +28,8 @@ export const CoverLetterPreview: React.FC<CoverLetterPreviewProps> = ({
     companyName,
     userProfile
 }) => {
+    const finalizedContent = finalizeCoverLetterOutput(content, userProfile.name);
+
     return (
         <div 
             id={id} 
@@ -52,14 +55,7 @@ export const CoverLetterPreview: React.FC<CoverLetterPreviewProps> = ({
                 </div>
 
                 <div className="text-base text-neutral-800 leading-[1.65] space-y-5 whitespace-pre-wrap">
-                    {content}
-                </div>
-
-                <div className="pt-12 space-y-1">
-                    <p className="font-sans font-medium text-neutral-500 text-sm">Sincerely,</p>
-                    <p className="font-sans font-bold text-neutral-900 text-lg tracking-tight">
-                        {userProfile.name}
-                    </p>
+                    {finalizedContent}
                 </div>
             </div>
         </div>

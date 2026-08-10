@@ -10,6 +10,7 @@ import { LocalizedErrorBoundary } from '../../components/common/LocalizedErrorBo
 import { useUser } from '../../contexts/UserContext';
 import { useNextGen } from '../../hooks/useNextGen';
 import { RdFeedbackService } from '../../services/ai/rd/feedbackService';
+import { finalizeCoverLetterOutput } from '../../services/ai/jobAiService';
 
 export const CoverLetters: React.FC = () => {
     const { jobs, setActiveJobId: onSelectJob } = useJobContext();
@@ -84,8 +85,10 @@ export const CoverLetters: React.FC = () => {
                         </button>
                     </div>
                 ) : (
-                    letters.map((job) => (
-                        <LocalizedErrorBoundary key={job.id} componentName="Cover Letter Card">
+                    letters.map((job) => {
+                        const displayLetter = fullName ? finalizeCoverLetterOutput(job.coverLetter!, fullName) : job.coverLetter!;
+                        return (
+                            <LocalizedErrorBoundary key={job.id} componentName="Cover Letter Card">
                             <div
                                 onClick={() => onSelectJob(job.id)}
                                 className="group relative bg-white dark:bg-neutral-900 rounded-[2.5rem] p-8 border border-neutral-200 dark:border-neutral-800/50 hover:shadow-2xl hover:shadow-indigo-500/10 hover:border-indigo-200 dark:hover:border-indigo-500/30 transition-all duration-500 cursor-pointer overflow-hidden flex flex-col h-full"
@@ -97,7 +100,7 @@ export const CoverLetters: React.FC = () => {
                                         </div>
                                         <div className="flex items-center gap-2">
                                             <button
-                                                onClick={(e) => handleCopy(e, job, job.coverLetter!)}
+                                                onClick={(e) => handleCopy(e, job, displayLetter)}
                                                 className="p-2 text-neutral-400 hover:text-indigo-600 dark:hover:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-900/30 rounded-xl transition-all"
                                                 title="Copy Letter"
                                             >
@@ -118,7 +121,7 @@ export const CoverLetters: React.FC = () => {
 
                                     <div className="relative">
                                         <div className="text-sm text-neutral-600 dark:text-neutral-400 font-serif leading-relaxed line-clamp-4 relative z-10">
-                                            {job.coverLetter}
+                                            {displayLetter}
                                         </div>
                                         <div className="absolute inset-x-0 bottom-0 h-10 bg-gradient-to-t from-white dark:from-neutral-900 to-transparent z-20" />
                                     </div>
@@ -134,8 +137,9 @@ export const CoverLetters: React.FC = () => {
                                     </div>
                                 </div>
                             </div>
-                        </LocalizedErrorBoundary>
-                    ))
+                            </LocalizedErrorBoundary>
+                        );
+                    })
                 )}
             </div>
         </SharedPageLayout>

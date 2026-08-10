@@ -51,7 +51,7 @@ export const COVER_LETTER_STYLE_MODULES = {
 export const COVER_LETTER_PROMPTS = {
   COVER_LETTER: {
     STYLE_MODULES: COVER_LETTER_STYLE_MODULES,
-    GENERATE: (styleModule: string, jobDescription: string, resumeText: string, tailoringInstructions: string[], additionalContext?: string, trajectoryContext?: string, bucketStrategy?: string, candidateName?: string, coverLetterPreferences?: string, candidateSignals: string[] = [], candidateProfileContext?: string) => `
+    GENERATE: (styleModule: string, jobDescription: string, resumeText: string, tailoringInstructions: string[], additionalContext?: string, trajectoryContext?: string, bucketStrategy?: string, _candidateName?: string, coverLetterPreferences?: string, candidateSignals: string[] = [], candidateProfileContext?: string) => `
     CORE TASK:
     Write a professional cover letter using only the selected evidence and modules below.
 
@@ -111,16 +111,14 @@ export const COVER_LETTER_PROMPTS = {
     - Start with exactly "Dear Hiring Manager," on its own line, followed by a blank line.
     - Write exactly 3 body paragraphs: (1) role motivation and fit, (2) the strongest evidence from the resume, and (3) transferable value, honest gap framing when needed, and interest in contributing.
     - Keep the full letter between 300 and 375 words. Remove repetition before adding detail.
-    - End with a blank line, then "Sincerely," and, when a candidate name is provided, the exact candidate name on the next line.
+    - Do not add a sign-off, candidate name, or placeholder name. The application will add the exact closing after generation.
     - Do not include headings, labels, bullets, markdown, or multiple closing signatures.
-    
-    ${candidateName ? `REQUIRED CLOSING: End the letter with a sign-off on its own line: "Sincerely," followed by the exact candidate name contained in ${anchorData('CANDIDATE_NAME', candidateName)} on the next line. This is a required structural element of a cover letter, not generic filler — always include it exactly once, even while trimming filler elsewhere.` : ''}
 
     FINAL CHECK:
     - Ensure no (BLOCK_ID) tags remain in the output.
     - REFLECT: Is this a list or a narrative? If it feels like a list, use a functional bridge to connect two thoughts.
     - REFLECT: Did I handle the metrics correctly for this role category?
-    - REFLECT: Does this sound like an AI? Remove generic filler like "I am excited to apply." (the closing sign-off above is exempt from this — never remove it)
+    - REFLECT: Does this sound like an AI? Remove generic filler like "I am excited to apply."
 
     IMPORTANT: Provide the cover letter as RAW TEXT ONLY. Do NOT wrap in JSON, Markdown code blocks, or any other formatting.
   `

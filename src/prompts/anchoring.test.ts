@@ -51,7 +51,7 @@ describe('prompt data anchoring', () => {
 
         expect(coverLetterPrompt).toContain('<<<JOB_DESCRIPTION_START>>>');
         expect(coverLetterPrompt).toContain('<<<RESUME_START>>>');
-        expect(coverLetterPrompt).toContain('<<<CANDIDATE_NAME_START>>>');
+        expect(coverLetterPrompt).not.toContain('<<<CANDIDATE_NAME_START>>>');
         expect(coverLetterPrompt).toContain('<<<PROFILE_WRITING_PREFERENCES_GUIDANCE_START>>>');
         expect(interviewPrompt).toContain('<<<JOB_DESCRIPTION_START>>>');
         expect(interviewPrompt).toContain('<<<RESUME_START>>>');

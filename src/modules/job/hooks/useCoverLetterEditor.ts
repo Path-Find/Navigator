@@ -16,6 +16,7 @@ import { RdStyleService } from '../../../services/ai/rd/styleService';
 import { createCandidateEducationContext, formatCandidateProfileContext, formatJourneyContext, formatVerifiedSkills } from '../../../services/candidateProfileContext';
 import { useUser } from '../../../contexts/UserContext';
 import { useSkillContext } from '../../skills/context/SkillContext';
+import { finalizeCoverLetterOutput } from '../../../services/ai/jobAiService';
 
 interface UseCoverLetterEditorProps {
     job: SavedJob;
@@ -51,8 +52,18 @@ export const useCoverLetterEditor = ({
 
     // Sync with parent when job prop changes
     useEffect(() => {
-        setLocalJob(job);
-    }, [job]);
+        const normalizedCoverLetter = job.coverLetter && fullName
+            ? finalizeCoverLetterOutput(job.coverLetter, fullName)
+            : job.coverLetter;
+        const normalizedJob = normalizedCoverLetter && normalizedCoverLetter !== job.coverLetter
+            ? { ...job, coverLetter: normalizedCoverLetter }
+            : job;
+        setLocalJob(normalizedJob);
+        if (normalizedJob !== job) {
+            void Storage.updateJob(normalizedJob).catch(() => undefined);
+            onJobUpdate(normalizedJob);
+        }
+    }, [job, fullName, onJobUpdate]);
 
     const handleCopy = useCallback(async (text: string) => {
         await navigator.clipboard.writeText(text);
@@ -362,8 +373,9 @@ export const useCoverLetterEditor = ({
     }, []);
 
     const handleEditCoverLetter = useCallback(async (newText: string) => {
-        if (newText !== localJob.coverLetter) {
-            const updated = { ...localJob, coverLetter: newText };
+        const finalizedText = finalizeCoverLetterOutput(newText, fullName || undefined);
+        if (finalizedText !== localJob.coverLetter) {
+            const updated = { ...localJob, coverLetter: finalizedText };
             setLocalJob(updated);
             onJobUpdate(updated);
             try {
