@@ -28,6 +28,15 @@ describe('EncryptionService - PBKDF2 iteration migration', () => {
         expect(localStorage.getItem('jobfit_vault_iterations')).toBe('600000');
     });
 
+    it('encrypts large values without overflowing the argument stack', async () => {
+        await encryptionService.init('test-seed');
+
+        const largeValue = 'job history '.repeat(10_000);
+        const encrypted = await encryptionService.encrypt(largeValue);
+
+        expect(encrypted).toContain(':');
+    });
+
     it('flags migration for an existing vault with no stored iteration count', async () => {
         // Simulate a vault created before iteration versioning was introduced:
         // salt exists, but no iteration count key was ever written.

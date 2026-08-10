@@ -10,6 +10,22 @@ const KEY_DERIVATION_ALGO = 'PBKDF2';
 const ITERATIONS = 600000;
 const SALT_SIZE = 16;
 const IV_SIZE = 12;
+const BASE64_CHUNK_SIZE = 0x8000;
+
+/**
+ * Converts bytes to Base64 without spreading a large buffer into one
+ * function call. The vault can contain a full job history, which can exceed
+ * the browser's argument-count limit.
+ */
+function bytesToBase64(bytes: Uint8Array): string {
+    let binary = '';
+
+    for (let offset = 0; offset < bytes.length; offset += BASE64_CHUNK_SIZE) {
+        binary += String.fromCharCode(...bytes.subarray(offset, offset + BASE64_CHUNK_SIZE));
+    }
+
+    return btoa(binary);
+}
 
 /**
  * The iteration count used before the security hardening in v2.25.
@@ -160,8 +176,8 @@ class EncryptionService {
         );
 
         // Package as Base64 for storage
-        const ivBase64 = btoa(String.fromCharCode(...iv));
-        const contentBase64 = btoa(String.fromCharCode(...new Uint8Array(encryptedContent)));
+        const ivBase64 = bytesToBase64(iv);
+        const contentBase64 = bytesToBase64(new Uint8Array(encryptedContent));
 
         return `${ivBase64}:${contentBase64}`;
     }

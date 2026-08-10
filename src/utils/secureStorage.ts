@@ -12,6 +12,17 @@ const DB_NAME = 'JobFitSecureStorage';
 const STORE_NAME = 'Keys';
 const KEY_PATH = 'masterKey';
 const DB_VERSION = 1;
+const BASE64_CHUNK_SIZE = 0x8000;
+
+function bytesToBase64(bytes: Uint8Array): string {
+  let binary = '';
+
+  for (let offset = 0; offset < bytes.length; offset += BASE64_CHUNK_SIZE) {
+    binary += String.fromCharCode(...bytes.subarray(offset, offset + BASE64_CHUNK_SIZE));
+  }
+
+  return btoa(binary);
+}
 
 /**
  * Open or create the IndexedDB database
@@ -203,7 +214,7 @@ async function encrypt(plaintext: string, key?: CryptoKey): Promise<string> {
     combined.set(iv, 0);
     combined.set(new Uint8Array(encryptedBuffer), iv.length);
 
-    return btoa(String.fromCharCode(...combined));
+    return bytesToBase64(combined);
   } catch (error) {
     console.error('Encryption failed:', error);
     throw new Error('Failed to encrypt data', { cause: error });

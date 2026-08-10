@@ -17,6 +17,7 @@ See [CHANGELOG_ARCHIVE.md](CHANGELOG_ARCHIVE.md) for earlier history.
 - **NextGen now records which cover-letter version a user actually copied or downloaded**: usage events point to the stored letter by checksum without duplicating the letter itself.
 
 ### Fixed
+- **Large saved job histories no longer break cloud sync or cover-letter pages**: encryption now encodes large vault values in safe chunks instead of overflowing the browser's argument stack.
 - **NextGen style and trajectory modeling now uses bounded context**: feedback signals, visible resume evidence, target roles, and historical signals are labeled as data, while hidden resume blocks and unnecessary metadata stay out of these prompts.
 - **Career and education AI calls now send clearly labeled, compact context**: role models, resumes, skills, and optional transcripts are separated; irrelevant stored metadata is removed; and extracted PDF text is no longer sent twice.
 - **Job-specific summaries and tailored interviews now receive only the selected resume evidence**: previously they could resend every stored resume or every visible block, adding irrelevant context to the prompt.
