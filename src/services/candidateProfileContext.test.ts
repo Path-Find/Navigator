@@ -108,7 +108,7 @@ describe('candidate profile prompt context', () => {
             candidateProfile: { signals: [], stories: [], currentBlockIds: ['work-1'] },
         });
 
-        expect(context).toContain('Current: Planning Assistant at Example City (2024 - Present)');
+        expect(context).toContain('Prioritized: Planning Assistant at Example City (2024 - Present)');
         expect(context).not.toContain('Sensitive resume evidence');
     });
 

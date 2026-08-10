@@ -19,9 +19,8 @@ interface ResumeSectionEditorProps {
     onMoveBullet: (blockId: string, index: number, direction: 'up' | 'down') => void;
     onRemoveBlock: (id: string) => void;
     onSetMovingBlockId: (id: string | null) => void;
-    featured: boolean;
-    current: boolean;
-    onToggleProfilePriority: (blockId: string, priority: 'featured' | 'current') => void;
+    prioritized: boolean;
+    onToggleProfilePriority: (blockId: string) => void;
 }
 
 const INTERVIEW_ELIGIBLE_TYPES: ExperienceBlock['type'][] = ['work', 'project', 'volunteer', 'other'];
@@ -39,8 +38,7 @@ export const ResumeSectionEditor: React.FC<ResumeSectionEditorProps> = ({
     onMoveBullet,
     onRemoveBlock,
     onSetMovingBlockId,
-    featured,
-    current,
+    prioritized,
     onToggleProfilePriority,
 }) => {
     const [showInterview, setShowInterview] = useState(false);
@@ -58,20 +56,12 @@ export const ResumeSectionEditor: React.FC<ResumeSectionEditorProps> = ({
                         <div className="absolute right-6 top-6 flex items-center gap-2 no-print">
                             <button
                                 type="button"
-                                onClick={() => onToggleProfilePriority(block.id, 'featured')}
-                                aria-label={featured ? `Remove ${block.title || 'entry'} from featured profile items` : `Feature ${block.title || 'entry'} in your profile`}
-                                title={featured ? 'Remove from featured profile items' : 'Feature in profile'}
-                                className={`p-2 rounded-xl border transition-colors ${featured ? 'text-amber-500 bg-amber-50 border-amber-200 dark:bg-amber-500/10 dark:border-amber-500/30' : 'text-neutral-300 border-transparent hover:text-amber-500 hover:bg-amber-50/70 dark:hover:bg-amber-500/10'}`}
+                                onClick={() => onToggleProfilePriority(block.id)}
+                                aria-label={prioritized ? `Remove ${block.title || 'entry'} from profile priorities` : `Prioritize ${block.title || 'entry'} in your profile`}
+                                title={prioritized ? 'Remove from profile priorities' : 'Prioritize in profile'}
+                                className={`p-2 rounded-xl border transition-colors ${prioritized ? 'text-amber-500 bg-amber-50 border-amber-200 dark:bg-amber-500/10 dark:border-amber-500/30' : 'text-neutral-300 border-transparent hover:text-amber-500 hover:bg-amber-50/70 dark:hover:bg-amber-500/10'}`}
                             >
-                                <Star className="w-4 h-4" fill={featured ? 'currentColor' : 'none'} />
-                            </button>
-                            <button
-                                type="button"
-                                onClick={() => onToggleProfilePriority(block.id, 'current')}
-                                aria-pressed={current}
-                                className={`rounded-xl border px-2.5 py-1.5 text-[10px] font-black transition-colors ${current ? 'text-indigo-600 bg-indigo-50 border-indigo-200 dark:text-indigo-300 dark:bg-indigo-500/10 dark:border-indigo-500/30' : 'text-neutral-400 border-neutral-200 hover:text-indigo-600 hover:border-indigo-200 dark:border-neutral-700'}`}
-                            >
-                                {current ? 'Current' : 'Mark current'}
+                                <Star className="w-4 h-4" fill={prioritized ? 'currentColor' : 'none'} />
                             </button>
                         </div>
                     )}

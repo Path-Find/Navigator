@@ -73,7 +73,6 @@ export const CandidateProfileContextManager: React.FC = () => {
     const [employmentTypes, setEmploymentTypes] = React.useState<CandidateEmploymentType[]>([]);
     const [startTiming, setStartTiming] = React.useState<CandidateStartTiming>('flexible');
     const [startDate, setStartDate] = React.useState('');
-    const [featuredBlockIds, setFeaturedBlockIds] = React.useState<string[]>([]);
     const [currentBlockIds, setCurrentBlockIds] = React.useState<string[]>([]);
     const primaryResume = resumes[0];
     const signals = primaryResume?.candidateProfile?.signals || [];
@@ -100,7 +99,6 @@ export const CandidateProfileContextManager: React.FC = () => {
         || facts.length > 0
         || Boolean(educationContext?.courses.length)
         || Boolean(primaryResume?.candidateProfile?.availability)
-        || featuredBlockIds.length > 0
         || currentBlockIds.length > 0
         || storedInsights.some(insight => insight.status === 'confirmed');
 
@@ -126,9 +124,8 @@ export const CandidateProfileContextManager: React.FC = () => {
             setStartTiming(saved.startTiming);
             setStartDate(saved.startDate || '');
         }
-        setFeaturedBlockIds(primaryResume?.candidateProfile?.featuredBlockIds || []);
         setCurrentBlockIds(primaryResume?.candidateProfile?.currentBlockIds || []);
-    }, [primaryResume?.id, primaryResume?.candidateProfile?.availability, primaryResume?.candidateProfile?.featuredBlockIds, primaryResume?.candidateProfile?.currentBlockIds]);
+    }, [primaryResume?.id, primaryResume?.candidateProfile?.availability, primaryResume?.candidateProfile?.currentBlockIds]);
 
     const handleSaveCoverLetterPreferences = () => {
         const trimmed = coverLetterPreferencesInput.trim();
@@ -158,7 +155,6 @@ export const CandidateProfileContextManager: React.FC = () => {
                 facts: context?.facts || [],
                 education: context?.education,
                 availability,
-                featuredBlockIds: context?.featuredBlockIds || [],
                 currentBlockIds: context?.currentBlockIds || [],
                 insights: context?.insights || [],
                 completedAt: context?.completedAt,
@@ -183,7 +179,6 @@ export const CandidateProfileContextManager: React.FC = () => {
                     facts: storedFacts,
                     education: context?.education,
                     availability: context?.availability,
-                    featuredBlockIds,
                     currentBlockIds,
                     completedAt: context?.completedAt,
                 }
@@ -215,7 +210,6 @@ export const CandidateProfileContextManager: React.FC = () => {
                     facts: nextFacts,
                     education: context?.education,
                     availability: context?.availability,
-                    featuredBlockIds,
                     currentBlockIds,
                     completedAt: context?.completedAt,
                 }
@@ -235,7 +229,6 @@ export const CandidateProfileContextManager: React.FC = () => {
                 facts: context?.facts || [],
                 education: context?.education,
                 availability: context?.availability,
-                featuredBlockIds,
                 currentBlockIds,
                 insights: context?.insights || [],
                 completedAt: context?.completedAt,
@@ -290,31 +283,21 @@ export const CandidateProfileContextManager: React.FC = () => {
                     </div>
                     <div className="space-y-2">
                         {profileBlocks.map(block => {
-                            const isFeatured = featuredBlockIds.includes(block.id);
-                            const isCurrent = currentBlockIds.includes(block.id);
+                            const isPrioritized = currentBlockIds.includes(block.id);
                             return (
                                 <div key={block.id} className="flex items-center gap-3 rounded-2xl border border-indigo-100 dark:border-indigo-500/20 bg-indigo-50/40 dark:bg-indigo-500/5 px-4 py-3">
                                     <button
                                         type="button"
-                                        onClick={() => setFeaturedBlockIds(current => toggleOption(current, block.id))}
-                                        aria-label={isFeatured ? `Remove ${block.title} from featured profile items` : `Feature ${block.title} in your profile`}
-                                        className={`p-1.5 rounded-lg transition-colors shrink-0 ${isFeatured ? 'text-amber-500 bg-amber-50 dark:bg-amber-500/10' : 'text-neutral-300 hover:text-amber-500'}`}
+                                        onClick={() => setCurrentBlockIds(current => toggleOption(current, block.id))}
+                                        aria-label={isPrioritized ? `Remove ${block.title} from profile priorities` : `Prioritize ${block.title} in your profile`}
+                                        className={`p-1.5 rounded-lg transition-colors shrink-0 ${isPrioritized ? 'text-amber-500 bg-amber-50 dark:bg-amber-500/10' : 'text-neutral-300 hover:text-amber-500'}`}
                                     >
-                                        <Star className="w-4 h-4" fill={isFeatured ? 'currentColor' : 'none'} />
+                                        <Star className="w-4 h-4" fill={isPrioritized ? 'currentColor' : 'none'} />
                                     </button>
                                     <div className="min-w-0 flex-1">
                                         <p className="text-sm font-bold text-neutral-800 dark:text-neutral-100 truncate">{block.title}</p>
                                         <p className="text-xs text-neutral-500 dark:text-neutral-400 truncate">{[block.organization, block.dateRange].filter(Boolean).join(' · ')}</p>
                                     </div>
-                                    <label className="inline-flex items-center gap-2 text-xs font-bold text-neutral-600 dark:text-neutral-300 shrink-0">
-                                        <input
-                                            type="checkbox"
-                                            checked={isCurrent}
-                                            onChange={() => setCurrentBlockIds(current => toggleOption(current, block.id))}
-                                            className="accent-indigo-600"
-                                        />
-                                        Current
-                                    </label>
                                 </div>
                             );
                         })}

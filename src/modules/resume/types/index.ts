@@ -116,7 +116,6 @@ export interface CandidateProfileContext {
     facts?: CandidateProfileFact[];
     education?: CandidateEducationContext;
     availability?: CandidateAvailability;
-    featuredBlockIds?: string[];
     currentBlockIds?: string[];
     insights?: CandidateProfileInsight[];
     completedAt?: number;

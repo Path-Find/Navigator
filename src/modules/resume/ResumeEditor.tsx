@@ -360,8 +360,7 @@ export const ResumeEditor: React.FC = () => {
                                                     onMoveBullet={moveBullet}
                                                     onRemoveBlock={removeBlock}
                                                     onSetMovingBlockId={setMovingBlockId}
-                                                    featured={initialResume.candidateProfile?.featuredBlockIds?.includes(block.id) || false}
-                                                    current={initialResume.candidateProfile?.currentBlockIds?.includes(block.id) || false}
+                                                    prioritized={initialResume.candidateProfile?.currentBlockIds?.includes(block.id) || false}
                                                     onToggleProfilePriority={toggleProfilePriority}
                                                 />
                                             ))}

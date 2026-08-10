@@ -90,7 +90,6 @@ export const getCandidateProfileContext = (profile?: ResumeProfile | null): Cand
         && !(context.facts || []).some(fact => fact.status === 'confirmed')
         && !(context.education?.courses || []).some(course => course.status !== 'withdrawn')
         && !context.availability
-        && !(context.featuredBlockIds || []).length
         && !(context.currentBlockIds || []).length
         && !(context.insights || []).some(insight => insight.status === 'confirmed')
     ) return null;
@@ -182,13 +181,8 @@ export const formatCandidateProfileContext = (
         .map(fact => `- ${fact.value}`)
         .join('\n');
     const priorityBlocks = profile?.blocks
-        .filter(block => context.featuredBlockIds?.includes(block.id) || context.currentBlockIds?.includes(block.id))
-        .map(block => {
-            const isCurrent = context.currentBlockIds?.includes(block.id);
-            const isFeatured = context.featuredBlockIds?.includes(block.id);
-            const label = isCurrent && isFeatured ? 'Current and featured' : isCurrent ? 'Current' : 'Featured';
-            return `- ${label}: ${block.title}${block.organization ? ` at ${block.organization}` : ''}${block.dateRange ? ` (${block.dateRange})` : ''}`;
-        })
+        .filter(block => context.currentBlockIds?.includes(block.id))
+        .map(block => `- Prioritized: ${block.title}${block.organization ? ` at ${block.organization}` : ''}${block.dateRange ? ` (${block.dateRange})` : ''}`)
         .join('\n') || '';
     const education = context.education;
     const educationCourses = education
