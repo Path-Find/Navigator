@@ -164,7 +164,7 @@ export const getUsageStats = async (userId: string): Promise<UsageStats> => {
                 .from('logs')
                 .select('*', { count: 'exact', head: true })
                 .eq('user_id', userId)
-                .in('event_type', ['interview_generation', 'unified_skill_interview_generation', 'skill_interview_generation'])
+                .in('event_type', ['interview_generation', 'interview_generation_general', 'profile_interview_summary', 'resume_interview_generation', 'unified_skill_interview_generation', 'skill_interview_generation'])
                 .gte('created_at', firstOfMonth.toISOString()))(),
             (async () => dataClient
                 .from('role_models')

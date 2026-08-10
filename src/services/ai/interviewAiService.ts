@@ -1,9 +1,10 @@
 import { getModel, callWithRetry, cleanJsonOutput } from "./aiCore";
 import { INTERVIEW_PROMPTS } from "../../prompts/index";
 import { AI_MODELS } from "../../constants";
-import type { ExperienceBlock, InterviewQuestion, InterviewResponseAnalysis, ResumeProfile } from "../../types";
+import type { CandidateProfileSignal, CustomSkill, ExperienceBlock, InterviewQuestion, InterviewResponseAnalysis, ResumeProfile } from "../../types";
+import { formatCandidateProfileContext, formatVerifiedSkills } from '../candidateProfileContext';
 
-const stringifyProfile = (profile: ResumeProfile): string => {
+const stringifyProfile = (profile: ResumeProfile, jobContext = '', verifiedSkills: CustomSkill[] = []): string => {
     const blocks = profile.blocks
         .filter((block: ExperienceBlock) => block.isVisible && ['work', 'volunteer', 'project', 'education'].includes(block.type))
         .map(({ type, title, organization, dateRange, bullets, narrativeContext }) => ({
@@ -14,16 +15,23 @@ const stringifyProfile = (profile: ResumeProfile): string => {
             bullets,
             ...(narrativeContext ? { narrativeContext } : {}),
         }));
-    return JSON.stringify(blocks);
+    const candidateContext = formatCandidateProfileContext(profile, jobContext);
+    const skillsContext = formatVerifiedSkills(verifiedSkills, jobContext);
+    return [
+        JSON.stringify(blocks),
+        candidateContext ? `APPROVED CANDIDATE CONTEXT:\n${candidateContext}` : '',
+        skillsContext,
+    ].filter(Boolean).join('\n\n');
 };
 
 export const generateTailoredInterviewQuestions = async (
     jobDescription: string,
     resumes: ResumeProfile[],
     jobId?: string,
-    jobTitle?: string
+    jobTitle?: string,
+    verifiedSkills: CustomSkill[] = []
 ): Promise<InterviewQuestion[]> => {
-    const resumeContext = resumes.map(stringifyProfile).join('\n---\n');
+    const resumeContext = resumes.map(resume => stringifyProfile(resume, jobDescription, verifiedSkills)).join('\n---\n');
     const prompt = INTERVIEW_PROMPTS.GENERATE_QUESTIONS(jobDescription, resumeContext, jobTitle);
 
     return callWithRetry(async (metadata) => {
@@ -87,6 +95,28 @@ export const generateGeneralBehavioralQuestions = async (resumeContext: string):
             ...(questions as InterviewQuestion[]).map(q => ({ ...q, id: crypto.randomUUID() })),
         ];
     }, { event_type: 'interview_generation_general', prompt, model: AI_MODELS.EXTRACTION });
+};
+
+export interface CandidateProfileDraft {
+    signals: Array<Pick<CandidateProfileSignal, 'key' | 'value'>>;
+    stories: Array<{ text: string; tags: string[] }>;
+}
+
+export const summarizeCandidateProfile = async (
+    resumeContext: string,
+    answers: Array<{ question: string; answer: string }>
+): Promise<CandidateProfileDraft> => {
+    const answerText = answers
+        .map((item, index) => `Q${index + 1}: ${item.question}\nA: ${item.answer}`)
+        .join('\n\n');
+    const prompt = INTERVIEW_PROMPTS.PROFILE_SUMMARY(resumeContext, answerText);
+
+    return callWithRetry(async (metadata) => {
+        const model = await getModel({ task: 'interview', generationConfig: { responseMimeType: 'application/json' } });
+        const response = await model.generateContent({ contents: [{ role: 'user', parts: [{ text: prompt }] }] });
+        metadata.token_usage = response.response.usageMetadata;
+        return JSON.parse(cleanJsonOutput(response.response.text())) as CandidateProfileDraft;
+    }, { event_type: 'profile_interview_summary', prompt, model: 'dynamic' });
 };
 
 export const analyzeInterviewResponse = async (

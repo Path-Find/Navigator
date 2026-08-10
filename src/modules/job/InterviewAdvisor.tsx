@@ -6,11 +6,14 @@ import { useToast } from '../../contexts/ToastContext';
 import { useGlobalUI } from '../../contexts/GlobalUIContext';
 import { useJobContext } from './context/JobContext';
 import { useResumeContext } from '../resume/context/ResumeContext';
+import { useSkillContext } from '../skills/context/SkillContext';
 import { useInterview } from './hooks/useInterview';
 import { computeSnippets } from './utils/interviewUtils';
 import { InterviewSelection } from './components/InterviewSelection';
 import { InterviewSessionScreen } from './components/InterviewSessionScreen';
+import { CandidateProfileInterview } from './components/CandidateProfileInterview';
 import { ROUTES } from '../../constants';
+import { createCandidateStory } from '../../services/candidateProfileContext';
 
 export const InterviewAdvisor: React.FC = () => {
     const { jobs } = useJobContext();
@@ -27,10 +30,12 @@ export const InterviewAdvisor: React.FC = () => {
         loadTailoredQuestions,
         submitResponse,
         nextQuestion,
-        isLastQuestion
+        isLastQuestion,
+        markStorySaved
     } = useInterview();
 
     const { resumes, handleUpdateResume } = useResumeContext();
+    const { skills } = useSkillContext();
 
     const [mode, setMode] = useState<'selection' | 'session'>('selection');
     const [sessionType, setSessionType] = useState<'general' | 'tailored' | null>(null);
@@ -65,10 +70,15 @@ export const InterviewAdvisor: React.FC = () => {
                 
                 if (type === 'general') {
                     setResumeSnippets(computeSnippets(resumes));
-                    loadGeneralQuestions(resumes);
+                    loadGeneralQuestions(resumes, skills);
                 }
             };
             startSession();
+        } else if (type === 'profile') {
+            queueMicrotask(() => {
+                setMode('session');
+                setFocusedMode(true);
+            });
         } else {
             queueMicrotask(() => {
                 setMode('selection');
@@ -76,7 +86,7 @@ export const InterviewAdvisor: React.FC = () => {
                 setSelectedJobId(null);
             });
         }
-    }, [type, navigate, resumes, loadGeneralQuestions, showError]);
+    }, [type, navigate, resumes, skills, loadGeneralQuestions, showError]);
 
     useEffect(() => {
         if (mode === 'session') {
@@ -104,13 +114,44 @@ export const InterviewAdvisor: React.FC = () => {
         navigate(`${ROUTES.INTERVIEWS}/general`);
     };
 
+    const handleStartProfile = async () => {
+        navigate(`${ROUTES.INTERVIEWS}/profile`);
+    };
+
     const handleJobSelected = (jobId: string) => {
         setSelectedJobId(jobId);
         const job = jobs.find(j => j.id === jobId);
         if (job) {
             setResumeSnippets(computeSnippets(resumes));
-            loadTailoredQuestions(job, resumes);
+            loadTailoredQuestions(job, resumes, skills);
         }
+    };
+
+    const handleSaveStory = async (questionId: string) => {
+        if (sessionType !== 'general') return;
+        const question = questions.find(item => item.id === questionId);
+        const response = responses[questionId]?.response;
+        const primaryResume = resumes[0];
+        if (!question || !response?.trim() || !primaryResume) return;
+
+        const existingStories = primaryResume.candidateProfile?.stories || [];
+        if (!existingStories.some(story => story.text.trim().toLowerCase() === response.trim().toLowerCase())) {
+            const story = createCandidateStory(
+                response,
+                'general_interview',
+                [question.category, 'behavioral'],
+                question.question
+            );
+            await handleUpdateResume({
+                ...primaryResume,
+                candidateProfile: {
+                    signals: primaryResume.candidateProfile?.signals || [],
+                    stories: [...existingStories, story],
+                    completedAt: primaryResume.candidateProfile?.completedAt,
+                },
+            });
+        }
+        markStorySaved(questionId);
     };
 
     const handleSubmit = async () => {
@@ -146,6 +187,10 @@ export const InterviewAdvisor: React.FC = () => {
         (sessionType === 'tailored' && selectedJobId && questions.length === 0 && isLoading)
     );
 
+    if (type === 'profile') {
+        return <CandidateProfileInterview />;
+    }
+
     if (mode === 'session') {
         return <InterviewSessionScreen
             questions={questions}
@@ -166,6 +211,7 @@ export const InterviewAdvisor: React.FC = () => {
             nextQuestion={nextQuestion}
             isLastQuestion={isLastQuestion}
             handleUpdateResume={handleUpdateResume}
+            onSaveStory={handleSaveStory}
         />;
     }
 
@@ -173,6 +219,7 @@ export const InterviewAdvisor: React.FC = () => {
         limitError={limitError}
         handleStartGeneral={handleStartGeneral}
         handleStartTailored={handleStartTailored}
+        handleStartProfile={handleStartProfile}
     />;
 };
 

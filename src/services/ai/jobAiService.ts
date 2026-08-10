@@ -13,12 +13,13 @@ import type {
 import { AI_MODELS, AI_TEMPERATURE, AGENT_LOOP, CURRENT_JOB_ANALYSIS_VERSION, USER_TIERS } from "../../constants";
 import { JOB_ANALYSIS_PROMPTS, COVER_LETTER_PROMPTS, COVER_LETTER_STYLE_METADATA } from "../../prompts/index";
 import { BucketStorage } from "../storage/bucketStorage";
+import { formatCandidateProfileContext } from '../candidateProfileContext';
 
 const stringifyProfile = (profile: ResumeProfile): string => {
     return profile.blocks
         .filter(b => b.isVisible)
         .map(b => {
-            return `BLOCK_ID: ${b.id}\nROLE: ${b.title}\nORG: ${b.organization}\nDATE: ${b.dateRange}\nDETAILS:\n${b.bullets.map(bull => `- ${bull}`).join('\n')}\n`;
+            return `BLOCK_ID: ${b.id}\nROLE: ${b.title}\nORG: ${b.organization}\nDATE: ${b.dateRange}\nDETAILS:\n${b.bullets.map(bull => `- ${bull}`).join('\n')}${b.narrativeContext ? `\nSTORY CONTEXT:\n${b.narrativeContext}` : ''}\n`;
         })
         .join('\n---\n');
 };
@@ -212,20 +213,28 @@ export const buildJobCandidateContext = (
 
     const courseworkRequirements = getRequirementTexts(parsedJob, 'coursework');
     const educationRequirements = getRequirementTexts(parsedJob, 'education');
+    const roleText = [parsedJob.roleTitle, parsedJob.category, ...(parsedJob.keySkills || []), ...(parsedJob.coreResponsibilities || [])]
+        .filter(Boolean)
+        .join(' ')
+        .toLowerCase();
+    const isAcademicOrEarlyCareerRole = /student|intern|co-?op|new grad|graduate|entry[- ]level|junior/.test(roleText);
 
-    if (transcript && courseworkRequirements.length) {
+    if (transcript && (courseworkRequirements.length || isAcademicOrEarlyCareerRole)) {
+        const courseMatchRequirements = courseworkRequirements.length ? courseworkRequirements : [jobSkillText];
         const matchingCourses = transcript.semesters
             .flatMap(semester => semester.courses)
-            .filter(course => matchesContextRequirement(`${course.code} ${course.title}`, courseworkRequirements))
+            .filter(course => matchesContextRequirement(`${course.code} ${course.title}`, courseMatchRequirements))
             .map(course => `${course.title} (${course.code})${course.grade ? ` — ${course.grade}` : ''}`);
-        academicEvidence.push(...matchingCourses);
+        academicEvidence.push(...matchingCourses.slice(0, 5));
     }
 
-    if (transcript && educationRequirements.length && !hasMatchingEducationBlock) {
+    if (transcript && (educationRequirements.length || isAcademicOrEarlyCareerRole) && !hasMatchingEducationBlock) {
         const programText = [transcript.credentialType, transcript.program, transcript.university]
             .filter(Boolean)
             .join(' at ');
-        if (programText && matchesContextRequirement(programText, educationRequirements)) {
+        if (programText && (educationRequirements.length
+            ? matchesContextRequirement(programText, educationRequirements)
+            : Boolean(transcript.program))) {
             academicEvidence.push(programText);
         }
     }
@@ -552,7 +561,8 @@ export const generateCoverLetter = async (
     personalizedStyle?: string,
     candidateName?: string,
     coverLetterPreferences?: string,
-    candidateSignals: string[] = []
+    candidateSignals: string[] = [],
+    candidateProfileContext?: string
 ): Promise<{
     text: string;
     promptVersion: string;
@@ -583,7 +593,8 @@ export const generateCoverLetter = async (
     // candidateName must be the person's real name (e.g. from their profile), not
     // selectedResume.name — that field is a resume/document label ("Resume", "Primary
     // Experience"), not the candidate's own name. See #192/#194.
-    const prompt = COVER_LETTER_PROMPTS.COVER_LETTER.GENERATE(styleModule, jobDescription, resumeText, tailoringInstructions, finalPersonalizedContext, trajectoryContext, bucketStrategy, candidateName || undefined, coverLetterPreferences || undefined, candidateSignals);
+    const selectedCandidateProfileContext = candidateProfileContext || formatCandidateProfileContext(selectedResume, jobDescription);
+    const prompt = COVER_LETTER_PROMPTS.COVER_LETTER.GENERATE(styleModule, jobDescription, resumeText, tailoringInstructions, finalPersonalizedContext, trajectoryContext, bucketStrategy, candidateName || undefined, coverLetterPreferences || undefined, candidateSignals, selectedCandidateProfileContext || undefined);
 
     return callWithRetry(async (metadata) => {
         const model = await getModel({ task: 'analysis', feature: 'cover_letter' });
@@ -628,7 +639,8 @@ export const generateCoverLetterWithQuality = async (
     candidateName?: string,
     fitScore?: number,
     coverLetterPreferences?: string,
-    candidateSignals: string[] = []
+    candidateSignals: string[] = [],
+    candidateProfileContext?: string
 ): Promise<{
     text: string;
     promptVersion: string;
@@ -657,7 +669,7 @@ export const generateCoverLetterWithQuality = async (
     const initialContext = isExtremeMismatch
         ? `${additionalContext ? `${additionalContext}\n\n` : ''}STRICT INSTRUCTION: This role's compatibility score is extremely low (${fitScore}/100) — a large, hard-to-bridge gap exists. Do not attempt to persuade past it. Include one clear, plain-language sentence that honestly names the specific gap (e.g. missing credential, licence, or years of direct experience) rather than glossing over it. Lead with genuine transferable strengths, but stay honest about the mismatch.`
         : additionalContext;
-    let result = await generateCoverLetter(jobDescription, selectedResume, tailoringInstructions, initialContext, undefined, trajectoryContext, jobId, canonicalTitle, personalizedStyle, candidateName, coverLetterPreferences, candidateSignals);
+    let result = await generateCoverLetter(jobDescription, selectedResume, tailoringInstructions, initialContext, undefined, trajectoryContext, jobId, canonicalTitle, personalizedStyle, candidateName, coverLetterPreferences, candidateSignals, candidateProfileContext);
     let attempts = 1;
 
     // Fast Path for Free and Plus tiers (No iterative loop to protect margins)
@@ -703,7 +715,7 @@ export const generateCoverLetterWithQuality = async (
                 STRICT INSTRUCTION: Stop attempting further persuasion. Include one clear, plain-language sentence that honestly names the specific gap identified above (e.g. a missing credential, licence, or years of direct experience) rather than glossing over it. The letter should read as self-aware about the gap, not falsely confident. Keep everything else about the letter's real strengths intact.
             `;
             const honestyContext = additionalContext ? `${additionalContext}\n\n${honestyInstruction}` : honestyInstruction;
-            result = await generateCoverLetter(jobDescription, selectedResume, tailoringInstructions, honestyContext, undefined, trajectoryContext, jobId, canonicalTitle, personalizedStyle, candidateName, coverLetterPreferences, candidateSignals);
+            result = await generateCoverLetter(jobDescription, selectedResume, tailoringInstructions, honestyContext, undefined, trajectoryContext, jobId, canonicalTitle, personalizedStyle, candidateName, coverLetterPreferences, candidateSignals, candidateProfileContext);
             attempts++;
             break;
         }
@@ -720,7 +732,7 @@ export const generateCoverLetterWithQuality = async (
         // We append the critique to any existing context
         const newContext = additionalContext ? `${additionalContext}\n\n${improvementContext}` : improvementContext;
 
-        result = await generateCoverLetter(jobDescription, selectedResume, tailoringInstructions, newContext, undefined, trajectoryContext, jobId, canonicalTitle, personalizedStyle, candidateName, coverLetterPreferences, candidateSignals);
+        result = await generateCoverLetter(jobDescription, selectedResume, tailoringInstructions, newContext, undefined, trajectoryContext, jobId, canonicalTitle, personalizedStyle, candidateName, coverLetterPreferences, candidateSignals, candidateProfileContext);
         attempts++;
     }
 

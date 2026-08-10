@@ -103,7 +103,7 @@ async function handler(req: Request): Promise<Response> {
                 const countRows = await sql`
                     SELECT COUNT(*)::int AS count FROM logs
                     WHERE user_id = ${userId}
-                      AND event_type IN ('interview_generation', 'unified_skill_interview_generation', 'skill_interview_generation')
+                      AND event_type IN ('interview_generation', 'interview_generation_general', 'profile_interview_summary', 'resume_interview_generation', 'unified_skill_interview_generation', 'skill_interview_generation')
                       AND created_at >= ${firstOfMonth.toISOString()}
                 `;
                 const monthlyInterviews = countRows[0]?.count ?? 0;

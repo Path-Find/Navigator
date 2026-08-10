@@ -12,15 +12,21 @@ import type {
     SavedJob
 } from '../types';
 import type { ResumeProfile } from '../../resume/types';
+import type { CustomSkill } from '../../skills/types';
+import { formatCandidateProfileContext, formatVerifiedSkills } from '../../../services/candidateProfileContext';
 
 const INTERVIEW_BLOCK_TYPES = new Set(['work', 'volunteer', 'project', 'education']);
 
-const stringifyForInterview = (resumes: ResumeProfile[]): string => {
+const stringifyForInterview = (resumes: ResumeProfile[], skills: CustomSkill[] = []): string => {
     if (!resumes.length) return '';
     return resumes[0].blocks
         .filter(b => b.isVisible && (b.type === 'work' || b.type === 'volunteer' || b.type === 'project' || b.type === 'education'))
-        .map(b => `${b.title} at ${b.organization} (${b.dateRange}):\n${b.bullets.map(bull => `- ${bull}`).join('\n')}`)
-        .join('\n\n');
+        .map(b => `${b.title} at ${b.organization} (${b.dateRange}):\n${b.bullets.map(bull => `- ${bull}`).join('\n')}${b.narrativeContext ? `\nStory context: ${b.narrativeContext}` : ''}`)
+        .join('\n\n')
+        + [
+            formatCandidateProfileContext(resumes[0]) ? `APPROVED CANDIDATE CONTEXT:\n${formatCandidateProfileContext(resumes[0])}` : '',
+            formatVerifiedSkills(skills),
+        ].filter(Boolean).join('\n\n');
 };
 
 /** Reuse parsed job facts for interview calls; raw text is only for legacy unanalyzed jobs. */
@@ -48,15 +54,15 @@ export const getInterviewResumes = (job: SavedJob, resumes: ResumeProfile[]): Re
 export const useInterview = () => {
     const [questions, setQuestions] = useState<InterviewQuestion[]>([]);
     const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
-    const [responses, setResponses] = useState<Record<string, { response: string, analysis?: InterviewResponseAnalysis }>>({});
+    const [responses, setResponses] = useState<Record<string, { response: string, analysis?: InterviewResponseAnalysis; savedAsStory?: boolean }>>({});
     const [isLoading, setIsLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
 
-    const loadGeneralQuestions = useCallback(async (resumes: ResumeProfile[] = []) => {
+    const loadGeneralQuestions = useCallback(async (resumes: ResumeProfile[] = [], skills: CustomSkill[] = []) => {
         setIsLoading(true);
         setError(null);
         try {
-            const resumeContext = stringifyForInterview(resumes);
+            const resumeContext = stringifyForInterview(resumes, skills);
             const result = await generateGeneralBehavioralQuestions(resumeContext);
             setQuestions(result);
             setCurrentQuestionIndex(0);
@@ -68,11 +74,11 @@ export const useInterview = () => {
         }
     }, []);
 
-    const loadTailoredQuestions = useCallback(async (job: SavedJob, resumes: ResumeProfile[]) => {
+    const loadTailoredQuestions = useCallback(async (job: SavedJob, resumes: ResumeProfile[], skills: CustomSkill[] = []) => {
         setIsLoading(true);
         setError(null);
         try {
-            const result = await generateTailoredInterviewQuestions(getInterviewJobContext(job), getInterviewResumes(job, resumes), job.id, job.position);
+            const result = await generateTailoredInterviewQuestions(getInterviewJobContext(job), getInterviewResumes(job, resumes), job.id, job.position, skills);
             setQuestions(result);
             setCurrentQuestionIndex(0);
             setResponses({});
@@ -152,6 +158,14 @@ export const useInterview = () => {
         }
     }, [currentQuestionIndex]);
 
+    const markStorySaved = useCallback((questionId: string) => {
+        setResponses(prev => {
+            const response = prev[questionId];
+            if (!response) return prev;
+            return { ...prev, [questionId]: { ...response, savedAsStory: true } };
+        });
+    }, []);
+
     return {
         questions,
         currentQuestionIndex,
@@ -164,6 +178,7 @@ export const useInterview = () => {
         submitResponse,
         nextQuestion,
         prevQuestion,
+        markStorySaved,
         isLastQuestion: currentQuestionIndex === questions.length - 1,
         isFirstQuestion: currentQuestionIndex === 0,
         totalQuestions: questions.length

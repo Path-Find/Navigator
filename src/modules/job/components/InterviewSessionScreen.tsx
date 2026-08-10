@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Sparkles, FileText, CheckCircle2, ShieldCheck, Check, Copy, Loader2 } from 'lucide-react';
+import { Sparkles, FileText, CheckCircle2, ShieldCheck, Check, Copy, Loader2, BookmarkPlus } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { InterviewChat } from '../../../components/common/InterviewChat';
 import type { ChatMessage } from '../../../components/common/InterviewChat';
@@ -12,7 +12,7 @@ type ResumeSuggestionItem = NonNullable<InterviewResponseAnalysis['resumeSuggest
 interface SessionProps {
     questions: InterviewQuestion[];
     currentQuestionIndex: number;
-    responses: Record<string, { response: string; analysis?: InterviewResponseAnalysis }>;
+    responses: Record<string, { response: string; analysis?: InterviewResponseAnalysis; savedAsStory?: boolean }>;
     mode: string;
     sessionType: 'general' | 'tailored' | null;
     jobs: SavedJob[];
@@ -28,12 +28,13 @@ interface SessionProps {
     nextQuestion: () => void;
     isLastQuestion: boolean;
     handleUpdateResume: (resume: ResumeProfile) => Promise<void>;
+    onSaveStory: (questionId: string) => Promise<void>;
 }
 
 export const InterviewSessionScreen = ({
     questions, currentQuestionIndex, responses, mode, sessionType, jobs, selectedJobId, onJobSelected,
     resumes, resumeSnippets, isSessionLoading, isLoading, userResponse, setUserResponse, handleSubmit,
-    nextQuestion, isLastQuestion, handleUpdateResume
+    nextQuestion, isLastQuestion, handleUpdateResume, onSaveStory
 }: SessionProps) => {
     const [copiedText, setCopiedText] = useState<string | null>(null);
 
@@ -149,6 +150,18 @@ export const InterviewSessionScreen = ({
                             <p className="text-xs text-neutral-600 dark:text-neutral-400">
                                 {resp.analysis.feedback}
                             </p>
+                            {sessionType === 'general' && (
+                                <button
+                                    onClick={() => { void onSaveStory(q.id); }}
+                                    disabled={resp.savedAsStory}
+                                    className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-lg text-[10px] font-black transition-colors ${resp.savedAsStory
+                                        ? 'bg-emerald-50 text-emerald-600 dark:bg-emerald-500/10 dark:text-emerald-400'
+                                        : 'bg-indigo-50 text-indigo-600 hover:bg-indigo-100 dark:bg-indigo-500/10 dark:text-indigo-400 dark:hover:bg-indigo-500/20'}`}
+                                >
+                                    {resp.savedAsStory ? <Check className="w-3 h-3" /> : <BookmarkPlus className="w-3 h-3" />}
+                                    {resp.savedAsStory ? 'Saved for future applications' : 'Save this story for future applications'}
+                                </button>
+                            )}
                             {resp.analysis.betterVersion && (
                                 <div className="text-xs text-neutral-500 dark:text-neutral-500 pt-2 border-t border-indigo-200 dark:border-indigo-800/30">
                                     <strong>Better:</strong> "{resp.analysis.betterVersion}"
@@ -219,7 +232,7 @@ export const InterviewSessionScreen = ({
         });
 
         return msgs;
-    }, [questions, currentQuestionIndex, responses, mode, resumes, copiedText, resumeSnippets, onBankSuggestion, sessionType, selectedJobId, jobs, onJobSelected, isSessionLoading]);
+    }, [questions, currentQuestionIndex, responses, mode, resumes, copiedText, resumeSnippets, onBankSuggestion, onSaveStory, sessionType, selectedJobId, jobs, onJobSelected, isSessionLoading]);
 
     if (mode === 'session') {
         const isInitialJobSelection = sessionType === 'tailored' && !selectedJobId;

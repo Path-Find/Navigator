@@ -165,6 +165,37 @@ export const INTERVIEW_PROMPTS = {
     ]
     `,
 
+  PROFILE_SUMMARY: (resumeContext: string, answers: string) => `
+    You are organizing a candidate's own answers into reusable application context.
+    Do not invent, diagnose, or infer sensitive personal characteristics.
+
+    ${UNTRUSTED_DATA_RULE}
+
+    RESUME DATA:
+    ${anchorData('RESUME', resumeContext)}
+
+    PROFILE INTERVIEW ANSWERS:
+    ${anchorData('PROFILE_INTERVIEW_ANSWERS', answers)}
+
+    TASK:
+    Extract only explicit, useful context for future career applications.
+    - Signals should be short statements about career stage, direction, education status, preferred emphasis, or a boundary about what not to claim.
+    - Stories should preserve the user's own evidence and should not add metrics, skills, credentials, or outcomes.
+    - Omit answers marked [Skipped].
+    - Omit anything uncertain, sensitive, or not useful for applications.
+    - Return at most 4 signals and 3 stories.
+
+    Return ONLY JSON:
+    {
+      "signals": [
+        { "key": "career_stage" | "career_direction" | "education_status" | "preferred_emphasis" | "boundary", "value": "short explicit statement" }
+      ],
+      "stories": [
+        { "text": "short evidence-grounded story", "tags": ["short", "relevant", "tags"] }
+      ]
+    }
+    `,
+
   ANALYZE_RESPONSE: (question: string, userResponse: string, jobContext?: string) => `
     You are a strict technical interviewer. Analyze the candidate's response.
 

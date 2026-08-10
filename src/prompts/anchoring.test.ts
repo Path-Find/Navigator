@@ -82,6 +82,28 @@ describe('prompt data anchoring', () => {
             ['POSSIBLE FIRST-PROFESSIONAL-ROLE SIGNAL']
         );
         expect(promptWithSignal).toContain('CANDIDATE_SIGNALS');
+
+        const promptWithProfileContext = COVER_LETTER_PROMPTS.COVER_LETTER.GENERATE(
+            'template',
+            'job',
+            'resume',
+            ['strategy'],
+            undefined,
+            undefined,
+            undefined,
+            undefined,
+            undefined,
+            [],
+            'APPROVED CANDIDATE SIGNALS:\n- career_stage: Current student'
+        );
+        expect(promptWithProfileContext).toContain('APPROVED_CANDIDATE_CONTEXT');
+    });
+
+    it('defines the optional profile interview summary prompt', () => {
+        const profilePrompt = INTERVIEW_PROMPTS.PROFILE_SUMMARY('resume', 'Q1: What roles?\nA: Planning');
+        expect(profilePrompt).toContain('<<<RESUME_START>>>');
+        expect(profilePrompt).toContain('<<<PROFILE_INTERVIEW_ANSWERS_START>>>');
+        expect(profilePrompt).toContain('Omit answers marked [Skipped]');
     });
 
     it('anchors Career, Education, and parsing inputs as data', () => {

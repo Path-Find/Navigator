@@ -18,11 +18,37 @@ export interface ResumeSuggestion {
     dateAdded: number;
 }
 
+export type CandidateStorySource = 'resume_interview' | 'general_interview' | 'profile_interview';
+
+export interface CandidateStory {
+    id: string;
+    text: string;
+    tags: string[];
+    source: CandidateStorySource;
+    question?: string;
+    approvedAt: number;
+}
+
+export interface CandidateProfileSignal {
+    id: string;
+    key: 'career_stage' | 'career_direction' | 'education_status' | 'preferred_emphasis' | 'boundary';
+    value: string;
+    source: 'profile_interview' | 'user_setting';
+    approvedAt: number;
+}
+
+export interface CandidateProfileContext {
+    signals: CandidateProfileSignal[];
+    stories: CandidateStory[];
+    completedAt?: number;
+}
+
 export interface ResumeProfile {
     id: string;
     name: string;
     blocks: ExperienceBlock[];
     suggestedUpdates?: ResumeSuggestion[]; // New: Persistent bank of AI suggestions
+    candidateProfile?: CandidateProfileContext; // Approved reusable context from profile/general interviews
     updatedAt?: number;
     importRevision?: number; // Incremented on each PDF import to trigger UI sync
 }

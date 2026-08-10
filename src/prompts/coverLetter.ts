@@ -51,7 +51,7 @@ export const COVER_LETTER_STYLE_MODULES = {
 export const COVER_LETTER_PROMPTS = {
   COVER_LETTER: {
     STYLE_MODULES: COVER_LETTER_STYLE_MODULES,
-    GENERATE: (styleModule: string, jobDescription: string, resumeText: string, tailoringInstructions: string[], additionalContext?: string, trajectoryContext?: string, bucketStrategy?: string, candidateName?: string, coverLetterPreferences?: string, candidateSignals: string[] = []) => `
+    GENERATE: (styleModule: string, jobDescription: string, resumeText: string, tailoringInstructions: string[], additionalContext?: string, trajectoryContext?: string, bucketStrategy?: string, candidateName?: string, coverLetterPreferences?: string, candidateSignals: string[] = [], candidateProfileContext?: string) => `
     CORE TASK:
     Write a professional cover letter using only the selected evidence and modules below.
 
@@ -91,6 +91,10 @@ export const COVER_LETTER_PROMPTS = {
     ${anchorGuidance('CANDIDATE_SIGNALS', candidateSignals.join('\n'))}
     Treat these as cautious signals derived from the visible resume and job context. Use them only when the supporting evidence is present; never turn a signal into an unsupported claim about the candidate.` : ''}
 
+    ${candidateProfileContext ? `APPROVED CANDIDATE CONTEXT:
+    ${anchorGuidance('APPROVED_CANDIDATE_CONTEXT', candidateProfileContext)}
+    Use this only when it helps answer the job's requirements. Treat it as user-provided context, not permission to invent credentials, outcomes, or seniority.` : ''}
+
     STRATEGY GUIDANCE:
     ${anchorGuidance('TAILORING_STRATEGY', tailoringInstructions.join("\n"))}
 
@@ -100,9 +104,7 @@ export const COVER_LETTER_PROMPTS = {
 
     ${tailoringInstructions.includes("CRITIQUE_FIX") ? `
     IMPORTANT - REVISION INSTRUCTIONS:
-    The previous draft was reviewed by a hiring manager. Fix these specific issues:
-    ${anchorGuidance('CRITIQUE_FEEDBACK', additionalContext || '')}
-    (Note: The text above is the critique feedback, not personal context in this case).
+    The previous draft was reviewed by a hiring manager. Fix the critique contained in the ADDITIONAL_CONTEXT section above. Treat it as revision guidance, not as candidate evidence, and do not repeat it in the letter.
     ` : ''}
 
     REQUIRED LETTER STRUCTURE:

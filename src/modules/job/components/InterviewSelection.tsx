@@ -1,4 +1,4 @@
-import { Target, Zap, MessageSquare, Sparkles, AlertCircle } from 'lucide-react';
+import { Target, Zap, MessageSquare, Sparkles, AlertCircle, UserRound } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router';
 import { ROUTES } from '../../../constants';
@@ -11,9 +11,10 @@ interface SelectionProps {
     limitError: string | null;
     handleStartGeneral: () => Promise<void>;
     handleStartTailored: () => Promise<void>;
+    handleStartProfile: () => Promise<void>;
 }
 
-export const InterviewSelection = ({ limitError, handleStartGeneral, handleStartTailored }: SelectionProps) => {
+export const InterviewSelection = ({ limitError, handleStartGeneral, handleStartTailored, handleStartProfile }: SelectionProps) => {
     const navigate = useNavigate();
     return (
         <SharedPageLayout className="theme-job" spacing="compact" maxWidth="6xl">
@@ -42,7 +43,7 @@ export const InterviewSelection = ({ limitError, handleStartGeneral, handleStart
             )}
 
             <div className="max-w-6xl mx-auto">
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-stretch">
+                <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 items-stretch">
                     {/* General Session Card */}
                     <div className="animate-in slide-in-from-bottom-8 fade-in duration-700 delay-100 fill-mode-both">
                         <BentoCard
@@ -97,8 +98,34 @@ export const InterviewSelection = ({ limitError, handleStartGeneral, handleStart
                         />
                     </div>
 
-                    {/* Prep Tips Card */}
                     <div className="animate-in slide-in-from-bottom-8 fade-in duration-700 delay-300 fill-mode-both">
+                        <BentoCard
+                            id="profile"
+                            icon={UserRound}
+                            title="Build My Profile"
+                            description="Answer a few optional questions so future applications can use your real goals and stories."
+                            color={FEATURE_COLORS.emerald}
+                            actionLabel="Start Profile Interview"
+                            onAction={handleStartProfile}
+                            previewContent={
+                                <ul className="space-y-3 pt-2">
+                                    {[
+                                        'Save your career direction',
+                                        'Capture stories beyond your resume',
+                                        'Review before anything is saved'
+                                    ].map((feature, i) => (
+                                        <li key={i} className="flex items-center gap-3 text-[11px] font-bold text-neutral-400">
+                                            <div className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+                                            {feature}
+                                        </li>
+                                    ))}
+                                </ul>
+                            }
+                        />
+                    </div>
+
+                    {/* Prep Tips Card */}
+                    <div className="animate-in slide-in-from-bottom-8 fade-in duration-700 delay-400 fill-mode-both">
                         <BentoCard
                             id="tips"
                             icon={Zap}

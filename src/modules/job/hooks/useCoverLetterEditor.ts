@@ -13,7 +13,9 @@ import { EventService } from '../../../services/eventService';
 import { useNextGen } from '../../../hooks/useNextGen';
 import { RdFeedbackService } from '../../../services/ai/rd/feedbackService';
 import { RdStyleService } from '../../../services/ai/rd/styleService';
+import { formatCandidateProfileContext, formatJourneyContext, formatVerifiedSkills } from '../../../services/candidateProfileContext';
 import { useUser } from '../../../contexts/UserContext';
+import { useSkillContext } from '../../skills/context/SkillContext';
 
 interface UseCoverLetterEditorProps {
     job: SavedJob;
@@ -44,7 +46,8 @@ export const useCoverLetterEditor = ({
     const isGenerating = generating;
     const { showError } = useToast();
     const isNextGen = useNextGen();
-    const { user, fullName, coverLetterPreferences } = useUser();
+    const { user, fullName, coverLetterPreferences, journey } = useUser();
+    const { skills } = useSkillContext();
 
     // Sync with parent when job prop changes
     useEffect(() => {
@@ -141,6 +144,11 @@ export const useCoverLetterEditor = ({
                 ? { ...bestResume, blocks: bestResume.blocks.filter(b => b.type === 'summary' || recommendedIds.has(b.id)) }
                 : bestResume;
             const candidateSignals = deriveCoverLetterSignals(bestResume, analysis.distilledJob);
+            const candidateProfileContext = [
+                formatCandidateProfileContext(bestResume, textToUse),
+                formatVerifiedSkills(skills, textToUse),
+                formatJourneyContext(journey),
+            ].filter(Boolean).join('\n\n');
 
             const isPro = ['pro', 'admin', 'tester'].includes(userTier);
             const canonicalTitle = analysis.distilledJob?.canonicalTitle;
@@ -159,7 +167,7 @@ export const useCoverLetterEditor = ({
                 const variants = Object.keys(COVER_LETTER_PROMPTS.COVER_LETTER.STYLE_MODULES).slice(0, 2);
 
                 const results = await Promise.all(variants.map(v =>
-                    generateCoverLetter(textToUse, focusedResume, instructions || [], finalContext, v, trajectoryContext, localJob.id, canonicalTitle, personalizedStyle, fullName || undefined, coverLetterPreferences || undefined, candidateSignals)
+                    generateCoverLetter(textToUse, focusedResume, instructions || [], finalContext, v, trajectoryContext, localJob.id, canonicalTitle, personalizedStyle, fullName || undefined, coverLetterPreferences || undefined, candidateSignals, candidateProfileContext)
                 ));
 
                 setComparisonVersions(results);
@@ -187,7 +195,8 @@ export const useCoverLetterEditor = ({
                     fullName || undefined,
                     score,
                     coverLetterPreferences || undefined,
-                    candidateSignals
+                    candidateSignals,
+                    candidateProfileContext
                 );
 
                 const updated = {
@@ -242,7 +251,8 @@ export const useCoverLetterEditor = ({
                     undefined,
                     fullName || undefined,
                     coverLetterPreferences || undefined,
-                    candidateSignals
+                    candidateSignals,
+                    candidateProfileContext
                 );
 
                 const updated = {
@@ -269,7 +279,7 @@ export const useCoverLetterEditor = ({
             setGenerationStatus(null);
             setGenerationProgress(0);
         }
-    }, [bestResume, analysis, localJob, targetJobs, userTier, onJobUpdate, showError, isNextGen, user, fullName, coverLetterPreferences]);
+    }, [bestResume, analysis, localJob, targetJobs, userTier, onJobUpdate, showError, isNextGen, user, fullName, coverLetterPreferences, journey, skills]);
 
     const handleSelectVariant = useCallback(async (variant: CoverLetterVariant) => {
         const other = comparisonVersions?.find(v => v.promptVersion !== variant.promptVersion);

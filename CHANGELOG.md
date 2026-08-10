@@ -9,6 +9,7 @@ See [CHANGELOG_ARCHIVE.md](CHANGELOG_ARCHIVE.md) for earlier history.
 ### Added
 - **Cover-letter style preferences now follow the user across applications**: account settings can define general tone, voice, or length preferences, while job-specific facts remain in each job's personal context.
 - **Cover-letter generation now composes one core prompt from named style and candidate-situation modules**: style choices and cautious signals such as possible first-role or current-education context are injected only when supported, then saved for future style learning.
+- **Candidate stories and profile signals can now be reused with consent**: resume stories, verified skills, and optional profile-interview answers are saved with the primary resume, reviewed before profile save, and injected only when relevant to an application or interview.
 
 ### Changed
 - **Application status reminders now explain why outcomes matter**: the reminder uses calmer pastel controls and connects status updates to better future job guidance and cover letters.
@@ -18,12 +19,14 @@ See [CHANGELOG_ARCHIVE.md](CHANGELOG_ARCHIVE.md) for earlier history.
 - **NextGen now records which cover-letter version a user actually copied or downloaded**: usage events point to the stored letter by checksum without duplicating the letter itself.
 
 ### Fixed
+- **Manual cover-letter revisions no longer repeat the same critique twice**: the feedback is now kept as one bounded revision instruction instead of appearing both as context and as a duplicated block.
 - **Large saved job histories no longer break cloud sync or cover-letter pages**: encryption now encodes large vault values in safe chunks instead of overflowing the browser's argument stack.
 - **NextGen style and trajectory modeling now uses bounded context**: feedback signals, visible resume evidence, target roles, and historical signals are labeled as data, while hidden resume blocks and unnecessary metadata stay out of these prompts.
 - **Career and education AI calls now send clearly labeled, compact context**: role models, resumes, skills, and optional transcripts are separated; irrelevant stored metadata is removed; and extracted PDF text is no longer sent twice.
 - **Job-specific summaries and tailored interviews now receive only the selected resume evidence**: previously they could resend every stored resume or every visible block, adding irrelevant context to the prompt.
 - **Older saved job analyses now upgrade automatically**: analyses are versioned, and opening a stale one sends it through the current parser/scorer once so new requirement priorities and cover-letter hooks are saved for future use.
 - **Cover-letter context retains specific employer hooks after removing raw job text**: parsing now preserves a few supported mission, product, team, or role-challenge details for focused downstream writing.
+- **Student and early-career applications now receive compact academic context when useful**: relevant courses and program details can be selected for those roles even when the posting does not state a formal education requirement, without sending the raw transcript.
 - **Tailored interview calls no longer resend the full raw job posting**: they reuse the parsed job context and only fall back to the original description for older jobs without an analysis.
 - **Embedded text can no longer redefine the job-analysis task as easily**: job postings, resumes, candidate responses, and other evidence are now clearly delimited as data, while user and tailoring instructions remain bounded guidance.
 - **Job requirements now preserve whether each item is required, preferred, or a hard gate**: scoring and downstream prompts no longer have to infer priority from separate, ambiguous lists, while older saved analyses remain readable.

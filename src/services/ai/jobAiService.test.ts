@@ -188,7 +188,10 @@ describe('job context assembly', () => {
         expect(context.prompt).not.toContain('Baking');
         expect(context.prompt).toContain('Statistics for Planning');
         expect(context.prompt).not.toContain('Canadian History');
-        expect(context.academicEvidence).toEqual(['Statistics for Planning (PLAN 302) — 86']);
+        expect(context.academicEvidence).toEqual([
+            'Statistics for Planning (PLAN 302) — 86',
+            'Urban Planning at University of Waterloo',
+        ]);
     });
 
     it('omits transcripts when the parsed job has no education or coursework need', () => {
@@ -196,7 +199,7 @@ describe('job context assembly', () => {
             [resume],
             [],
             transcript,
-            { ...parsedJob, courseworkRequirements: [] },
+            { ...parsedJob, roleTitle: 'Project Manager', courseworkRequirements: [] },
         );
 
         expect(context.prompt).not.toContain('ACADEMIC EVIDENCE');
