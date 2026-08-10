@@ -51,7 +51,7 @@ export const ResumeEditor: React.FC = () => {
         moveBullet,
         handleApplySuggestion,
         handleDismissSuggestion,
-        toggleProfilePriority,
+        toggleCurrentBlock,
     } = useResumeEditor(initialResume, resumes, onSave);
 
     const [hasStartedManually, setHasStartedManually] = useState(false);
@@ -310,7 +310,11 @@ export const ResumeEditor: React.FC = () => {
                             {SECTIONS.map((section) => {
                                 const sectionBlocks = blocks.filter(b => b.type === section.type);
                                 if (!movingBlockId) {
-                                    sectionBlocks.sort((a, b) => getSortDate(b.dateRange) - getSortDate(a.dateRange));
+                                    sectionBlocks.sort((a, b) => {
+                                        const aIsCurrent = initialResume.candidateProfile?.currentBlockIds?.includes(a.id) ? 1 : 0;
+                                        const bIsCurrent = initialResume.candidateProfile?.currentBlockIds?.includes(b.id) ? 1 : 0;
+                                        return bIsCurrent - aIsCurrent || getSortDate(b.dateRange) - getSortDate(a.dateRange);
+                                    });
                                 }
 
                                 return (
@@ -360,8 +364,8 @@ export const ResumeEditor: React.FC = () => {
                                                     onMoveBullet={moveBullet}
                                                     onRemoveBlock={removeBlock}
                                                     onSetMovingBlockId={setMovingBlockId}
-                                                    prioritized={initialResume.candidateProfile?.currentBlockIds?.includes(block.id) || false}
-                                                    onToggleProfilePriority={toggleProfilePriority}
+                                                    current={initialResume.candidateProfile?.currentBlockIds?.includes(block.id) || false}
+                                                    onToggleCurrent={toggleCurrentBlock}
                                                 />
                                             ))}
                                         </div>

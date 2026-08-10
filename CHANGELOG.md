@@ -7,7 +7,7 @@ See [CHANGELOG_ARCHIVE.md](CHANGELOG_ARCHIVE.md) for earlier history.
 ## [Unreleased]
 
 ### Added
-- **Resume entries can now be starred directly in the editor**: one simple priority signal stays connected to the work, volunteer, education, and project entries Navigator should notice first.
+- **Resume entries can now be marked current directly in the editor**: current work, volunteer, education, and project entries move to the top of their section and can be used explicitly in applications.
 - **Profile review now keeps resume observations in the interview**: users review cautious education or career-stage suggestions there, while Settings focuses on structured profile information.
 - **Application profiles can now prioritize resume blocks**: users can feature or mark current work, volunteer, education, and project entries without re-entering their details or copying their bullets into prompts.
 - **Availability preferences now use structured choices**: users can save their city, relocation preference, work arrangement, employment type, and start timing without adding another free-form prompt field.
@@ -31,6 +31,7 @@ See [CHANGELOG_ARCHIVE.md](CHANGELOG_ARCHIVE.md) for earlier history.
 - **NextGen now records which cover-letter version a user actually copied or downloaded**: usage events point to the stored letter by checksum without duplicating the letter itself.
 
 ### Fixed
+- **Education is no longer treated as current from a year alone**: Navigator now needs explicit wording such as “Present,” “Ongoing,” or “Expected” before making that suggestion.
 - **Manual cover-letter revisions no longer repeat the same critique twice**: the feedback is now kept as one bounded revision instruction instead of appearing both as context and as a duplicated block.
 - **Large saved job histories no longer break cloud sync or cover-letter pages**: encryption now encodes large vault values in safe chunks instead of overflowing the browser's argument stack.
 - **NextGen style and trajectory modeling now uses bounded context**: feedback signals, visible resume evidence, target roles, and historical signals are labeled as data, while hidden resume blocks and unnecessary metadata stay out of these prompts.

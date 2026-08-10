@@ -139,7 +139,7 @@ export function useResumeEditor(
         handleDismissSuggestion(suggestion.id);
     }, [blocks, addBullet, handleDismissSuggestion]);
 
-    const toggleProfilePriority = useCallback((blockId: string) => {
+    const toggleCurrentBlock = useCallback((blockId: string) => {
         const resume = initialResumeRef.current;
         if (!resume) return;
 
@@ -178,6 +178,6 @@ export function useResumeEditor(
         moveBullet,
         handleApplySuggestion,
         handleDismissSuggestion,
-        toggleProfilePriority,
+        toggleCurrentBlock,
     };
 }

@@ -29,12 +29,12 @@ export const deriveCoverLetterSignals = (profile: ResumeProfile, job?: Distilled
     const visibleBlocks = profile.blocks.filter(block => block.isVisible !== false);
     const hasWorkExperience = visibleBlocks.some(block => block.type === 'work');
     const hasEducationEvidence = visibleBlocks.some(block => block.type === 'education' || block.type === 'project');
+    const currentBlockIds = new Set(profile.candidateProfile?.currentBlockIds || []);
     const hasCurrentEducation = visibleBlocks.some(block => {
         if (block.type !== 'education') return false;
+        if (currentBlockIds.has(block.id)) return true;
         const educationText = [block.dateRange, block.title, ...block.bullets].filter(Boolean).join(' ');
-        const currentYear = new Date().getFullYear();
-        return /present|current|ongoing|in progress|expected/i.test(educationText)
-            || new RegExp(`\\b${currentYear}(?:[-–]\\d{4})?\\b`).test(educationText);
+        return /present|current|ongoing|in progress|expected/i.test(educationText);
     });
     const roleTitle = job?.roleTitle?.toLowerCase() || '';
     const isStudentOrEarlyCareerRole = /student|intern|co-?op|new grad|graduate|entry[- ]level|junior/.test(roleTitle);

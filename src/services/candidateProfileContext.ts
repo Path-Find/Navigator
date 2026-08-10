@@ -34,17 +34,20 @@ const hashContext = (value: string): string => {
 
 export const getCandidateProfileSourceVersion = (profile?: ResumeProfile | null): string => {
     if (!profile) return 'none';
-    const source = JSON.stringify(profile.blocks
-        .filter(block => block.isVisible !== false)
-        .map(({ id, type, title, organization, dateRange, bullets, narrativeContext }) => ({
-            id,
-            type,
-            title,
-            organization,
-            dateRange,
-            bullets,
-            narrativeContext,
-        })));
+    const source = JSON.stringify({
+        blocks: profile.blocks
+            .filter(block => block.isVisible !== false)
+            .map(({ id, type, title, organization, dateRange, bullets, narrativeContext }) => ({
+                id,
+                type,
+                title,
+                organization,
+                dateRange,
+                bullets,
+                narrativeContext,
+            })),
+        currentBlockIds: profile.candidateProfile?.currentBlockIds || [],
+    });
     return `${profile.importRevision || 0}:${hashContext(source)}`;
 };
 
@@ -107,12 +110,12 @@ export const deriveCandidateProfileInsights = (profile?: ResumeProfile | null): 
     const visibleBlocks = profile.blocks.filter(block => block.isVisible !== false);
     const hasWorkExperience = visibleBlocks.some(block => block.type === 'work');
     const hasAcademicEvidence = visibleBlocks.some(block => block.type === 'education' || block.type === 'project');
+    const currentBlockIds = new Set(profile.candidateProfile?.currentBlockIds || []);
     const currentEducationBlock = visibleBlocks.find(block => {
         if (block.type !== 'education') return false;
+        if (currentBlockIds.has(block.id)) return true;
         const educationText = [block.dateRange, block.title, ...block.bullets].filter(Boolean).join(' ');
-        const currentYear = new Date().getFullYear();
-        return /present|current|ongoing|in progress|expected/i.test(educationText)
-            || new RegExp(`\\b${currentYear}(?:[-–]\\d{4})?\\b`).test(educationText);
+        return /present|current|ongoing|in progress|expected/i.test(educationText);
     });
 
     const insights: CandidateProfileInsightSuggestion[] = [];
@@ -180,9 +183,9 @@ export const formatCandidateProfileContext = (
         .slice(0, 8)
         .map(fact => `- ${fact.value}`)
         .join('\n');
-    const priorityBlocks = profile?.blocks
+    const currentBlocks = profile?.blocks
         .filter(block => context.currentBlockIds?.includes(block.id))
-        .map(block => `- Prioritized: ${block.title}${block.organization ? ` at ${block.organization}` : ''}${block.dateRange ? ` (${block.dateRange})` : ''}`)
+        .map(block => `- Current: ${block.title}${block.organization ? ` at ${block.organization}` : ''}${block.dateRange ? ` (${block.dateRange})` : ''}`)
         .join('\n') || '';
     const education = context.education;
     const educationCourses = education
@@ -218,7 +221,7 @@ export const formatCandidateProfileContext = (
         signals ? `APPROVED CANDIDATE SIGNALS:\n${signals}` : '',
         confirmedInsights ? `CONFIRMED CANDIDATE INSIGHTS:\n${confirmedInsights}` : '',
         confirmedFacts ? `APPROVED PROFILE FACTS:\n${confirmedFacts}` : '',
-        priorityBlocks ? `PROFILE PRIORITIES:\n${priorityBlocks}` : '',
+        currentBlocks ? `CURRENT RESUME ENTRIES:\n${currentBlocks}` : '',
         educationContext,
         availabilityContext ? `APPROVED AVAILABILITY:\n${availabilityContext}` : '',
         stories ? `APPROVED CANDIDATE STORIES:\n${stories}` : '',

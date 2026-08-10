@@ -81,6 +81,31 @@ describe('candidate profile prompt context', () => {
         expect(context).not.toContain('Dismissed first-role context');
     });
 
+    it('does not treat a year by itself as proof of current education', () => {
+        const insights = deriveCandidateProfileInsights({
+            id: 'resume-year-only',
+            name: 'Primary',
+            blocks: [{ id: 'education-1', type: 'education', title: 'Bachelor of Planning', organization: 'Example University', dateRange: '2026', bullets: [], isVisible: true }],
+        });
+
+        expect(insights).toEqual([{ key: 'possible_first_role', value: 'You may be early in your career or preparing for your first professional role.', reason: 'Your visible resume includes education or project evidence but no work-experience block.', source: 'resume', sourceVersion: getCandidateProfileSourceVersion({
+            id: 'resume-year-only',
+            name: 'Primary',
+            blocks: [{ id: 'education-1', type: 'education', title: 'Bachelor of Planning', organization: 'Example University', dateRange: '2026', bullets: [], isVisible: true }],
+        }) }]);
+    });
+
+    it('uses an explicit current flag when the resume has no current date wording', () => {
+        const profile = {
+            id: 'resume-current-flag',
+            name: 'Primary',
+            blocks: [{ id: 'education-1', type: 'education' as const, title: 'Bachelor of Planning', organization: 'Example University', dateRange: '2026', bullets: [], isVisible: true }],
+            candidateProfile: { signals: [], stories: [], currentBlockIds: ['education-1'] },
+        };
+
+        expect(deriveCandidateProfileInsights(profile).map(insight => insight.key)).toEqual(['possible_first_role', 'current_education']);
+    });
+
     it('turns a confirmed education observation into direct language', () => {
         const profile = {
             id: 'resume-education-confirmed',
@@ -100,7 +125,7 @@ describe('candidate profile prompt context', () => {
         expect(context).not.toContain('You may currently be studying');
     });
 
-    it('uses only selected resume block metadata for profile priorities', () => {
+    it('uses only selected resume block metadata for current entries', () => {
         const context = formatCandidateProfileContext({
             id: 'resume-priorities',
             name: 'Primary',
@@ -108,7 +133,7 @@ describe('candidate profile prompt context', () => {
             candidateProfile: { signals: [], stories: [], currentBlockIds: ['work-1'] },
         });
 
-        expect(context).toContain('Prioritized: Planning Assistant at Example City (2024 - Present)');
+        expect(context).toContain('Current: Planning Assistant at Example City (2024 - Present)');
         expect(context).not.toContain('Sensitive resume evidence');
     });
 
