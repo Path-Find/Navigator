@@ -7,85 +7,46 @@ See [CHANGELOG_ARCHIVE.md](CHANGELOG_ARCHIVE.md) for earlier history.
 ## [Unreleased]
 
 ### Added
-- **Signup now collects the name used on applications**: the account stores one editable application name so generated cover letters have a reliable sign-off from the start.
-- **Resume entries can now be marked current directly in the editor**: current work, volunteer, education, and project entries move to the top of their section and can be used explicitly in applications.
-- **Profile review now keeps resume observations in the interview**: users review cautious education or career-stage suggestions there, while Settings focuses on structured profile information.
-- **Application profiles can now prioritize resume blocks**: users can feature or mark current work, volunteer, education, and project entries without re-entering their details or copying their bullets into prompts.
-- **Availability preferences now use structured choices**: users can save their city, relocation preference, work arrangement, employment type, and start timing without adding another free-form prompt field.
-- **Profile context now keeps source-labelled facts and education reviewable**: Navigator can reuse confirmed profile details and compact course context while clearly separating completed, upcoming, and withdrawn coursework.
-- **Navigator observations are now reviewable instead of silently becoming profile facts**: Settings can show cautious resume-based patterns, and only confirmed observations become reusable AI context while rejected ones stay suppressed.
-- **Cover-letter style preferences now follow the user across applications**: account settings can define general tone, voice, or length preferences, while job-specific facts remain in each job's personal context.
-- **Cover-letter generation now composes one core prompt from named style and candidate-situation modules**: style choices and cautious signals such as possible first-role or current-education context are injected only when supported, then saved for future style learning.
-- **Candidate stories and profile signals can now be reused with consent**: resume stories, verified skills, and optional profile-interview answers are saved with the primary resume, reviewed before profile save, and injected only when relevant to an application or interview.
-- **Reusable application context can now be managed in Settings**: users can review or remove saved signals and stories, while refreshing the profile interview replaces duplicate signals instead of accumulating them.
+- **Signup now captures the name used on applications**: generated letters have a reliable account-owned name from the start.
+- **Resume entries can be marked current**: current work, volunteer, education, and project entries move to the top of their section and can be used explicitly in applications.
+- **Profile review now includes cautious resume observations**: users can confirm or reject possible education and career-stage patterns before Navigator reuses them.
+- **Application profiles can prioritize reusable resume blocks**: users can select important experience without re-entering details or copying bullets into prompts.
+- **Availability preferences now use structured choices**: users can save their city, relocation preference, work arrangement, employment type, and start timing.
+- **Reusable application context can be reviewed in Settings**: confirmed facts, stories, skills, education evidence, and interview answers remain separated and removable.
+- **Cover-letter style preferences now follow the user across applications**: account-level tone, voice, and length preferences stay separate from job-specific facts.
+- **Cover-letter generation now adapts to the job and candidate situation**: relevant style and early-career or education signals are added only when supported.
 
 ### Changed
-- **Cover-letter greetings are now application-owned**: letters default to “Dear Hiring Manager,” and use a clearly named contact or hiring group only when the job posting provides one.
-- **Homepage feature cards now fit into one row on desktop**: the five-card layout no longer leaves an unnecessary second row at common desktop widths.
-- **Navigator observations now expire when their resume evidence changes**: confirmed insights are marked for review and stop affecting AI calls until they are confirmed against the updated resume.
-- **Profile settings can clear saved observation decisions**: users can reset confirmed or dismissed observations without deleting their resumes, stories, or writing preferences.
-- **Profile settings now keep writing preferences beside Current Focus and reusable context**: users have one place to manage how Navigator understands and represents them, while account security remains separate.
-- **Settings now groups current focus with the application profile**: direction, account preferences, and approved reusable context are easier to find together without changing where the underlying resume, interview, skill, or education data lives.
-- **Application status reminders now explain why outcomes matter**: the reminder uses calmer pastel controls and connects status updates to better future job guidance and cover letters.
-- **NextGen feedback now uses the current Neon backend**: application outcomes, cover-letter edits, and other learning signals are stored and read reliably instead of depending on the retired Supabase path.
-- **NextGen outcome feedback now distinguishes signal strength**: interviews and offers reinforce successful patterns, while applications and ghosted jobs stay neutral instead of being treated as success or failure.
-- **NextGen modeling feedback now redacts personal content before storage**: names supplied by the app, contact details, URLs, and internal IDs are removed from the text used for style learning.
-- **NextGen now records which cover-letter version a user actually copied or downloaded**: usage events point to the stored letter by checksum without duplicating the letter itself.
+- **Profile settings now group current focus, writing preferences, reusable context, and observation decisions**: users have one place to manage how Navigator understands and represents them.
+- **Confirmed observations now return for review when their resume evidence changes**: outdated inferences stop affecting AI calls until reconfirmed.
+- **Homepage feature cards now fit into one row on desktop**: the five-card layout uses the available width more effectively.
+- **Application status reminders now explain why outcome updates matter**: calmer controls connect feedback to better future guidance and applications.
+- **NextGen now learns from application outcomes and actual letter usage**: interviews and offers reinforce patterns, while applications and ghosted jobs remain neutral; copy and download actions identify the stored letter used.
+- **NextGen feedback is anonymized before storage**: personal names, contact details, URLs, and internal identifiers are removed from learning signals.
+- **Mock interviews now always begin with “Tell me about yourself”**: the remaining questions are still generated for the specific role.
+- **History now has a dedicated filter for jobs needing attention**: failed analyses no longer disappear among ordinary saved jobs.
+- **Feed and Skills Interview are now consistently gated as beta features**: non-admin users cannot reach them through navigation, direct URLs, or bookmarks.
 
 ### Fixed
-- **The homepage no longer labels live cover letters as “Soon”**: the feature registry now explicitly treats cover-letter generation as public.
-- **Older cover letters now regain their required salutation when opened or reused**: saved drafts without a greeting are repaired without changing an existing personalized salutation.
-- **Cover-letter sign-offs are now application-owned**: generated and saved letters remove model placeholders and always use the account's exact name without duplicating the closing in print output.
-- **Education is no longer treated as current from a year alone**: Navigator now needs explicit wording such as “Present,” “Ongoing,” or “Expected” before making that suggestion.
-- **Manual cover-letter revisions no longer repeat the same critique twice**: the feedback is now kept as one bounded revision instruction instead of appearing both as context and as a duplicated block.
-- **Large saved job histories no longer break cloud sync or cover-letter pages**: encryption now encodes large vault values in safe chunks instead of overflowing the browser's argument stack.
-- **NextGen style and trajectory modeling now uses bounded context**: feedback signals, visible resume evidence, target roles, and historical signals are labeled as data, while hidden resume blocks and unnecessary metadata stay out of these prompts.
-- **Career and education AI calls now send clearly labeled, compact context**: role models, resumes, skills, and optional transcripts are separated; irrelevant stored metadata is removed; and extracted PDF text is no longer sent twice.
-- **Job-specific summaries and tailored interviews now receive only the selected resume evidence**: previously they could resend every stored resume or every visible block, adding irrelevant context to the prompt.
-- **Older saved job analyses now upgrade automatically**: analyses are versioned, and opening a stale one sends it through the current parser/scorer once so new requirement priorities and cover-letter hooks are saved for future use.
-- **Cover-letter context retains specific employer hooks after removing raw job text**: parsing now preserves a few supported mission, product, team, or role-challenge details for focused downstream writing.
-- **Student and early-career applications now receive compact academic context when useful**: relevant courses and program details can be selected for those roles even when the posting does not state a formal education requirement, without sending the raw transcript.
-- **Tailored interview calls no longer resend the full raw job posting**: they reuse the parsed job context and only fall back to the original description for older jobs without an analysis.
-- **Embedded text can no longer redefine the job-analysis task as easily**: job postings, resumes, candidate responses, and other evidence are now clearly delimited as data, while user and tailoring instructions remain bounded guidance.
-- **Job requirements now preserve whether each item is required, preferred, or a hard gate**: scoring and downstream prompts no longer have to infer priority from separate, ambiguous lists, while older saved analyses remain readable.
-- **Job analysis no longer resends the full posting to every downstream AI call**: parsing and scoring are separate, and cover letters, summaries, and resume tailoring reuse compact parsed requirements while adding only relevant skills, coursework, academic evidence, and the candidate's real name where needed.
-- **The same job could get a noticeably different fit score on back-to-back analyses of identical input**: the scoring call had no randomness control, unlike the neighboring fact-extraction call which already ran deterministically. Confirmed via repeated testing (e.g. one posting swinging 48-68/100 across runs); pinning the scoring call to the same strict setting cut most of that spread substantially (that same job: 48, 52, 48 afterward).
-- **Pro-tier cover letters on a weak-fit job kept sounding confident even after 3 rewrite attempts never satisfied our own quality check**: the self-review loop would just ship the last draft once it ran out of retries, regardless of how it read. Now forces one final rewrite that has to plainly name the actual gap (missing credential, licence, years of experience) instead of trying persuasion again. For an extreme mismatch (compatibility score under 20), skips straight to an honestly-framed letter on the first attempt instead of burning 3 wasted rewrite cycles first — same outcome, less cost.
-- **Cover letters sometimes ended with no sign-off at all, or a placeholder like "Sincerely, Candidate"**: nothing told the model a closing signature was required rather than trimmable filler, and there was no reliable source for the candidate's actual name to close with (an interim fix wrongly assumed the resume profile's own label was the person's name — briefly caused every letter to close "Sincerely, Resume," now corrected). Added a proper name field to the account profile (Settings → Full Name) and require a real "Sincerely, [Name]" close every time it's set.
-- **Raw internal resume-block IDs could leak into the Tailoring Strategy panel** (e.g. "...regulatory guidelines (5b6d7208-0ce0-4863-844f-9e2307731216)."): the existing cleanup only caught one exact output format; broadened it to strip a leaked ID in any format.
+- **Cover-letter output now has consistent application-owned greetings and sign-offs**: generic greetings are the default, clearly named contacts are used when available, model placeholders are removed, and print output does not duplicate the closing.
+- **Education is no longer inferred as current from a year alone**: explicit wording such as “Present,” “Ongoing,” or “Expected” is required.
+- **Manual cover-letter revisions no longer repeat the same critique twice**: revision guidance stays in one bounded instruction.
+- **AI calls now use compact, relevant context**: parsed job requirements, selected resume evidence, employer hooks, skills, and academic evidence are reused downstream instead of resending full postings, full resumes, or raw transcripts.
+- **AI prompt inputs are now clearly bounded as data**: job postings, resumes, candidate responses, and optional context cannot as easily override the task or leak internal labels and resume-block IDs.
+- **Tailoring Strategy now gives forward-looking advice without exposing prompt fields or implementation identifiers.**
+- **Job requirements now preserve required, preferred, and hard-gate distinctions**: scoring and downstream writing use the same priority information, including when older analyses are upgraded.
+- **Fit analysis is more stable and honest**: repeated analyses produce more consistent scores, empty resumes no longer receive grounded-looking scores, and weak-fit Pro letters name hard gaps instead of repeatedly trying to persuade past them.
+- **Cover-letter quality checks now catch unsupported tools and copied resume sentence structures**: generated prose must remain grounded in the supplied evidence.
+- **Verified interview skills remain visible even when their names are not written verbatim in a resume bullet.**
+- **Match insights now address the user directly instead of referring to “the candidate.”**
+- **Job ingestion is more reliable**: repeated website boilerplate is cleaned, short pasted descriptions are preserved, invalid URLs are explained accurately, and one submission cannot create duplicate jobs.
+- **Saved-job and resume storage is safer**: large histories sync without browser overflows, sign-out no longer deletes cloud resumes, duplicate job inserts are prevented, and cleanup failures are surfaced.
+- **Neon-backed features now use the same live data source**: cover-letter tailoring lookups and admin usage data no longer depend on the retired Supabase path.
+- **A stray debug message no longer replaces the “job not found” screen.**
 
-### Fixed
-- **Patched 5 undici vulnerabilities (1 high, 4 medium)**: a nested copy of undici pulled in via jsdom was pinned to a vulnerable version (7.28.0) separately from the top-level dependency, so bumping the top-level package alone didn't close the alerts. Both copies now patched.
-- **Patched a high-severity brace-expansion DoS vulnerability**: the existing override (`>=5.0.8`) predated a new advisory showing that version's mitigation was incomplete. Bumped to the actually-patched `5.0.9`.
-
-### Changed
-- **General mock interview now always opens with "Tell me about yourself"**: previously left entirely to the AI's pick of 10 questions, so the single most common real interview opener wasn't guaranteed to appear. Now fixed as question 1, with the AI generating 9 more behind it.
-
-### Fixed
-- **Production deploys were failing after a routine dependency bump**: TypeScript 7 (a ground-up compiler rewrite) broke Vercel's own build pipeline (`Cannot read properties of undefined (reading 'readFile')`) even though the app's own build succeeded locally. Pinned back to TypeScript 6 until Vercel's tooling supports 7.
-
-### Changed
-- **History has a filter for jobs that need attention**: failed analyses already got a distinct "Action Required" badge on their card, but were otherwise bucketed inside "Saved" with no way to isolate them in a long list. Added a dedicated filter tab.
-- **Feed and Skills Interview marked beta**: matches Feed and Skills Interview to how Job Alerts and Interview Advisor already behave — shown as "Coming Soon" instead of open, since neither is ready for general use yet.
-- **Beta gate on Feed/Skills Interview now actually blocks access**: the earlier fix only hid one entry point. The Feed link in the top nav, footer, and both pages themselves were still fully open to every user regardless of tier — nav links now match Interviews' existing admin-only pattern, and both pages redirect non-admins away directly, so a bookmark or typed URL can't bypass it either.
-
-### Fixed
-- **Tailoring Strategy read as a review of a finished letter instead of actual advice**: bullets like "The letter effectively bridges..." describe writing that already happened, not what to do — confusing under a heading called "Strategy." The instructions now explicitly ask for forward-looking advice ("Lead with X to show Y"), not a retrospective description.
-- **A skill you verified through the Skills Interview could vanish from "Verified Strengths"**: the section only showed a skill if its exact name happened to appear as text in a resume bullet — so a genuinely AI-interview-verified skill (with real evidence) whose name wasn't typed verbatim into your resume just didn't show up at all. Now shows any skill that's either interview-verified or resume-text-matched.
-- **A cover letter named a tool that doesn't appear anywhere on the resume**: generation added a plausible-sounding tool alongside real ones from the resume, unverifiable from the text the AI actually has access to — even if true, it's not something the letter can back up in front of an employer. The existing "don't invent skills" rule wasn't concrete enough to stop it, and the self-review step's hallucination check didn't catch it either. Both now require naming every specific tool/technology mentioned and verifying it's actually in the resume before the letter can pass review.
-- **Match analysis talked about "the candidate" instead of talking to you**: Insight, Strengths, and Gaps read like a third-party report about someone else ("The candidate lacks...") instead of a direct message to the person using the tool. Now written in second person.
-- **A rejected job URL showed a confusing error written as if you'd typed bad text yourself**: when a URL scraped successfully but the AI decided the content wasn't a real job posting, the screen said "this content doesn't look like a valid job description" — as if you'd pasted a description by hand, when you'd only given a link. Now distinguishes that case and explains what actually happened.
-- **Cover letters could closely echo resume bullets instead of writing new prose**: metric-bearing sentences sometimes reused a resume bullet's exact structure with only a word or two swapped ("maintaining 98% accuracy while managing a caseload of 16 claims per hour" → "maintained a 98% accuracy rate while processing 16 cases per hour"). The self-review step's copy-paste check only looked for literal lifted text, so it missed this and still rated the draft "Strong." Both the writing instructions and the review check now explicitly treat a reused sentence skeleton as a copy, not just a reused phrase.
-- **Real job postings from some sites got rejected as "not a valid job description"**: the scraper dumped raw page text into the AI prompt with no cleanup, so sites with duplicated responsive nav markup (desktop + mobile menus, not wrapped in semantic `<nav>` tags) sent 2-3x repeated cookie-banner and navigation text ahead of the actual posting — enough noise to trip the AI's "is this really a job" check on otherwise complete, correctly-scraped postings. Confirmed against live City of Toronto job listings. Repeated short boilerplate lines are now deduplicated before the text reaches the AI.
-- **Pasting a short non-URL string into Match wiped what you typed, with no explanation**: only long non-URL text was preserved when the box auto-detected it wasn't a link; short strings fell through a different path that cleared the box and set an error message nobody ever saw (the message was computed but never rendered). Now the typed text carries over into manual mode and the error actually shows as a toast.
-- **Two features were silently broken since the Neon migration (2026-07-27)**: cover letter generation's role-specific tailoring lookup, and the admin usage-outliers view, were both still querying the old, disconnected Supabase project. Failures were caught and swallowed, so nothing looked broken — cover letters just quietly lost a personalization signal, and the admin dashboard lost real data. Both now point at Neon.
-- **Resume cleanup could fail silently after upload or edit**: every resume save fires a background delete of old/removed profile versions, but the delete's result was never checked. When it failed (409 conflict, observed live), nothing logged it and nothing told you — stale rows would just linger. Now logs the failure instead of swallowing it.
-- **Match analysis showed a confident score with no resume behind it**: an empty resume (created automatically but never filled in) slipped past the "do we have data" check, so Gemini produced a specific score and skill list from a blank candidate profile instead of saying so. It now checks the real assembled prompt data and returns no score, with a clear message, when there's genuinely nothing to ground it in.
-- **Internal AI prompt labels leaked into the Cover Letter and Resume tabs**: the "Tailoring Strategy" panel showed raw field names like `EVIDENCE_BRIDGE_1:` and `FIT_FRAME:` instead of plain text.
-- **Saving a job could create it twice in History**: two separate code paths each inserted the job on save; consolidated to one.
-- **Signing out deleted your saved resume**: `clearAllData()` (run on every sign-out) was deleting the cloud resume row along with local browser cache. Sign-out now only clears local cache.
-- **Pasting a job description could silently save it dozens of times**: the manual-paste box treated a bare Enter as submit, so a fast paste or automated input firing one keystroke per line could fire multiple real submissions, each one a permanent blank "New Job" row. Submit now requires Cmd/Ctrl+Enter; plain Enter is just a newline.
-- **A stray debug message could appear instead of "job not found"**: replaced with a proper not-found screen.
+### Security
+- **Patched five undici vulnerabilities, including one high-severity issue**: both the top-level and nested dependency copies now resolve to patched versions.
+- **Patched the high-severity brace-expansion denial-of-service vulnerability**: the dependency override now requires the patched release.
 
 ## [2.43.12] — 2026-07-31
 
