@@ -4,6 +4,11 @@ All notable changes to this project will be documented in this file.
 
 See [CHANGELOG_ARCHIVE.md](CHANGELOG_ARCHIVE.md) for earlier history.
 
+## [Unreleased]
+
+### Security
+- **Patched the high-severity nanoid denial-of-service vulnerability**: the development dependency now resolves to a fixed release.
+
 ## [2.43.13] — 2026-08-11
 
 ### Added
