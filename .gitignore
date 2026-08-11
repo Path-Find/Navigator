@@ -52,3 +52,6 @@ coverage/
 supabase/.temp
 *.orig
 .vercel
+
+# One-off local evaluation scripts
+scripts/web-planning-batch.ts
