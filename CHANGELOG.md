@@ -4,7 +4,7 @@ All notable changes to this project will be documented in this file.
 
 See [CHANGELOG_ARCHIVE.md](CHANGELOG_ARCHIVE.md) for earlier history.
 
-## [Unreleased]
+## [2.43.13] — 2026-08-11
 
 ### Added
 - **Signup now captures the name used on applications**: generated letters have a reliable account-owned name from the start.
@@ -28,6 +28,7 @@ See [CHANGELOG_ARCHIVE.md](CHANGELOG_ARCHIVE.md) for earlier history.
 - **Feed and Skills Interview are now consistently gated as beta features**: non-admin users cannot reach them through navigation, direct URLs, or bookmarks.
 
 ### Fixed
+- **Production deployments no longer fail after dependency updates**: TypeScript remains on the supported 6.x line for Vercel compatibility.
 - **Cover-letter output now has consistent application-owned greetings and sign-offs**: generic greetings are the default, clearly named contacts are used when available, model placeholders are removed, and print output does not duplicate the closing.
 - **Education is no longer inferred as current from a year alone**: explicit wording such as “Present,” “Ongoing,” or “Expected” is required.
 - **Manual cover-letter revisions no longer repeat the same critique twice**: revision guidance stays in one bounded instruction.
