@@ -54,4 +54,4 @@ supabase/.temp
 .vercel
 
 # One-off local evaluation scripts
-scripts/web-planning-batch.ts
+scripts/local/
