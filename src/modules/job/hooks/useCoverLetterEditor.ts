@@ -16,7 +16,7 @@ import { RdStyleService } from '../../../services/ai/rd/styleService';
 import { createCandidateEducationContext, formatCandidateProfileContext, formatJourneyContext, formatVerifiedSkills } from '../../../services/candidateProfileContext';
 import { useUser } from '../../../contexts/UserContext';
 import { useSkillContext } from '../../skills/context/SkillContext';
-import { finalizeCoverLetterOutput } from '../../../services/ai/jobAiService';
+import { finalizeCoverLetterOutput, getHardEligibilityRequirements } from '../../../services/ai/jobAiService';
 
 interface UseCoverLetterEditorProps {
     job: SavedJob;
@@ -39,6 +39,7 @@ export const useCoverLetterEditor = ({
     const [showContextInput, setShowContextInput] = useState(false);
     const [copiedState, setCopiedState] = useState<'cl' | null>(null);
     const [acknowledgedAiBan, setAcknowledgedAiBan] = useState(false);
+    const [acknowledgedHardEligibility, setAcknowledgedHardEligibility] = useState(false);
     const [analysisProgress, setAnalysisProgress] = useState<string | null>(null);
     const [comparisonVersions, setComparisonVersions] = useState<CoverLetterVariant[] | null>(null);
     const [localJob, setLocalJob] = useState(job);
@@ -49,6 +50,13 @@ export const useCoverLetterEditor = ({
     const isNextGen = useNextGen();
     const { user, fullName, coverLetterPreferences, journey } = useUser();
     const { skills } = useSkillContext();
+    const hardEligibilityRequirements = getHardEligibilityRequirements(analysis.distilledJob);
+    const hardEligibilityKey = hardEligibilityRequirements.join('|');
+    const hasUnacknowledgedHardEligibility = hardEligibilityRequirements.length > 0 && !acknowledgedHardEligibility;
+
+    useEffect(() => {
+        setAcknowledgedHardEligibility(false);
+    }, [job.id, hardEligibilityKey]);
 
     // Sync with parent when job prop changes
     useEffect(() => {
@@ -95,6 +103,11 @@ export const useCoverLetterEditor = ({
     }, [localJob, onJobUpdate, showError]);
 
     const handleGenerateCoverLetter = useCallback(async (critiqueContext?: string) => {
+        if (hasUnacknowledgedHardEligibility) {
+            showError('Please confirm the job eligibility requirements before generating a cover letter.');
+            return;
+        }
+
         if (!bestResume) {
             showError("Please upload a resume first.");
             return;
@@ -302,7 +315,7 @@ export const useCoverLetterEditor = ({
             setGenerationStatus(null);
             setGenerationProgress(0);
         }
-    }, [bestResume, analysis, localJob, targetJobs, userTier, onJobUpdate, showError, isNextGen, user, fullName, coverLetterPreferences, journey, skills]);
+    }, [bestResume, analysis, localJob, targetJobs, userTier, onJobUpdate, showError, isNextGen, user, fullName, coverLetterPreferences, journey, skills, hasUnacknowledgedHardEligibility]);
 
     const handleSelectVariant = useCallback(async (variant: CoverLetterVariant) => {
         const other = comparisonVersions?.find(v => v.promptVersion !== variant.promptVersion);
@@ -408,7 +421,7 @@ export const useCoverLetterEditor = ({
     // Auto-Generate on Mount if no letter exists — skipped for AI-banned employers
     useEffect(() => {
         const isBanned = analysis.distilledJob?.isAiBanned;
-        if (!localJob.coverLetter && !generating && !localJob.coverLetterCritique && bestResume && !isBanned) {
+        if (!localJob.coverLetter && !generating && !localJob.coverLetterCritique && bestResume && !isBanned && !hasUnacknowledgedHardEligibility) {
             handleGenerateCoverLetter();
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -433,5 +446,8 @@ export const useCoverLetterEditor = ({
         isGenerating,
         acknowledgedAiBan,
         setAcknowledgedAiBan,
+        hardEligibilityRequirements,
+        acknowledgedHardEligibility,
+        setAcknowledgedHardEligibility,
     };
 };

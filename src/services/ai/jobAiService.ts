@@ -184,6 +184,16 @@ const normalizeJobRequirements = (rawJob: Record<string, unknown>): Pick<Distill
 const getJobRequirements = (parsedJob: DistilledJob): JobRequirement[] =>
     normalizeJobRequirements(parsedJob as unknown as Record<string, unknown>).requirements || [];
 
+/**
+ * Return only explicit eligibility gates from the posting. These are shown to
+ * the user for confirmation; Navigator must never infer whether the user meets
+ * one from their resume or profile.
+ */
+export const getHardEligibilityRequirements = (parsedJob: DistilledJob): string[] =>
+    [...new Set(getJobRequirements(parsedJob)
+        .filter(requirement => requirement.priority === 'hard_gate')
+        .map(requirement => requirement.text))];
+
 const getRequirementTexts = (parsedJob: DistilledJob, category: JobRequirement['category']): JobRequirement[] =>
     getJobRequirements(parsedJob).filter(requirement => requirement.category === category);
 

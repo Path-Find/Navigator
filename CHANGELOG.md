@@ -6,6 +6,9 @@ See [CHANGELOG_ARCHIVE.md](CHANGELOG_ARCHIVE.md) for earlier history.
 
 ## [Unreleased]
 
+### Fixed
+- **Cover-letter generation now surfaces hard eligibility requirements first**: applicants must confirm the posting’s stated citizenship, residency, licensing, certification, or other non-negotiable conditions before Navigator drafts or refines a letter.
+
 ### Security
 - **Patched the high-severity nanoid denial-of-service vulnerability**: the development dependency now resolves to a fixed release.
 

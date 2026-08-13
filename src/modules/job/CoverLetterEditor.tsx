@@ -49,6 +49,9 @@ export const CoverLetterEditor: React.FC<CoverLetterEditorProps> = (props) => {
         isGenerating,
         acknowledgedAiBan,
         setAcknowledgedAiBan,
+        hardEligibilityRequirements,
+        acknowledgedHardEligibility,
+        setAcknowledgedHardEligibility,
     } = useCoverLetterEditor(props);
 
     const isAiBanned = analysis.distilledJob?.isAiBanned;
@@ -96,6 +99,46 @@ export const CoverLetterEditor: React.FC<CoverLetterEditorProps> = (props) => {
                             variant="warning"
                             title="Employer AI Prohibition Detected"
                             message="This job posting explicitly discourages or bans the use of AI/LLMs. Use this draft ONLY as a reference."
+                        />
+                    </div>
+                )}
+
+                {hardEligibilityRequirements.length > 0 && (
+                    <div className="px-8 py-6 border-b border-neutral-100 dark:border-neutral-800/50 bg-neutral-50/30 dark:bg-neutral-900/30">
+                        <Alert
+                            variant="warning"
+                            title="Eligibility requirement in this posting"
+                            message={(
+                                <div className="space-y-3">
+                                    <p>
+                                        This job posting says applicants must meet the requirement{hardEligibilityRequirements.length === 1 ? '' : 's'} below. Navigator cannot verify this from your resume or profile.
+                                    </p>
+                                    <ul className="list-disc space-y-1 pl-5 text-sm font-medium">
+                                        {hardEligibilityRequirements.map((requirement) => (
+                                            <li key={requirement}>{requirement}</li>
+                                        ))}
+                                    </ul>
+                                    {!acknowledgedHardEligibility ? (
+                                        <div className="space-y-2 pt-1">
+                                            <p className="text-xs font-medium text-neutral-500 dark:text-neutral-400">
+                                                Confirm that you meet these requirements before generating or refining this letter.
+                                            </p>
+                                            <Button
+                                                variant="outline"
+                                                size="sm"
+                                                onClick={() => setAcknowledgedHardEligibility(true)}
+                                                className="border-amber-500/40 text-amber-800 hover:bg-amber-50 dark:text-amber-200 dark:hover:bg-amber-950/30"
+                                            >
+                                                I confirm I meet these requirements
+                                            </Button>
+                                        </div>
+                                    ) : (
+                                        <p className="text-xs font-semibold text-emerald-700 dark:text-emerald-300">
+                                            Confirmed for this application. You are responsible for verifying the posting&apos;s requirements before applying.
+                                        </p>
+                                    )}
+                                </div>
+                            )}
                         />
                     </div>
                 )}

@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { analyzeJobFit, buildJobCandidateContext, cleanCoverLetterOutput, deriveCoverLetterSignals, finalizeCoverLetterOutput, formatParsedJobContext } from './jobAiService';
+import { analyzeJobFit, buildJobCandidateContext, cleanCoverLetterOutput, deriveCoverLetterSignals, finalizeCoverLetterOutput, formatParsedJobContext, getHardEligibilityRequirements } from './jobAiService';
 import { callWithRetry, getModel } from './aiCore';
 import { JOB_ANALYSIS_PROMPTS } from '../../prompts/index';
 
@@ -166,6 +166,34 @@ describe('cover-letter candidate signals', () => {
         } as any, { roleTitle: 'Project Manager' } as any);
 
         expect(signals.some(signal => signal.includes('POSSIBLE FIRST-PROFESSIONAL-ROLE'))).toBe(false);
+    });
+});
+
+describe('hard eligibility requirements', () => {
+    it('extracts explicit gates without inferring whether the user meets them', () => {
+        expect(getHardEligibilityRequirements({
+            companyName: 'Example',
+            roleTitle: 'Planner',
+            applicationDeadline: null,
+            keySkills: [],
+            coreResponsibilities: [],
+            requirements: [
+                { text: 'Canadian citizenship', category: 'hard_gate', priority: 'hard_gate' },
+                { text: 'Active PMP certification', category: 'hard_gate', priority: 'hard_gate' },
+                { text: 'Microsoft Excel', category: 'skill', priority: 'required' },
+            ],
+        })).toEqual(['Canadian citizenship', 'Active PMP certification']);
+    });
+
+    it('keeps legacy hard-gate arrays visible for older saved analyses', () => {
+        expect(getHardEligibilityRequirements({
+            companyName: 'Example',
+            roleTitle: 'Planner',
+            applicationDeadline: null,
+            keySkills: [],
+            coreResponsibilities: [],
+            hardGates: ['Must reside in Yukon'],
+        })).toEqual(['Must reside in Yukon']);
     });
 });
 
