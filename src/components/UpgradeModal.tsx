@@ -129,10 +129,10 @@ export const UpgradeModal: React.FC<UpgradeModalProps> = ({ limitInfo, onClose, 
                             </div>
 
                             <h2 className="text-3xl font-black text-neutral-900 dark:text-white mb-2 tracking-tight">
-                                Trial Complete
+                                Free analyses used
                             </h2>
                             <p className="text-neutral-500 dark:text-neutral-400 text-sm font-medium mb-8">
-                                You've seen what Navigator can do. Here's where you landed.
+                                Continue with more analyses and application tools on a paid plan.
                             </p>
 
                             {averageScore != null && (
@@ -150,7 +150,7 @@ export const UpgradeModal: React.FC<UpgradeModalProps> = ({ limitInfo, onClose, 
                             )}
 
                             <p className="text-sm text-neutral-500 dark:text-neutral-400 leading-relaxed mb-8">
-                                Keep the momentum going. Upgrade to run unlimited analyses, close your skills gaps, and generate cover letters built from your actual experience.
+                                Upgrade to keep analyzing jobs, review detailed fit information, and tailor applications to specific roles.
                             </p>
 
                             <div className="grid grid-cols-1 gap-4 mb-10">
@@ -158,7 +158,7 @@ export const UpgradeModal: React.FC<UpgradeModalProps> = ({ limitInfo, onClose, 
                                     onClick={() => setView('compare')}
                                     className="w-full py-4 bg-indigo-600 hover:bg-indigo-700 text-white rounded-2xl text-sm font-black uppercase tracking-widest transition-all shadow-lg shadow-indigo-500/25 active:scale-95"
                                 >
-                                    View All Plans
+                                    Compare plans
                                 </button>
                                 <button
                                     onClick={onClose}
@@ -171,9 +171,9 @@ export const UpgradeModal: React.FC<UpgradeModalProps> = ({ limitInfo, onClose, 
                     ) : (
                         <div>
                             <div className="text-center mb-12">
-                                <h1 className="text-4xl font-black text-neutral-900 dark:text-white mb-4 tracking-tighter">Choose Your Velocity</h1>
+                                <h1 className="text-4xl font-black text-neutral-900 dark:text-white mb-4 tracking-tighter">Choose your plan</h1>
                                 <p className="text-sm text-neutral-500 dark:text-neutral-400 font-medium max-w-lg mx-auto leading-relaxed">
-                                    From casual exploring to high-stakes career pivoting, there's a Navigator plan built for your path.
+                                    Compare access and choose the plan that fits your job search.
                                 </p>
                             </div>
 

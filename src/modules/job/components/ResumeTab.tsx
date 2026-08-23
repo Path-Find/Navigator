@@ -57,7 +57,7 @@ export const ResumeTab: React.FC<ResumeTabProps> = ({
                         <div className="flex items-start gap-3 min-w-0">
                             <Wand2 className="w-4 h-4 text-indigo-500 shrink-0" />
                             <p className="text-xs font-bold text-neutral-600 dark:text-neutral-400 leading-relaxed">
-                                Upgrade to rewrite every bullet for this specific role — this is what the trial was building toward.
+                                Use Plus or Pro to rewrite resume bullets for this specific role.
                             </p>
                         </div>
                         <Button

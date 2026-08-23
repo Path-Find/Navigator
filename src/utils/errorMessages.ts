@@ -12,7 +12,7 @@ export const ERROR_MESSAGES = {
   // Quota & Limit errors
   DAILY_QUOTA_EXCEEDED: "You've reached your daily limit. Try again tomorrow, or upgrade to Navigator Pro for unlimited access.",
   WEEKLY_QUOTA_EXCEEDED: "You've reached your weekly limit. Consider upgrading for a higher cap.",
-  FREE_LIMIT_REACHED: "You've used all your free analyses! Upgrade to Navigator Plus or Pro to keep going.",
+  FREE_LIMIT_REACHED: "You've used your free analyses. Upgrade to Plus or Pro to continue.",
   RATE_LIMIT_EXCEEDED: "The AI is working hard right now! Please take a quick break and try again in a moment.",
 
   // Network errors

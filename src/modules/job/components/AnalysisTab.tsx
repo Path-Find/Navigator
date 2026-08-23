@@ -58,10 +58,10 @@ export const AnalysisTab: React.FC<AnalysisTabProps> = ({
                                         {analysis.compatibilityScore >= SCORE_THRESHOLDS.STRONG
                                             ? "Strong match — tailor your resume to close it."
                                             : analysis.compatibilityScore >= SCORE_THRESHOLDS.FAIR
-                                                ? "You're close. See exactly what's holding you back."
-                                                : "There's a gap. Find out precisely what to close."}
+                                                ? "You're close. See which requirements to address."
+                                                : "Review the main requirements to address."}
                                     </div>
-                                    <div className="text-[10px] font-bold text-indigo-400 dark:text-indigo-500 mt-0.5 tracking-wide">Unlock with Plus</div>
+                                    <div className="text-[10px] font-bold text-indigo-400 dark:text-indigo-500 mt-0.5 tracking-wide">Available with Plus</div>
                                 </div>
                                 <Sparkles className="w-4 h-4 text-indigo-400 shrink-0 group-hover:scale-110 transition-transform" />
                             </button>
@@ -142,7 +142,7 @@ export const AnalysisTab: React.FC<AnalysisTabProps> = ({
                                                     onClick={() => openModal('UPGRADE', { initialView: 'compare' })}
                                                     className="px-3 py-1.5 bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold rounded-full transition-all shadow-lg shadow-rose-500/20 active:scale-95"
                                                 >
-                                                    +{hidden.length} more — Unlock
+                                                    +{hidden.length} more — See with Plus
                                                 </button>
                                             </div>
                                         </div>

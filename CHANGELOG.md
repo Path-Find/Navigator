@@ -8,6 +8,7 @@ See [CHANGELOG_ARCHIVE.md](CHANGELOG_ARCHIVE.md) for earlier history.
 
 ### Fixed
 - **Cover-letter generation now surfaces hard eligibility requirements first**: applicants must confirm the posting’s stated citizenship, residency, licensing, certification, or other non-negotiable conditions before Navigator drafts or refines a letter.
+- **Admin and tester accounts no longer see paid-plan prompts**: plan comparisons now recognize access above Pro, while upgrade messaging uses direct language about what each plan provides.
 
 ### Security
 - **Patched the high-severity nanoid denial-of-service vulnerability**: the development dependency now resolves to a fixed release.

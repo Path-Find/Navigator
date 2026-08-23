@@ -227,17 +227,17 @@ export const FeaturesPage: React.FC = () => {
                 className="max-w-2xl mx-auto text-center mt-32 mb-12"
             >
                 <h2 className="text-2xl md:text-3xl font-extrabold text-neutral-900 dark:text-white tracking-tight mb-4">
-                    Ready to unlock your advantage?
+                    Need more detail?
                 </h2>
                 <p className="text-sm text-neutral-400 dark:text-neutral-500 mb-8">
-                    Start with 3 free analyses. No credit card required.
+                    Compare plans for more analyses and application tools.
                 </p>
                 <div className="flex items-center justify-center gap-4">
                     <button
                         onClick={() => navigate(ROUTES.PLANS)}
                         className="px-6 py-3 bg-neutral-900 dark:bg-white text-white dark:text-black text-sm font-bold rounded-xl hover:bg-neutral-800 dark:hover:bg-neutral-200 transition-all shadow-lg shadow-neutral-500/10 active:scale-95 cursor-pointer"
                     >
-                        View Plans
+                        Compare plans
                     </button>
                     <button
                         onClick={() => {
