@@ -73,12 +73,12 @@ export const CandidateProfileContextManager: React.FC = () => {
     const [employmentTypes, setEmploymentTypes] = React.useState<CandidateEmploymentType[]>([]);
     const [startTiming, setStartTiming] = React.useState<CandidateStartTiming>('flexible');
     const [startDate, setStartDate] = React.useState('');
-    const [currentBlockIds, setCurrentBlockIds] = React.useState<string[]>([]);
     const [isProfileExpanded, setIsProfileExpanded] = React.useState(true);
     const primaryResume = resumes[0];
     const signals = primaryResume?.candidateProfile?.signals || [];
     const stories = primaryResume?.candidateProfile?.stories || [];
     const storedFacts = primaryResume?.candidateProfile?.facts || [];
+    const currentBlockIds = primaryResume?.candidateProfile?.currentBlockIds || [];
     const facts = storedFacts.filter(fact => fact.status === 'confirmed');
     // A newly uploaded transcript is the freshest compact education source.
     // Fall back to saved profile education when no transcript is available.
@@ -86,9 +86,6 @@ export const CandidateProfileContextManager: React.FC = () => {
         ? createCandidateEducationContext(transcript)
         : primaryResume?.candidateProfile?.education;
     const storedInsights = primaryResume?.candidateProfile?.insights || [];
-    const profileBlocks = (primaryResume?.blocks || []).filter(block =>
-        block.isVisible !== false && ['work', 'volunteer', 'education', 'project'].includes(block.type)
-    );
     const inferredInsights = deriveCandidateProfileInsights(primaryResume);
     const sourceVersion = getCandidateProfileSourceVersion(primaryResume);
     const reviewCount = inferredInsights.filter(insight => {
@@ -100,7 +97,6 @@ export const CandidateProfileContextManager: React.FC = () => {
         || facts.length > 0
         || Boolean(educationContext?.courses.length)
         || Boolean(primaryResume?.candidateProfile?.availability)
-        || currentBlockIds.length > 0
         || storedInsights.some(insight => insight.status === 'confirmed');
 
     // The profile loads asynchronously after the Settings screen mounts.
@@ -125,8 +121,7 @@ export const CandidateProfileContextManager: React.FC = () => {
             setStartTiming(saved.startTiming);
             setStartDate(saved.startDate || '');
         }
-        setCurrentBlockIds(primaryResume?.candidateProfile?.currentBlockIds || []);
-    }, [primaryResume?.id, primaryResume?.candidateProfile?.availability, primaryResume?.candidateProfile?.currentBlockIds]);
+    }, [primaryResume?.id, primaryResume?.candidateProfile?.availability]);
 
     const handleSaveCoverLetterPreferences = () => {
         const trimmed = coverLetterPreferencesInput.trim();
@@ -219,25 +214,6 @@ export const CandidateProfileContextManager: React.FC = () => {
         showSuccess('Removed from your reusable profile.');
     };
 
-    const handleSaveCurrentEntries = async () => {
-        if (!primaryResume) return;
-        const context = primaryResume.candidateProfile;
-        await handleUpdateResume({
-            ...primaryResume,
-            candidateProfile: {
-                signals: context?.signals || [],
-                stories: context?.stories || [],
-                facts: context?.facts || [],
-                education: context?.education,
-                availability: context?.availability,
-                currentBlockIds,
-                insights: context?.insights || [],
-                completedAt: context?.completedAt,
-            },
-        });
-        showSuccess('Saved profile priorities.');
-    };
-
     return (
         <section className="mt-12 bg-white dark:bg-neutral-900/50 rounded-3xl border border-indigo-100 dark:border-indigo-500/20 p-8 shadow-sm">
             <div className="flex flex-col gap-5 sm:flex-row sm:items-start sm:justify-between">
@@ -276,48 +252,6 @@ export const CandidateProfileContextManager: React.FC = () => {
             </div>
 
             {isProfileExpanded && <>
-            {profileBlocks.length > 0 ? (
-                <div className="mt-8 pt-6 border-t border-indigo-100/70 dark:border-indigo-500/10">
-                    <div className="flex items-start justify-between gap-4 mb-4">
-                        <div>
-                            <h5 className="text-[10px] font-black uppercase tracking-widest text-neutral-400">Current entries</h5>
-                            <p className="text-xs text-neutral-400 leading-relaxed mt-2 max-w-2xl">
-                                Mark the roles, education, projects, or volunteer work that are current. Current entries appear first in their resume section.
-                            </p>
-                        </div>
-                        <Button
-                            variant="subtle"
-                            size="sm"
-                            onClick={() => { void handleSaveCurrentEntries(); }}
-                            className="shrink-0 !text-indigo-600 dark:!text-indigo-300 !border-indigo-100 dark:!border-indigo-500/20"
-                        >
-                            Save current entries
-                        </Button>
-                    </div>
-                    <div className="space-y-2">
-                        {profileBlocks.map(block => {
-                            const isCurrent = currentBlockIds.includes(block.id);
-                            return (
-                                <div key={block.id} className="flex items-center gap-3 rounded-2xl border border-indigo-100 dark:border-indigo-500/20 bg-indigo-50/40 dark:bg-indigo-500/5 px-4 py-3">
-                                    <button
-                                        type="button"
-                                        onClick={() => setCurrentBlockIds(current => toggleOption(current, block.id))}
-                                        aria-label={isCurrent ? `Unmark ${block.title} as current` : `Mark ${block.title} as current`}
-                                        className={`rounded-xl border px-2.5 py-1.5 text-[10px] font-black transition-colors shrink-0 ${isCurrent ? 'text-indigo-600 bg-indigo-50 border-indigo-200 dark:text-indigo-300 dark:bg-indigo-500/10 dark:border-indigo-500/30' : 'text-neutral-400 border-neutral-200 hover:text-indigo-600 hover:border-indigo-200 dark:border-neutral-700'}`}
-                                    >
-                                        {isCurrent ? 'Current' : 'Mark current'}
-                                    </button>
-                                    <div className="min-w-0 flex-1">
-                                        <p className="text-sm font-bold text-neutral-800 dark:text-neutral-100 truncate">{block.title}</p>
-                                        <p className="text-xs text-neutral-500 dark:text-neutral-400 truncate">{[block.organization, block.dateRange].filter(Boolean).join(' · ')}</p>
-                                    </div>
-                                </div>
-                            );
-                        })}
-                    </div>
-                </div>
-            ) : null}
-
             <div className="mt-8 pt-6 border-t border-indigo-100/70 dark:border-indigo-500/10">
                 <div className="flex items-start justify-between gap-4 mb-4">
                     <div>
