@@ -149,16 +149,22 @@ export const getUsageStats = async (userId: string): Promise<UsageStats> => {
                 }
                 return { data, error: null };
             })(),
+            // Analysis usage is kept separately from saved jobs so deleting a
+            // job cannot erase usage history or make quotas appear unused.
             (async () => dataClient
-                .from('jobs')
+                .from('logs')
                 .select('*', { count: 'exact', head: true })
                 .eq('user_id', userId)
-                .gte('date_added', today))(),
+                .eq('event_type', 'job_extraction')
+                .eq('status', 'success')
+                .gte('created_at', today))(),
             (async () => dataClient
-                .from('jobs')
+                .from('logs')
                 .select('*', { count: 'exact', head: true })
                 .eq('user_id', userId)
-                .gte('date_added', weekAgo.toISOString()))(),
+                .eq('event_type', 'job_extraction')
+                .eq('status', 'success')
+                .gte('created_at', weekAgo.toISOString()))(),
             // Monthly interview count: count the START of sessions, not individual analyses
             (async () => dataClient
                 .from('logs')

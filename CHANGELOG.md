@@ -7,6 +7,7 @@ See [CHANGELOG_ARCHIVE.md](CHANGELOG_ARCHIVE.md) for earlier history.
 ## [Unreleased]
 
 ### Fixed
+- **Analysis usage no longer resets when saved jobs are deleted**: paid-plan limits and usage displays now count permanent analysis records instead of job-history rows.
 - **Cover-letter generation now surfaces hard eligibility requirements first**: applicants must confirm the posting’s stated citizenship, residency, licensing, certification, or other non-negotiable conditions before Navigator drafts or refines a letter.
 - **Admin and tester accounts no longer see paid-plan prompts**: plan comparisons now recognize access above Pro, while upgrade messaging uses direct language about what each plan provides.
 - **Resume editing no longer shows the unrequested “Tell Your Story” control**: the editor stays focused on resume content and actions users asked for.

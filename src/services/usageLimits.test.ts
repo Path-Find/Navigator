@@ -126,7 +126,7 @@ describe('getUsageStats', () => {
         });
         const mockSelectProfile = vi.fn().mockReturnValue({ eq: vi.fn().mockReturnValue({ single: mockSingle }) });
 
-        // Mock chain for jobs query (count) using recursive approach
+        // Mock chain for jobs query (email count) using recursive approach
         const mockGte = vi.fn().mockResolvedValue({ count: 5 });
         const jobsChain = {
             eq: vi.fn(),
@@ -137,8 +137,22 @@ describe('getUsageStats', () => {
 
         const mockSelectJobs = vi.fn().mockReturnValue({ eq: jobsChain.eq });
 
+        let logQuery = 0;
+        const mockSelectLogs = vi.fn().mockImplementation(() => {
+            const count = logQuery++ < 2 ? 5 : 0;
+            const logsChain = {
+                eq: vi.fn(),
+                in: vi.fn(),
+                gte: vi.fn().mockResolvedValue({ count })
+            };
+            logsChain.eq.mockReturnValue(logsChain);
+            logsChain.in.mockReturnValue(logsChain);
+            return logsChain;
+        });
+
         vi.mocked(dataClient.from).mockImplementation((table: string) => {
             if (table === 'profiles') return { select: mockSelectProfile } as any;
+            if (table === 'logs') return { select: mockSelectLogs } as any;
             if (table === 'jobs') return { select: mockSelectJobs } as any;
             const defaultChain = { select: vi.fn().mockReturnThis(), eq: vi.fn().mockReturnThis(), in: vi.fn().mockReturnThis(), gte: vi.fn().mockResolvedValue({ count: 0 }) };
             return defaultChain as any;
