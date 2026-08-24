@@ -1,5 +1,5 @@
 
-import { supabase } from './supabase';
+import { dataClient } from '../lib/data-client';
 
 export interface UsageOutlier {
     user_id: string;
@@ -14,7 +14,7 @@ export interface UsageOutlier {
 }
 
 export const getUsageOutliers = async (): Promise<UsageOutlier[]> => {
-    const { data, error } = await supabase
+    const { data, error } = await dataClient
         .from('usage_outliers')
         .select('*');
 
@@ -38,7 +38,7 @@ export interface AdminUser {
 }
 
 export const getAdminUsers = async (): Promise<AdminUser[]> => {
-    const { data, error } = await supabase
+    const { data, error } = await dataClient
         .from('profiles')
         .select('id, email, subscription_tier, is_admin, is_tester, total_ai_calls, job_analyses_count, created_at')
         .order('created_at', { ascending: false });
@@ -62,7 +62,7 @@ export const getDailyPulse = async (): Promise<DailyPulse[]> => {
     twentyEightDaysAgo.setDate(twentyEightDaysAgo.getDate() - 28);
     
     try {
-        const { data: logData, error: logError } = await supabase
+        const { data: logData, error: logError } = await dataClient
             .from('logs')
             .select('created_at')
             .gte('created_at', twentyEightDaysAgo.toISOString());

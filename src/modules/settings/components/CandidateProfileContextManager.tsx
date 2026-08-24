@@ -182,7 +182,7 @@ export const CandidateProfileContextManager: React.FC = () => {
                 completedAt: context?.completedAt,
             },
         });
-        showSuccess('Saved structured availability preferences.');
+        showSuccess('Availability preferences saved.');
     };
 
     const handleClearSavedInsights = async () => {

@@ -9,7 +9,7 @@ import { ROUTES } from '../../constants';
 import { type ViewId } from '../../utils/navigation';
 
 export const Header: React.FC = () => {
-    const { user, isLoading, isAdmin, signOut } = useUser();
+    const { user, isLoading, isAdmin, isTester, userTier, signOut } = useUser();
     const { openModal } = useModal();
     const { currentView, setView: onViewChange, isDark, toggleDarkMode, isFocusedMode, setFocusedMode, setView } = useGlobalUI();
     const [scrolled, setScrolled] = React.useState(false);
@@ -48,14 +48,14 @@ export const Header: React.FC = () => {
 
             ]
         },
-        {
+        ...(userTier === 'free' && !isAdmin && !isTester ? [{
             id: 'plans',
             label: 'Upgrade',
             icon: Sparkles,
             isActive: ['plans', 'plans-compare'].includes(currentView),
             defaultView: 'plans' as ViewId,
             items: []
-        }
+        }] : [])
     ];
 
 
