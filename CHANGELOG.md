@@ -31,6 +31,8 @@ See [CHANGELOG_ARCHIVE.md](CHANGELOG_ARCHIVE.md) for earlier history.
 - **Fixed the Update Focus homepage destination**: it now opens Application Profile instead of the old Settings page.
 - **Simplified the availability save confirmation**: it now uses user-facing language instead of internal “structured” terminology.
 - **Removed Upgrade from paid, tester, and admin navigation**: only free users see the upgrade prompt.
+- **Clarified plan access labels**: current and admin/tester access no longer appears as the vague “Access included,” and sunset Feed no longer appears as a plan feature.
+- **Renamed the plan limit from Alerts to Email alerts**: the pricing page now makes clear that this means forwarded job-alert emails.
 - **Added an optional STAR explanation at interview start**: users can get a plain-language framework and example before answering, or continue immediately.
 - **Reconnected Resume Interview to resume entries**: work, education, volunteer, and project entries can now be interviewed individually to capture useful context behind them.
 - **Application Profile no longer repeats the resume entry list**: current-role controls remain in the Resume editor instead of duplicating every role and school entry.

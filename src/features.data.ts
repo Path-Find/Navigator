@@ -206,8 +206,8 @@ export const FEATURE_REGISTRY: Record<string, FeatureDefinition> = {
         targetView: 'feed',
         link: '/jobs/feed',
         rank: 4,
-        showOnHomepage: true,
-        planHighlight: true,
+        showOnHomepage: false,
+        planHighlight: false,
         stage: 'beta',
     },
     MAIL_IN: {

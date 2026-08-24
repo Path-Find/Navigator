@@ -145,7 +145,7 @@ export const PlanCard = ({
                         </div>
                         <div className="flex justify-between items-center text-[10px]">
                             <div className="flex items-center gap-1.5">
-                                <span className="font-bold text-neutral-400 capitalize tracking-wide">Alerts</span>
+                                <span className="font-bold text-neutral-400 tracking-wide">Email alerts</span>
                             </div>
                             <span className="font-black text-neutral-900 dark:text-white">
                                 {limits.emails === 0 ? '—' : limits.emails}
@@ -176,4 +176,3 @@ export const PlanCard = ({
         </motion.div>
     );
 };
-

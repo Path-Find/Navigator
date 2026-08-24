@@ -15,7 +15,7 @@ import { useToast } from '../../contexts/ToastContext';
 export const PlansPage: React.FC = () => {
 
 
-    const { user, userTier } = useUser();
+    const { user, userTier, isAdmin, isTester } = useUser();
     const { openModal } = useModal();
     const navigate = useNavigate();
     const [searchParams] = useSearchParams();
@@ -34,6 +34,13 @@ export const PlansPage: React.FC = () => {
     const proPrice = isAnnual ? PLAN_PRICING[USER_TIERS.PRO].ANNUAL_MONTHLY : PLAN_PRICING[USER_TIERS.PRO].MONTHLY;
     const tierRank: Record<string, number> = { free: 0, plus: 1, pro: 2, admin: 3, tester: 3 };
     const hasPlanAccess = (tier: string) => (tierRank[userTier] ?? 0) >= (tierRank[tier] ?? 0);
+    const getPlanButtonText = (tier: string) => {
+        if (isAdmin) return 'Included with admin access';
+        if (isTester) return 'Included with tester access';
+        if (userTier === tier) return 'Current plan';
+        if (hasPlanAccess(tier)) return 'Included in current plan';
+        return tier === USER_TIERS.PLUS ? 'Join Plus Waitlist' : 'Join Pro Waitlist';
+    };
 
     useEffect(() => {
         if (searchParams.get('success')) {
@@ -208,7 +215,7 @@ export const PlansPage: React.FC = () => {
                     price={`$${plusPrice}`}
                     accentColor="indigo"
                     subText="For active job searches"
-                    buttonText={hasPlanAccess(USER_TIERS.PLUS) ? 'Access included' : 'Join Plus Waitlist'}
+                    buttonText={getPlanButtonText(USER_TIERS.PLUS)}
                     onSelect={() => handleSelectPlan(USER_TIERS.PLUS)}
                     isLoading={loadingTier === USER_TIERS.PLUS || (loadingTier === USER_TIERS.PLUS && waitlistStatus === 'loading')}
                     features={getFeaturesForPlan('plus').map(f => ({ name: f.name, desc: f.description.plan, isComingSoon: f.stage === 'beta' }))}
@@ -230,7 +237,7 @@ export const PlansPage: React.FC = () => {
                     isPopular={true}
                     accentColor="emerald"
                     subText="For deeper career planning"
-                    buttonText={hasPlanAccess(USER_TIERS.PRO) ? 'Access included' : 'Join Pro Waitlist'}
+                    buttonText={getPlanButtonText(USER_TIERS.PRO)}
                     onSelect={() => handleSelectPlan(USER_TIERS.PRO)}
                     isLoading={loadingTier === USER_TIERS.PRO || (loadingTier === USER_TIERS.PRO && waitlistStatus === 'loading')}
                     features={getFeaturesForPlan('pro').map(f => ({ name: f.name, desc: f.description.plan, isComingSoon: f.stage === 'beta' }))}
