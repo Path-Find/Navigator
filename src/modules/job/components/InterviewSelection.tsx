@@ -1,9 +1,8 @@
-import { Target, Zap, MessageSquare, Sparkles, AlertCircle, UserRound } from 'lucide-react';
+import { Target, MessageSquare, AlertCircle, UserRound } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router';
 import { ROUTES } from '../../../constants';
 import { BentoCard } from '../../../components/ui/BentoCard';
-import { FEATURE_COLORS } from '../../../featureRegistry';
 import { SharedPageLayout } from '../../../components/common/SharedPageLayout';
 import { PageHeader } from '../../../components/ui/PageHeader';
 
@@ -43,15 +42,15 @@ export const InterviewSelection = ({ limitError, handleStartGeneral, handleStart
             )}
 
             <div className="max-w-6xl mx-auto">
-                <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6 items-stretch">
+                <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 items-stretch">
                     {/* General Session Card */}
                     <div className="animate-in slide-in-from-bottom-8 fade-in duration-700 delay-100 fill-mode-both">
                         <BentoCard
                             id="general"
                             icon={MessageSquare}
-                            title="Behavioral Training"
-                            description="Master common behavioral questions and the STAR method for any interview context."
-                            color={FEATURE_COLORS.indigo}
+                            title="Common questions"
+                            description="Practice common interview questions and build strong STAR answers."
+                            variant="compact"
                             actionLabel="Practice Now"
                             onAction={handleStartGeneral}
                             previewContent={
@@ -62,7 +61,7 @@ export const InterviewSelection = ({ limitError, handleStartGeneral, handleStart
                                         'Instant AI feedback'
                                     ].map((feature, i) => (
                                         <li key={i} className="flex items-center gap-3 text-[11px] font-bold text-neutral-400">
-                                            <div className="w-1.5 h-1.5 rounded-full bg-indigo-500" />
+                                            <div className="w-1.5 h-1.5 rounded-full bg-neutral-400" />
                                             {feature}
                                         </li>
                                     ))}
@@ -76,9 +75,9 @@ export const InterviewSelection = ({ limitError, handleStartGeneral, handleStart
                         <BentoCard
                             id="tailored"
                             icon={Target}
-                            title="Role-Specific Mock"
-                            description="Practice with high-precision questions generated for a specific job you've analyzed."
-                            color={FEATURE_COLORS.violet}
+                            title="Specific job practice"
+                            description="Practice questions tailored to a job you have analyzed."
+                            variant="compact"
                             actionLabel="Launch Mock"
                             onAction={handleStartTailored}
                             previewContent={
@@ -89,7 +88,7 @@ export const InterviewSelection = ({ limitError, handleStartGeneral, handleStart
                                         'Deep performance analysis'
                                     ].map((feature, i) => (
                                         <li key={i} className="flex items-center gap-3 text-[11px] font-bold text-neutral-400">
-                                            <div className="w-1.5 h-1.5 rounded-full bg-violet-500" />
+                                            <div className="w-1.5 h-1.5 rounded-full bg-neutral-400" />
                                             {feature}
                                         </li>
                                     ))}
@@ -102,9 +101,9 @@ export const InterviewSelection = ({ limitError, handleStartGeneral, handleStart
                         <BentoCard
                             id="profile"
                             icon={UserRound}
-                            title="Build My Profile"
-                            description="Answer a few optional questions so future applications can use your real goals and stories."
-                            color={FEATURE_COLORS.emerald}
+                            title="Build your profile"
+                            description="Answer a few optional questions so applications can reflect your goals and experience."
+                            variant="compact"
                             actionLabel="Start Profile Interview"
                             onAction={handleStartProfile}
                             previewContent={
@@ -115,7 +114,7 @@ export const InterviewSelection = ({ limitError, handleStartGeneral, handleStart
                                         'Review before anything is saved'
                                     ].map((feature, i) => (
                                         <li key={i} className="flex items-center gap-3 text-[11px] font-bold text-neutral-400">
-                                            <div className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+                                            <div className="w-1.5 h-1.5 rounded-full bg-neutral-400" />
                                             {feature}
                                         </li>
                                     ))}
@@ -124,47 +123,6 @@ export const InterviewSelection = ({ limitError, handleStartGeneral, handleStart
                         />
                     </div>
 
-                    {/* Prep Tips Card */}
-                    <div className="animate-in slide-in-from-bottom-8 fade-in duration-700 delay-400 fill-mode-both">
-                        <BentoCard
-                            id="tips"
-                            icon={Zap}
-                            title="Preparation Tips"
-                            description="Logic and strategy to differentiate your narrative and maximize impact."
-                            color={FEATURE_COLORS.amber}
-                            previewContent={
-                                <div className="space-y-4 pt-2">
-                                    <div className="flex gap-3">
-                                        <div className="w-8 h-8 rounded-lg bg-emerald-50 dark:bg-emerald-500/10 flex items-center justify-center shrink-0">
-                                            <Target className="w-4 h-4 text-emerald-500" />
-                                        </div>
-                                        <div className="space-y-0.5">
-                                            <p className="text-[11px] font-black text-neutral-900 dark:text-white">Master the 'Why'</p>
-                                            <p className="text-[10px] text-neutral-500 dark:text-neutral-400 leading-tight">Focus on business impact, not tasks.</p>
-                                        </div>
-                                    </div>
-                                    <div className="flex gap-3">
-                                        <div className="w-8 h-8 rounded-lg bg-indigo-50 dark:bg-indigo-500/10 flex items-center justify-center shrink-0">
-                                            <Zap className="w-4 h-4 text-indigo-500" />
-                                        </div>
-                                        <div className="space-y-0.5">
-                                            <p className="text-[11px] font-black text-neutral-900 dark:text-white">Quantify Success</p>
-                                            <p className="text-[10px] text-neutral-500 dark:text-neutral-400 leading-tight">Use numbers like 40% reduction.</p>
-                                        </div>
-                                    </div>
-                                    <div className="flex gap-3">
-                                        <div className="w-8 h-8 rounded-lg bg-amber-50 dark:bg-amber-500/10 flex items-center justify-center shrink-0">
-                                            <Sparkles className="w-4 h-4 text-amber-500" />
-                                        </div>
-                                        <div className="space-y-0.5">
-                                            <p className="text-[11px] font-black text-neutral-900 dark:text-white">STAR+ Method</p>
-                                            <p className="text-[10px] text-neutral-500 dark:text-neutral-400 leading-tight">S-T-A-R + Learning/Impact.</p>
-                                        </div>
-                                    </div>
-                                </div>
-                            }
-                        />
-                    </div>
                 </div>
             </div>
         </SharedPageLayout >

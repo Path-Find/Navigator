@@ -19,6 +19,9 @@ See [CHANGELOG_ARCHIVE.md](CHANGELOG_ARCHIVE.md) for earlier history.
 - **Removed meaningless reorder controls from Professional Summary**: up/down arrows remain only for ordered resume bullets.
 - **Aligned resume editor actions**: Add Line, Move, and section controls no longer wrap or sit at mismatched heights.
 - **Stopped current-status controls from overlapping resume titles**: long education and work titles now reserve space for their action button.
+- **Simplified Interview Advisor cards**: the selection screen now uses compact neutral cards instead of four competing accent colours.
+- **Renamed Interview Advisor options in plain language**: the choices now describe what each practice mode actually does.
+- **Removed the redundant Interview Tips card**: Interview Advisor now focuses on the three actions users can actually take.
 - **Application Profile no longer repeats the resume entry list**: current-role controls remain in the Resume editor instead of duplicating every role and school entry.
 - **Resume dates now explain their expected format**: entry editing clearly asks for Month + Year and shows examples for past and current roles.
 - **Settings now focuses on account management**: application preferences and reusable resume context have their own Application Profile page instead of crowding account settings.

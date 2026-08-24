@@ -62,7 +62,7 @@ export const BentoCard: React.FC<BentoCardProps> = ({
     const iconBgClass = color?.iconBg || 'bg-neutral-100 dark:bg-white/5';
     const borderAccentClass = color?.accent || 'border-neutral-200 dark:border-white/10';
     const glowClass = color?.glow || 'bg-accent-primary/15';
-    const actionTextClass = color?.text || 'text-accent-primary-hex';
+    const actionTextClass = color?.text || 'text-neutral-600 dark:text-neutral-300';
     const iconColorClass = color ? 'text-white' : 'text-neutral-700 dark:text-neutral-300';
 
     const isTouch = typeof window !== 'undefined' && window.matchMedia('(pointer: coarse)').matches;
