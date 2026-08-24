@@ -121,11 +121,7 @@ export const AppRoutes: React.FC = () => {
                             <JobModule />
                         </Suspense>
                     } />
-                    <Route path="/feed" element={
-                        <Suspense fallback={<LoadingState message="Loading Feed..." />}>
-                            <JobModule />
-                        </Suspense>
-                    } />
+                    <Route path="/feed" element={<Navigate to={ROUTES.JOB_HOME} replace />} />
                     <Route path="/cover-letters/*" element={
                         <Suspense fallback={<LoadingState message="Opening Cover Letters..." />}>
                             <JobModule />

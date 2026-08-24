@@ -22,6 +22,9 @@ See [CHANGELOG_ARCHIVE.md](CHANGELOG_ARCHIVE.md) for earlier history.
 - **Simplified Interview Advisor cards**: the selection screen now uses compact neutral cards instead of four competing accent colours.
 - **Renamed Interview Advisor options in plain language**: the choices now describe what each practice mode actually does.
 - **Removed the redundant Interview Tips card**: Interview Advisor now focuses on the three actions users can actually take.
+- **Combined interview practice modes**: one Practice interview card now offers general or specific-job practice without making them look like separate products.
+- **Sunset the Feed surface for now**: removed its navigation and homepage card, while old Feed URLs return users to Jobs.
+- **Removed the stale policy-update homepage card**: Terms and Privacy remain available in the footer without showing an outdated recurring notice.
 - **Added an optional STAR explanation at interview start**: users can get a plain-language framework and example before answering, or continue immediately.
 - **Reconnected Resume Interview to resume entries**: work, education, volunteer, and project entries can now be interviewed individually to capture useful context behind them.
 - **Application Profile no longer repeats the resume entry list**: current-role controls remain in the Resume editor instead of duplicating every role and school entry.

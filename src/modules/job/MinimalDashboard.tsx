@@ -2,8 +2,6 @@ import React, { useState, useMemo } from 'react';
 import { useNavigate } from 'react-router';
 import {
     Search,
-    ArrowRight,
-    Zap,
     Briefcase,
     Activity,
     FileText,
@@ -129,31 +127,6 @@ export const MinimalDashboard: React.FC = () => {
                     </motion.div>
 
                     <div className="grid grid-cols-1 gap-8">
-                        {/* Feed Widget */}
-                        <motion.div 
-                            initial={{ opacity: 0, y: 20 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{ delay: 0.2 }}
-                            className="p-8 rounded-[2.5rem] bg-white dark:bg-[#050505] border border-neutral-100 dark:border-neutral-900"
-                        >
-                            <div className="flex items-center justify-between mb-6">
-                                <h2 className="text-xs font-bold text-neutral-400 flex items-center gap-2">
-                                    <Zap className="w-3.5 h-3.5 text-emerald-500" />
-                                    Discovery
-                                </h2>
-                                <button onClick={() => navigate(ROUTES.FEED)} className="p-1.5 rounded-lg hover:bg-neutral-50 dark:hover:bg-neutral-800">
-                                    <ArrowRight className="w-3.5 h-3.5 text-neutral-400" />
-                                </button>
-                            </div>
-                            <p className="text-[11px] font-medium text-neutral-500 leading-relaxed mb-6">
-                                Your personalized stream of high-match professional opportunities is active.
-                            </p>
-                            <div className="flex items-center gap-2">
-                                <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                                <span className="text-[10px] font-bold text-emerald-600">Scout monitoring active</span>
-                            </div>
-                        </motion.div>
-
                         {/* Quick Links Widget */}
                         <motion.div 
                             initial={{ opacity: 0, y: 20 }}

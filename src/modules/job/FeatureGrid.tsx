@@ -7,7 +7,6 @@ import { BentoCard } from '../../components/ui/BentoCard';
 import { EventService } from '../../services/eventService';
 import type { User as SupabaseUser } from '@supabase/supabase-js';
 import { useUser } from '../../contexts/UserContext';
-import { LATEST_TOS_VERSION } from '../../constants';
 
 // Icon Map — resolves string icon names to Lucide components
 const ICON_MAP: Record<string, LucideIcon> = {
@@ -53,7 +52,7 @@ export const FeatureGrid: React.FC<FeatureGridProps> = ({
     userTier = 'free',
     className = ""
 }) => {
-    const { lastArchetypeUpdate, acceptedTosVersion, user: contextUser, dismissedNotices, dismissNotice } = useUser();
+    const { lastArchetypeUpdate, user: contextUser, dismissedNotices, dismissNotice } = useUser();
 
     const user = propUser || contextUser;
 
@@ -117,23 +116,17 @@ export const FeatureGrid: React.FC<FeatureGridProps> = ({
             const SIX_MONTHS_MS = 180 * 24 * 60 * 60 * 1000;
             // eslint-disable-next-line react-hooks/purity
             const isArchetypeStale = !lastArchetypeUpdate || (Date.now() - lastArchetypeUpdate > SIX_MONTHS_MS);
-            const isTosUpdateNeeded = acceptedTosVersion < LATEST_TOS_VERSION;
-
             // Check if notices are dismissed/snoozed
             // eslint-disable-next-line react-hooks/purity
             const now = Date.now();
             const isArchetypeDismissed = dismissedNotices['_NOTICE_ARCHETYPE'] > now;
-            const isTosDismissed = dismissedNotices['_NOTICE_TOS'] > now;
-
-            if (isTosUpdateNeeded && !isTosDismissed) {
-                finalKeys[finalKeys.length - 1] = '_NOTICE_TOS';
-            } else if (isArchetypeStale && !isArchetypeDismissed) {
+            if (isArchetypeStale && !isArchetypeDismissed) {
                 finalKeys[finalKeys.length - 1] = '_NOTICE_ARCHETYPE';
             }
         }
 
         return finalKeys;
-    }, [isAdmin, isTester, journey, userTier, user, lastArchetypeUpdate, acceptedTosVersion, dismissedNotices]);
+    }, [isAdmin, isTester, journey, userTier, user, lastArchetypeUpdate, dismissedNotices]);
 
     const handleAction = (config: FeatureDefinition) => {
         // Track curiosity (Interest)

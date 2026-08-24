@@ -11,7 +11,7 @@ import { ROUTES } from '../../constants';
 import type { ViewId } from '../../utils/navigation';
 
 export const TopHeader: React.FC = () => {
-    const { user, isAdmin } = useUser();
+    const { user } = useUser();
     const { currentView, setView, isFocusedMode } = useGlobalUI();
     const navigate = useNavigate();
 
@@ -19,7 +19,6 @@ export const TopHeader: React.FC = () => {
 
     const navItems = [
         { id: 'resumes', label: 'Resumes', path: ROUTES.RESUMES },
-        ...(isAdmin ? [{ id: 'feed', label: 'Feed', path: ROUTES.FEED }] : []),
     ];
 
     const handleNavigate = (id: string, path: string) => {

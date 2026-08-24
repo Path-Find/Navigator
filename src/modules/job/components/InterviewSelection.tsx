@@ -1,4 +1,4 @@
-import { Target, MessageSquare, AlertCircle, UserRound } from 'lucide-react';
+import { MessageSquare, AlertCircle, UserRound } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { useNavigate } from 'react-router';
 import { ROUTES } from '../../../constants';
@@ -42,57 +42,34 @@ export const InterviewSelection = ({ limitError, handleStartGeneral, handleStart
             )}
 
             <div className="max-w-6xl mx-auto">
-                <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4 items-stretch">
-                    {/* General Session Card */}
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 items-stretch max-w-4xl">
+                    {/* Practice Card */}
                     <div className="animate-in slide-in-from-bottom-8 fade-in duration-700 delay-100 fill-mode-both">
                         <BentoCard
-                            id="general"
+                            id="practice"
                             icon={MessageSquare}
-                            title="Common questions"
-                            description="Practice common interview questions and build strong STAR answers."
+                            title="Practice interview"
+                            description="Choose whether you want general practice or questions tailored to a specific job."
                             variant="compact"
-                            actionLabel="Practice Now"
-                            onAction={handleStartGeneral}
                             previewContent={
-                                <ul className="space-y-3 pt-2">
-                                    {[
-                                        'Common behavioral questions',
-                                        'STAR method training',
-                                        'Instant AI feedback'
-                                    ].map((feature, i) => (
-                                        <li key={i} className="flex items-center gap-3 text-[11px] font-bold text-neutral-400">
-                                            <div className="w-1.5 h-1.5 rounded-full bg-neutral-400" />
-                                            {feature}
-                                        </li>
-                                    ))}
-                                </ul>
-                            }
-                        />
-                    </div>
-
-                    {/* Tailored Session Card */}
-                    <div className="animate-in slide-in-from-bottom-8 fade-in duration-700 delay-200 fill-mode-both">
-                        <BentoCard
-                            id="tailored"
-                            icon={Target}
-                            title="Specific job practice"
-                            description="Practice questions tailored to a job you have analyzed."
-                            variant="compact"
-                            actionLabel="Launch Mock"
-                            onAction={handleStartTailored}
-                            previewContent={
-                                <ul className="space-y-3 pt-2">
-                                    {[
-                                        'Role-specific questions',
-                                        'Real-time simulation',
-                                        'Deep performance analysis'
-                                    ].map((feature, i) => (
-                                        <li key={i} className="flex items-center gap-3 text-[11px] font-bold text-neutral-400">
-                                            <div className="w-1.5 h-1.5 rounded-full bg-neutral-400" />
-                                            {feature}
-                                        </li>
-                                    ))}
-                                </ul>
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-2">
+                                    <button
+                                        type="button"
+                                        onClick={event => { event.stopPropagation(); void handleStartGeneral(); }}
+                                        className="rounded-xl border border-neutral-200 dark:border-neutral-700 px-3 py-2.5 text-left text-[11px] font-bold text-neutral-700 dark:text-neutral-200 hover:border-neutral-400 hover:bg-neutral-50 dark:hover:bg-neutral-800 transition-colors"
+                                    >
+                                        <span className="block">General practice</span>
+                                        <span className="block mt-0.5 text-[10px] font-medium text-neutral-400">Common interview questions</span>
+                                    </button>
+                                    <button
+                                        type="button"
+                                        onClick={event => { event.stopPropagation(); void handleStartTailored(); }}
+                                        className="rounded-xl border border-neutral-200 dark:border-neutral-700 px-3 py-2.5 text-left text-[11px] font-bold text-neutral-700 dark:text-neutral-200 hover:border-neutral-400 hover:bg-neutral-50 dark:hover:bg-neutral-800 transition-colors"
+                                    >
+                                        <span className="block">Specific job practice</span>
+                                        <span className="block mt-0.5 text-[10px] font-medium text-neutral-400">Questions for an analyzed job</span>
+                                    </button>
+                                </div>
                             }
                         />
                     </div>
