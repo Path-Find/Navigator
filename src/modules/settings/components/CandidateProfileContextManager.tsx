@@ -74,6 +74,7 @@ export const CandidateProfileContextManager: React.FC = () => {
     const [startTiming, setStartTiming] = React.useState<CandidateStartTiming>('flexible');
     const [startDate, setStartDate] = React.useState('');
     const [currentBlockIds, setCurrentBlockIds] = React.useState<string[]>([]);
+    const [isProfileExpanded, setIsProfileExpanded] = React.useState(false);
     const primaryResume = resumes[0];
     const signals = primaryResume?.candidateProfile?.signals || [];
     const stories = primaryResume?.candidateProfile?.stories || [];
@@ -252,17 +253,29 @@ export const CandidateProfileContextManager: React.FC = () => {
                     </div>
                 </div>
 
-                <Button
-                    variant="subtle"
-                    size="sm"
-                    onClick={() => navigate(ROUTES.PROFILE_INTERVIEW)}
-                    icon={<ArrowRight className="w-3.5 h-3.5" />}
-                    className="shrink-0 !text-indigo-600 dark:!text-indigo-400 !border-indigo-100 dark:!border-indigo-500/20"
-                >
-                    Review your profile
-                </Button>
+                <div className="flex flex-wrap gap-2 shrink-0">
+                    <Button
+                        variant="subtle"
+                        size="sm"
+                        onClick={() => navigate(ROUTES.PROFILE_INTERVIEW)}
+                        icon={<ArrowRight className="w-3.5 h-3.5" />}
+                        className="!text-indigo-600 dark:!text-indigo-400 !border-indigo-100 dark:!border-indigo-500/20"
+                    >
+                        Review profile
+                    </Button>
+                    <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => setIsProfileExpanded(current => !current)}
+                        icon={<ChevronDown className={`w-3.5 h-3.5 transition-transform ${isProfileExpanded ? 'rotate-180' : ''}`} />}
+                        className="!text-neutral-500 dark:!text-neutral-400"
+                    >
+                        {isProfileExpanded ? 'Hide details' : 'Edit details'}
+                    </Button>
+                </div>
             </div>
 
+            {isProfileExpanded && <>
             {profileBlocks.length > 0 ? (
                 <div className="mt-8 pt-6 border-t border-indigo-100/70 dark:border-indigo-500/10">
                     <div className="flex items-start justify-between gap-4 mb-4">
@@ -590,6 +603,7 @@ export const CandidateProfileContextManager: React.FC = () => {
                     )}
                 </div>
             )}
+            </>}
         </section>
     );
 };
