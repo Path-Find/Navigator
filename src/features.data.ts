@@ -103,6 +103,8 @@ export const FEATURE_REGISTRY: Record<string, FeatureDefinition> = {
         link: '/jobs/resumes',
         rank: 5,
         showOnHomepage: true,
+        showInFooter: true,
+        footerLabel: 'Resume',
     },
     COVER_LETTERS: {
         id: 'cover_letters',
@@ -187,6 +189,8 @@ export const FEATURE_REGISTRY: Record<string, FeatureDefinition> = {
         rank: 6,
         showOnHomepage: true,
         planHighlight: true,
+        showInFooter: true,
+        footerLabel: 'History',
     },
     FEED: {
         id: 'feed',
@@ -208,7 +212,7 @@ export const FEATURE_REGISTRY: Record<string, FeatureDefinition> = {
         rank: 4,
         showOnHomepage: false,
         planHighlight: false,
-        stage: 'beta',
+        stage: 'admin',
     },
     MAIL_IN: {
         id: 'mail-in',
@@ -229,7 +233,7 @@ export const FEATURE_REGISTRY: Record<string, FeatureDefinition> = {
         link: '/jobs/feed',
         rank: 9,
         showOnHomepage: false,
-        stage: 'beta',
+        stage: 'admin',
     },
     SKILLS_INTERVIEW: {
         id: 'skills-verify',
@@ -270,6 +274,8 @@ export const FEATURE_REGISTRY: Record<string, FeatureDefinition> = {
         link: '/jobs/interviews',
         rank: 18,
         stage: 'beta',
+        showInFooter: true,
+        footerLabel: 'Interviews',
     },
     COACH: {
         id: 'coach',

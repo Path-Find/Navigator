@@ -9,7 +9,7 @@ import {
     type LucideIcon,
 } from 'lucide-react';
 import { BentoCard } from '../../components/ui/BentoCard';
-import { getAllFeatures, getFeatureColor } from '../../featureRegistry';
+import { getAllFeatures, getFeatureColor, isFeatureComingSoon, isFeatureListed } from '../../featureRegistry';
 import { getPreviewComponent } from '../../components/common/FeaturePreviews';
 import { useUser } from '../../contexts/UserContext';
 import { useModal } from '../../contexts/ModalContext';
@@ -61,9 +61,8 @@ export const FeaturesPage: React.FC = () => {
     const allFeatures = useMemo(() => {
         return getAllFeatures()
             .filter(f => !f.id.toLowerCase().startsWith('_notice_')) // Filter system notices
-            .filter(f => f.stage !== 'admin')
+            .filter(isFeatureListed)
             .filter(f => f.category === 'JOB') // Focus strictly on Jobs-first experience
-            .filter(f => f.targetView !== 'feed') // Feed is currently sunset
             .sort((a, b) => a.rank - b.rank);
     }, []);
 
@@ -186,12 +185,12 @@ export const FeaturesPage: React.FC = () => {
                                         title={feature.name}
                                         description={feature.description.full}
                                         color={color}
-                                        actionLabel={feature.stage === 'beta' ? "Coming Soon" : actionLabel}
-                                        isComingSoon={feature.stage === 'beta'}
+                                        actionLabel={isFeatureComingSoon(feature) ? "Coming Soon" : actionLabel}
+                                        isComingSoon={isFeatureComingSoon(feature)}
                                         badge={feature.badge}
                                         previewContent={getPreviewComponent(feature.id, color)}
                                         onAction={() => {
-                                            if (feature.stage === 'beta' && !isAdmin) {
+                                            if (isFeatureComingSoon(feature) && !isAdmin) {
                                                 // Log interest or show toast
                                                 return;
                                             }

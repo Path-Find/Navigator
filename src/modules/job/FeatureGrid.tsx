@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react';
-import { FEATURE_REGISTRY, FEATURE_RANKINGS, getFeatureColor, shouldShowNewBadge, type FeatureDefinition } from '../../featureRegistry';
+import { FEATURE_REGISTRY, FEATURE_RANKINGS, getFeatureColor, isFeatureComingSoon, shouldShowNewBadge, type FeatureDefinition } from '../../featureRegistry';
 import { getPreviewComponent } from '../../components/common/FeaturePreviews';
 import type { ViewId } from '../../utils/navigation';
 import { Mail, TrendingUp, PenTool, Sparkles, FileText, GraduationCap, Bookmark, Zap, RefreshCw, Shield, Users, Globe, Search, Calculator, MessageSquare, Rss, Activity, Building2, School, type LucideIcon } from 'lucide-react';
@@ -167,7 +167,7 @@ export const FeatureGrid: React.FC<FeatureGridProps> = ({
                             color={color}
                             actionLabel={config.action[actionKey]}
                             badge={config.badge || (shouldShowNewBadge(config) ? 'New' : undefined)}
-                            isComingSoon={config.stage === 'beta'}
+                            isComingSoon={isFeatureComingSoon(config)}
                             previewContent={getPreviewComponent(config.id, color)}
                             onAction={() => handleAction(config)}
                             onDismiss={isSystemNotice ? () => {

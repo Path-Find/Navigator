@@ -71,6 +71,10 @@ export interface FeatureDefinition {
     showOnHomepage?: boolean;
     /** Hand-picked to appear on plan cards */
     planHighlight?: boolean;
+    /** Include this feature in the authenticated footer navigation */
+    showInFooter?: boolean;
+    /** Optional footer-specific label */
+    footerLabel?: string;
     /** Optional badge text (manually overridden if present) */
     badge?: string;
     /** ISO date string for feature release (e.g. '2024-01-15') */
@@ -232,7 +236,7 @@ export const getAllFeatures = (): FeatureDefinition[] => {
 
 /** Get features eligible for the homepage grid */
 export const getHomepageFeatures = (): FeatureDefinition[] => {
-    return getAllFeatures().filter(f => f.showOnHomepage);
+    return getAllFeatures().filter(f => f.showOnHomepage && f.stage !== 'admin');
 };
 
 /** Get features by tier (cumulative — includes lower tiers) */
@@ -244,8 +248,20 @@ export const getFeaturesByTier = (tier: 'explorer' | 'plus' | 'pro'): FeatureDef
 
 /** Get hand-picked features to highlight on plan cards */
 export const getFeaturesForPlan = (tier: 'explorer' | 'plus' | 'pro'): FeatureDefinition[] => {
-    return getAllFeatures().filter(f => f.planHighlight && f.tier === tier);
+    return getAllFeatures().filter(f => f.planHighlight && f.tier === tier && f.stage !== 'admin');
 };
+
+export const isFeatureComingSoon = (feature: FeatureDefinition): boolean => feature.stage === 'beta';
+
+export const isFeatureListed = (feature: FeatureDefinition): boolean => feature.stage !== 'admin';
+
+export const canUseFeature = (feature: FeatureDefinition, isAdmin: boolean): boolean => (
+    feature.stage === 'public' || (feature.stage === 'beta' && isAdmin)
+);
+
+export const getFooterFeatures = (isAdmin: boolean): FeatureDefinition[] => (
+    getAllFeatures().filter(feature => feature.showInFooter && canUseFeature(feature, isAdmin))
+);
 
 /** 
  * Helper to determine if a feature should show a "NEW" badge.

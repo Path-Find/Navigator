@@ -2,7 +2,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Check, ArrowRight, Zap, Shield } from 'lucide-react';
 import { ROUTES, PLAN_LIMITS, PLAN_PRICING, USER_TIERS, HEADLINES } from '../../constants';
-import { getFeaturesForPlan } from '../../featureRegistry';
+import { getFeaturesForPlan, isFeatureComingSoon } from '../../featureRegistry';
 import { SharedPageLayout } from '../../components/common/SharedPageLayout';
 import { PageHeader } from '../../components/ui/PageHeader';
 import { useUser } from '../../contexts/UserContext';
@@ -218,7 +218,7 @@ export const PlansPage: React.FC = () => {
                     buttonText={getPlanButtonText(USER_TIERS.PLUS)}
                     onSelect={() => handleSelectPlan(USER_TIERS.PLUS)}
                     isLoading={loadingTier === USER_TIERS.PLUS || (loadingTier === USER_TIERS.PLUS && waitlistStatus === 'loading')}
-                    features={getFeaturesForPlan('plus').map(f => ({ name: f.name, desc: f.description.plan, isComingSoon: f.stage === 'beta' }))}
+                    features={getFeaturesForPlan('plus').map(f => ({ name: f.name, desc: f.description.plan, isComingSoon: isFeatureComingSoon(f) }))}
                     limits={{
                         analyses: String(PLAN_LIMITS[USER_TIERS.PLUS].WEEKLY_ANALYSES),
                         analysesPeriod: 'week',
@@ -236,7 +236,7 @@ export const PlansPage: React.FC = () => {
                     buttonText={getPlanButtonText(USER_TIERS.PRO)}
                     onSelect={() => handleSelectPlan(USER_TIERS.PRO)}
                     isLoading={loadingTier === USER_TIERS.PRO || (loadingTier === USER_TIERS.PRO && waitlistStatus === 'loading')}
-                    features={getFeaturesForPlan('pro').map(f => ({ name: f.name, desc: f.description.plan, isComingSoon: f.stage === 'beta' }))}
+                    features={getFeaturesForPlan('pro').map(f => ({ name: f.name, desc: f.description.plan, isComingSoon: isFeatureComingSoon(f) }))}
                     limits={{
                         analyses: String(PLAN_LIMITS[USER_TIERS.PRO].DAILY_ANALYSES),
                         analysesPeriod: 'day',

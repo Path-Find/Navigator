@@ -1,5 +1,6 @@
 import React from 'react';
-import { TrendingUp, Zap, Bookmark, FileText, Mail, Shield, Scale, MessageSquare } from 'lucide-react';
+import { TrendingUp, FileText, Mail, Shield, Scale, Bookmark, MessageSquare } from 'lucide-react';
+import { getFooterFeatures } from '../../featureRegistry';
 import { useGlobalUI } from '../../contexts/GlobalUIContext';
 import { ROUTES, APP_VERSION } from '../../constants';
 import { useNavigate } from 'react-router';
@@ -38,27 +39,25 @@ export const Footer: React.FC = () => {
 
 
 
+    const footerFeatureItems = getFooterFeatures(isAdmin).map(feature => ({
+        label: feature.footerLabel || feature.shortName,
+        path: feature.link,
+        view: feature.targetView,
+        icon: ({ FileText, Bookmark, MessageSquare } as Record<string, React.ElementType>)[feature.iconName] || FileText,
+    }));
+
     const footerSections = [
         {
             title: 'Jobs',
-            items: [
-                { label: 'Resume', path: ROUTES.RESUMES, view: 'resumes', icon: FileText },
-                ...(isAdmin ? [{ label: 'Interviews', path: ROUTES.INTERVIEWS, view: 'interviews', icon: MessageSquare }] : []),
-                { label: 'History', path: ROUTES.HISTORY, view: 'history', icon: Bookmark },
-
-            ]
+            items: footerFeatureItems,
         },
         {
             title: '',
-            items: [
-                { label: '', path: '', view: '', icon: Zap },
-            ]
+            items: [],
         },
         {
             title: '',
-            items: [
-                { label: '', path: '', view: '', icon: Zap },
-            ]
+            items: [],
         },
         {
             title: 'About',
