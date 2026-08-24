@@ -132,7 +132,9 @@ export const UserProvider: React.FC<{ children: React.ReactNode }> = ({ children
                 setActualTier(profileData.is_admin ? 'admin' : tier);
                 setIsAdmin(profileData.is_admin || false);
                 setIsTester(profileData.is_tester || false);
-                setIsNextGenEnabled(profileData.next_gen_enabled || false);
+                // Admins always have access to NextGen; the profile flag remains
+                // available for non-admin rollout/testing until it is retired.
+                setIsNextGenEnabled(profileData.is_admin || profileData.next_gen_enabled || false);
                 const metadataName = typeof currentUser.user_metadata?.full_name === 'string'
                     ? currentUser.user_metadata.full_name.trim()
                     : '';

@@ -7,7 +7,7 @@ import { useUser } from '../../../contexts/UserContext';
 import { Button } from '../../../components/ui/Button';
 
 export const NextGenCalibration: React.FC = () => {
-    const { user, isNextGenEnabled, updateProfile } = useUser();
+    const { user } = useUser();
     const [stats, setStats] = useState<{ total: number; breakdown: Record<string, number> } | null>(null);
     const [style, setStyle] = useState<string | null>(null);
     const [isLoading, setIsLoading] = useState(false);
@@ -42,34 +42,21 @@ export const NextGenCalibration: React.FC = () => {
                     </div>
                     <div>
                         <h4 className="font-bold text-neutral-900 dark:text-white">NextGen Engine</h4>
-                        <p className="text-xs text-neutral-400 mt-0.5">Admin only — not visible to users</p>
+                        <p className="text-xs text-neutral-400 mt-0.5">Learns from your application activity to personalize assistance</p>
                     </div>
                 </div>
-                <div className="flex items-center gap-3">
-                    <span className="text-xs font-medium text-neutral-400">
-                        NextGen {isNextGenEnabled ? 'on' : 'off'}
-                    </span>
-                    <button
-                        type="button"
-                        aria-label={`${isNextGenEnabled ? 'Disable' : 'Enable'} NextGen Engine`}
-                        title={`${isNextGenEnabled ? 'Disable' : 'Enable'} NextGen Engine`}
-                        onClick={() => updateProfile({ next_gen_enabled: !isNextGenEnabled })}
-                        className={`relative w-10 h-5 rounded-full transition-all duration-300 p-0.5 ${isNextGenEnabled ? 'bg-indigo-600' : 'bg-neutral-200 dark:bg-neutral-700'}`}
-                    >
-                        <div className={`w-4 h-4 bg-white rounded-full transition-all duration-300 shadow-sm ${isNextGenEnabled ? 'translate-x-5' : 'translate-x-0'}`} />
-                    </button>
-                </div>
+                <span className="text-xs font-medium text-emerald-600 dark:text-emerald-400">Enabled</span>
             </div>
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-                {/* Writing style */}
+                {/* Learned style */}
                 <div className="bg-neutral-50 dark:bg-neutral-900/50 rounded-2xl p-5 border border-neutral-100 dark:border-neutral-800">
                     <div className="flex items-center justify-between mb-4">
                         <div className="flex items-center gap-2">
                             <div className="p-1.5 bg-indigo-500/10 rounded-lg">
                                 <Cpu className="w-3.5 h-3.5 text-indigo-500" />
                             </div>
-                            <span className="text-sm font-semibold text-neutral-700 dark:text-neutral-300">Writing style</span>
+                            <span className="text-sm font-semibold text-neutral-700 dark:text-neutral-300">Learned writing style</span>
                         </div>
                         <Button
                             variant="ghost"
@@ -83,7 +70,7 @@ export const NextGenCalibration: React.FC = () => {
                         </Button>
                     </div>
                     <p className="text-xs text-neutral-400 mb-4 leading-relaxed">
-                        Learned from your cover letters. Guides AI to sound like you.
+                        Generated from recorded cover-letter usage. This is separate from your editable cover-letter preference.
                     </p>
                     <div className="min-h-[80px] flex items-center justify-center">
                         {style ? (

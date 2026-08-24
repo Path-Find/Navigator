@@ -6,9 +6,12 @@ import { PageHeader } from '../../components/ui/PageHeader';
 import { SharedPageLayout } from '../../components/common/SharedPageLayout';
 import { ROUTES } from '../../constants';
 import { CandidateProfileContextManager } from './components/CandidateProfileContextManager';
+import { NextGenCalibration } from './components/NextGenCalibration';
+import { useUser } from '../../contexts/UserContext';
 
 export const ApplicationProfilePage: React.FC = () => {
     const navigate = useNavigate();
+    const { isNextGenEnabled } = useUser();
 
     return (
         <SharedPageLayout maxWidth="6xl" spacing="hero" className="pb-20">
@@ -36,6 +39,12 @@ export const ApplicationProfilePage: React.FC = () => {
             </div>
 
             <CandidateProfileContextManager />
+
+            {isNextGenEnabled && (
+                <div className="mt-8">
+                    <NextGenCalibration />
+                </div>
+            )}
         </SharedPageLayout>
     );
 };
