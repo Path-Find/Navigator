@@ -1,5 +1,5 @@
 import React from 'react';
-import { Plus, Trash2, Calendar, ArrowRightLeft, ChevronUp, ChevronDown } from 'lucide-react';
+import { Plus, Trash2, Calendar, ArrowRightLeft, ChevronUp, ChevronDown, MessageCircle } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import type { ExperienceBlock } from '../types';
 import type { SectionType } from '../constants';
@@ -20,6 +20,7 @@ interface ResumeSectionEditorProps {
     onSetMovingBlockId: (id: string | null) => void;
     current: boolean;
     onToggleCurrent: (blockId: string) => void;
+    onStartInterview: (block: ExperienceBlock) => void;
 }
 
 const CURRENT_FLAG_TYPES: ExperienceBlock['type'][] = ['work', 'volunteer', 'education', 'project'];
@@ -38,6 +39,7 @@ export const ResumeSectionEditor: React.FC<ResumeSectionEditorProps> = ({
     onSetMovingBlockId,
     current,
     onToggleCurrent,
+    onStartInterview,
 }) => {
     return (
         <>
@@ -211,6 +213,19 @@ export const ResumeSectionEditor: React.FC<ResumeSectionEditorProps> = ({
                                     >
                                         Add Line
                                     </Button>
+
+                                    {CURRENT_FLAG_TYPES.includes(block.type) && (
+                                        <Button
+                                            onClick={() => onStartInterview(block)}
+                                            variant="subtle"
+                                            size="xs"
+                                            className="shrink-0 whitespace-nowrap"
+                                            icon={<MessageCircle className="w-3.5 h-3.5" />}
+                                            title="Interview me about this entry"
+                                        >
+                                            Interview
+                                        </Button>
+                                    )}
 
                                     <div className="flex items-center gap-1 group/move relative h-full">
                                         <Button

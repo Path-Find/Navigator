@@ -23,6 +23,7 @@ See [CHANGELOG_ARCHIVE.md](CHANGELOG_ARCHIVE.md) for earlier history.
 - **Renamed Interview Advisor options in plain language**: the choices now describe what each practice mode actually does.
 - **Removed the redundant Interview Tips card**: Interview Advisor now focuses on the three actions users can actually take.
 - **Added an optional STAR explanation at interview start**: users can get a plain-language framework and example before answering, or continue immediately.
+- **Reconnected Resume Interview to resume entries**: work, education, volunteer, and project entries can now be interviewed individually to capture useful context behind them.
 - **Application Profile no longer repeats the resume entry list**: current-role controls remain in the Resume editor instead of duplicating every role and school entry.
 - **Resume dates now explain their expected format**: entry editing clearly asks for Month + Year and shows examples for past and current roles.
 - **Settings now focuses on account management**: application preferences and reusable resume context have their own Application Profile page instead of crowding account settings.

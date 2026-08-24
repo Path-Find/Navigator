@@ -13,6 +13,7 @@ import { UnifiedUploadHero } from '../../components/common/UnifiedUploadHero';
 import { GlobalDragOverlay } from '../../components/common/GlobalDragOverlay';
 import { ResumePreview } from './components/ResumePreview';
 import { ResumeSectionEditor } from './components/ResumeSectionEditor';
+import { ResumeInterviewModal } from './components/ResumeInterviewModal';
 import { ResumeDiscoverySidebar } from './components/ResumeDiscoverySidebar';
 import { AddEntryModal } from './components/AddEntryModal';
 import { SECTIONS, getSortDate, getTypeColor } from './constants';
@@ -21,6 +22,7 @@ import { useSkillContext } from '../skills/context/SkillContext';
 import { printElement } from '../../utils/printService';
 import { ROUTES } from '../../constants';
 import { useNavigate } from 'react-router';
+import type { ExperienceBlock } from './types';
 
 export const ResumeEditor: React.FC = () => {
     const navigate = useNavigate();
@@ -61,6 +63,7 @@ export const ResumeEditor: React.FC = () => {
     const [addingSection, setAddingSection] = useState<SectionType | null>(null);
     const [parsingMessageIndex, setParsingMessageIndex] = useState(0);
     const [isPreviewOpen, setIsPreviewOpen] = useState(false);
+    const [interviewBlock, setInterviewBlock] = useState<ExperienceBlock | null>(null);
     const fileInputRef = useRef<HTMLInputElement>(null);
 
     const PARSING_MESSAGES = [
@@ -378,6 +381,7 @@ export const ResumeEditor: React.FC = () => {
                                                     onSetMovingBlockId={setMovingBlockId}
                                                     current={initialResume.candidateProfile?.currentBlockIds?.includes(block.id) || false}
                                                     onToggleCurrent={toggleCurrentBlock}
+                                                    onStartInterview={setInterviewBlock}
                                                 />
                                             ))}
                                         </div>
@@ -412,6 +416,16 @@ export const ResumeEditor: React.FC = () => {
                     />
                 )}
             </AnimatePresence>
+
+            {interviewBlock && (
+                <ResumeInterviewModal
+                    block={interviewBlock}
+                    onSave={(narrativeContext) => {
+                        updateBlock(interviewBlock.id, 'narrativeContext', narrativeContext);
+                    }}
+                    onClose={() => setInterviewBlock(null)}
+                />
+            )}
 
             {/* Preview Modal */}
             {isPreviewOpen && (
