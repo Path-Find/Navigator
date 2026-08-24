@@ -80,6 +80,14 @@ export interface FeatureDefinition {
 // ─── Shared Color Palette ──────────────────────────────────────────────
 
 export const FEATURE_COLORS: Record<string, FeatureColor> = {
+    neutral: {
+        bg: 'bg-neutral-50 dark:bg-neutral-900/40',
+        text: 'text-neutral-600 dark:text-neutral-300',
+        accent: 'border-neutral-200 dark:border-neutral-700',
+        iconBg: 'bg-neutral-700 dark:bg-neutral-600',
+        preview: 'from-neutral-500/5',
+        glow: 'bg-neutral-500/5 group-hover:bg-neutral-500/10',
+    },
     indigo: {
         bg: 'bg-indigo-50/50 dark:bg-indigo-500/5',
         text: 'text-indigo-500 dark:text-indigo-400',
@@ -257,4 +265,3 @@ export const shouldShowNewBadge = (feature: FeatureDefinition): boolean => {
         return false;
     }
 };
-
