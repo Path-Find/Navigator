@@ -162,7 +162,7 @@ export const ResumeSectionEditor: React.FC<ResumeSectionEditorProps> = ({
                                             }}
                                         />
                                         <div className="opacity-0 group-hover/line:opacity-100 flex items-center gap-0.5 no-print">
-                                            {block.bullets.length > 1 && (
+                                            {block.type !== 'summary' && block.bullets.length > 1 && (
                                                 <>
                                                     <Button
                                                         onClick={() => onMoveBullet(block.id, idx, 'up')}
