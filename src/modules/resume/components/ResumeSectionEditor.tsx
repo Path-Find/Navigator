@@ -201,12 +201,12 @@ export const ResumeSectionEditor: React.FC<ResumeSectionEditorProps> = ({
                             </div>
 
                             {block.type !== 'summary' && (
-                                <div className="mt-6 flex items-center gap-3 no-print h-9">
+                                <div className="mt-6 flex items-center gap-3 no-print min-h-9">
                                     <Button
                                         onClick={() => onAddBullet(block.id)}
                                         variant="subtle"
                                         size="xs"
-                                        className="group/add"
+                                        className="group/add shrink-0 whitespace-nowrap"
                                         icon={<Plus className="w-3.5 h-3.5 group-hover/add:rotate-90 transition-transform duration-300" />}
                                     >
                                         Add Line
@@ -217,7 +217,7 @@ export const ResumeSectionEditor: React.FC<ResumeSectionEditorProps> = ({
                                             onClick={() => onSetMovingBlockId(movingBlockId === block.id ? null : block.id)}
                                             variant={movingBlockId === block.id ? "accent" : "subtle"}
                                             size="xs"
-                                            className="relative z-20"
+                                            className="relative z-20 shrink-0 whitespace-nowrap"
                                             icon={<ArrowRightLeft className="w-3.5 h-3.5" />}
                                         >
                                             Move
@@ -229,7 +229,7 @@ export const ResumeSectionEditor: React.FC<ResumeSectionEditorProps> = ({
                                                     initial={{ opacity: 0, x: -10, scale: 0.95 }}
                                                     animate={{ opacity: 1, x: 0, scale: 1 }}
                                                     exit={{ opacity: 0, x: -10, scale: 0.95 }}
-                                                    className="flex items-center gap-1 ml-2 p-1 px-1 bg-white/80 dark:bg-neutral-900/80 rounded-full border border-white/30 dark:border-neutral-800/50 backdrop-blur-2xl shadow-[0_4px_24px_rgba(0,0,0,0.06)] dark:shadow-[0_8px_32px_rgba(0,0,0,0.4)] z-10 h-full"
+                                                    className="flex items-center gap-1 ml-2 p-1 px-1 bg-white/80 dark:bg-neutral-900/80 rounded-full border border-white/30 dark:border-neutral-800/50 backdrop-blur-2xl shadow-[0_4px_24px_rgba(0,0,0,0.06)] dark:shadow-[0_8px_32px_rgba(0,0,0,0.4)] z-10 h-7"
                                                 >
                                                     {sections.filter(s => s.type !== 'summary').map(s => {
                                                         const isSelected = block.type === s.type;
@@ -269,7 +269,7 @@ export const ResumeSectionEditor: React.FC<ResumeSectionEditorProps> = ({
                                         onClick={() => onRemoveBlock(block.id)}
                                         variant="subtle"
                                         size="xs"
-                                        className="ml-auto text-rose-500 hover:text-rose-600 hover:border-rose-200 dark:hover:border-rose-800"
+                                        className="ml-auto shrink-0 text-rose-500 hover:text-rose-600 hover:border-rose-200 dark:hover:border-rose-800"
                                         icon={<Trash2 className="w-4 h-4" />}
                                     />
                                 </div>
