@@ -1,4 +1,4 @@
-import { supabase } from './supabase';
+import { dataClient } from '../lib/data-client';
 import { withTimeout } from '../utils/promiseUtils';
 
 export interface WaitlistEntry {
@@ -11,7 +11,7 @@ export const WaitlistService = {
     async joinWaitlist(email: string, source: string = 'auth_modal'): Promise<{ success: boolean; error?: string }> {
         try {
             const { error } = await withTimeout(
-                supabase
+                dataClient
                     .from('waitlist')
                     .insert({
                         email: email.toLowerCase().trim(),

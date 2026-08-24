@@ -1,5 +1,5 @@
 import { RdEmbeddingService } from './embeddingService';
-import { supabase } from '../../supabase';
+import { dataClient } from '../../../lib/data-client';
 
 export interface SimilarityResult {
     score: number;
@@ -51,7 +51,7 @@ export class RdSimilarityService {
             }
 
             // 2. Fetch the user's experience blocks (embeddings)
-            const { data: userEmbeddings, error } = await supabase
+            const { data: userEmbeddings, error } = await dataClient
                 .from('rd_user_embeddings')
                 .select('*')
                 .eq('user_id', userId)
