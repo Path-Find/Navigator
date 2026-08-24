@@ -7,6 +7,7 @@ See [CHANGELOG_ARCHIVE.md](CHANGELOG_ARCHIVE.md) for earlier history.
 ## [Unreleased]
 
 ### Fixed
+- **NextGen’s admin switch now says whether NextGen is on or off**: the control no longer uses ambiguous “Standby” wording.
 - **Application Profile no longer repeats the resume entry list**: current-role controls remain in the Resume editor instead of duplicating every role and school entry.
 - **Resume dates now explain their expected format**: entry editing clearly asks for Month + Year and shows examples for past and current roles.
 - **Settings now focuses on account management**: application preferences and reusable resume context have their own Application Profile page instead of crowding account settings.

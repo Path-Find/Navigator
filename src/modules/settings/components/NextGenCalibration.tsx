@@ -47,9 +47,12 @@ export const NextGenCalibration: React.FC = () => {
                 </div>
                 <div className="flex items-center gap-3">
                     <span className="text-xs font-medium text-neutral-400">
-                        {isNextGenEnabled ? 'Active' : 'Standby'}
+                        NextGen {isNextGenEnabled ? 'on' : 'off'}
                     </span>
                     <button
+                        type="button"
+                        aria-label={`${isNextGenEnabled ? 'Disable' : 'Enable'} NextGen Engine`}
+                        title={`${isNextGenEnabled ? 'Disable' : 'Enable'} NextGen Engine`}
                         onClick={() => updateProfile({ next_gen_enabled: !isNextGenEnabled })}
                         className={`relative w-10 h-5 rounded-full transition-all duration-300 p-0.5 ${isNextGenEnabled ? 'bg-indigo-600' : 'bg-neutral-200 dark:bg-neutral-700'}`}
                     >
