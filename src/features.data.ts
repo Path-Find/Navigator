@@ -290,7 +290,7 @@ export const FEATURE_REGISTRY: Record<string, FeatureDefinition> = {
         link: '/career/growth',
         rank: 7,
         showOnHomepage: false,
-        planHighlight: true,
+        planHighlight: false,
     },
     ROLE_MODELS: {
         id: 'role-modeling',
@@ -310,7 +310,7 @@ export const FEATURE_REGISTRY: Record<string, FeatureDefinition> = {
         targetView: 'coach-home',
         link: '/career/models',
         rank: 19,
-        planHighlight: true,
+        planHighlight: false,
     },
     EXTENSION: {
         id: 'extension',

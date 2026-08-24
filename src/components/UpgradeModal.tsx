@@ -73,8 +73,6 @@ export const UpgradeModal: React.FC<UpgradeModalProps> = ({ limitInfo, onClose, 
             description: 'For the active searcher',
             features: [
                 '200 Job Analyses / week',
-                '5 Email Job Alerts / day',
-                '5 Career Mentors',
                 'Interview Mission Control',
                 'Pro AI Model (Gemini 2.5 Pro)',
                 'Detailed Match Scores'
@@ -91,8 +89,6 @@ export const UpgradeModal: React.FC<UpgradeModalProps> = ({ limitInfo, onClose, 
             description: 'For the career pivoter',
             features: [
                 'Unlimited Job Analyses',
-                '25 Email Job Alerts / day',
-                'Unlimited Career Mentors',
                 'Interview Mission Control (Pro)',
                 'Best AI Model (Gemini 3 Pro)',
                 'Cover Letter Quality Loop'

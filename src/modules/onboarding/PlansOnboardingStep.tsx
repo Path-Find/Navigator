@@ -318,9 +318,6 @@ export const PlansOnboardingStep: React.FC<PlansOnboardingStepProps> = ({
                         onSelect={() => handleSelectPlan(USER_TIERS.PRO)}
                         isLoading={loadingTier === USER_TIERS.PRO}
                         features={[
-                            { name: 'Personalized Roadmaps', desc: '' },
-                            { name: 'Role Modeling', desc: '' },
-                            { name: 'Interview Coaching', desc: '' },
                         ]}
                     />
                 </div>

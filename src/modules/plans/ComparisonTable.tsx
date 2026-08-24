@@ -6,8 +6,6 @@ export const ComparisonTable = () => {
     const features = [
         { name: 'Monthly Cost', nav: '$19', jobscan: '$49.95', teal: '$29', rezi: '$29' },
         { name: 'Unlimited Analyses', nav: true, jobscan: false, teal: false, rezi: false },
-        { name: 'Auto-save from Email', nav: true, jobscan: false, teal: true, rezi: false },
-        { name: 'Daily Job Alerts', nav: true, jobscan: true, teal: true, rezi: false },
         { name: 'AI Cover Letters', nav: true, jobscan: false, teal: true, rezi: true },
         { name: 'Skills Audit & Gap Analysis', nav: true, jobscan: true, teal: true, rezi: true },
     ];

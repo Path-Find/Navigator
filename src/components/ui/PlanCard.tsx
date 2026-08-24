@@ -12,9 +12,9 @@ interface PlanCardProps {
     limits?: {
         analyses: string;
         analysesPeriod: string;
-        emails: number;
+        emails?: number;
         emailPeriod?: string;
-        mentors: number | string;
+        mentors?: number | string;
         mentorPeriod?: string;
         interviews: number | string;
     };
@@ -125,7 +125,7 @@ export const PlanCard = ({
                 {/* Usage Limits Section (Only in Default variant) */}
                 {!isCompact && limits && (
                     <div className="p-4 rounded-3xl bg-neutral-50/50 dark:bg-neutral-800/20 border border-neutral-100/50 dark:border-neutral-800/30 space-y-3 mb-6">
-                        <div className="flex justify-between items-center text-[10px]">
+                        {limits.emails !== undefined && <div className="flex justify-between items-center text-[10px]">
                             <div className="flex items-center gap-1.5">
                                 <span className="font-bold text-neutral-400 capitalize tracking-wide">Jobs</span>
                                 <SimpleTooltip content="How many jobs you can save and have analyzed. Each job gets a detailed compatibility breakdown.">
@@ -142,7 +142,7 @@ export const PlanCard = ({
                                 {limits.analyses}
                                 {limits.analysesPeriod && <span className="text-neutral-300 font-bold ml-0.5">/ {limits.analysesPeriod}</span>}
                             </span>
-                        </div>
+                        </div>}
                         <div className="flex justify-between items-center text-[10px]">
                             <div className="flex items-center gap-1.5">
                                 <span className="font-bold text-neutral-400 tracking-wide">Email alerts</span>

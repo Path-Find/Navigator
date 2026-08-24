@@ -218,12 +218,9 @@ export const Terms: React.FC = () => {
                                     <p>
                                         Questions about the Terms of Service should be sent to:
                                     </p>
-                                    <div className="mt-12 p-8 rounded-[2rem] bg-neutral-50 dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 shadow-sm relative overflow-hidden group">
-                                        <div className="absolute top-0 right-0 w-32 h-32 bg-indigo-500/5 rounded-full -mr-16 -mt-16 group-hover:scale-150 transition-transform duration-500" />
-                                        <p className="m-0 font-bold text-indigo-600 dark:text-indigo-400">Legal Team</p>
-                                        <p className="m-0 text-neutral-500 dark:text-neutral-400">Navigator Career Tools</p>
-                                        <a href="mailto:legal@navigator.com" className="inline-block mt-4 text-2xl font-black">legal@navigator.com</a>
-                                    </div>
+                                    <p className="mt-6">
+                                        Please use the <a href="/contact" className="font-bold text-indigo-600 dark:text-indigo-400">Contact page</a> so we can route your question correctly.
+                                    </p>
                                 </section>
                             </div>
                         </div>

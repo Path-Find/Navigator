@@ -222,10 +222,6 @@ export const PlansPage: React.FC = () => {
                     limits={{
                         analyses: String(PLAN_LIMITS[USER_TIERS.PLUS].WEEKLY_ANALYSES),
                         analysesPeriod: 'week',
-                        emails: PLAN_LIMITS[USER_TIERS.PLUS].DAILY_EMAILS,
-                        emailPeriod: 'day',
-                        mentors: PLAN_LIMITS[USER_TIERS.PLUS].ROLE_MODELS,
-                        mentorPeriod: 'total',
                         interviews: PLAN_LIMITS[USER_TIERS.PLUS].SKILLS_INTERVIEWS
                     }}
                 />
@@ -244,10 +240,6 @@ export const PlansPage: React.FC = () => {
                     limits={{
                         analyses: String(PLAN_LIMITS[USER_TIERS.PRO].DAILY_ANALYSES),
                         analysesPeriod: 'day',
-                        emails: PLAN_LIMITS[USER_TIERS.PRO].DAILY_EMAILS,
-                        emailPeriod: 'day',
-                        mentors: PLAN_LIMITS[USER_TIERS.PRO].ROLE_MODELS,
-                        mentorPeriod: 'total',
                         interviews: PLAN_LIMITS[USER_TIERS.PRO].SKILLS_INTERVIEWS
                     }}
                 />
