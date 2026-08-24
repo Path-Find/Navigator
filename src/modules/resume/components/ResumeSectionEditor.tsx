@@ -53,7 +53,7 @@ export const ResumeSectionEditor: React.FC<ResumeSectionEditorProps> = ({
                                 type="button"
                                 onClick={() => onToggleCurrent(block.id)}
                                 aria-pressed={current}
-                                className={`rounded-xl border px-2.5 py-1.5 text-[10px] font-black transition-colors ${current ? 'text-indigo-600 bg-indigo-50 border-indigo-200 dark:text-indigo-300 dark:bg-indigo-500/10 dark:border-indigo-500/30' : 'text-neutral-400 border-neutral-200 hover:text-indigo-600 hover:border-indigo-200 dark:border-neutral-700'}`}
+                                className={`whitespace-nowrap rounded-xl border px-2.5 py-1.5 text-[10px] font-black transition-colors ${current ? 'text-indigo-600 bg-indigo-50 border-indigo-200 dark:text-indigo-300 dark:bg-indigo-500/10 dark:border-indigo-500/30' : 'text-neutral-400 border-neutral-200 hover:text-indigo-600 hover:border-indigo-200 dark:border-neutral-700'}`}
                             >
                                 {current ? 'Current' : 'Mark as current'}
                             </button>
@@ -62,7 +62,7 @@ export const ResumeSectionEditor: React.FC<ResumeSectionEditorProps> = ({
                     <div className="space-y-6">
                         {/* Title Area */}
                         {block.type !== 'summary' && (
-                            <div className="pr-12">
+                            <div className="pr-52">
                                 <textarea
                                     value={block.title}
                                     onChange={(e) => onUpdateBlock(block.id, 'title', e.target.value)}
