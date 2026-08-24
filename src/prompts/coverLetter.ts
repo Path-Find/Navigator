@@ -62,8 +62,8 @@ export const COVER_LETTER_PROMPTS = {
     - Build functional bridges between experiences instead of using robotic transitions or chronological resume lists.
     - Use a different relevant resume block for each body paragraph when the evidence supports it.
     - Avoid filler. Every sentence must add new, evidence-backed weight.
-    - Never copy a resume bullet's sentence structure with synonyms swapped.
-    - Preserve literal metrics for technical or academic roles; paraphrase them only for creative, managerial, or general roles.
+    - Treat the resume as a source of facts, not wording to reproduce. Never copy a resume bullet's sentence structure with synonyms swapped.
+    - Preserve the underlying truth of every achievement, but choose the most natural level of precision for the letter. Exact metrics are optional: keep, round, generalize, or omit a number when that improves the sentence, but never invent a number or change the scale of the result.
 
     ${UNTRUSTED_DATA_RULE}
     ${GUIDANCE_RULE}
@@ -116,7 +116,7 @@ export const COVER_LETTER_PROMPTS = {
     FINAL CHECK:
     - Ensure no (BLOCK_ID) tags remain in the output.
     - REFLECT: Is this a list or a narrative? If it feels like a list, use a functional bridge to connect two thoughts.
-    - REFLECT: Did I handle the metrics correctly for this role category?
+    - REFLECT: Did I preserve each achievement accurately while using natural, non-resume wording and only the level of numerical precision this role needs?
     - REFLECT: Does this sound like an AI? Remove generic filler like "I am excited to apply."
 
     IMPORTANT: Provide the cover letter as RAW TEXT ONLY. Do NOT wrap in JSON, Markdown code blocks, or any other formatting.
@@ -137,7 +137,7 @@ export const COVER_LETTER_PROMPTS = {
     PROPOSED COVER LETTER DATA:
     ${anchorData('COVER_LETTER', coverLetter)}
 
-    1. TECHNICAL FIDELITY: List every specific tool, software, platform, certification, or technology named in the letter, then check each one appears verbatim in the resume. Any that don't (even a plausible-sounding one that fits the theme, e.g. adding "QGIS" to a real "ArcGIS Pro, ArcGIS Online" list) is a hallucination — put it in hallucinationAlerts and this cannot score above "Weak", regardless of whether the tool might genuinely be true of the candidate; this check is about what the resume can verify, not what's actually true. Also check: does it lift a resume bullet's sentence structure/phrasing with only a word or two changed? (Compare each metric-bearing sentence against its source resume bullet — same skeleton with synonyms swapped counts as a copy, even if no phrase matches exactly.)
+    1. TECHNICAL FIDELITY: List every specific tool, software, platform, certification, or technology named in the letter, then check each one is supported by the resume. A tool or credential that is not supported (even a plausible-sounding one that fits the theme, e.g. adding "QGIS" to a real "ArcGIS Pro, ArcGIS Online" list) is a hallucination — put it in hallucinationAlerts and this cannot score above "Weak", regardless of whether it might genuinely be true of the candidate. For achievements and numbers, exact wording and exact precision are optional, but the underlying fact, direction, and scale must remain truthful; flag invented, inflated, or materially changed results. Also check whether any sentence copies a resume bullet's structure with synonyms swapped.
     2. NARRATIVE SUBSTANCE: Is it a cohesive argument or a robotic list?
     3. FUNCTIONAL BRIDGING: Are the transitions thematic or additive?
 
