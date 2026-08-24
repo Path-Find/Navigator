@@ -19,8 +19,8 @@ const PROFILE_QUESTIONS = [
 ];
 
 const REVIEW_QUESTIONS: Record<CandidateProfileInsightSuggestion['key'], string> = {
-    current_education: 'Your resume suggests that you are currently studying or completing an education program. Is that accurate?',
-    possible_first_role: 'Your resume looks like it may be preparing you for an early-career or first professional role. Is that how Navigator should frame your applications?',
+    current_education: 'Is this education still current?',
+    possible_first_role: 'Should Navigator treat you as early-career?',
 };
 
 const stringifyResume = (profile: ResumeProfile): string => profile.blocks
@@ -61,6 +61,9 @@ export const CandidateProfileInterview: React.FC<CandidateProfileInterviewProps>
         return !savedInsight || savedInsight.sourceVersion !== sourceVersion;
     }), [primaryResume, reviewedInsightKeys, sourceVersion]);
     const reviewItem = reviewItems[0];
+    const reviewReason = reviewItem?.key === 'current_education'
+        ? 'The dates look current or ongoing.'
+        : reviewItem?.reason;
 
     useEffect(() => {
         let mounted = true;
@@ -281,9 +284,9 @@ export const CandidateProfileInterview: React.FC<CandidateProfileInterviewProps>
                         <div className="bg-white dark:bg-neutral-900 rounded-3xl border border-violet-100 dark:border-violet-500/20 p-8 shadow-sm">
                             <p className="text-[10px] font-black uppercase tracking-widest text-violet-500 dark:text-violet-300 mb-3">Profile review</p>
                             <h1 className="text-2xl font-black text-neutral-900 dark:text-white mb-4">{REVIEW_QUESTIONS[reviewItem.key]}</h1>
-                            <p className="text-sm text-neutral-500 dark:text-neutral-400 mb-3">Navigator noticed:</p>
+                            <p className="text-sm text-neutral-500 dark:text-neutral-400 mb-3">Based on your resume:</p>
                             <p className="text-sm font-bold text-neutral-800 dark:text-neutral-200 bg-violet-50 dark:bg-violet-500/10 rounded-2xl px-4 py-3">{reviewItem.value}</p>
-                            <p className="text-xs text-neutral-500 dark:text-neutral-400 mt-3">Why: {reviewItem.reason}</p>
+                            <p className="text-xs text-neutral-500 dark:text-neutral-400 mt-3">Why: {reviewReason}</p>
                             <div className="flex flex-wrap gap-3 mt-8">
                                 <button type="button" onClick={() => { void handleReviewDecision('confirmed'); }} disabled={isSavingReview} className="rounded-2xl bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 text-white px-5 py-3 text-sm font-black">That’s right</button>
                                 <button type="button" onClick={() => { void handleReviewDecision('dismissed'); }} disabled={isSavingReview} className="rounded-2xl border border-neutral-200 dark:border-neutral-700 text-neutral-700 dark:text-neutral-200 px-5 py-3 text-sm font-black">Not me</button>
