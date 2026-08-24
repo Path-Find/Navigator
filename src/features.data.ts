@@ -131,7 +131,7 @@ export const FEATURE_REGISTRY: Record<string, FeatureDefinition> = {
         id: 'resume-interview',
         key: 'RESUME_INTERVIEW',
         name: 'Resume Interview',
-        shortName: 'Story Mode',
+        shortName: 'Resume Interview',
         description: {
             short: 'Capture the real story behind your resume.',
             full: 'Answer a few focused questions about each experience block. The depth you reveal gets woven automatically into every cover letter you generate.',
@@ -146,7 +146,7 @@ export const FEATURE_REGISTRY: Record<string, FeatureDefinition> = {
         link: '/jobs/resumes',
         rank: 13,
         planHighlight: true,
-        stage: 'beta',
+        stage: 'public',
     },
     QUALITY_LOOP: {
         id: 'quality-loop',
@@ -228,7 +228,7 @@ export const FEATURE_REGISTRY: Record<string, FeatureDefinition> = {
         targetView: 'feed',
         link: '/jobs/feed',
         rank: 9,
-        showOnHomepage: true,
+        showOnHomepage: false,
         stage: 'beta',
     },
     SKILLS_INTERVIEW: {

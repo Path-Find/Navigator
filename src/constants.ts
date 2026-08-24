@@ -136,7 +136,6 @@ export const RESUME_SECTION_TYPES = {
 
 // External Utility Links
 export const EXTERNAL_LINKS = {
-  SUPPORT_EMAIL: 'mailto:support@navigator.com',
   LINKEDIN_EXPORT_GUIDE: 'https://www.linkedin.com/help/linkedin/answer/a511674',
 } as const;
 

@@ -60,9 +60,10 @@ export const FeaturesPage: React.FC = () => {
     // Get all features from registry (excluding admin-only for public features page)
     const allFeatures = useMemo(() => {
         return getAllFeatures()
-            .filter(f => !f.id.startsWith('_notice_')) // Filter system notices
+            .filter(f => !f.id.toLowerCase().startsWith('_notice_')) // Filter system notices
             .filter(f => f.stage !== 'admin')
             .filter(f => f.category === 'JOB') // Focus strictly on Jobs-first experience
+            .filter(f => f.targetView !== 'feed') // Feed is currently sunset
             .sort((a, b) => a.rank - b.rank);
     }, []);
 

@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Mail, MessageSquare, Send, CheckCircle, ArrowRight, User, AtSign, Building } from 'lucide-react';
+import { MessageSquare, Send, CheckCircle, ArrowRight, User, AtSign, Building } from 'lucide-react';
 
 export const Contact: React.FC = () => {
     const [status, setStatus] = useState<'idle' | 'sending' | 'success'>('idle');
@@ -50,27 +50,9 @@ export const Contact: React.FC = () => {
                             </p>
                         </div>
 
-                        <div className="space-y-6">
-                            <div className="flex items-start gap-4 p-6 rounded-3xl border border-neutral-100 dark:border-neutral-800 bg-neutral-50/50 dark:bg-neutral-900/50">
-                                <div className="p-2 bg-white dark:bg-neutral-800 rounded-xl shadow-sm">
-                                    <Mail className="w-5 h-5 text-indigo-600" />
-                                </div>
-                                <div>
-                                    <h3 className="font-bold text-neutral-900 dark:text-white">Email Us</h3>
-                                    <p className="text-sm text-neutral-500 dark:text-neutral-400">support@navigator.com</p>
-                                </div>
-                            </div>
-
-                            <div className="flex items-start gap-4 p-6 rounded-3xl border border-neutral-100 dark:border-neutral-800 bg-neutral-50/50 dark:bg-neutral-900/50">
-                                <div className="p-2 bg-white dark:bg-neutral-800 rounded-xl shadow-sm">
-                                    <AtSign className="w-5 h-5 text-emerald-600" />
-                                </div>
-                                <div>
-                                    <h3 className="font-bold text-neutral-900 dark:text-white">Social</h3>
-                                    <p className="text-sm text-neutral-500 dark:text-neutral-400">@navigator_ai on X & LinkedIn</p>
-                                </div>
-                            </div>
-                        </div>
+                        <p className="text-sm font-bold text-neutral-500 dark:text-neutral-400">
+                            Send us a message using the form and we’ll get back to you.
+                        </p>
                     </div>
 
                     {/* Right Side: Form */}

@@ -138,7 +138,6 @@ describe('constants', () => {
 
   describe('EXTERNAL_LINKS', () => {
     it('should have valid utility links', () => {
-      expect(EXTERNAL_LINKS.SUPPORT_EMAIL).toContain('mailto:');
       expect(EXTERNAL_LINKS.LINKEDIN_EXPORT_GUIDE).toContain('https://');
     });
   });
