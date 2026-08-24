@@ -269,7 +269,7 @@ export const FEATURE_REGISTRY: Record<string, FeatureDefinition> = {
         targetView: 'interviews',
         link: '/jobs/interviews',
         rank: 18,
-        stage: 'beta',
+        stage: 'public',
     },
     COACH: {
         id: 'coach',
