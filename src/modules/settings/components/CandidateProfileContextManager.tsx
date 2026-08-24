@@ -255,7 +255,7 @@ export const CandidateProfileContextManager: React.FC = () => {
             <div className="mt-8 pt-6 border-t border-indigo-100/70 dark:border-indigo-500/10">
                 <div className="flex items-start justify-between gap-4 mb-4">
                     <div>
-                        <h5 className="text-[10px] font-black uppercase tracking-widest text-neutral-400">Availability</h5>
+                        <h5 className="text-sm font-semibold text-neutral-700 dark:text-neutral-300">Availability</h5>
                         <p className="text-xs text-neutral-400 leading-relaxed mt-2 max-w-2xl">
                             These choices help Navigator filter and frame applications. City is the only short text field; the rest stay structured.
                         </p>
@@ -351,7 +351,7 @@ export const CandidateProfileContextManager: React.FC = () => {
                     <div className="flex items-start gap-3 mb-4">
                         <GraduationCap className="w-4 h-4 text-emerald-500 mt-0.5" />
                         <div>
-                            <h5 className="text-[10px] font-black uppercase tracking-widest text-neutral-400">Education context</h5>
+                            <h5 className="text-sm font-semibold text-neutral-700 dark:text-neutral-300">Education context</h5>
                             <p className="text-xs text-neutral-400 leading-relaxed mt-2 max-w-2xl">
                                 Course status is kept explicit: a recorded grade means completed, a blank grade means upcoming, and a withdrawal is not used as completed evidence.
                             </p>
@@ -386,7 +386,7 @@ export const CandidateProfileContextManager: React.FC = () => {
 
             {facts.length > 0 ? (
                 <div className="mt-8 pt-6 border-t border-indigo-100/70 dark:border-indigo-500/10">
-                    <h5 className="text-[10px] font-black uppercase tracking-widest text-neutral-400 mb-3">Additional profile details</h5>
+                    <h5 className="text-sm font-semibold text-neutral-700 dark:text-neutral-300 mb-3">Additional profile details</h5>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                         {facts.map(fact => (
                             <div key={fact.id} className="flex items-start gap-3 rounded-2xl bg-sky-50/70 dark:bg-sky-500/10 border border-sky-100 dark:border-sky-500/20 px-4 py-3">
@@ -409,7 +409,7 @@ export const CandidateProfileContextManager: React.FC = () => {
 
             <div className="mt-8 pt-6 border-t border-indigo-100/70 dark:border-indigo-500/10">
                 <div className="pb-6 border-b border-indigo-100/70 dark:border-indigo-500/10">
-                    <h5 className="text-[10px] font-black uppercase tracking-widest text-neutral-400 mb-2">Cover-letter style</h5>
+                    <h5 className="text-sm font-semibold text-neutral-700 dark:text-neutral-300 mb-2">Cover-letter style</h5>
                     <p className="text-xs text-neutral-400 leading-relaxed mb-4 max-w-2xl">
                         Applies to every cover letter. Use this for tone, voice, or length—not facts about a specific job.
                     </p>
@@ -426,7 +426,7 @@ export const CandidateProfileContextManager: React.FC = () => {
 
                 <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                     <div>
-                        <h5 className="text-[10px] font-black uppercase tracking-widest text-neutral-400">Current focus</h5>
+                        <h5 className="text-sm font-semibold text-neutral-700 dark:text-neutral-300">Current focus</h5>
                         <p className="text-xs text-neutral-400 leading-relaxed mt-2 max-w-xl">
                             Helps Navigator understand the kind of support you want right now. You can change this whenever your direction changes.
                         </p>
@@ -487,7 +487,7 @@ export const CandidateProfileContextManager: React.FC = () => {
                 <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mt-8">
                     {signals.length > 0 && (
                         <div>
-                            <h5 className="text-[10px] font-black uppercase tracking-widest text-neutral-400 mb-3">Signals</h5>
+                            <h5 className="text-sm font-semibold text-neutral-700 dark:text-neutral-300 mb-3">Signals</h5>
                             <div className="space-y-3">
                                 {signals.map(signal => (
                                     <div key={signal.id} className="flex items-start gap-3 rounded-2xl bg-indigo-50/70 dark:bg-indigo-500/10 border border-indigo-100 dark:border-indigo-500/20 px-4 py-3">
@@ -511,7 +511,7 @@ export const CandidateProfileContextManager: React.FC = () => {
 
                     {stories.length > 0 && (
                         <div>
-                            <h5 className="text-[10px] font-black uppercase tracking-widest text-neutral-400 mb-3">Stories</h5>
+                            <h5 className="text-sm font-semibold text-neutral-700 dark:text-neutral-300 mb-3">Stories</h5>
                             <div className="space-y-3">
                                 {stories.map(story => (
                                     <div key={story.id} className="flex items-start gap-3 rounded-2xl bg-amber-50/70 dark:bg-amber-500/10 border border-amber-100 dark:border-amber-500/20 px-4 py-3">

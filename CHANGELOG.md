@@ -11,6 +11,7 @@ See [CHANGELOG_ARCHIVE.md](CHANGELOG_ARCHIVE.md) for earlier history.
 - **NextGen diagnostics no longer duplicate profile preferences**: personal learned-style and activity details now live in Application Profile, alongside editable cover-letter style.
 - **NextGen is automatic for admins and no longer has a confusing toggle**: eligible users see it in Application Profile, where its personal learned context belongs.
 - **Application Profile is now reachable from Resume**: resume context and preferences are linked from the workflow where they are used instead of living under account settings.
+- **Application Profile subsection headings are now readable**: labels use normal capitalization, sizing, and spacing instead of appearing like tiny all-caps metadata.
 - **Application Profile no longer repeats the resume entry list**: current-role controls remain in the Resume editor instead of duplicating every role and school entry.
 - **Resume dates now explain their expected format**: entry editing clearly asks for Month + Year and shows examples for past and current roles.
 - **Settings now focuses on account management**: application preferences and reusable resume context have their own Application Profile page instead of crowding account settings.
