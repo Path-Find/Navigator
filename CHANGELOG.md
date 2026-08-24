@@ -5,6 +5,7 @@ All notable changes to this project will be documented in this file.
 See [CHANGELOG_ARCHIVE.md](CHANGELOG_ARCHIVE.md) for earlier history.
 
 ## [Unreleased]
+- Hid unfinished interview, Feed, roadmap, mentor, transcript, and program destinations from navigation.
 - Marked the live Practice Interviews experience as available instead of “Coming soon.”
 - Removed placeholder social and support contact details so users are not sent to unowned accounts.
 

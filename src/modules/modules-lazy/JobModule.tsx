@@ -1,12 +1,11 @@
 import React, { useEffect } from 'react';
-import { useLocation, Routes, Route } from 'react-router';
+import { useLocation, Routes, Route, Navigate } from 'react-router';
 import { useJobContext } from '../job/context/JobContext';
 import HomePage from '../job/HomePage';
 import JobMatchInput from '../job/JobMatchInput';
 import History from '../job/History';
 import JobDetail from '../job/JobDetail';
 import { CoverLetters } from '../job/CoverLetters';
-import { NavigatorPro } from '../job/NavigatorPro';
 import { InterviewAdvisor } from '../job/InterviewAdvisor';
 
 const JobSyncEffect: React.FC = () => {
@@ -36,7 +35,7 @@ const JobModuleContent: React.FC = () => {
                 <Route path="match" element={<JobMatchInput />} />
                 <Route path="history" element={<History />} />
                 <Route path="cover-letters" element={<CoverLetters />} />
-                <Route path="feed" element={<NavigatorPro />} />
+                <Route path="feed" element={<Navigate to="/jobs" replace />} />
                 <Route path="interviews" element={<InterviewAdvisor />} />
                 <Route path="interviews/:type" element={<InterviewAdvisor />} />
                 

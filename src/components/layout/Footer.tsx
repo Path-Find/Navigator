@@ -1,5 +1,5 @@
 import React from 'react';
-import { TrendingUp, Sparkles, Zap, Bookmark, FileText, Users, Target, GraduationCap, Mail, Shield, Scale, MessageSquare } from 'lucide-react';
+import { TrendingUp, Zap, Bookmark, FileText, Mail, Shield, Scale, MessageSquare } from 'lucide-react';
 import { useGlobalUI } from '../../contexts/GlobalUIContext';
 import { ROUTES, APP_VERSION } from '../../constants';
 import { useNavigate } from 'react-router';
@@ -49,18 +49,15 @@ export const Footer: React.FC = () => {
             ]
         },
         {
-            title: 'Career',
+            title: '',
             items: [
-                { label: 'Skills', path: ROUTES.SKILLS, view: 'skills', icon: Zap },
-                { label: 'Roadmap', path: ROUTES.CAREER_GROWTH, view: 'career-growth', icon: Target },
-                { label: 'Mentors', path: ROUTES.CAREER_MODELS, view: 'career-models', icon: Users },
+                { label: '', path: '', view: '', icon: Zap },
             ]
         },
         {
-            title: 'Education',
+            title: '',
             items: [
-                { label: 'Transcript', path: ROUTES.TRANSCRIPT, view: 'edu-transcript', icon: GraduationCap },
-                { label: 'Programs', path: ROUTES.PROGRAM_EXPLORER, view: 'edu-programs', icon: Sparkles },
+                { label: '', path: '', view: '', icon: Zap },
             ]
         },
         {
@@ -94,13 +91,11 @@ export const Footer: React.FC = () => {
                     </div>
 
                     {/* Navigation Columns */}
-                    {footerSections.map((section) => (
-                        <div key={section.title} className="space-y-6">
-                            <h4 className="text-sm font-bold text-neutral-900 dark:text-white">
-                                {section.title}
-                            </h4>
+                    {footerSections.map((section, index) => (
+                        <div key={`${section.title || 'spacer'}-${index}`} className="space-y-6">
+                            {section.title && <h4 className="text-sm font-bold text-neutral-900 dark:text-white">{section.title}</h4>}
                             <ul className="space-y-3">
-                                {section.items.map((item) => (
+                                {section.title && section.items.map((item) => (
                                     <li key={item.label}>
                                         <button
                                             onClick={() => handleNavigate(item.path, item.view)}

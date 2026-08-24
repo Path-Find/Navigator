@@ -100,7 +100,7 @@ describe('FeatureGrid', () => {
             <FeatureGrid user={null} isAdmin={true} />
         );
 
-        // Should see Education card
-        expect(screen.getByText(eduConfig.shortName)).toBeInTheDocument();
+        // Education is intentionally hidden while its flows are being tested.
+        expect(screen.queryByText(eduConfig.shortName)).not.toBeInTheDocument();
     });
 });

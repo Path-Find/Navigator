@@ -7,6 +7,7 @@ import { useGlobalUI } from '../../contexts/GlobalUIContext';
 import { useJobContext } from './context/JobContext';
 import { useResumeContext } from '../resume/context/ResumeContext';
 import { useSkillContext } from '../skills/context/SkillContext';
+import { useUser } from '../../contexts/UserContext';
 import { useInterview } from './hooks/useInterview';
 import { computeSnippets } from './utils/interviewUtils';
 import { InterviewSelection } from './components/InterviewSelection';
@@ -16,6 +17,7 @@ import { ROUTES } from '../../constants';
 import { createCandidateStory } from '../../services/candidateProfileContext';
 
 export const InterviewAdvisor: React.FC = () => {
+    const { isAdmin, isLoading: isUserLoading } = useUser();
     const { jobs } = useJobContext();
     const { type } = useParams<{ type: string }>();
     const navigate = useNavigate();
@@ -47,8 +49,13 @@ export const InterviewAdvisor: React.FC = () => {
     const { showError } = useToast();
     const [resumeSnippets, setResumeSnippets] = useState<{ text: string; source: string }[]>([]);
 
+    useEffect(() => {
+        if (!isUserLoading && !isAdmin) navigate(ROUTES.FEATURES, { replace: true });
+    }, [isAdmin, isUserLoading, navigate]);
+
     // Sync state with URL
     useEffect(() => {
+        if (isUserLoading || !isAdmin) return;
         if (type === 'general' || type === 'tailored') {
             const startSession = async () => {
                 const { data: { user } } = await authClient.getUser();
@@ -86,7 +93,7 @@ export const InterviewAdvisor: React.FC = () => {
                 setSelectedJobId(null);
             });
         }
-    }, [type, navigate, resumes, skills, loadGeneralQuestions, showError]);
+    }, [type, navigate, resumes, skills, loadGeneralQuestions, showError, isAdmin, isUserLoading]);
 
     useEffect(() => {
         if (mode === 'session') {
@@ -190,6 +197,8 @@ export const InterviewAdvisor: React.FC = () => {
         (sessionType === 'general' && questions.length === 0 && isLoading) ||
         (sessionType === 'tailored' && selectedJobId && questions.length === 0 && isLoading)
     );
+
+    if (isUserLoading || !isAdmin) return null;
 
     if (type === 'profile') {
         return <CandidateProfileInterview />;
