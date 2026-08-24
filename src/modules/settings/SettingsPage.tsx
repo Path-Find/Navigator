@@ -11,7 +11,6 @@ import { SharedPageLayout } from '../../components/common/SharedPageLayout';
 import { PageHeader } from '../../components/ui/PageHeader';
 import { useNavigate } from 'react-router';
 import { NextGenCalibration } from './components/NextGenCalibration';
-import { CandidateProfileContextManager } from './components/CandidateProfileContextManager';
 
 export const SettingsPage: React.FC = () => {
     const { user, userTier, isTester, isAdmin, simulatedTier, fullName, updateProfile } = useUser();
@@ -284,7 +283,23 @@ export const SettingsPage: React.FC = () => {
                 </div>
             </div>
 
-            <CandidateProfileContextManager />
+            <div className="mt-12 flex flex-col gap-5 rounded-3xl border border-violet-100 bg-violet-50/60 p-8 shadow-sm dark:border-violet-500/20 dark:bg-violet-500/10 sm:flex-row sm:items-center sm:justify-between">
+                <div>
+                    <h4 className="font-bold tracking-tight text-neutral-900 dark:text-white">Application Profile</h4>
+                    <p className="mt-2 max-w-2xl text-sm leading-relaxed text-neutral-500 dark:text-neutral-400">
+                        Resume priorities, availability, writing preferences, and approved profile context live here.
+                    </p>
+                </div>
+                <Button
+                    variant="subtle"
+                    size="sm"
+                    onClick={() => navigate(ROUTES.APPLICATION_PROFILE)}
+                    icon={<ArrowRight className="w-3.5 h-3.5" />}
+                    className="shrink-0 !text-indigo-600 dark:!text-indigo-400 !border-indigo-100 dark:!border-indigo-500/20"
+                >
+                    Manage profile
+                </Button>
+            </div>
 
             {isAdmin && (
                 <div className="mt-12">

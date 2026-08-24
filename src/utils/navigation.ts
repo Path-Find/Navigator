@@ -29,6 +29,7 @@ export type ViewId =
     | 'features'
     | 'welcome'
     | 'settings'
+    | 'application-profile'
     | 'skills-interview'
     | 'career-orgs'
     | 'career-salary';
@@ -62,6 +63,7 @@ const PATH_TO_VIEW: Record<string, ViewId> = {
     [ROUTES.FEATURES]: 'features',
     [ROUTES.WELCOME]: 'welcome',
     [ROUTES.SETTINGS]: 'settings',
+    [ROUTES.APPLICATION_PROFILE]: 'application-profile',
     ['/career/skills/interview']: 'skills-interview',
 };
 
@@ -94,6 +96,7 @@ const VIEW_TO_PATH: Record<ViewId, string> = {
     'features': ROUTES.FEATURES,
     'welcome': ROUTES.WELCOME,
     'settings': ROUTES.SETTINGS,
+    'application-profile': ROUTES.APPLICATION_PROFILE,
     'skills-interview': '/career/skills/interview',
     'career-orgs': ROUTES.CAREER_ORGS,
     'career-salary': ROUTES.CAREER_HOME,
@@ -118,7 +121,7 @@ export const getPathFromViewId = (viewId: ViewId): string => {
 export const getModeFromViewId = (viewId: string) => {
     const isCoachMode = viewId.startsWith('career') || viewId.startsWith('coach') || viewId === 'skills' || viewId === 'skills-interview';
     const isEduMode = viewId.startsWith('edu');
-    const isJobMode = !isCoachMode && !isEduMode && !['privacy', 'home', 'admin', 'plans', 'plans-compare', 'settings', 'welcome', 'features', 'terms', 'contact'].includes(viewId);
+    const isJobMode = !isCoachMode && !isEduMode && !['privacy', 'home', 'admin', 'plans', 'plans-compare', 'settings', 'application-profile', 'welcome', 'features', 'terms', 'contact'].includes(viewId);
 
     return { isCoachMode, isEduMode, isJobMode };
 };

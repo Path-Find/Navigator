@@ -74,7 +74,7 @@ export const CandidateProfileContextManager: React.FC = () => {
     const [startTiming, setStartTiming] = React.useState<CandidateStartTiming>('flexible');
     const [startDate, setStartDate] = React.useState('');
     const [currentBlockIds, setCurrentBlockIds] = React.useState<string[]>([]);
-    const [isProfileExpanded, setIsProfileExpanded] = React.useState(false);
+    const [isProfileExpanded, setIsProfileExpanded] = React.useState(true);
     const primaryResume = resumes[0];
     const signals = primaryResume?.candidateProfile?.signals || [];
     const stories = primaryResume?.candidateProfile?.stories || [];

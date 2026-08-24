@@ -7,6 +7,7 @@ See [CHANGELOG_ARCHIVE.md](CHANGELOG_ARCHIVE.md) for earlier history.
 ## [Unreleased]
 
 ### Fixed
+- **Settings now focuses on account management**: application preferences and reusable resume context have their own Application Profile page instead of crowding account settings.
 - **Settings no longer opens as one long editor**: application-profile details are collapsed until needed, keeping account controls and integrations easy to scan.
 - **Analysis usage no longer resets when saved jobs are deleted**: paid-plan limits and usage displays now count permanent analysis records instead of job-history rows.
 - **Cover-letter generation now surfaces hard eligibility requirements first**: applicants must confirm the posting’s stated citizenship, residency, licensing, certification, or other non-negotiable conditions before Navigator drafts or refines a letter.

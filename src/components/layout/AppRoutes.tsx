@@ -29,6 +29,7 @@ const ComparisonTable = lazyWithRetry(() => import('../../modules/plans/Comparis
 const FeaturesPage = lazyWithRetry(() => import('../../modules/features/FeaturesPage').then(m => ({ default: m.FeaturesPage })));
 const OnboardingPage = lazyWithRetry(() => import('../../modules/onboarding/OnboardingPage').then(m => ({ default: m.OnboardingPage })));
 const SettingsPage = lazyWithRetry(() => import('../../modules/settings/SettingsPage').then(m => ({ default: m.SettingsPage })));
+const ApplicationProfilePage = lazyWithRetry(() => import('../../modules/settings/ApplicationProfilePage').then(m => ({ default: m.ApplicationProfilePage })));
 const EmailVerificationScreen = lazyWithRetry(() => import('../auth/EmailVerificationScreen').then(m => ({ default: m.EmailVerificationScreen })));
 const ResetPasswordScreen = lazyWithRetry(() => import('../auth/ResetPasswordScreen').then(m => ({ default: m.ResetPasswordScreen })));
 
@@ -165,6 +166,11 @@ export const AppRoutes: React.FC = () => {
                     <Route path={ROUTES.SETTINGS} element={
                         <Suspense fallback={<LoadingState message="Loading Settings..." />}>
                             <SettingsPage />
+                        </Suspense>
+                    } />
+                    <Route path={ROUTES.APPLICATION_PROFILE} element={
+                        <Suspense fallback={<LoadingState message="Loading Application Profile..." />}>
+                            <ApplicationProfilePage />
                         </Suspense>
                     } />
                 </Route>

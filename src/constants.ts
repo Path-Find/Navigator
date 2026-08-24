@@ -184,6 +184,7 @@ export const ROUTES = {
   TERMS: '/terms',
   CONTACT: '/contact',
   SETTINGS: '/settings',
+  APPLICATION_PROFILE: '/profile',
   VERIFY_EMAIL: '/verify-email',
   RESET_PASSWORD: '/reset-password',
 } as const;
