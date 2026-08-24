@@ -7,6 +7,7 @@ See [CHANGELOG_ARCHIVE.md](CHANGELOG_ARCHIVE.md) for earlier history.
 ## [Unreleased]
 
 ### Fixed
+- **Resume dates now explain their expected format**: entry editing clearly asks for Month + Year and shows examples for past and current roles.
 - **Settings now focuses on account management**: application preferences and reusable resume context have their own Application Profile page instead of crowding account settings.
 - **Settings no longer opens as one long editor**: application-profile details are collapsed until needed, keeping account controls and integrations easy to scan.
 - **Analysis usage no longer resets when saved jobs are deleted**: paid-plan limits and usage displays now count permanent analysis records instead of job-history rows.

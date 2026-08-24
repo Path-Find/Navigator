@@ -110,12 +110,17 @@ export const ResumeSectionEditor: React.FC<ResumeSectionEditorProps> = ({
 
                                 <div className="flex items-center gap-2 text-neutral-400 bg-neutral-50/50 dark:bg-neutral-800/50 px-3 py-1 rounded-full border border-neutral-100 dark:border-neutral-800 transition-all focus-within:border-indigo-200/50 focus-within:bg-white dark:focus-within:bg-neutral-800">
                                     <Calendar className="w-3.5 h-3.5 opacity-50" />
-                                    <input
-                                        value={block.dateRange}
-                                        onChange={(e) => onUpdateBlock(block.id, 'dateRange', e.target.value)}
-                                        className="bg-transparent text-[11px] font-bold text-neutral-500 w-32 focus:outline-none text-right"
-                                        placeholder="Jan 2023 - Present"
-                                    />
+                                    <div className="flex flex-col">
+                                        <span className="text-[8px] font-black uppercase tracking-wider text-neutral-400">Month + year</span>
+                                        <input
+                                            value={block.dateRange}
+                                            onChange={(e) => onUpdateBlock(block.id, 'dateRange', e.target.value)}
+                                            aria-label={`Dates for ${block.title || 'entry'}`}
+                                            title="Use Month YYYY – Month YYYY, or Present if current"
+                                            className="bg-transparent text-[11px] font-bold text-neutral-500 w-36 focus:outline-none"
+                                            placeholder="Jan 2023 – Present"
+                                        />
+                                    </div>
                                 </div>
                             </div>
                         )}
