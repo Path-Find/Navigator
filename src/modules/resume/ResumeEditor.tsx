@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Upload, Loader2, Plus, Briefcase, Code, Zap, Sparkles, Heart, FileText, Download, X } from 'lucide-react';
+import { Upload, Loader2, Plus, Briefcase, Code, Zap, Sparkles, Heart, FileText, Download, X, UserRound } from 'lucide-react';
 import { AnimatePresence } from 'framer-motion';
 import { SharedPageLayout } from '../../components/common/SharedPageLayout';
 import { LoadingState } from '../../components/common/LoadingState';
@@ -19,8 +19,11 @@ import { SECTIONS, getSortDate, getTypeColor } from './constants';
 import type { SectionType } from './constants';
 import { useSkillContext } from '../skills/context/SkillContext';
 import { printElement } from '../../utils/printService';
+import { ROUTES } from '../../constants';
+import { useNavigate } from 'react-router';
 
 export const ResumeEditor: React.FC = () => {
+    const navigate = useNavigate();
     const {
         resumes,
         handleUpdateResumes: onSave,
@@ -224,6 +227,15 @@ export const ResumeEditor: React.FC = () => {
                 className="mb-8 no-print"
                 actions={(
                     <div className="flex items-center gap-3">
+                        <Button
+                            onClick={() => navigate(ROUTES.APPLICATION_PROFILE)}
+                            variant="subtle"
+                            size="xs"
+                            icon={<UserRound className="w-3.5 h-3.5" />}
+                        >
+                            <span className="hidden sm:inline">Application Profile</span>
+                            <span className="sm:hidden">Profile</span>
+                        </Button>
                         <Button
                             onClick={() => fileInputRef.current?.click()}
                             disabled={isParsing}
