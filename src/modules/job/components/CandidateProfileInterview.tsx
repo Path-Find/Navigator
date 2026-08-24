@@ -257,7 +257,7 @@ export const CandidateProfileInterview: React.FC<CandidateProfileInterviewProps>
 
                         {draft.stories.length > 0 && (
                             <section className="mb-8">
-                                <h2 className="text-xs font-black uppercase tracking-widest text-neutral-400 mb-3">Stories</h2>
+                                <h2 className="text-xs font-black uppercase tracking-widest text-neutral-400 mb-3">Application examples</h2>
                                 <div className="space-y-2">
                                     {draft.stories.map((story, index) => <p key={`${story.text}-${index}`} className="text-sm text-neutral-700 dark:text-neutral-300 bg-neutral-50 dark:bg-neutral-800 rounded-xl px-4 py-3">{story.text}</p>)}
                                 </div>

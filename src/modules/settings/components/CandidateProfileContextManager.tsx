@@ -410,32 +410,6 @@ export const CandidateProfileContextManager: React.FC = () => {
                 </div>
             ) : null}
 
-            {facts.length > 0 ? (
-                <div className="mt-8 pt-6 border-t border-indigo-100/70 dark:border-indigo-500/10">
-                    <h5 className="text-sm font-semibold text-neutral-700 dark:text-neutral-300 mb-3">Additional context</h5>
-                    <p className="text-xs text-neutral-400 leading-relaxed mb-3">
-                        Extra preferences or constraints that are not already captured in your resume.
-                    </p>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-                        {facts.map(fact => (
-                            <div key={fact.id} className="flex items-start gap-3 rounded-2xl bg-sky-50/70 dark:bg-sky-500/10 border border-sky-100 dark:border-sky-500/20 px-4 py-3">
-                                <div className="min-w-0 flex-1">
-                                    <p className="text-sm text-neutral-700 dark:text-neutral-200">{fact.value}</p>
-                                </div>
-                                <button
-                                    type="button"
-                                    onClick={() => { void removeContext('fact', fact.id); }}
-                                    aria-label="Remove confirmed profile fact"
-                                    className="p-1.5 rounded-lg text-neutral-400 hover:text-rose-500 hover:bg-white/70 dark:hover:bg-neutral-900/50 transition-colors shrink-0"
-                                >
-                                    <Trash2 className="w-3.5 h-3.5" />
-                                </button>
-                            </div>
-                        ))}
-                    </div>
-                </div>
-            ) : null}
-
             <div className="mt-8 pt-6 border-t border-indigo-100/70 dark:border-indigo-500/10">
                 <div className="pb-6 border-b border-indigo-100/70 dark:border-indigo-500/10">
                     <h5 className="text-sm font-semibold text-neutral-700 dark:text-neutral-300 mb-2">Cover-letter style</h5>
@@ -540,7 +514,7 @@ export const CandidateProfileContextManager: React.FC = () => {
 
                     {stories.length > 0 && (
                         <div>
-                            <h5 className="text-sm font-semibold text-neutral-700 dark:text-neutral-300 mb-3">Stories</h5>
+                            <h5 className="text-sm font-semibold text-neutral-700 dark:text-neutral-300 mb-3">Application examples</h5>
                             <div className="space-y-3">
                                 {stories.map(story => (
                                     <div key={story.id} className="flex items-start gap-3 rounded-2xl bg-amber-50/70 dark:bg-amber-500/10 border border-amber-100 dark:border-amber-500/20 px-4 py-3">
