@@ -13,6 +13,7 @@ See [CHANGELOG_ARCHIVE.md](CHANGELOG_ARCHIVE.md) for earlier history.
 - **Application Profile is now reachable from Resume**: resume context and preferences are linked from the workflow where they are used instead of living under account settings.
 - **Application Profile subsection headings are now readable**: labels use normal capitalization, sizing, and spacing instead of appearing like tiny all-caps metadata.
 - **Profile review prompts no longer repeat the same resume finding**: the question asks for confirmation, the resume fact appears once, and the reason only explains the evidence.
+- **Additional profile context no longer repeats the resume**: stale experience, education, skill, and imported facts are removed from that section and kept in the appropriate resume or structured profile area.
 - **Application Profile no longer repeats the resume entry list**: current-role controls remain in the Resume editor instead of duplicating every role and school entry.
 - **Resume dates now explain their expected format**: entry editing clearly asks for Month + Year and shows examples for past and current roles.
 - **Settings now focuses on account management**: application preferences and reusable resume context have their own Application Profile page instead of crowding account settings.

@@ -8,7 +8,7 @@ import { useResumeContext } from '../../resume/context/ResumeContext';
 import { ROUTES } from '../../../constants';
 import { Storage } from '../../../services/storageService';
 import { createCandidateEducationContext, deriveCandidateProfileInsights, getCandidateProfileSourceVersion } from '../../../services/candidateProfileContext';
-import type { CandidateAvailability, CandidateEmploymentType, CandidateProfileSignal, CandidateRelocationPreference, CandidateStartTiming, CandidateStory, CandidateWorkArrangement } from '../../resume/types';
+import type { CandidateAvailability, CandidateEmploymentType, CandidateProfileSignal, CandidateRelocationPreference, CandidateStartTiming, CandidateStory, CandidateWorkArrangement, CandidateProfileFact } from '../../resume/types';
 import type { Transcript } from '../../grad/types';
 
 const SIGNAL_LABELS: Record<CandidateProfileSignal['key'], string> = {
@@ -60,6 +60,13 @@ const toggleOption = <T,>(values: T[], value: T): T[] => values.includes(value)
     ? values.filter(item => item !== value)
     : [...values, value];
 
+const isAdditionalProfileFact = (fact: CandidateProfileFact): boolean => (
+    fact.status === 'confirmed'
+    && fact.source !== 'resume'
+    && fact.source !== 'imported_profile'
+    && !['experience', 'education', 'skill'].includes(fact.category)
+);
+
 export const CandidateProfileContextManager: React.FC = () => {
     const navigate = useNavigate();
     const { resumes, handleUpdateResume, isLoading } = useResumeContext();
@@ -79,7 +86,7 @@ export const CandidateProfileContextManager: React.FC = () => {
     const stories = primaryResume?.candidateProfile?.stories || [];
     const storedFacts = primaryResume?.candidateProfile?.facts || [];
     const currentBlockIds = primaryResume?.candidateProfile?.currentBlockIds || [];
-    const facts = storedFacts.filter(fact => fact.status === 'confirmed');
+    const facts = storedFacts.filter(isAdditionalProfileFact);
     // A newly uploaded transcript is the freshest compact education source.
     // Fall back to saved profile education when no transcript is available.
     const educationContext = transcript
@@ -123,6 +130,25 @@ export const CandidateProfileContextManager: React.FC = () => {
         }
     }, [primaryResume?.id, primaryResume?.candidateProfile?.availability]);
 
+    React.useEffect(() => {
+        if (!primaryResume || !storedFacts.some(fact => !isAdditionalProfileFact(fact))) return;
+
+        const context = primaryResume.candidateProfile;
+        void handleUpdateResume({
+            ...primaryResume,
+            candidateProfile: {
+                signals: context?.signals || [],
+                stories: context?.stories || [],
+                facts: storedFacts.filter(isAdditionalProfileFact),
+                education: context?.education,
+                availability: context?.availability,
+                currentBlockIds,
+                insights: context?.insights || [],
+                completedAt: context?.completedAt,
+            },
+        });
+    }, [currentBlockIds, handleUpdateResume, primaryResume, storedFacts]);
+
     const handleSaveCoverLetterPreferences = () => {
         const trimmed = coverLetterPreferencesInput.trim();
         if (trimmed !== (coverLetterPreferences || '')) {
@@ -148,7 +174,7 @@ export const CandidateProfileContextManager: React.FC = () => {
             candidateProfile: {
                 signals: context?.signals || [],
                 stories: context?.stories || [],
-                facts: context?.facts || [],
+                facts,
                 education: context?.education,
                 availability,
                 currentBlockIds: context?.currentBlockIds || [],
@@ -386,7 +412,10 @@ export const CandidateProfileContextManager: React.FC = () => {
 
             {facts.length > 0 ? (
                 <div className="mt-8 pt-6 border-t border-indigo-100/70 dark:border-indigo-500/10">
-                    <h5 className="text-sm font-semibold text-neutral-700 dark:text-neutral-300 mb-3">Additional profile details</h5>
+                    <h5 className="text-sm font-semibold text-neutral-700 dark:text-neutral-300 mb-3">Additional context</h5>
+                    <p className="text-xs text-neutral-400 leading-relaxed mb-3">
+                        Extra preferences or constraints that are not already captured in your resume.
+                    </p>
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                         {facts.map(fact => (
                             <div key={fact.id} className="flex items-start gap-3 rounded-2xl bg-sky-50/70 dark:bg-sky-500/10 border border-sky-100 dark:border-sky-500/20 px-4 py-3">
