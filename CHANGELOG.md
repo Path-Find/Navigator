@@ -28,6 +28,7 @@ See [CHANGELOG_ARCHIVE.md](CHANGELOG_ARCHIVE.md) for earlier history.
 - **Centralized homepage feature colours around neutral and indigo tones**: rose/pink accents are gone from feature cards, while rose remains available for actual errors and negative statuses.
 - **Fixed the Admin Usage Deviations loading state**: admin metrics now use Navigator’s current Neon data connection instead of the retired Supabase client.
 - **Finished the client data-layer audit**: active similarity and waitlist operations now use Neon too; the only remaining Supabase payment code is behind the intentional checkout kill switch.
+- **Fixed the Update Focus homepage destination**: it now opens Application Profile instead of the old Settings page.
 - **Added an optional STAR explanation at interview start**: users can get a plain-language framework and example before answering, or continue immediately.
 - **Reconnected Resume Interview to resume entries**: work, education, volunteer, and project entries can now be interviewed individually to capture useful context behind them.
 - **Application Profile no longer repeats the resume entry list**: current-role controls remain in the Resume editor instead of duplicating every role and school entry.

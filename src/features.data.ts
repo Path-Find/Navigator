@@ -447,7 +447,7 @@ export const FEATURE_REGISTRY: Record<string, FeatureDefinition> = {
         colorKey: 'indigo',
         category: 'JOB',
         tier: 'explorer',
-        targetView: 'settings', // Trigger settings modal
+        targetView: 'application-profile',
         link: '#',
         rank: 999,
         showOnHomepage: false,
