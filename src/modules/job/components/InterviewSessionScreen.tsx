@@ -147,14 +147,13 @@ export const InterviewSessionScreen = ({
             ? `Great pick! We'll practice for your ${positionName} role${companyName ? ` at ${companyName}` : ''}. I'll ask one question at a time, and after each answer I'll give you practical coaching to make it stronger.`
             : 'Welcome! We\'ll run this like a real behavioral interview. I\'ll ask one question at a time, and after each answer I\'ll give you practical coaching to help you improve.';
         const continueInterview = () => {
-            setShowStarHelp(false);
             setHasStartedInterview(true);
         };
 
         msgs.push({
             id: 'intro-msg',
             role: 'ai',
-            content: `${intro}${!showStarHelp && !interviewHasStarted ? '\n\nYou can ask for STAR guidance before you begin if you want a structure for your answer.' : ''}${interviewHasStarted ? '\n\nTake a moment, then answer as you would in the interview.' : ''}`,
+            content: intro,
             suggestionPills: !showStarHelp && !interviewHasStarted ? [
                     { id: 'continue-interview', label: 'Continue interview', onClick: continueInterview, variant: 'action' as const },
                     { id: 'star-help', label: "What's STAR?", onClick: () => setShowStarHelp(true), variant: 'action' as const },
@@ -171,6 +170,12 @@ export const InterviewSessionScreen = ({
         }
 
         if (!hasStartedInterview) return msgs;
+
+        msgs.push({
+            id: 'interview-ready',
+            role: 'ai',
+            content: 'Take a moment, then answer as you would in the interview.',
+        });
 
         const conversationHistory = questions.slice(0, currentQuestionIndex + 1);
 
@@ -328,7 +333,7 @@ export const InterviewSessionScreen = ({
 
     if (mode === 'session') {
         const isInitialJobSelection = sessionType === 'tailored' && !selectedJobId;
-        const shouldDisableInput = !isInitialJobSelection && (!hasStartedInterview && Object.keys(responses).length === 0 && currentQuestionIndex === 0 || showStarHelp);
+        const shouldDisableInput = !isInitialJobSelection && (!hasStartedInterview && Object.keys(responses).length === 0 && currentQuestionIndex === 0 || (showStarHelp && !hasStartedInterview));
 
         // Safety check: ensure questions exist, unless we're in the initial job selection phase
         if (!isInitialJobSelection && (!questions || questions.length === 0)) {
