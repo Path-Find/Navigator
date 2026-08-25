@@ -10,7 +10,7 @@ import { useSkillContext } from '../skills/context/SkillContext';
 import { useUser } from '../../contexts/UserContext';
 import { useInterview } from './hooks/useInterview';
 import { computeSnippets } from './utils/interviewUtils';
-import { InterviewSelection } from './components/InterviewSelection';
+import { InterviewSelection, PracticeModeSelection } from './components/InterviewSelection';
 import { InterviewSessionScreen } from './components/InterviewSessionScreen';
 import { CandidateProfileInterview } from './components/CandidateProfileInterview';
 import { ROUTES } from '../../constants';
@@ -39,7 +39,7 @@ export const InterviewAdvisor: React.FC = () => {
     const { resumes, handleUpdateResume } = useResumeContext();
     const { skills } = useSkillContext();
 
-    const [mode, setMode] = useState<'selection' | 'session'>('selection');
+    const [mode, setMode] = useState<'selection' | 'practice-selection' | 'session'>('selection');
     const [sessionType, setSessionType] = useState<'general' | 'tailored' | null>(null);
     const [selectedJobId, setSelectedJobId] = useState<string | null>(null);
     const [userResponse, setUserResponse] = useState('');
@@ -81,6 +81,8 @@ export const InterviewAdvisor: React.FC = () => {
                 }
             };
             startSession();
+        } else if (type === 'practice') {
+            queueMicrotask(() => setMode('practice-selection'));
         } else if (type === 'profile') {
             queueMicrotask(() => {
                 setMode('session');
@@ -119,6 +121,10 @@ export const InterviewAdvisor: React.FC = () => {
 
     const handleStartGeneral = async () => {
         navigate(`${ROUTES.INTERVIEWS}/general`);
+    };
+
+    const handleStartPractice = async () => {
+        navigate(`${ROUTES.INTERVIEWS}/practice`);
     };
 
     const handleStartProfile = async () => {
@@ -204,6 +210,10 @@ export const InterviewAdvisor: React.FC = () => {
         return <CandidateProfileInterview />;
     }
 
+    if (mode === 'practice-selection') {
+        return <PracticeModeSelection onGeneral={() => { void handleStartGeneral(); }} onTailored={() => { void handleStartTailored(); }} />;
+    }
+
     if (mode === 'session') {
         return <InterviewSessionScreen
             questions={questions}
@@ -230,8 +240,7 @@ export const InterviewAdvisor: React.FC = () => {
 
     return <InterviewSelection
         limitError={limitError}
-        handleStartGeneral={handleStartGeneral}
-        handleStartTailored={handleStartTailored}
+        handleStartPractice={handleStartPractice}
         handleStartProfile={handleStartProfile}
     />;
 };

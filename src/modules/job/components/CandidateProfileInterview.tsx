@@ -96,11 +96,7 @@ export const CandidateProfileInterview: React.FC<CandidateProfileInterviewProps>
     }, []);
 
     const messages = useMemo((): ChatMessage[] => {
-        const result: ChatMessage[] = [{
-            id: 'profile-intro',
-            role: 'ai',
-            content: 'Let’s review what Navigator found in your profile, then fill in only the gaps. Answer only what you are comfortable saving, and you can skip anything.',
-        }];
+        const result: ChatMessage[] = [];
 
         answers.forEach((item, index) => {
             result.push({ id: `profile-question-${index}`, role: 'ai', content: item.question });
@@ -295,6 +291,17 @@ export const CandidateProfileInterview: React.FC<CandidateProfileInterviewProps>
                         </div>
                     </div>
                 ) : (
+                    <div className="px-5 pb-2">
+                        <div className="max-w-2xl mx-auto rounded-3xl border border-indigo-100 bg-indigo-50/70 px-6 py-5 dark:border-indigo-500/20 dark:bg-indigo-500/10">
+                            <div className="flex items-center gap-2 mb-2">
+                                <Sparkles className="w-4 h-4 text-indigo-500" />
+                                <h1 className="text-lg font-black text-neutral-900 dark:text-white">Build your application profile</h1>
+                            </div>
+                            <p className="text-sm leading-relaxed text-neutral-600 dark:text-neutral-300">Answer a few optional questions about your goals and experience. You can skip anything, review the summary, and approve what Navigator may reuse in future applications.</p>
+                        </div>
+                    </div>
+                )}
+                {!reviewItem && (
                     <InterviewChat
                         messages={messages}
                         inputValue={answer}

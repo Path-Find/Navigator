@@ -1,11 +1,9 @@
 import React from 'react';
-import { ArrowRight, BookOpen, ChevronDown, GraduationCap, Sparkles, Trash2 } from 'lucide-react';
-import { useNavigate } from 'react-router';
+import { BookOpen, ChevronDown, GraduationCap, Sparkles, Trash2 } from 'lucide-react';
 import { Button } from '../../../components/ui/Button';
 import { useToast } from '../../../contexts/ToastContext';
 import { useUser } from '../../../contexts/UserContext';
 import { useResumeContext } from '../../resume/context/ResumeContext';
-import { ROUTES } from '../../../constants';
 import { Storage } from '../../../services/storageService';
 import { createCandidateEducationContext, deriveCandidateProfileInsights, getCandidateProfileSourceVersion } from '../../../services/candidateProfileContext';
 import type { CandidateAvailability, CandidateEmploymentType, CandidateProfileSignal, CandidateRelocationPreference, CandidateStartTiming, CandidateStory, CandidateWorkArrangement, CandidateProfileFact } from '../../resume/types';
@@ -68,7 +66,6 @@ const isAdditionalProfileFact = (fact: CandidateProfileFact): boolean => (
 );
 
 export const CandidateProfileContextManager: React.FC = () => {
-    const navigate = useNavigate();
     const { resumes, handleUpdateResume, isLoading } = useResumeContext();
     const { journey, coverLetterPreferences, updateProfile } = useUser();
     const { showSuccess, showError } = useToast();
@@ -80,7 +77,6 @@ export const CandidateProfileContextManager: React.FC = () => {
     const [employmentTypes, setEmploymentTypes] = React.useState<CandidateEmploymentType[]>([]);
     const [startTiming, setStartTiming] = React.useState<CandidateStartTiming>('flexible');
     const [startDate, setStartDate] = React.useState('');
-    const [isProfileExpanded, setIsProfileExpanded] = React.useState(true);
     const primaryResume = resumes[0];
     const signals = primaryResume?.candidateProfile?.signals || [];
     const stories = primaryResume?.candidateProfile?.stories || [];
@@ -248,36 +244,15 @@ export const CandidateProfileContextManager: React.FC = () => {
                         <Sparkles className="w-5 h-5 text-violet-500" />
                     </div>
                     <div>
-                        <h4 className="font-bold text-neutral-900 dark:text-white tracking-tight">Your application profile</h4>
+                        <h4 className="font-bold text-neutral-900 dark:text-white tracking-tight">Application preferences</h4>
                         <p className="text-xs text-neutral-400 leading-relaxed mt-2 max-w-2xl">
-                            Keep your direction here, along with details you approved for Navigator to reuse in interviews and applications when they fit.
+                            Set your direction and the extra context Navigator may reuse when it fits an application.
                         </p>
                     </div>
                 </div>
 
-                <div className="flex flex-wrap gap-2 shrink-0">
-                    <Button
-                        variant="subtle"
-                        size="sm"
-                        onClick={() => navigate(ROUTES.PROFILE_INTERVIEW)}
-                        icon={<ArrowRight className="w-3.5 h-3.5" />}
-                        className="!text-indigo-600 dark:!text-indigo-400 !border-indigo-100 dark:!border-indigo-500/20"
-                    >
-                        Review profile
-                    </Button>
-                    <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={() => setIsProfileExpanded(current => !current)}
-                        icon={<ChevronDown className={`w-3.5 h-3.5 transition-transform ${isProfileExpanded ? 'rotate-180' : ''}`} />}
-                        className="!text-neutral-500 dark:!text-neutral-400"
-                    >
-                        {isProfileExpanded ? 'Hide details' : 'Edit details'}
-                    </Button>
-                </div>
             </div>
 
-            {isProfileExpanded && <>
             <div className="mt-8 pt-6 border-t border-indigo-100/70 dark:border-indigo-500/10">
                 <div className="flex items-start justify-between gap-4 mb-4">
                     <div>
@@ -540,7 +515,6 @@ export const CandidateProfileContextManager: React.FC = () => {
                     )}
                 </div>
             )}
-            </>}
         </section>
     );
 };

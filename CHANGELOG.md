@@ -39,6 +39,11 @@ See [CHANGELOG_ARCHIVE.md](CHANGELOG_ARCHIVE.md) for earlier history.
 - **Removed Upgrade from paid, tester, and admin navigation**: only free users see the upgrade prompt.
 - **Clarified plan access labels**: current and admin/tester access no longer appears as the vague “Access included,” and sunset Feed no longer appears as a plan feature.
 - **Added cover-letter quality checks for Free and Plus**: weak drafts now receive an honest-gap rewrite instead of shipping unchecked.
+- **Hid unfinished integration controls**: browser-extension, email-alert setup, and inbound-email usage metrics no longer imply those flows are ready.
+- **Simplified Application Preferences**: removed the unnecessary collapse control and moved the profile interview action into the page header with clearer wording.
+- **Restored the resume-story interview option**: Interview Advisor now has practice, profile, and resume-context paths as three clear choices.
+- **Moved practice-mode selection into the interview flow**: the Practice card now starts one interview entry point, which asks whether to use general or specific-job practice.
+- **Added profile interview context before questions**: users now see what will be saved and how it will be reused before answering.
 - **Renamed the plan limit from Alerts to Email alerts**: the pricing page now makes clear that this means forwarded job-alert emails.
 - **Removed sunset job surfaces**: Feed and Job Alerts no longer appear as usable homepage or Features-page options, and Resume Interview no longer appears as “Story Mode” or “Soon.”
 - **Added an optional STAR explanation at interview start**: users can get a plain-language framework and example before answering, or continue immediately.

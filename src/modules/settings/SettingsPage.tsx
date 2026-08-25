@@ -1,7 +1,6 @@
 import React from 'react';
-import { Lock, Copy, Check, Star, Puzzle, Mail, Activity, ArrowRight, User as UserIcon } from 'lucide-react';
+import { Lock, Star, Puzzle, Mail, Activity, ArrowRight, User as UserIcon } from 'lucide-react';
 import { ROUTES } from '../../constants';
-import { useModal } from '../../contexts/ModalContext';
 import { useToast } from '../../contexts/ToastContext';
 import { useUser } from '../../contexts/UserContext';
 import { useJobContext } from '../job/context/JobContext';
@@ -14,12 +13,9 @@ import { useNavigate } from 'react-router';
 export const SettingsPage: React.FC = () => {
     const { user, userTier, isTester, isAdmin, simulatedTier, fullName, updateProfile } = useUser();
     const { usageStats } = useJobContext();
-    const { openModal } = useModal();
     const { showInfo, showError } = useToast();
     const navigate = useNavigate();
 
-    const [isCopyingToken, setIsCopyingToken] = React.useState(false);
-    const [isCopyingEmail, setIsCopyingEmail] = React.useState(false);
     const [nameInput, setNameInput] = React.useState(fullName || '');
 
     React.useEffect(() => { setNameInput(fullName || ''); }, [fullName]);
@@ -42,22 +38,6 @@ export const SettingsPage: React.FC = () => {
                 showInfo("Password reset email sent!");
             }
         }
-    };
-
-    const handleCopyToken = async () => {
-        const { data } = await authClient.getSession();
-        if (data.session?.access_token) {
-            navigator.clipboard.writeText(data.session.access_token);
-            setIsCopyingToken(true);
-            setTimeout(() => setIsCopyingToken(false), 2000);
-        }
-    };
-
-    const handleCopyEmail = () => {
-        const email = `navigator-${usageStats?.inboundEmailToken || 'admin'}@inbound.navigator.work`;
-        navigator.clipboard.writeText(email);
-        setIsCopyingEmail(true);
-        setTimeout(() => setIsCopyingEmail(false), 2000);
     };
 
     return (
@@ -176,26 +156,6 @@ export const SettingsPage: React.FC = () => {
                                     </div>
                                 </div>
 
-                                {/* Inbound Emails */}
-                                {usageStats?.emailLimit > 0 && (
-                                    <div className="space-y-2.5">
-                                        <div className="flex justify-between items-end">
-                                            <div className="flex items-center gap-2">
-                                                <Mail className="w-3.5 h-3.5 text-indigo-500" />
-                                                <span className="text-sm font-bold text-neutral-700 dark:text-neutral-300">Inbound Emails</span>
-                                            </div>
-                                            <span className="text-sm font-bold text-neutral-900 dark:text-white">
-                                                {usageStats?.todayEmails || 0} <span className="text-neutral-300 dark:text-neutral-600 font-normal">/ {(isAdmin || isTester) && !simulatedTier ? '∞' : usageStats?.emailLimit}</span>
-                                            </span>
-                                        </div>
-                                        <div className="h-2 w-full bg-neutral-100 dark:bg-neutral-800 rounded-full overflow-hidden">
-                                            <div
-                                                className="h-full bg-gradient-to-r from-indigo-500 to-indigo-400 transition-all duration-1000"
-                                                style={{ width: `${(isAdmin || isTester) && !simulatedTier ? 0 : Math.min(100, ((usageStats?.todayEmails || 0) / (usageStats?.emailLimit || 1)) * 100)}%` }}
-                                            />
-                                        </div>
-                                    </div>
-                                )}
                             </div>
                         </div>
 
@@ -229,18 +189,9 @@ export const SettingsPage: React.FC = () => {
                             <div className="space-y-3">
                                 <div className="flex items-center gap-2 mb-1">
                                     <span className="text-sm font-bold text-neutral-700 dark:text-neutral-300">Browser Extension</span>
-                                </div>
-                                <p className="text-xs text-neutral-400 leading-relaxed -mt-2 mb-2">Save jobs from any website with one click. Connect the extension using your access token.</p>
-
-                                <Button
-                                    variant="ghost"
-                                    size="sm"
-                                    onClick={handleCopyToken}
-                                    icon={isCopyingToken ? <Check className="w-3.5 h-3.5 text-emerald-500" /> : <Copy className="w-3.5 h-3.5" />}
-                                    className="w-full !justify-start !text-neutral-900 dark:!text-white hover:bg-neutral-50 dark:hover:bg-neutral-800 px-4 py-2 border border-neutral-100 dark:border-neutral-800 rounded-xl"
-                                >
-                                    {isCopyingToken ? 'Copied Token!' : 'Copy Access Token'}
-                                </Button>
+                                    <span className="px-1.5 py-0.5 bg-neutral-100 dark:bg-white/5 text-[8px] font-black tracking-wider text-neutral-400 dark:text-neutral-500 rounded-md border border-neutral-200/50 dark:border-white/5 ml-1">Coming soon</span>
+                            </div>
+                                <p className="text-xs text-neutral-400 leading-relaxed -mt-2">Save jobs from any website with one click. The extension is being updated for Navigator’s current data system.</p>
                             </div>
                         </div>
 
@@ -249,34 +200,11 @@ export const SettingsPage: React.FC = () => {
                             <div className="flex items-center gap-2 mb-1">
                                 <Mail className="w-3.5 h-3.5 text-indigo-500" />
                                 <span className="text-sm font-bold text-neutral-700 dark:text-neutral-300">Email Alerts</span>
-                                {(!isAdmin && !isTester) && (
-                                    <span className="px-1.5 py-0.5 bg-neutral-100 dark:bg-white/5 text-[8px] font-black tracking-wider text-neutral-400 dark:text-neutral-500 rounded-md border border-neutral-200/50 dark:border-white/5 ml-1">
-                                        Soon
-                                    </span>
-                                )}
+                                <span className="px-1.5 py-0.5 bg-neutral-100 dark:bg-white/5 text-[8px] font-black tracking-wider text-neutral-400 dark:text-neutral-500 rounded-md border border-neutral-200/50 dark:border-white/5 ml-1">
+                                    Coming soon
+                                </span>
                             </div>
-                            <p className="text-xs text-neutral-400 leading-relaxed -mt-2 mb-2">Forward job alert emails to your personal Navigator address to auto-import opportunities.</p>
-
-                            {(usageStats?.inboundEmailToken || isAdmin || isTester) ? (
-                                <Button
-                                    variant="ghost"
-                                    size="sm"
-                                    onClick={handleCopyEmail}
-                                    icon={isCopyingEmail ? <Check className="w-3.5 h-3.5 text-emerald-500" /> : <Copy className="w-3.5 h-3.5" />}
-                                    className="w-full !justify-start !text-neutral-900 dark:!text-white hover:bg-neutral-50 dark:hover:bg-neutral-800 px-4 py-2 border border-neutral-100 dark:border-neutral-800 rounded-xl"
-                                >
-                                    {isCopyingEmail ? 'Copied Address!' : 'Copy Email Address'}
-                                </Button>
-                            ) : (
-                                <Button
-                                    variant="ghost"
-                                    size="sm"
-                                    onClick={() => openModal('UPGRADE')}
-                                    className="w-full !justify-start !text-indigo-600 dark:!text-indigo-400 hover:underline px-4 py-2 bg-indigo-50/50 dark:bg-indigo-500/5 rounded-xl border border-indigo-100 dark:border-indigo-500/20"
-                                >
-                                    Upgrade to unlock
-                                </Button>
-                            )}
+                            <p className="text-xs text-neutral-400 leading-relaxed -mt-2">Forward job alert emails to Navigator when this feature is ready.</p>
                         </div>
                     </div>
                 </div>
