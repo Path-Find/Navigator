@@ -198,7 +198,7 @@ export const InterviewAdvisor: React.FC = () => {
         const job = jobs.find(j => j.id === selectedJobId);
         const submissionText = userResponse;
         setUserResponse('');
-        await submitResponse(currentQuestion.id, submissionText, job);
+        await submitResponse(currentQuestion.id, submissionText, job, resumes, skills);
     };
 
     const isSessionLoading = mode === 'session' && sessionType && (

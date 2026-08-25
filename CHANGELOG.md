@@ -57,6 +57,7 @@ See [CHANGELOG_ARCHIVE.md](CHANGELOG_ARCHIVE.md) for earlier history.
 - **Make STAR coaching additive**: STAR guidance now appears as a separate coaching message with rotating examples instead of replacing the interview introduction.
 - **Disable answer input until needed**: interview typing stays visible but greyed out during introductions and coaching choices, then enables for actual questions.
 - **Recommend answer structures by question**: interview prompts now suggest STAR for experience stories and ARC for direct, technical, or situational questions.
+- **Ground “Better” answers in the resume**: interview coaching now uses the relevant resume evidence and avoids inventing placeholder accomplishments.
 - **Renamed the plan limit from Alerts to Email alerts**: the pricing page now makes clear that this means forwarded job-alert emails.
 - **Removed sunset job surfaces**: Feed and Job Alerts no longer appear as usable homepage or Features-page options, and Resume Interview no longer appears as “Story Mode” or “Soon.”
 - **Added an optional STAR explanation at interview start**: users can get a plain-language framework and example before answering, or continue immediately.

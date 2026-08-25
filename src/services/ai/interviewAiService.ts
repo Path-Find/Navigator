@@ -139,9 +139,10 @@ export const analyzeAndFollowUp = async (
     question: string,
     userResponse: string,
     jobDescription?: string,
-    jobId?: string
+    jobId?: string,
+    resumeContext?: string
 ): Promise<InterviewResponseAnalysis & { followUp: { shouldFollowUp: boolean; question: string | null; rationale?: string } }> => {
-    const prompt = INTERVIEW_PROMPTS.ANALYZE_AND_FOLLOW_UP(question, userResponse, jobDescription);
+    const prompt = INTERVIEW_PROMPTS.ANALYZE_AND_FOLLOW_UP(question, userResponse, jobDescription, resumeContext);
 
     return callWithRetry(async (metadata) => {
         const model = await getModel({ task: 'interview', generationConfig: { responseMimeType: "application/json" } });

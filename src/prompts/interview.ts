@@ -228,7 +228,7 @@ export const INTERVIEW_PROMPTS = {
     }
     `,
 
-  ANALYZE_AND_FOLLOW_UP: (question: string, userResponse: string, jobContext?: string) => `
+  ANALYZE_AND_FOLLOW_UP: (question: string, userResponse: string, jobContext?: string, resumeContext?: string) => `
     You are a strict technical interviewer. Analyze the candidate's response, then decide if a follow-up is warranted.
 
     ${UNTRUSTED_DATA_RULE}
@@ -236,13 +236,15 @@ export const INTERVIEW_PROMPTS = {
     QUESTION DATA: ${anchorData('QUESTION', question)}
     RESPONSE DATA: ${anchorData('CANDIDATE_RESPONSE', userResponse)}
     ${jobContext ? `JOB CONTEXT DATA: ${anchorData('JOB_CONTEXT', jobContext)}` : ''}
+    ${resumeContext ? `RESUME DATA: ${anchorData('RESUME', resumeContext)}` : ''}
 
     TASK:
     1. GRADE: Does this answer demonstrate the required competence?
     2. DECISION: "Reject" | "Weak" | "Average" | "Strong" | "Exceptional"
     3. FEEDBACK: Explain *why* you made this decision.
-    4. RESUME SUGGESTIONS: If the candidate mentioned a strong achievement or gap not well-represented on a resume, provide specific bullet suggestions.
-    5. FOLLOW-UP: Decide if a follow-up question would deepen understanding. Criteria:
+    4. BETTER VERSION: Rewrite the candidate's answer using only facts explicitly supported by the resume, candidate response, and job context. Never invent names, employers, titles, technologies, metrics, years, or achievements. If the available evidence is insufficient, provide a concise answer structure with bracketed prompts for the candidate to complete rather than pretending to know the facts.
+    5. RESUME SUGGESTIONS: If the candidate mentioned a strong achievement or gap not well-represented on a resume, provide specific bullet suggestions.
+    6. FOLLOW-UP: Decide if a follow-up question would deepen understanding. Criteria:
        - VAGUENESS: Did they use buzzwords without details? Ask for an example.
        - DEPTH: Did they mention a complex topic without explaining it?
        - INTERESTING: Did they mention a metric worth probing?

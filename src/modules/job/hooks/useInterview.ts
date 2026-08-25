@@ -103,7 +103,7 @@ export const useInterview = () => {
         }
     }, []);
 
-    const submitResponse = useCallback(async (questionId: string, responseText: string, job?: SavedJob) => {
+    const submitResponse = useCallback(async (questionId: string, responseText: string, job?: SavedJob, resumes: ResumeProfile[] = [], skills: CustomSkill[] = []) => {
         const questionIndex = questions.findIndex(q => q.id === questionId);
         const question = questions[questionIndex];
 
@@ -124,7 +124,8 @@ export const useInterview = () => {
                 question.question,
                 responseText,
                 job ? getInterviewJobContext(job) : undefined,
-                job?.id
+                job?.id,
+                stringifyForInterview(job ? getInterviewResumes(job, resumes) : resumes, skills)
             );
             const { followUp: followUpResult, ...analysis } = result;
 
