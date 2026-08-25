@@ -30,13 +30,13 @@ export const ResumeDiscoverySidebar: React.FC<ResumeDiscoverySidebarProps> = ({
 
     return (
         <aside className="hidden lg:block sticky top-32 w-80 shrink-0 space-y-6 no-print pt-14">
-            {/* Discovery Bank */}
+            {/* Saved resume suggestions */}
             {initialResume.suggestedUpdates && initialResume.suggestedUpdates.length > 0 && (
                 <Card variant="premium" className="p-5 border-neutral-100 dark:border-neutral-900/30 bg-neutral-50/10 dark:bg-neutral-950/5">
                     <div className="flex items-center gap-2 mb-4">
                         <div className="flex flex-col">
-                            <h3 className="text-[10px] font-black text-neutral-500 tracking-widest leading-none mb-1">Discovery Bank</h3>
-                            <p className="text-[9px] text-neutral-400 font-bold tracking-tight">AI Captured Suggestions</p>
+                            <h3 className="text-[10px] font-black text-neutral-500 tracking-widest leading-none mb-1">Saved resume suggestions</h3>
+                            <p className="text-[9px] text-neutral-400 font-bold tracking-tight">Review before updating your resume</p>
                         </div>
                     </div>
 

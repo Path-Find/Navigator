@@ -329,7 +329,7 @@ describe('ResumeEditor — sidebar', () => {
         isVisible: true
     };
 
-    it('renders the Discovery Bank when suggestedUpdates are present', () => {
+    it('renders saved resume suggestions when suggestedUpdates are present', () => {
         vi.mocked(useResumeContext).mockReturnValue(makeContext({
             resumes: [{
                 id: '1',
@@ -347,17 +347,17 @@ describe('ResumeEditor — sidebar', () => {
         }));
         render(<ResumeEditor />);
 
-        expect(screen.getByText('Discovery Bank')).toBeInTheDocument();
+        expect(screen.getByText('Saved resume suggestions')).toBeInTheDocument();
         expect(screen.getByText('Add TypeScript to skills')).toBeInTheDocument();
     });
 
-    it('does not render the Discovery Bank when suggestedUpdates is empty', () => {
+    it('does not render saved resume suggestions when suggestedUpdates is empty', () => {
         vi.mocked(useResumeContext).mockReturnValue(makeContext({
             resumes: [{ id: '1', name: 'Test Resume', blocks: [workBlock], suggestedUpdates: [] }]
         }));
         render(<ResumeEditor />);
 
-        expect(screen.queryByText('Discovery Bank')).not.toBeInTheDocument();
+        expect(screen.queryByText('Saved resume suggestions')).not.toBeInTheDocument();
     });
 
     it('dismisses a suggestion when Dismiss is clicked', () => {

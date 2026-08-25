@@ -297,34 +297,36 @@ export const InterviewSessionScreen = ({
                                                             </div>
                                                             <p className="text-[10px] text-neutral-500 leading-relaxed italic">{suggestion.impact}</p>
                                                         </div>
-                                                        <div className="flex items-center gap-2 shrink-0">
-                                                            <button
-                                                                onClick={() => onBankSuggestion(suggestion)}
-                                                                disabled={isBanked}
-                                                                className={`p-1.5 rounded-lg transition-all ${isBanked
-                                                                    ? 'bg-emerald-50 text-emerald-500 dark:bg-emerald-500/10 cursor-default'
-                                                                    : 'hover:bg-neutral-50 text-neutral-400 hover:text-neutral-600 dark:hover:bg-neutral-500/10'
-                                                                    }`}
-                                                                title={isBanked ? "Banked" : "Bank Suggestion"}
-                                                            >
-                                                                {isBanked ? <CheckCircle2 className="w-3.5 h-3.5" /> : <ShieldCheck className="w-3.5 h-3.5" />}
-                                                            </button>
-                                                            <button
+                                                                                                <div className="flex items-center gap-2 shrink-0">
+                                                                                                    <button
+                                                                                                        onClick={() => onBankSuggestion(suggestion)}
+                                                                                                        disabled={isBanked}
+                                                                                                        className={`flex items-center gap-1 px-2 py-1 rounded-lg text-[10px] font-bold transition-all ${isBanked
+                                                                                                            ? 'bg-emerald-50 text-emerald-500 dark:bg-emerald-500/10 cursor-default'
+                                                                                                            : 'text-neutral-500 hover:bg-neutral-100 hover:text-neutral-700 dark:hover:bg-neutral-800'
+                                                                                                            }`}
+                                                                                                        title={isBanked ? "Saved suggestion" : "Save suggestion"}
+                                                                                                    >
+                                                                                                        {isBanked ? <CheckCircle2 className="w-3.5 h-3.5" /> : <ShieldCheck className="w-3.5 h-3.5" />}
+                                                                                                        <span>{isBanked ? 'Saved' : 'Save suggestion'}</span>
+                                                                                                    </button>
+                                                                                                    <button
                                                                 onClick={() => {
                                                                     navigator.clipboard.writeText(suggestion.suggestion);
                                                                     setCopiedText(suggestion.suggestion);
                                                                     setTimeout(() => setCopiedText(null), 2000);
                                                                 }}
-                                                                className={`p-1.5 rounded-lg transition-colors ${copiedText === suggestion.suggestion
+                                                                className={`flex items-center gap-1 px-2 py-1 rounded-lg text-[10px] font-bold transition-colors ${copiedText === suggestion.suggestion
                                                                     ? 'bg-emerald-50 text-emerald-500 dark:bg-emerald-500/10'
                                                                     : 'hover:bg-neutral-100 dark:hover:bg-neutral-800 text-neutral-400 hover:text-neutral-500'}`}
-                                                                title="Copy to clipboard"
+                                                                title="Copy text"
                                                             >
                                                                 {copiedText === suggestion.suggestion ? (
                                                                     <Check className="w-3.5 h-3.5" />
                                                                 ) : (
                                                                     <Copy className="w-3.5 h-3.5" />
                                                                 )}
+                                                                <span>{copiedText === suggestion.suggestion ? 'Copied' : 'Copy text'}</span>
                                                             </button>
                                                         </div>
                                                     </div>
