@@ -185,7 +185,7 @@ export const FeaturesPage: React.FC = () => {
                                         title={feature.name}
                                         description={feature.description.full}
                                         color={color}
-                                        actionLabel={isFeatureComingSoon(feature) ? "Coming Soon" : actionLabel}
+                                        actionLabel={isFeatureComingSoon(feature) ? "Coming soon" : actionLabel}
                                         isComingSoon={isFeatureComingSoon(feature)}
                                         badge={feature.badge}
                                         previewContent={getPreviewComponent(feature.id, color)}

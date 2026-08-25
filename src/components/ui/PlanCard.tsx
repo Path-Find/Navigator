@@ -110,7 +110,7 @@ export const PlanCard = ({
                                 <span className="font-bold text-neutral-900 dark:text-white text-xs leading-tight">
                                     {feature.name}
                                     {feature.isComingSoon && (
-                                        <span className="ml-1 text-[10px] font-medium text-neutral-400 dark:text-neutral-500 italic">(Soon)</span>
+                                        <span className="ml-1 text-[10px] font-medium text-neutral-400 dark:text-neutral-500 italic">(Coming soon)</span>
                                     )}
                                 </span>
                                 {!isCompact && <span className="text-[10px] text-neutral-500 dark:text-neutral-500 font-medium leading-relaxed mt-0.5">{feature.desc}</span>}

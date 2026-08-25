@@ -19,6 +19,8 @@ See [CHANGELOG_ARCHIVE.md](CHANGELOG_ARCHIVE.md) for earlier history.
 - **Made the interview ending conversational**: the transcript now explicitly says when the last question is complete before showing the summary.
 - **Added an optional job-specific closing exercise**: tailored interviews now leave space for candidates to write their own questions for the employer after the results.
 - **Added optional question coaching**: candidates can ask Navigator to review their own employer questions without replacing them with canned prompts.
+- **Restored homepage feature colours**: category accents are visible again using blue, teal, green, and amber while purple and pink remain out of the palette.
+- **Standardized lifecycle labels**: unfinished features consistently use “Coming soon” across cards, plans, and feature listings.
 - **Removed the interview progression-button gradient**: the button now uses a flat grey treatment.
 - **Made interview rewrites sound conversational**: resume-grounded introductions now turn action bullets into first-person statements instead of quoting resume text.
 - **Preserved interview button treatment during the palette change**: action buttons retain their original hierarchy and shape while using grey accents.

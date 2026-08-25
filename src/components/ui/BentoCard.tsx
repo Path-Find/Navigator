@@ -118,7 +118,7 @@ export const BentoCard: React.FC<BentoCardProps> = ({
                     )}
                     {isComingSoon && (
                         <span className="px-1.5 py-0.5 bg-neutral-100 dark:bg-white/5 text-[8px] font-black text-neutral-400 dark:text-neutral-500 rounded-md border border-neutral-200/50 dark:border-white/5">
-                            Soon
+                            Coming soon
                         </span>
                     )}
                 </div>
