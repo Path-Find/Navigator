@@ -205,18 +205,18 @@ export const InterviewSessionScreen = ({
                                 initial={{ opacity: 0, y: 5 }}
                                 animate={{ opacity: 1, y: 0 }}
                                 transition={{ delay: 0.3 }}
-                                className="mt-4 pt-3 flex flex-wrap gap-2"
+                                className="mt-3 pt-1 flex flex-wrap items-center gap-2"
                             >
-                                <div className="w-full text-[10px] font-black text-neutral-400 mb-1 flex items-center gap-1.5">
-                                    You might want to think about...
+                                <div className="text-[10px] font-black text-neutral-400 mr-1">
+                                    Think about:
                                 </div>
                                 {resumeSnippets.map((snippet, sIdx) => (
                                     <div
                                         key={sIdx}
-                                        className="group flex items-center gap-2 px-3 py-1 bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-xl shadow-sm hover:border-neutral-400 dark:hover:border-neutral-500/50 transition-all cursor-default max-w-xs"
+                                        className="group flex items-center gap-1.5 px-2.5 py-1 bg-neutral-100 dark:bg-neutral-800/80 border border-neutral-200 dark:border-neutral-700 rounded-full shadow-sm hover:bg-neutral-200 dark:hover:bg-neutral-700 transition-all cursor-default max-w-[12rem]"
                                         title={snippet.source}
                                     >
-                                        <span className="text-[11px] font-bold text-neutral-600 dark:text-neutral-400 truncate">
+                                        <span className="text-[10px] font-bold text-neutral-600 dark:text-neutral-400 truncate">
                                             {snippet.text}
                                         </span>
                                     </div>
