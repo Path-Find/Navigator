@@ -361,6 +361,7 @@ export const InterviewSessionScreen = ({
         const currentQ = questions?.[currentQuestionIndex];
         const hasResponse = currentQ && !!responses[currentQ.id];
         const currentResponse = currentQ ? responses[currentQ.id] : undefined;
+        const hasCompletedResponse = !!currentResponse?.analysis && !isLoading;
         const canSaveCurrentStory = !!currentQ
             && sessionType === 'general'
             && !!currentResponse?.analysis
@@ -379,7 +380,7 @@ export const InterviewSessionScreen = ({
             inputHint = 'Select an option above';
         } else if (hasResponse) {
             placeholder = 'Waiting for next question...';
-            inputHint = isLastQuestion ? 'Interview Complete' : 'Press Enter for Next Question';
+            inputHint = isLastQuestion && hasCompletedResponse ? 'Interview Complete' : 'Press Enter for Next Question';
         }
 
         return (
@@ -401,6 +402,7 @@ export const InterviewSessionScreen = ({
                             disabled: currentResponse?.savedAsStory,
                             completed: currentResponse?.savedAsStory,
                         } : undefined}
+                        completionMessage={isLastQuestion && hasCompletedResponse ? 'Interview complete — you reached the end of this session.' : undefined}
                         inputDisabled={(!!currentQ && hasResponse) || isLoading || shouldDisableInput}
                         accentGradient="from-neutral-700 to-neutral-500"
                     />

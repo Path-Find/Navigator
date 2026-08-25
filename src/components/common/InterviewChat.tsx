@@ -1,5 +1,5 @@
 import React, { useRef, useEffect } from 'react';
-import { Send, Sparkles, User, ArrowRight } from 'lucide-react';
+import { Send, Sparkles, User, ArrowRight, CheckCircle2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 
 export interface ChatMessage {
@@ -40,6 +40,7 @@ interface InterviewChatProps {
         disabled?: boolean;
         completed?: boolean;
     };
+    completionMessage?: string;
     inputDisabled?: boolean;
     accentGradient?: string;
     hideInput?: boolean;
@@ -56,6 +57,7 @@ export const InterviewChat: React.FC<InterviewChatProps> = ({
     showNextButton = false,
     onNext,
     secondaryAction,
+    completionMessage,
     inputDisabled = false,
     accentGradient = "from-neutral-700 to-neutral-500",
     hideInput = false
@@ -244,6 +246,16 @@ export const InterviewChat: React.FC<InterviewChatProps> = ({
                         </motion.button>
                         )}
                     </div>
+                )}
+                {completionMessage && (
+                    <motion.div
+                        initial={{ opacity: 0, y: 8 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        className="mt-3 flex items-center gap-2 rounded-xl border border-neutral-200 bg-neutral-50 px-3 py-2 text-xs font-bold text-neutral-600 dark:border-neutral-800 dark:bg-neutral-900/60 dark:text-neutral-300"
+                    >
+                        <CheckCircle2 className="h-4 w-4 text-emerald-500" />
+                        <span>{completionMessage}</span>
+                    </motion.div>
                 )}
             </div>
 
