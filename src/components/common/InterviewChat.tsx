@@ -209,6 +209,20 @@ export const InterviewChat: React.FC<InterviewChatProps> = ({
                         </div>
                     </motion.div>
                 )}
+
+                {showNextButton && (
+                    <div className="flex justify-end pt-2">
+                        <motion.button
+                            initial={{ opacity: 0, y: 8 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            onClick={onNext}
+                            className={`flex items-center gap-2 px-6 py-2.5 bg-gradient-to-r ${accentGradient} text-white rounded-full text-xs font-black tracking-widest shadow-lg shadow-indigo-500/20 active:scale-95 transition-all`}
+                        >
+                            <span>Next Question</span>
+                            <ArrowRight className="w-3.5 h-3.5" />
+                        </motion.button>
+                    </div>
+                )}
             </div>
 
             {/* Input Area */}
@@ -243,17 +257,6 @@ export const InterviewChat: React.FC<InterviewChatProps> = ({
                                     <span className="text-[10px] font-bold text-neutral-400/80 tracking-tight">{inputHint}</span>
                                 </div>
 
-                                {showNextButton && (
-                                    <motion.button
-                                        initial={{ opacity: 0, x: 20 }}
-                                        animate={{ opacity: 1, x: 0 }}
-                                        onClick={onNext}
-                                        className={`flex items-center gap-2 px-6 py-2 bg-gradient-to-r ${accentGradient} text-white rounded-full text-xs font-black tracking-widest shadow-lg shadow-indigo-500/20 active:scale-95 transition-all`}
-                                    >
-                                        <span>Next Question</span>
-                                        <ArrowRight className="w-3.5 h-3.5" />
-                                    </motion.button>
-                                )}
                             </div>
                         </div>
                     </div>
