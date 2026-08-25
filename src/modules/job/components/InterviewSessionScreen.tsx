@@ -38,6 +38,7 @@ export const InterviewSessionScreen = ({
 }: SessionProps) => {
     const [copiedText, setCopiedText] = useState<string | null>(null);
     const [showStarHelp, setShowStarHelp] = useState(false);
+    const [hasStartedInterview, setHasStartedInterview] = useState(false);
 
     const onBankSuggestion = React.useCallback(async (suggestion: ResumeSuggestionItem) => {
         await handleBankSuggestion(suggestion, resumes, handleUpdateResume);
@@ -92,18 +93,24 @@ export const InterviewSessionScreen = ({
         const intro = sessionType === 'tailored' && job
             ? `Great pick! Let's practice for your ${positionName} role${companyName ? ` at ${companyName}` : ''}. We'll focus on behavioral questions.`
             : 'Welcome! Let\'s get started with some general behavioral practice.';
+        const continueInterview = () => {
+            setShowStarHelp(false);
+            setHasStartedInterview(true);
+        };
 
         msgs.push({
             id: 'intro-msg',
             role: 'ai',
-            content: `${intro}${showStarHelp ? '\n\nSTAR is a simple structure for answering experience-based questions:\n\n• Situation — set the context.\n• Task — explain what needed to be done.\n• Action — focus on what you personally did.\n• Result — share what changed or what you learned.\n\nExample: “Our team was missing deadlines (Situation), and I was asked to improve the process (Task). I created a shared tracker and weekly check-ins (Action), which helped us deliver the next project on time (Result).”' : ''}\n\nHere\'s your first question:`,
+            content: `${intro}${showStarHelp ? '\n\nSTAR is a simple structure for answering experience-based questions:\n\n• Situation — set the context.\n• Task — explain what needed to be done.\n• Action — focus on what you personally did.\n• Result — share what changed or what you learned.\n\nExample: “Our team was missing deadlines (Situation), and I was asked to improve the process (Task). I created a shared tracker and weekly check-ins (Action), which helped us deliver the next project on time (Result).”' : ''}${hasStartedInterview ? '\n\nHere\'s your first question:' : ''}`,
             suggestionPills: showStarHelp
-                ? [{ id: 'continue-interview', label: 'Continue interview', onClick: () => setShowStarHelp(false) }]
+                ? [{ id: 'continue-interview', label: 'Continue interview', onClick: continueInterview }]
                 : [
-                    { id: 'continue-interview', label: 'Continue interview', onClick: () => setShowStarHelp(false) },
+                    { id: 'continue-interview', label: 'Continue interview', onClick: continueInterview },
                     { id: 'star-help', label: "What's STAR?", onClick: () => setShowStarHelp(true) },
                 ],
         });
+
+        if (!hasStartedInterview) return msgs;
 
         const conversationHistory = questions.slice(0, currentQuestionIndex + 1);
 
@@ -241,7 +248,7 @@ export const InterviewSessionScreen = ({
         });
 
         return msgs;
-    }, [questions, currentQuestionIndex, responses, mode, resumes, copiedText, resumeSnippets, onBankSuggestion, onSaveStory, sessionType, selectedJobId, jobs, onJobSelected, isSessionLoading]);
+    }, [questions, currentQuestionIndex, responses, mode, resumes, copiedText, resumeSnippets, onBankSuggestion, onSaveStory, sessionType, selectedJobId, jobs, onJobSelected, isSessionLoading, showStarHelp, hasStartedInterview]);
 
     if (mode === 'session') {
         const isInitialJobSelection = sessionType === 'tailored' && !selectedJobId;

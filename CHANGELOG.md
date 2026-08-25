@@ -48,6 +48,7 @@ See [CHANGELOG_ARCHIVE.md](CHANGELOG_ARCHIVE.md) for earlier history.
 - **Made the resume-story card launch the resume interview**: choosing that path opens the resume and starts with an experience ready to discuss.
 - **Fixed tailored interview job search**: typed job searches now check saved jobs and explain when a matching job still needs analysis.
 - **Hide unavailable tailored practice**: users without saved jobs now see only general practice until they have a role to prepare for.
+- **Sequence interview openings**: the first question now waits until the user continues past the interview introduction or STAR explanation.
 - **Renamed the plan limit from Alerts to Email alerts**: the pricing page now makes clear that this means forwarded job-alert emails.
 - **Removed sunset job surfaces**: Feed and Job Alerts no longer appear as usable homepage or Features-page options, and Resume Interview no longer appears as “Story Mode” or “Soon.”
 - **Added an optional STAR explanation at interview start**: users can get a plain-language framework and example before answering, or continue immediately.
