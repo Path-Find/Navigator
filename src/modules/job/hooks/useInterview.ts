@@ -16,6 +16,8 @@ import type { CustomSkill } from '../../skills/types';
 import { Storage } from '../../../services/storageService';
 import { createCandidateEducationContext, formatCandidateProfileContext, formatVerifiedSkills } from '../../../services/candidateProfileContext';
 
+const MAX_FOLLOW_UPS = 2;
+
 const INTERVIEW_BLOCK_TYPES = new Set(['work', 'volunteer', 'project', 'education']);
 
 const stringifyForInterview = (resumes: ResumeProfile[], skills: CustomSkill[] = []): string => {
@@ -136,7 +138,8 @@ export const useInterview = () => {
             }));
 
             // 4. Handle Follow-up Insertion (only if this wasn't already a follow-up)
-            if (!question.isFollowUp && followUpResult && followUpResult.shouldFollowUp && followUpResult.question) {
+            const followUpCount = questions.filter(item => item.isFollowUp).length;
+            if (!question.isFollowUp && followUpCount < MAX_FOLLOW_UPS && followUpResult && followUpResult.shouldFollowUp && followUpResult.question) {
                 const followUpQuestion: InterviewQuestion = {
                     id: crypto.randomUUID(),
                     question: followUpResult.question,

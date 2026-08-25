@@ -403,6 +403,7 @@ export const InterviewSessionScreen = ({
                             completed: currentResponse?.savedAsStory,
                         } : undefined}
                         completionMessage={isLastQuestion && hasCompletedResponse ? 'Interview complete — you reached the end of this session.' : undefined}
+                        progressLabel={!isInitialJobSelection ? `Question ${currentQuestionIndex + 1} of ${questions.length}` : undefined}
                         inputDisabled={(!!currentQ && hasResponse) || isLoading || shouldDisableInput}
                         accentGradient="from-neutral-700 to-neutral-500"
                     />

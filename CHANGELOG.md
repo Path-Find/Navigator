@@ -14,6 +14,7 @@ See [CHANGELOG_ARCHIVE.md](CHANGELOG_ARCHIVE.md) for earlier history.
 - **Renamed the resume suggestion storage area**: “Discovery Bank” is now “Saved resume suggestions,” with plain-language review guidance.
 - **Made interview completion visible**: the final response now shows a clear end-of-session message instead of relying on the disabled input hint.
 - **Fixed premature interview completion**: the end message now waits for response analysis and follow-up insertion to finish.
+- **Shortened interview sessions**: general interviews now start with eight questions, allow at most two follow-ups, and show progress through the session.
 - **Removed the interview progression-button gradient**: the button now uses a flat grey treatment.
 - **Made interview rewrites sound conversational**: resume-grounded introductions now turn action bullets into first-person statements instead of quoting resume text.
 - **Preserved interview button treatment during the palette change**: action buttons retain their original hierarchy and shape while using grey accents.

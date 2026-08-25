@@ -140,7 +140,7 @@ export const INTERVIEW_PROMPTS = {
     ${anchorData('CANDIDATE_BACKGROUND', resumeContext)}
 
     TASK:
-    Generate 9 behavioral interview questions that cover:
+    Generate 7 behavioral interview questions that cover:
     - Overcoming a challenge or setback
     - Working in or leading a team
     - Handling conflict or a difficult person

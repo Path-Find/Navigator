@@ -41,6 +41,7 @@ interface InterviewChatProps {
         completed?: boolean;
     };
     completionMessage?: string;
+    progressLabel?: string;
     inputDisabled?: boolean;
     accentGradient?: string;
     hideInput?: boolean;
@@ -58,6 +59,7 @@ export const InterviewChat: React.FC<InterviewChatProps> = ({
     onNext,
     secondaryAction,
     completionMessage,
+    progressLabel,
     inputDisabled = false,
     accentGradient = "from-neutral-700 to-neutral-500",
     hideInput = false
@@ -256,6 +258,11 @@ export const InterviewChat: React.FC<InterviewChatProps> = ({
                         <CheckCircle2 className="h-4 w-4 text-emerald-500" />
                         <span>{completionMessage}</span>
                     </motion.div>
+                )}
+                {progressLabel && (
+                    <div className="mt-3 text-center text-[10px] font-bold uppercase tracking-widest text-neutral-400">
+                        {progressLabel}
+                    </div>
                 )}
             </div>
 
