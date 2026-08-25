@@ -150,7 +150,7 @@ export const Privacy: React.FC = () => {
                                             <strong>Usage Data:</strong> We collect non-identifiable usage patterns, such as features used, time spent, and engagement with new designs. This data helps us prioritize improvements and ensure the tool remains intuitive.
                                         </p>
                                         <p>
-                                            <strong>AI Quality and Safety Logs:</strong> Navigator and Google may process AI prompts and responses to improve letter quality, troubleshoot failures, and investigate abuse. Google AI Studio logging is currently enabled during active product testing and may retain these interactions for up to 55 days. Do not submit information you are not comfortable sending to Google Gemini.
+                                            <strong>AI Quality and Safety Logs:</strong> Navigator and Google may process AI prompts and responses. Google AI Studio logging is currently enabled during active product testing and may retain these interactions for up to 55 days. Navigator does not routinely review these logs; we access them case-by-case when needed for a support request, complaint, refund, quality investigation, or abuse report. Do not submit information you are not comfortable sending to Google Gemini.
                                         </p>
                                     </div>
                                 </section>
@@ -178,7 +178,7 @@ export const Privacy: React.FC = () => {
                                             </li>
                                         </ul>
                                         <p>
-                                            <strong>AI Processing:</strong> Navigator uses Google&apos;s Gemini API. The content you submit may include resumes, job descriptions, and other career information. It is <strong>not used to train Google&apos;s global models</strong> under the API terms we use, but current Google AI Studio logging may retain prompts and responses for up to 55 days for quality, debugging, and abuse review.
+                                            <strong>AI Processing:</strong> Navigator uses Google&apos;s Gemini API. The content you submit may include resumes, job descriptions, and other career information. It is <strong>not used to train Google&apos;s global models</strong> under the API terms we use, but current Google AI Studio logging may retain prompts and responses for up to 55 days. We review Navigator logs only when needed for support, complaints, refunds, quality investigations, or abuse reports.
                                         </p>
                                     </div>
                                 </section>
