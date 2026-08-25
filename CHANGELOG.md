@@ -5,6 +5,7 @@ All notable changes to this project will be documented in this file.
 See [CHANGELOG_ARCHIVE.md](CHANGELOG_ARCHIVE.md) for earlier history.
 
 ## [Unreleased]
+- **Gave feature cards distinct accents**: the homepage and Features page now use the shared palette so cards are easier to tell apart without bringing purple or pink back.
 - **Made interview answer-framework help additive**: users can learn STAR and ARC independently without replacing earlier explanations.
 - **Fixed interview framework recommendations**: experience examples, obstacles, conflicts, and mistakes now recommend STAR instead of falling through to ARC.
 - **Made interview framework recommendations explicit**: generated questions now carry STAR or ARC metadata, with wording-based fallback for older questions.
