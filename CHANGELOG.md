@@ -17,6 +17,7 @@ See [CHANGELOG_ARCHIVE.md](CHANGELOG_ARCHIVE.md) for earlier history.
 - **Shortened interview sessions**: general interviews now start with eight questions, allow at most two follow-ups, and show progress through the session.
 - **Added an evidence-based interview summary**: completed sessions now show reviewed-answer counts plus the strongest themes and next areas to improve.
 - **Made the interview ending conversational**: the transcript now explicitly says when the last question is complete before showing the summary.
+- **Added an optional job-specific closing exercise**: tailored interviews now suggest questions the candidate can ask the employer after the results.
 - **Removed the interview progression-button gradient**: the button now uses a flat grey treatment.
 - **Made interview rewrites sound conversational**: resume-grounded introductions now turn action bullets into first-person statements instead of quoting resume text.
 - **Preserved interview button treatment during the palette change**: action buttons retain their original hierarchy and shape while using grey accents.

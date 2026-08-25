@@ -381,6 +381,7 @@ export const InterviewSessionScreen = ({
         }, {});
         const summaryStrengths = Array.from(new Set(analyzedResponses.flatMap((response) => response.analysis?.strengths || []))).slice(0, 3);
         const summaryImprovements = Array.from(new Set(analyzedResponses.flatMap((response) => response.analysis?.improvements || []))).slice(0, 3);
+        const selectedJob = jobs.find((job) => job.id === selectedJobId);
         const completionSummary = isInterviewComplete ? (
             <div className="mt-3 rounded-xl border border-neutral-200 bg-white px-4 py-3 text-xs dark:border-neutral-800 dark:bg-neutral-950">
                 <p className="font-black uppercase tracking-widest text-neutral-500">Session summary</p>
@@ -406,6 +407,25 @@ export const InterviewSessionScreen = ({
                                 </ul>
                             </div>
                         )}
+                    </div>
+                )}
+                {sessionType === 'tailored' && (
+                    <div className="mt-4 border-t border-neutral-200 pt-3 dark:border-neutral-800">
+                        <p className="font-bold text-neutral-700 dark:text-neutral-300">Questions for the interviewer (optional)</p>
+                        <p className="mt-1 text-neutral-500 dark:text-neutral-400">
+                            What would you ask about {selectedJob?.position || 'this role'}?
+                        </p>
+                        <div className="mt-2 flex flex-wrap gap-2 text-neutral-600 dark:text-neutral-300">
+                            {[
+                                'What would success look like in the first 90 days?',
+                                'What are the team’s biggest priorities right now?',
+                                'How would this role work with the rest of the team?',
+                            ].map((question) => (
+                                <span key={question} className="rounded-full border border-neutral-200 px-3 py-1.5 text-[11px] dark:border-neutral-700">
+                                    {question}
+                                </span>
+                            ))}
+                        </div>
                     </div>
                 )}
             </div>
