@@ -44,7 +44,11 @@ const buildResumeGroundedIntroduction = (resumes: ResumeProfile[], verifiedSkill
 
     const parts = [`I’m a ${role}${organization}.`];
     if (strongestBullet) {
-        parts.push(`One example from my resume is: “${strongestBullet.trim().replace(/[.]$/, '')}.”`);
+        const detail = strongestBullet.trim().replace(/[.]$/, '').replace(/^([A-Z])/, (_, letter: string) => letter.toLowerCase());
+        const isNonActionBullet = /^(proven|strong|demonstrated|responsible|experience|ability|knowledge|familiar)/i.test(detail);
+        parts.push(isNonActionBullet
+            ? `My experience includes ${detail}.`
+            : `In that role, I ${detail}.`);
     }
     if (otherExperience) parts.push(`My background also includes ${otherExperience}.`);
     const skillNames = verifiedSkills.map(skill => skill.name.trim()).filter(Boolean).slice(0, 3);
@@ -375,7 +379,7 @@ export const InterviewSessionScreen = ({
                         showNextButton={hasResponse && !isLastQuestion}
                         onNext={nextQuestion}
                         inputDisabled={(!!currentQ && hasResponse) || isLoading || shouldDisableInput}
-                        accentGradient="from-neutral-500 to-neutral-500"
+                        accentGradient="from-neutral-700 to-neutral-500"
                     />
                 </div>
             </div>

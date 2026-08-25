@@ -5,6 +5,8 @@ All notable changes to this project will be documented in this file.
 See [CHANGELOG_ARCHIVE.md](CHANGELOG_ARCHIVE.md) for earlier history.
 
 ## [Unreleased]
+- **Made interview rewrites sound conversational**: resume-grounded introductions now turn action bullets into first-person statements instead of quoting resume text.
+- **Preserved interview button treatment during the palette change**: action buttons retain their original hierarchy and shape while using grey accents.
 - **Made resume prompts compact and inline**: company and experience hints now sit beside a short “Think about” label instead of taking over the question card.
 - **Separated interview suggestions from actions**: optional resume prompts now use muted chips instead of looking like controls that advance the interview.
 - **Preserved interview messages during coaching**: STAR guidance and the ready-to-answer prompt now appear as new messages instead of replacing the introduction.

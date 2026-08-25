@@ -224,7 +224,7 @@ export const ResumeInterviewModal: React.FC<ResumeInterviewModalProps> = ({ bloc
                                     inputHint={phase === 'done' ? '' : `Question ${Math.min(currentQ + 1, questions.length)} of ${questions.length}`}
                                     inputDisabled={phase === 'saving' || phase === 'done'}
                                     hideInput={phase === 'done'}
-                                    accentGradient="from-neutral-600 to-neutral-600"
+                        accentGradient="from-neutral-700 to-neutral-500"
                                 />
 
                                 {phase === 'done' && (

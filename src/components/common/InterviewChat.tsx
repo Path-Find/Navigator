@@ -50,7 +50,7 @@ export const InterviewChat: React.FC<InterviewChatProps> = ({
     showNextButton = false,
     onNext,
     inputDisabled = false,
-    accentGradient = "from-neutral-600 to-neutral-600",
+    accentGradient = "from-neutral-700 to-neutral-500",
     hideInput = false
 }) => {
     const scrollRef = useRef<HTMLDivElement>(null);
