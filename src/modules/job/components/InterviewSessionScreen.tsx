@@ -101,6 +101,7 @@ export const InterviewSessionScreen = ({
     const [copiedText, setCopiedText] = useState<string | null>(null);
     const [helpTopics, setHelpTopics] = useState<AnswerHelpTopic[]>([]);
     const [hasStartedInterview, setHasStartedInterview] = useState(false);
+    const [interviewerQuestions, setInterviewerQuestions] = useState('');
     const [starExample] = useState(() => STAR_EXAMPLES[Math.floor(Math.random() * STAR_EXAMPLES.length)]);
 
     const onBankSuggestion = React.useCallback(async (suggestion: ResumeSuggestionItem) => {
@@ -415,17 +416,13 @@ export const InterviewSessionScreen = ({
                         <p className="mt-1 text-neutral-500 dark:text-neutral-400">
                             What would you ask about {selectedJob?.position || 'this role'}?
                         </p>
-                        <div className="mt-2 flex flex-wrap gap-2 text-neutral-600 dark:text-neutral-300">
-                            {[
-                                'What would success look like in the first 90 days?',
-                                'What are the team’s biggest priorities right now?',
-                                'How would this role work with the rest of the team?',
-                            ].map((question) => (
-                                <span key={question} className="rounded-full border border-neutral-200 px-3 py-1.5 text-[11px] dark:border-neutral-700">
-                                    {question}
-                                </span>
-                            ))}
-                        </div>
+                        <textarea
+                            value={interviewerQuestions}
+                            onChange={(event) => setInterviewerQuestions(event.target.value)}
+                            placeholder="Write any questions you would ask..."
+                            rows={2}
+                            className="mt-2 w-full resize-none rounded-lg border border-neutral-200 bg-neutral-50 px-3 py-2 text-xs text-neutral-700 outline-none placeholder:text-neutral-400 focus:border-neutral-400 dark:border-neutral-700 dark:bg-neutral-900/60 dark:text-neutral-200"
+                        />
                     </div>
                 )}
             </div>
