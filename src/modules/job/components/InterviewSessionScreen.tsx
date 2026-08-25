@@ -266,7 +266,7 @@ export const InterviewSessionScreen = ({
 
     if (mode === 'session') {
         const isInitialJobSelection = sessionType === 'tailored' && !selectedJobId;
-        const shouldHideInput = !isInitialJobSelection && (!hasStartedInterview || showStarHelp);
+        const shouldDisableInput = !isInitialJobSelection && (!hasStartedInterview || showStarHelp);
 
         // Safety check: ensure questions exist, unless we're in the initial job selection phase
         if (!isInitialJobSelection && (!questions || questions.length === 0)) {
@@ -286,6 +286,9 @@ export const InterviewSessionScreen = ({
         if (isInitialJobSelection) {
             placeholder = "Pick a job or type its name...";
             inputHint = "Press Enter to Select Job";
+        } else if (shouldDisableInput) {
+            placeholder = 'Choose an option above to continue...';
+            inputHint = 'Select an option above';
         } else if (hasResponse) {
             placeholder = 'Waiting for next question...';
             inputHint = isLastQuestion ? 'Interview Complete' : 'Press Enter for Next Question';
@@ -304,9 +307,8 @@ export const InterviewSessionScreen = ({
                         inputHint={inputHint}
                         showNextButton={hasResponse && !isLastQuestion}
                         onNext={nextQuestion}
-                        inputDisabled={(!!currentQ && hasResponse) || isLoading}
+                        inputDisabled={(!!currentQ && hasResponse) || isLoading || shouldDisableInput}
                         accentGradient="from-indigo-500 to-violet-500"
-                        hideInput={shouldHideInput}
                     />
                 </div>
             </div>

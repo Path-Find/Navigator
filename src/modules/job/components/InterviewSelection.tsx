@@ -145,7 +145,15 @@ export const PracticeModeSelection = ({ onGeneral, onTailored, hasSavedJobs }: {
     return (
         <div className="h-screen w-full flex flex-col items-center bg-neutral-50/50 dark:bg-black overflow-hidden">
             <div className="w-full max-w-4xl flex-1 min-h-0 flex flex-col pt-16">
-                <InterviewChat messages={messages} inputValue="" onInputChange={() => undefined} onSubmit={() => undefined} hideInput inputDisabled />
+                <InterviewChat
+                    messages={messages}
+                    inputValue=""
+                    onInputChange={() => undefined}
+                    onSubmit={() => undefined}
+                    placeholder="Choose an option above to continue..."
+                    inputHint="Select an interview type above"
+                    inputDisabled
+                />
             </div>
         </div>
     );

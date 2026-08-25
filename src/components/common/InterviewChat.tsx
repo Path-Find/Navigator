@@ -224,7 +224,7 @@ export const InterviewChat: React.FC<InterviewChatProps> = ({
                                     onKeyDown={handleKeyDown}
                                     disabled={inputDisabled}
                                     placeholder={placeholder}
-                                    className="w-full bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-700 rounded-3xl p-4 pr-20 text-sm text-neutral-900 dark:text-white font-medium placeholder:text-neutral-400 focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500/30 transition-all shadow-sm min-h-[80px] leading-relaxed"
+                                    className="w-full bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-700 rounded-3xl p-4 pr-20 text-sm text-neutral-900 dark:text-white font-medium placeholder:text-neutral-400 focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500/30 disabled:opacity-50 disabled:bg-neutral-100 dark:disabled:bg-neutral-800 transition-all shadow-sm min-h-[80px] leading-relaxed"
                                 />
 
                                 <div className="absolute right-2.5 bottom-2.5 flex items-center gap-3">

@@ -55,7 +55,7 @@ See [CHANGELOG_ARCHIVE.md](CHANGELOG_ARCHIVE.md) for earlier history.
 - **Restore public footer links**: Resume and History now appear under Jobs again while unfinished features stay hidden.
 - **Center homepage cards responsively**: four-card homepages now use a centered four-column layout while five-card homepages keep the existing five-column layout.
 - **Make STAR coaching additive**: STAR guidance now appears as a separate coaching message with rotating examples instead of replacing the interview introduction.
-- **Only show answer input when needed**: interview typing is hidden during introductions and coaching choices, then enabled for actual questions.
+- **Disable answer input until needed**: interview typing stays visible but greyed out during introductions and coaching choices, then enables for actual questions.
 - **Renamed the plan limit from Alerts to Email alerts**: the pricing page now makes clear that this means forwarded job-alert emails.
 - **Removed sunset job surfaces**: Feed and Job Alerts no longer appear as usable homepage or Features-page options, and Resume Interview no longer appears as “Story Mode” or “Soon.”
 - **Added an optional STAR explanation at interview start**: users can get a plain-language framework and example before answering, or continue immediately.
