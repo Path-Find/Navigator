@@ -113,6 +113,8 @@ export const InterviewSessionScreen = ({
         const msgs: ChatMessage[] = [];
         const hasAnsweredAnyQuestion = Object.keys(responses).length > 0;
         const interviewHasStarted = hasStartedInterview || hasAnsweredAnyQuestion || currentQuestionIndex > 0;
+        const finalResponse = questions[currentQuestionIndex] ? responses[questions[currentQuestionIndex].id] : undefined;
+        const interviewHasCompleted = isLastQuestion && !!finalResponse?.analysis && !isLoading;
 
         // Preparing state (in-chat loading)
         if (isSessionLoading) {
@@ -342,8 +344,16 @@ export const InterviewSessionScreen = ({
             }
         });
 
+        if (interviewHasCompleted) {
+            msgs.push({
+                id: 'interview-complete-message',
+                role: 'ai',
+                content: 'That’s the end of this interview. You answered every question, and your summary is below.',
+            });
+        }
+
         return msgs;
-    }, [questions, currentQuestionIndex, responses, mode, resumes, copiedText, resumeSnippets, onBankSuggestion, onSaveStory, sessionType, selectedJobId, jobs, onJobSelected, isSessionLoading, helpTopics, hasStartedInterview, starExample]);
+    }, [questions, currentQuestionIndex, responses, mode, resumes, copiedText, resumeSnippets, onBankSuggestion, onSaveStory, sessionType, selectedJobId, jobs, onJobSelected, isSessionLoading, isLoading, isLastQuestion, helpTopics, hasStartedInterview, starExample]);
 
     if (mode === 'session') {
         const isInitialJobSelection = sessionType === 'tailored' && !selectedJobId;
