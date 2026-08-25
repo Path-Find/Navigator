@@ -266,6 +266,7 @@ export const InterviewSessionScreen = ({
 
     if (mode === 'session') {
         const isInitialJobSelection = sessionType === 'tailored' && !selectedJobId;
+        const shouldHideInput = !isInitialJobSelection && (!hasStartedInterview || showStarHelp);
 
         // Safety check: ensure questions exist, unless we're in the initial job selection phase
         if (!isInitialJobSelection && (!questions || questions.length === 0)) {
@@ -305,6 +306,7 @@ export const InterviewSessionScreen = ({
                         onNext={nextQuestion}
                         inputDisabled={(!!currentQ && hasResponse) || isLoading}
                         accentGradient="from-indigo-500 to-violet-500"
+                        hideInput={shouldHideInput}
                     />
                 </div>
             </div>
