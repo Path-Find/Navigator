@@ -16,6 +16,8 @@ const STAR_EXAMPLES = [
     'I noticed new team members were struggling with the same system (Situation), so I took responsibility for making onboarding clearer (Task). I wrote a short guide and paired with each new teammate (Action), which shortened the time it took them to work independently (Result).',
 ];
 
+type AnswerHelpTopic = 'STAR' | 'ARC';
+
 const getAnswerFramework = (question: InterviewQuestion): { name: 'STAR' | 'ARC'; description: string } => {
     const normalized = question.question.toLowerCase();
     const isExperienceStory = /tell me about a time|describe a time|give me an example|walk me through a situation|experience where/.test(normalized);
@@ -91,7 +93,7 @@ export const InterviewSessionScreen = ({
     nextQuestion, isLastQuestion, handleUpdateResume, onSaveStory
 }: SessionProps) => {
     const [copiedText, setCopiedText] = useState<string | null>(null);
-    const [showStarHelp, setShowStarHelp] = useState(false);
+    const [helpTopics, setHelpTopics] = useState<AnswerHelpTopic[]>([]);
     const [hasStartedInterview, setHasStartedInterview] = useState(false);
     const [starExample] = useState(() => STAR_EXAMPLES[Math.floor(Math.random() * STAR_EXAMPLES.length)]);
 
@@ -153,25 +155,36 @@ export const InterviewSessionScreen = ({
         const continueInterview = () => {
             setHasStartedInterview(true);
         };
+        const requestHelp = (topic: AnswerHelpTopic) => {
+            setHelpTopics(current => current.includes(topic) ? current : [...current, topic]);
+        };
 
         msgs.push({
             id: 'intro-msg',
             role: 'ai',
-            content: intro,
-            suggestionPills: !showStarHelp && !interviewHasStarted ? [
+            content: `${intro}\n\nYou can ask for STAR for experience-based stories or ARC for direct, role-focused answers.`,
+            suggestionPills: helpTopics.length === 0 && !interviewHasStarted ? [
                     { id: 'continue-interview', label: 'Continue interview', onClick: continueInterview, variant: 'action' as const },
-                    { id: 'star-help', label: "What's STAR?", onClick: () => setShowStarHelp(true), variant: 'action' as const },
+                    { id: 'star-help', label: "What's STAR?", onClick: () => requestHelp('STAR'), variant: 'action' as const },
+                    { id: 'arc-help', label: "What's ARC?", onClick: () => requestHelp('ARC'), variant: 'action' as const },
                 ] : undefined,
         });
 
-        if (showStarHelp) {
+        helpTopics.forEach(topic => {
+            const isStar = topic === 'STAR';
+            const otherTopic = isStar ? 'ARC' : 'STAR';
             msgs.push({
-                id: 'star-help',
+                id: `${topic.toLowerCase()}-help`,
                 role: 'ai',
-                content: `STAR is a simple structure for answering experience-based questions:\n\n• Situation — set the context.\n• Task — explain what needed to be done.\n• Action — focus on what you personally did.\n• Result — share what changed or what you learned.\n\nExample: “${starExample}”`,
-                suggestionPills: [{ id: 'continue-interview', label: 'Continue interview', onClick: continueInterview, variant: 'action' as const }],
+                content: isStar
+                    ? `STAR is a simple structure for answering experience-based questions:\n\n• Situation — set the context.\n• Task — explain what needed to be done.\n• Action — focus on what you personally did.\n• Result — share what changed or what you learned.\n\nExample: “${starExample}”`
+                    : 'ARC works well for direct questions. Answer the question clearly, add the relevant context, and connect your answer back to the role or situation.',
+                suggestionPills: [
+                    ...(!helpTopics.includes(otherTopic) ? [{ id: `${otherTopic.toLowerCase()}-help`, label: `What's ${otherTopic}?`, onClick: () => requestHelp(otherTopic), variant: 'action' as const }] : []),
+                    ...(!interviewHasStarted ? [{ id: 'continue-interview', label: 'Continue interview', onClick: continueInterview, variant: 'action' as const }] : []),
+                ],
             });
-        }
+        });
 
         if (!hasStartedInterview) return msgs;
 
@@ -333,11 +346,11 @@ export const InterviewSessionScreen = ({
         });
 
         return msgs;
-    }, [questions, currentQuestionIndex, responses, mode, resumes, copiedText, resumeSnippets, onBankSuggestion, onSaveStory, sessionType, selectedJobId, jobs, onJobSelected, isSessionLoading, showStarHelp, hasStartedInterview, starExample]);
+    }, [questions, currentQuestionIndex, responses, mode, resumes, copiedText, resumeSnippets, onBankSuggestion, onSaveStory, sessionType, selectedJobId, jobs, onJobSelected, isSessionLoading, helpTopics, hasStartedInterview, starExample]);
 
     if (mode === 'session') {
         const isInitialJobSelection = sessionType === 'tailored' && !selectedJobId;
-        const shouldDisableInput = !isInitialJobSelection && (!hasStartedInterview && Object.keys(responses).length === 0 && currentQuestionIndex === 0 || (showStarHelp && !hasStartedInterview));
+        const shouldDisableInput = !isInitialJobSelection && (!hasStartedInterview && Object.keys(responses).length === 0 && currentQuestionIndex === 0 || (helpTopics.length > 0 && !hasStartedInterview));
 
         // Safety check: ensure questions exist, unless we're in the initial job selection phase
         if (!isInitialJobSelection && (!questions || questions.length === 0)) {
