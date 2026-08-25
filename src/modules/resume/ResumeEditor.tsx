@@ -21,11 +21,12 @@ import type { SectionType } from './constants';
 import { useSkillContext } from '../skills/context/SkillContext';
 import { printElement } from '../../utils/printService';
 import { ROUTES } from '../../constants';
-import { useNavigate } from 'react-router';
+import { useNavigate, useSearchParams } from 'react-router';
 import type { ExperienceBlock } from './types';
 
 export const ResumeEditor: React.FC = () => {
     const navigate = useNavigate();
+    const [searchParams, setSearchParams] = useSearchParams();
     const {
         resumes,
         handleUpdateResumes: onSave,
@@ -89,6 +90,14 @@ export const ResumeEditor: React.FC = () => {
             clearImportError();
         };
     }, [clearImportError]);
+
+    useEffect(() => {
+        if (searchParams.get('interview') !== '1' || interviewBlock || isLoading) return;
+        const firstExperience = blocks.find(block => block.isVisible && block.type !== 'summary');
+        if (!firstExperience) return;
+        setInterviewBlock(firstExperience);
+        setSearchParams({}, { replace: true });
+    }, [blocks, interviewBlock, isLoading, searchParams, setSearchParams]);
 
     const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
         const file = e.target.files?.[0];

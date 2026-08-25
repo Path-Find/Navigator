@@ -44,6 +44,8 @@ See [CHANGELOG_ARCHIVE.md](CHANGELOG_ARCHIVE.md) for earlier history.
 - **Restored the resume-story interview option**: Interview Advisor now has practice, profile, and resume-context paths as three clear choices.
 - **Moved practice-mode selection into the interview flow**: the Practice card now starts one interview entry point, which asks whether to use general or specific-job practice.
 - **Added profile interview context before questions**: users now see what will be saved and how it will be reused before answering.
+- **Made practice mode a real interview opening**: the first chat interaction asks whether to practice generally or for a specific job, while STAR help remains available inside the interview.
+- **Made the resume-story card launch the resume interview**: choosing that path opens the resume and starts with an experience ready to discuss.
 - **Renamed the plan limit from Alerts to Email alerts**: the pricing page now makes clear that this means forwarded job-alert emails.
 - **Removed sunset job surfaces**: Feed and Job Alerts no longer appear as usable homepage or Features-page options, and Resume Interview no longer appears as “Story Mode” or “Soon.”
 - **Added an optional STAR explanation at interview start**: users can get a plain-language framework and example before answering, or continue immediately.

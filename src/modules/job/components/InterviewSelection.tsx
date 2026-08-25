@@ -6,6 +6,8 @@ import { BentoCard } from '../../../components/ui/BentoCard';
 import { FEATURE_COLORS } from '../../../featureRegistry';
 import { SharedPageLayout } from '../../../components/common/SharedPageLayout';
 import { PageHeader } from '../../../components/ui/PageHeader';
+import { InterviewChat } from '../../../components/common/InterviewChat';
+import type { ChatMessage } from '../../../components/common/InterviewChat';
 
 interface SelectionProps {
     limitError: string | null;
@@ -99,8 +101,8 @@ export const InterviewSelection = ({ limitError, handleStartPractice, handleStar
                             title="Tell a resume story"
                             description="Add the context behind an experience so your applications can explain more than the bullet points."
                             color={FEATURE_COLORS.blue}
-                            actionLabel="Open Resume"
-                            onAction={() => navigate(ROUTES.RESUMES)}
+                            actionLabel="Choose experience"
+                            onAction={() => navigate(`${ROUTES.RESUMES}?interview=1`)}
                             previewContent={(
                                 <ul className="space-y-3 pt-2">
                                     {[
@@ -124,24 +126,25 @@ export const InterviewSelection = ({ limitError, handleStartPractice, handleStar
     );
 };
 
-export const PracticeModeSelection = ({ onGeneral, onTailored }: { onGeneral: () => void; onTailored: () => void }) => (
-    <SharedPageLayout className="theme-job" spacing="compact" maxWidth="4xl">
-        <PageHeader
-            title="Practice"
-            highlight="interview"
-            subtitle="What kind of practice would you like to do?"
-            variant="simple"
-            className="mb-8"
-        />
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-            <button type="button" onClick={onGeneral} className="rounded-3xl border border-indigo-200 bg-white p-6 text-left shadow-sm transition hover:-translate-y-1 hover:shadow-lg dark:border-indigo-500/20 dark:bg-neutral-900">
-                <h2 className="text-xl font-black text-neutral-900 dark:text-white">General practice</h2>
-                <p className="mt-2 text-sm text-neutral-500 dark:text-neutral-400">Common behavioral questions, STAR practice, and feedback you can reuse anywhere.</p>
-            </button>
-            <button type="button" onClick={onTailored} className="rounded-3xl border border-violet-200 bg-white p-6 text-left shadow-sm transition hover:-translate-y-1 hover:shadow-lg dark:border-violet-500/20 dark:bg-neutral-900">
-                <h2 className="text-xl font-black text-neutral-900 dark:text-white">Specific job practice</h2>
-                <p className="mt-2 text-sm text-neutral-500 dark:text-neutral-400">Questions built around a job you have already analyzed.</p>
-            </button>
+export const PracticeModeSelection = ({ onGeneral, onTailored }: { onGeneral: () => void; onTailored: () => void }) => {
+    const messages: ChatMessage[] = [{
+        id: 'practice-mode-question',
+        role: 'ai',
+        content: 'What kind of practice would you like to do?',
+        suggestionPills: [
+            { id: 'general', label: 'General practice', sublabel: 'Common behavioral questions', onClick: onGeneral },
+            { id: 'tailored', label: 'Specific job practice', sublabel: 'Questions for an analyzed job', onClick: onTailored },
+        ],
+    }];
+
+    return (
+        <div className="h-screen w-full flex flex-col items-center bg-neutral-50/50 dark:bg-black overflow-hidden">
+            <div className="w-full max-w-4xl flex-1 min-h-0 flex flex-col pt-16">
+                <div className="px-5 pb-2">
+                    <PageHeader title="Practice" highlight="interview" subtitle="Choose a practice mode to get started." variant="simple" className="mb-4" />
+                </div>
+                <InterviewChat messages={messages} inputValue="" onInputChange={() => undefined} onSubmit={() => undefined} hideInput inputDisabled />
+            </div>
         </div>
-    </SharedPageLayout>
-);
+    );
+};
