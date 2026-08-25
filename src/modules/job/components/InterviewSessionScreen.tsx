@@ -200,7 +200,7 @@ export const InterviewSessionScreen = ({
                 ] : undefined,
         });
 
-        helpTopics.forEach(topic => {
+        helpTopics.forEach((topic, topicIndex) => {
             const isStar = topic === 'STAR';
             const otherTopic = isStar ? 'ARC' : 'STAR';
             msgs.push({
@@ -211,7 +211,7 @@ export const InterviewSessionScreen = ({
                     : 'ARC works well for direct questions. Answer the question clearly, add the relevant context, and connect your answer back to the role or situation.',
                 suggestionPills: [
                     ...(!helpTopics.includes(otherTopic) ? [{ id: `${otherTopic.toLowerCase()}-help`, label: `What's ${otherTopic}?`, onClick: () => requestHelp(otherTopic), variant: 'action' as const }] : []),
-                    ...(!interviewHasStarted ? [{ id: 'continue-interview', label: 'Continue interview', onClick: continueInterview, variant: 'action' as const }] : []),
+                    ...(!interviewHasStarted && topicIndex === helpTopics.length - 1 ? [{ id: 'continue-interview', label: 'Continue interview', onClick: continueInterview, variant: 'action' as const }] : []),
                 ],
             });
         });
