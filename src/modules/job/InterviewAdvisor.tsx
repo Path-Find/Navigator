@@ -98,7 +98,7 @@ export const InterviewAdvisor: React.FC = () => {
     }, [type, navigate, resumes, skills, loadGeneralQuestions, showError, isAdmin, isUserLoading]);
 
     useEffect(() => {
-        if (mode === 'session') {
+        if (mode === 'session' || mode === 'practice-selection') {
             setFocusedMode(true);
         } else {
             setFocusedMode(false);

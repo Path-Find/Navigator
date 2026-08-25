@@ -256,7 +256,7 @@ export const isFeatureComingSoon = (feature: FeatureDefinition): boolean => feat
 export const isFeatureListed = (feature: FeatureDefinition): boolean => feature.stage !== 'admin';
 
 export const canUseFeature = (feature: FeatureDefinition, isAdmin: boolean): boolean => (
-    feature.stage === 'public' || (feature.stage === 'beta' && isAdmin)
+    (!feature.stage || feature.stage === 'public') || (feature.stage === 'beta' && isAdmin)
 );
 
 export const getFooterFeatures = (isAdmin: boolean): FeatureDefinition[] => (

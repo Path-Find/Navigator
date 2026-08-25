@@ -137,17 +137,14 @@ export const PracticeModeSelection = ({ onGeneral, onTailored, hasSavedJobs }: {
             ? 'What kind of practice would you like to do?'
             : 'Let\'s start with general practice. Save a job first if you want questions tailored to a specific role.',
         suggestionPills: [
-            { id: 'general', label: 'General practice', sublabel: 'Common behavioral questions', onClick: onGeneral },
-            ...(hasSavedJobs ? [{ id: 'tailored', label: 'Specific job practice', sublabel: 'Questions for an analyzed job', onClick: onTailored }] : []),
+            { id: 'general', label: 'General practice', sublabel: 'Common behavioral questions', onClick: onGeneral, variant: 'action' as const },
+            ...(hasSavedJobs ? [{ id: 'tailored', label: 'Specific job practice', sublabel: 'Questions for an analyzed job', onClick: onTailored, variant: 'action' as const }] : []),
         ],
     }];
 
     return (
         <div className="h-screen w-full flex flex-col items-center bg-neutral-50/50 dark:bg-black overflow-hidden">
             <div className="w-full max-w-4xl flex-1 min-h-0 flex flex-col pt-16">
-                <div className="px-5 pb-2">
-                    <PageHeader title="Practice" highlight="interview" subtitle="Choose a practice mode to get started." variant="simple" className="mb-4" />
-                </div>
                 <InterviewChat messages={messages} inputValue="" onInputChange={() => undefined} onSubmit={() => undefined} hideInput inputDisabled />
             </div>
         </div>

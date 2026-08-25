@@ -19,6 +19,7 @@ export interface ChatMessage {
         label: string;
         sublabel?: string;
         onClick: () => void;
+        variant?: 'action' | 'suggestion';
     }[];
     isThinking?: boolean;
 }
@@ -132,13 +133,17 @@ export const InterviewChat: React.FC<InterviewChatProps> = ({
                                                 <button
                                                     key={pill.id}
                                                     onClick={pill.onClick}
-                                                    className="flex flex-col items-start px-3.5 py-1.5 bg-white dark:bg-neutral-900 border border-neutral-100 dark:border-neutral-800 rounded-xl hover:border-indigo-500 dark:hover:border-indigo-500/50 shadow-sm transition-all group"
+                                                    className={pill.variant === 'action'
+                                                        ? `flex flex-col items-start px-5 py-3 rounded-2xl border shadow-sm transition-all group ${pill.id === 'continue-interview'
+                                                            ? 'bg-indigo-600 border-indigo-600 text-white hover:bg-indigo-700'
+                                                            : 'bg-white dark:bg-neutral-900 border-neutral-200 dark:border-neutral-700 hover:border-indigo-500'}`
+                                                        : 'flex flex-col items-start px-3.5 py-1.5 bg-white dark:bg-neutral-900 border border-neutral-100 dark:border-neutral-800 rounded-xl hover:border-indigo-500 dark:hover:border-indigo-500/50 shadow-sm transition-all group'}
                                                 >
-                                                    <span className="text-[11px] font-bold text-neutral-700 dark:text-neutral-200 group-hover:text-indigo-600 dark:group-hover:text-indigo-400">
+                                                    <span className={`font-bold group-hover:text-indigo-600 dark:group-hover:text-indigo-400 ${pill.variant === 'action' ? 'text-sm' : 'text-[11px]'} ${pill.id === 'continue-interview' ? 'text-white group-hover:text-white' : 'text-neutral-700 dark:text-neutral-200'}`}>
                                                         {pill.label}
                                                     </span>
                                                     {pill.sublabel && (
-                                                        <span className="text-[9px] text-neutral-400 dark:text-neutral-500">
+                                                        <span className={`text-[9px] ${pill.id === 'continue-interview' ? 'text-indigo-100' : 'text-neutral-400 dark:text-neutral-500'}`}>
                                                             {pill.sublabel}
                                                         </span>
                                                     )}

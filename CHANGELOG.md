@@ -50,6 +50,10 @@ See [CHANGELOG_ARCHIVE.md](CHANGELOG_ARCHIVE.md) for earlier history.
 - **Hide unavailable tailored practice**: users without saved jobs now see only general practice until they have a role to prepare for.
 - **Sequence interview openings**: the first question now waits until the user continues past the interview introduction or STAR explanation.
 - **Unified interview presentation**: Resume Story now uses the same full-screen coaching layout as the main interview experience instead of a separate modal.
+- **Separated interview actions from suggestions**: opening choices now look like buttons, while resume prompts remain lightweight suggestion chips.
+- **Put practice mode selection inside the interview shell**: choosing general or specific-job practice now starts in the focused Interview Advisor experience.
+- **Restore public footer links**: Resume and History now appear under Jobs again while unfinished features stay hidden.
+- **Center homepage cards responsively**: four-card homepages now use a centered four-column layout while five-card homepages keep the existing five-column layout.
 - **Renamed the plan limit from Alerts to Email alerts**: the pricing page now makes clear that this means forwarded job-alert emails.
 - **Removed sunset job surfaces**: Feed and Job Alerts no longer appear as usable homepage or Features-page options, and Resume Interview no longer appears as “Story Mode” or “Soon.”
 - **Added an optional STAR explanation at interview start**: users can get a plain-language framework and example before answering, or continue immediately.
