@@ -34,6 +34,12 @@ interface InterviewChatProps {
     inputHint?: string;
     showNextButton?: boolean;
     onNext?: () => void;
+    secondaryAction?: {
+        label: string;
+        onClick: () => void;
+        disabled?: boolean;
+        completed?: boolean;
+    };
     inputDisabled?: boolean;
     accentGradient?: string;
     hideInput?: boolean;
@@ -49,6 +55,7 @@ export const InterviewChat: React.FC<InterviewChatProps> = ({
     inputHint = "Press Enter to Submit",
     showNextButton = false,
     onNext,
+    secondaryAction,
     inputDisabled = false,
     accentGradient = "from-neutral-700 to-neutral-500",
     hideInput = false
@@ -210,8 +217,22 @@ export const InterviewChat: React.FC<InterviewChatProps> = ({
                     </motion.div>
                 )}
 
-                {showNextButton && (
+                {(showNextButton || secondaryAction) && (
                     <div className="flex justify-end pt-2">
+                        {secondaryAction && (
+                            <motion.button
+                                initial={{ opacity: 0, y: 8 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                onClick={secondaryAction.onClick}
+                                disabled={secondaryAction.disabled}
+                                className={`mr-2 flex items-center gap-2 px-4 py-2.5 rounded-full text-xs font-black tracking-wide border transition-all ${secondaryAction.completed
+                                    ? 'bg-emerald-50 text-emerald-600 border-emerald-200 dark:bg-emerald-500/10 dark:text-emerald-400 dark:border-emerald-500/20'
+                                    : 'bg-white text-neutral-600 border-neutral-200 hover:bg-neutral-100 dark:bg-neutral-900 dark:text-neutral-300 dark:border-neutral-700 dark:hover:bg-neutral-800'}`}
+                            >
+                                <span>{secondaryAction.label}</span>
+                            </motion.button>
+                        )}
+                        {showNextButton && (
                         <motion.button
                             initial={{ opacity: 0, y: 8 }}
                             animate={{ opacity: 1, y: 0 }}
@@ -221,6 +242,7 @@ export const InterviewChat: React.FC<InterviewChatProps> = ({
                             <span>Next Question</span>
                             <ArrowRight className="w-3.5 h-3.5" />
                         </motion.button>
+                        )}
                     </div>
                 )}
             </div>

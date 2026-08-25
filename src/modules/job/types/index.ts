@@ -135,6 +135,7 @@ export interface InterviewQuestion {
     question: string;
     rationale?: string;
     category: 'technical' | 'behavioral' | 'situational'; // Re-added
+    answerFramework?: 'STAR' | 'ARC';
     tips?: string;
     followUp?: InterviewQuestion;
     isFollowUp?: boolean; // New: Flag to identify inserted follow-up questions

@@ -25,6 +25,7 @@ export const INTERVIEW_PROMPTS = {
     2. DEPTH: 50% of questions must be technical/role-specific scenarios (e.g., "How would you handle [specific edge case]?").
     3. BEHAVIORAL: 2 questions on conflict/failure, referencing specific bullets from their resume if possible.
     4. TONE: Professional, slightly skeptical, direct.
+    5. ANSWER STRUCTURE: Set "answerFramework" to "STAR" for questions asking for a specific experience, example, obstacle, conflict, mistake, leadership story, or achievement. Set it to "ARC" for direct, technical, situational, or explanatory questions.
     
     Return ONLY a JSON array of objects:
     [
@@ -32,6 +33,7 @@ export const INTERVIEW_PROMPTS = {
         "question": "The question text.",
         "rationale": "Why you are asking this (e.g. 'Checking depth of React knowledge').",
         "category": "technical" | "behavioral" | "situational",
+        "answerFramework": "STAR" | "ARC",
         "tips": "What a 'Senior' level answer would include."
       }
     ]
@@ -152,7 +154,8 @@ export const INTERVIEW_PROMPTS = {
     - Do NOT include "Tell me about yourself" or a close variant — that opener is already added separately.
     - Questions must sound like a real interviewer — natural, open-ended, not candidate-specific. Do NOT reference the candidate's employers, roles, or experiences in the question text.
     - Use the candidate's background to calibrate which questions to ask and at what level. For example: if they have management experience, include a leadership question; if they are early-career, focus on learning and teamwork; match the seniority and industry context.
-    - Tips should be general coaching advice (STAR method, what a strong answer includes) — not references to their specific background, since the UI already surfaces that separately.
+    - Set "answerFramework" to "STAR" for experience stories, examples, obstacles, conflicts, mistakes, leadership, or achievements. Set it to "ARC" for direct, explanatory, technical, situational, or motivation questions.
+    - Tips should be general coaching advice (STAR method, ARC, or what a strong answer includes) — not references to their specific background, since the UI already surfaces that separately.
     - Keep each question under 2 sentences.
 
     Return ONLY a JSON array of objects:
@@ -160,6 +163,7 @@ export const INTERVIEW_PROMPTS = {
       {
         "question": "The question text.",
         "category": "behavioral",
+        "answerFramework": "STAR" | "ARC",
         "tips": "Brief advice on how to answer this specific question well (STAR method or similar)."
       }
     ]

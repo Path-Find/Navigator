@@ -19,8 +19,14 @@ const STAR_EXAMPLES = [
 type AnswerHelpTopic = 'STAR' | 'ARC';
 
 const getAnswerFramework = (question: InterviewQuestion): { name: 'STAR' | 'ARC'; description: string } => {
+    if (question.answerFramework) {
+        return question.answerFramework === 'STAR'
+            ? { name: 'STAR', description: 'Use a specific situation, your task, the actions you took, and the result.' }
+            : { name: 'ARC', description: 'Answer directly, add the relevant context, and connect it to the role or question.' };
+    }
+
     const normalized = question.question.toLowerCase();
-    const isExperienceStory = /tell me about a time|describe a time|give me an example|walk me through a situation|experience where/.test(normalized);
+    const isExperienceStory = /tell me about a time|describe a time|(?:give|share) (?:me )?(?:a )?specific (?:example|instance)|(?:give|share) (?:me )?an example|walk me through (?:a situation|an example|a specific)|experience where|time you|situation where|obstacle|roadblock|mistake|conflict|de-escalat|mentor(?:ed|ing)?|lead(?:ing)? a team/.test(normalized);
 
     return isExperienceStory
         ? { name: 'STAR', description: 'Use a specific situation, your task, the actions you took, and the result.' }
@@ -210,9 +216,10 @@ export const InterviewSessionScreen = ({
                         {isLastQ && !resp && (() => {
                             const framework = getAnswerFramework(q);
                             return (
-                                <div className="mt-3 px-3 py-2 rounded-xl bg-neutral-50 dark:bg-neutral-900/60 border border-neutral-100 dark:border-neutral-800">
-                                    <p className="text-[10px] font-black uppercase tracking-widest text-neutral-500">Suggested approach: {framework.name}</p>
-                                    <p className="mt-1 text-[11px] text-neutral-500 dark:text-neutral-400">{framework.description}</p>
+                                <div className="mt-3 flex flex-wrap items-baseline gap-x-2 gap-y-1 text-[11px] text-neutral-500 dark:text-neutral-400">
+                                    <span className="font-black uppercase tracking-widest text-neutral-500">Suggested approach:</span>
+                                    <span className="font-black uppercase tracking-widest text-neutral-700 dark:text-neutral-300">{framework.name}</span>
+                                    <span>{framework.description}</span>
                                 </div>
                             );
                         })()}

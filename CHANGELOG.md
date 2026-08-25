@@ -6,6 +6,9 @@ See [CHANGELOG_ARCHIVE.md](CHANGELOG_ARCHIVE.md) for earlier history.
 
 ## [Unreleased]
 - **Made interview answer-framework help additive**: users can learn STAR and ARC independently without replacing earlier explanations.
+- **Fixed interview framework recommendations**: experience examples, obstacles, conflicts, and mistakes now recommend STAR instead of falling through to ARC.
+- **Made interview framework recommendations explicit**: generated questions now carry STAR or ARC metadata, with wording-based fallback for older questions.
+- **Made interview framework guidance inline**: STAR and ARC coaching now stays compact beside the question instead of appearing as a large separate card.
 - **Removed the interview progression-button gradient**: the button now uses a flat grey treatment.
 - **Made interview rewrites sound conversational**: resume-grounded introductions now turn action bullets into first-person statements instead of quoting resume text.
 - **Preserved interview button treatment during the palette change**: action buttons retain their original hierarchy and shape while using grey accents.
