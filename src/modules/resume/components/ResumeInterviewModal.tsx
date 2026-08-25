@@ -1,5 +1,5 @@
 import React, { useState, useCallback } from 'react';
-import { X, CheckCircle2, Loader2, BookOpen, Sparkles } from 'lucide-react';
+import { X, CheckCircle2, Loader2, Sparkles } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { InterviewChat } from '../../../components/common/InterviewChat';
 import type { ChatMessage } from '../../../components/common/InterviewChat';
@@ -133,31 +133,20 @@ export const ResumeInterviewModal: React.FC<ResumeInterviewModalProps> = ({ bloc
         : 0;
 
     return (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm">
-            <motion.div
-                initial={{ opacity: 0, scale: 0.96, y: 12 }}
-                animate={{ opacity: 1, scale: 1, y: 0 }}
-                exit={{ opacity: 0, scale: 0.96, y: 12 }}
-                transition={{ duration: 0.2 }}
-                className="relative w-full max-w-2xl bg-white dark:bg-neutral-900 rounded-3xl shadow-2xl border border-neutral-100 dark:border-neutral-800 flex flex-col overflow-hidden"
-                style={{ height: '600px' }}
-            >
-                {/* Header */}
-                <div className="flex items-center justify-between px-6 py-4 border-b border-neutral-100 dark:border-neutral-800 shrink-0">
-                    <div className="flex items-center gap-3">
-                        <div className="w-8 h-8 bg-indigo-100 dark:bg-indigo-900/40 rounded-xl flex items-center justify-center">
-                            <BookOpen className="w-4 h-4 text-indigo-600 dark:text-indigo-400" />
-                        </div>
-                        <div>
-                            <p className="text-xs font-black text-neutral-900 dark:text-white tracking-tight">{block.title}</p>
-                            <p className="text-[10px] font-bold text-neutral-400">{block.organization}</p>
-                        </div>
+        <div className="fixed inset-0 z-50 h-screen w-full flex flex-col items-center bg-neutral-50/50 dark:bg-black overflow-hidden">
+            <div className="w-full max-w-4xl flex-1 min-h-0 flex flex-col pt-16">
+                <div className="flex items-start justify-between gap-4 px-5 pb-4">
+                    <div>
+                        <p className="text-xs font-black uppercase tracking-widest text-indigo-500 mb-1">Resume story interview</p>
+                        <h1 className="text-2xl font-black text-neutral-900 dark:text-white">{block.title}</h1>
+                        <p className="text-sm font-medium text-neutral-500 dark:text-neutral-400">{block.organization}</p>
                     </div>
                     <button
                         onClick={onClose}
-                        className="w-8 h-8 flex items-center justify-center rounded-xl text-neutral-400 hover:text-neutral-900 dark:hover:text-white hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors"
+                        className="w-10 h-10 flex items-center justify-center rounded-2xl text-neutral-400 hover:text-neutral-900 dark:hover:text-white hover:bg-white dark:hover:bg-neutral-800 transition-colors"
+                        aria-label="Close interview"
                     >
-                        <X className="w-4 h-4" />
+                        <X className="w-5 h-5" />
                     </button>
                 </div>
 
@@ -263,7 +252,7 @@ export const ResumeInterviewModal: React.FC<ResumeInterviewModalProps> = ({ bloc
                         )}
                     </AnimatePresence>
                 </div>
-            </motion.div>
+            </div>
         </div>
     );
 };
