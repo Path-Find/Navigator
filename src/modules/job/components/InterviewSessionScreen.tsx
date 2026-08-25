@@ -64,6 +64,8 @@ export const InterviewSessionScreen = ({
         if (mode !== 'session') return [];
 
         const msgs: ChatMessage[] = [];
+        const hasAnsweredAnyQuestion = Object.keys(responses).length > 0;
+        const interviewHasStarted = hasStartedInterview || hasAnsweredAnyQuestion || currentQuestionIndex > 0;
 
         // Preparing state (in-chat loading)
         if (isSessionLoading) {
@@ -117,8 +119,8 @@ export const InterviewSessionScreen = ({
         msgs.push({
             id: 'intro-msg',
             role: 'ai',
-            content: `${intro}${!showStarHelp && !hasStartedInterview ? '\n\nYou can ask for STAR guidance before you begin if you want a structure for your answer.' : ''}${hasStartedInterview ? '\n\nTake a moment, then answer as you would in the interview.' : ''}`,
-            suggestionPills: !showStarHelp && !hasStartedInterview ? [
+            content: `${intro}${!showStarHelp && !interviewHasStarted ? '\n\nYou can ask for STAR guidance before you begin if you want a structure for your answer.' : ''}${interviewHasStarted ? '\n\nTake a moment, then answer as you would in the interview.' : ''}`,
+            suggestionPills: !showStarHelp && !interviewHasStarted ? [
                     { id: 'continue-interview', label: 'Continue interview', onClick: continueInterview, variant: 'action' as const },
                     { id: 'star-help', label: "What's STAR?", onClick: () => setShowStarHelp(true), variant: 'action' as const },
                 ] : undefined,
@@ -198,7 +200,7 @@ export const InterviewSessionScreen = ({
                             <p className="text-xs text-neutral-600 dark:text-neutral-400">
                                 {resp.analysis.feedback}
                             </p>
-                            {sessionType === 'general' && (
+                                    {sessionType === 'general' && resp.analysis.decision !== 'Reject' && resp.response !== '[Skipped]' && (
                                 <button
                                     onClick={() => { void onSaveStory(q.id); }}
                                     disabled={resp.savedAsStory}
@@ -284,7 +286,7 @@ export const InterviewSessionScreen = ({
 
     if (mode === 'session') {
         const isInitialJobSelection = sessionType === 'tailored' && !selectedJobId;
-        const shouldDisableInput = !isInitialJobSelection && (!hasStartedInterview || showStarHelp);
+        const shouldDisableInput = !isInitialJobSelection && (!hasStartedInterview && Object.keys(responses).length === 0 && currentQuestionIndex === 0 || showStarHelp);
 
         // Safety check: ensure questions exist, unless we're in the initial job selection phase
         if (!isInitialJobSelection && (!questions || questions.length === 0)) {
