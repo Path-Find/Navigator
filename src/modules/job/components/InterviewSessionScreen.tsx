@@ -4,6 +4,9 @@ import { motion } from 'framer-motion';
 import { InterviewChat } from '../../../components/common/InterviewChat';
 import type { ChatMessage } from '../../../components/common/InterviewChat';
 import { handleBankSuggestion } from '../utils/interviewUtils';
+import { getInterviewJobContext } from '../hooks/useInterview';
+import { reviewInterviewerQuestions } from '../../../services/geminiService';
+import type { InterviewerQuestionReview } from '../../../services/ai/interviewAiService';
 import type { InterviewQuestion, InterviewResponseAnalysis, SavedJob } from '../types';
 import type { ResumeProfile } from '../../resume/types';
 import type { CustomSkill } from '../../skills/types';
@@ -102,11 +105,29 @@ export const InterviewSessionScreen = ({
     const [helpTopics, setHelpTopics] = useState<AnswerHelpTopic[]>([]);
     const [hasStartedInterview, setHasStartedInterview] = useState(false);
     const [interviewerQuestions, setInterviewerQuestions] = useState('');
+    const [questionReview, setQuestionReview] = useState<InterviewerQuestionReview | null>(null);
+    const [isReviewingQuestions, setIsReviewingQuestions] = useState(false);
+    const selectedJob = jobs.find((job) => job.id === selectedJobId);
     const [starExample] = useState(() => STAR_EXAMPLES[Math.floor(Math.random() * STAR_EXAMPLES.length)]);
 
     const onBankSuggestion = React.useCallback(async (suggestion: ResumeSuggestionItem) => {
         await handleBankSuggestion(suggestion, resumes, handleUpdateResume);
     }, [resumes, handleUpdateResume]);
+
+    const reviewQuestions = React.useCallback(async () => {
+        if (!selectedJob || !interviewerQuestions.trim()) return;
+        setIsReviewingQuestions(true);
+        try {
+            const result = await reviewInterviewerQuestions(
+                selectedJob.position,
+                getInterviewJobContext(selectedJob),
+                interviewerQuestions.trim()
+            );
+            setQuestionReview(result);
+        } finally {
+            setIsReviewingQuestions(false);
+        }
+    }, [selectedJob, interviewerQuestions]);
 
     const chatMessages = React.useMemo((): ChatMessage[] => {
         if (mode !== 'session') return [];
@@ -382,7 +403,6 @@ export const InterviewSessionScreen = ({
         }, {});
         const summaryStrengths = Array.from(new Set(analyzedResponses.flatMap((response) => response.analysis?.strengths || []))).slice(0, 3);
         const summaryImprovements = Array.from(new Set(analyzedResponses.flatMap((response) => response.analysis?.improvements || []))).slice(0, 3);
-        const selectedJob = jobs.find((job) => job.id === selectedJobId);
         const completionSummary = isInterviewComplete ? (
             <div className="mt-3 rounded-xl border border-neutral-200 bg-white px-4 py-3 text-xs dark:border-neutral-800 dark:bg-neutral-950">
                 <p className="font-black uppercase tracking-widest text-neutral-500">Session summary</p>
@@ -423,6 +443,24 @@ export const InterviewSessionScreen = ({
                             rows={2}
                             className="mt-2 w-full resize-none rounded-lg border border-neutral-200 bg-neutral-50 px-3 py-2 text-xs text-neutral-700 outline-none placeholder:text-neutral-400 focus:border-neutral-400 dark:border-neutral-700 dark:bg-neutral-900/60 dark:text-neutral-200"
                         />
+                        <button
+                            type="button"
+                            onClick={() => void reviewQuestions()}
+                            disabled={!interviewerQuestions.trim() || isReviewingQuestions}
+                            className="mt-2 rounded-lg bg-neutral-700 px-3 py-2 text-[10px] font-bold text-white transition-colors hover:bg-neutral-600 disabled:cursor-not-allowed disabled:opacity-40"
+                        >
+                            {isReviewingQuestions ? 'Reviewing...' : 'Review my questions'}
+                        </button>
+                        {questionReview && (
+                            <div className="mt-3 rounded-lg bg-neutral-50 p-3 text-xs dark:bg-neutral-900/60">
+                                <p className="text-neutral-600 dark:text-neutral-300">{questionReview.feedback}</p>
+                                {questionReview.suggestions.length > 0 && (
+                                    <ul className="mt-2 list-disc space-y-1 pl-4 text-neutral-500 dark:text-neutral-400">
+                                        {questionReview.suggestions.map((suggestion) => <li key={suggestion}>{suggestion}</li>)}
+                                    </ul>
+                                )}
+                            </div>
+                        )}
                     </div>
                 )}
             </div>

@@ -18,6 +18,7 @@ See [CHANGELOG_ARCHIVE.md](CHANGELOG_ARCHIVE.md) for earlier history.
 - **Added an evidence-based interview summary**: completed sessions now show reviewed-answer counts plus the strongest themes and next areas to improve.
 - **Made the interview ending conversational**: the transcript now explicitly says when the last question is complete before showing the summary.
 - **Added an optional job-specific closing exercise**: tailored interviews now leave space for candidates to write their own questions for the employer after the results.
+- **Added optional question coaching**: candidates can ask Navigator to review their own employer questions without replacing them with canned prompts.
 - **Removed the interview progression-button gradient**: the button now uses a flat grey treatment.
 - **Made interview rewrites sound conversational**: resume-grounded introductions now turn action bullets into first-person statements instead of quoting resume text.
 - **Preserved interview button treatment during the palette change**: action buttons retain their original hierarchy and shape while using grey accents.

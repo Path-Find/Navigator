@@ -177,6 +177,26 @@ export const generateFollowUp = async (
     }, { event_type: 'interview_followup', prompt, model: 'dynamic', job_id: jobId });
 };
 
+export interface InterviewerQuestionReview {
+    feedback: string;
+    suggestions: string[];
+}
+
+export const reviewInterviewerQuestions = async (
+    jobTitle: string,
+    jobContext: string,
+    candidateQuestions: string
+): Promise<InterviewerQuestionReview> => {
+    const prompt = INTERVIEW_PROMPTS.REVIEW_INTERVIEWER_QUESTIONS(jobTitle, jobContext, candidateQuestions);
+
+    return callWithRetry(async (metadata) => {
+        const model = await getModel({ task: 'interview', generationConfig: { responseMimeType: "application/json" } });
+        const response = await model.generateContent({ contents: [{ role: "user", parts: [{ text: prompt }] }] });
+        metadata.token_usage = response.response.usageMetadata;
+        return JSON.parse(cleanJsonOutput(response.response.text())) as InterviewerQuestionReview;
+    }, { event_type: 'interviewer_question_review', prompt, model: 'dynamic' });
+};
+
 // ─── Resume Interview ────────────────────────────────────────────────────────
 // Surfaces narrative depth behind resume bullets, saved as narrativeContext on the block.
 

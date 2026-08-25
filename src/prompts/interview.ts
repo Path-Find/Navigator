@@ -299,4 +299,28 @@ export const INTERVIEW_PROMPTS = {
       "rationale": "Why you are asking this (or why not)."
     }
     `
+  ,
+
+  REVIEW_INTERVIEWER_QUESTIONS: (jobTitle: string, jobContext: string, candidateQuestions: string) => `
+    You are coaching a candidate on questions they may ask an interviewer.
+
+    ${UNTRUSTED_DATA_RULE}
+
+    ROLE DATA:
+    ${anchorData('ROLE', jobTitle)}
+    JOB DATA:
+    ${anchorData('JOB', jobContext)}
+    CANDIDATE QUESTIONS DATA:
+    ${anchorData('CANDIDATE_QUESTIONS', candidateQuestions)}
+
+    Review the candidate's own questions. Do not replace them with a canned list.
+    Check whether each question is relevant to the role, specific enough to be useful, and appropriate for an interview.
+    Suggest small rewrites only where they improve clarity or specificity.
+
+    Return ONLY JSON:
+    {
+      "feedback": "One or two concise sentences about the questions overall.",
+      "suggestions": ["Optional improved wording, preserving the candidate's intent."]
+    }
+    `
 };
