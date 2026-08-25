@@ -14,7 +14,7 @@ export const FEATURE_REGISTRY: Record<string, FeatureDefinition> = {
         },
         action: { short: 'View Match', full: 'View Match' },
         iconName: 'Sparkles',
-        colorKey: 'indigo',
+        colorKey: 'blue',
         category: 'JOB',
         tier: 'explorer',
         targetView: 'job-match',
