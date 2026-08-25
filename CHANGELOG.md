@@ -38,6 +38,7 @@ See [CHANGELOG_ARCHIVE.md](CHANGELOG_ARCHIVE.md) for earlier history.
 - **Simplified the availability save confirmation**: it now uses user-facing language instead of internal “structured” terminology.
 - **Removed Upgrade from paid, tester, and admin navigation**: only free users see the upgrade prompt.
 - **Clarified plan access labels**: current and admin/tester access no longer appears as the vague “Access included,” and sunset Feed no longer appears as a plan feature.
+- **Added cover-letter quality checks for Free and Plus**: weak drafts now receive an honest-gap rewrite instead of shipping unchecked.
 - **Renamed the plan limit from Alerts to Email alerts**: the pricing page now makes clear that this means forwarded job-alert emails.
 - **Removed sunset job surfaces**: Feed and Job Alerts no longer appear as usable homepage or Features-page options, and Resume Interview no longer appears as “Story Mode” or “Soon.”
 - **Added an optional STAR explanation at interview start**: users can get a plain-language framework and example before answering, or continue immediately.

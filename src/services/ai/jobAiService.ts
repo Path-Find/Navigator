@@ -774,9 +774,45 @@ export const generateCoverLetterWithQuality = async (
     let result = await generateCoverLetter(jobDescription, selectedResume, tailoringInstructions, initialContext, undefined, trajectoryContext, jobId, canonicalTitle, personalizedStyle, candidateName, coverLetterPreferences, candidateSignals, candidateProfileContext, recipient);
     let attempts = 1;
 
-    // Fast Path for Free and Plus tiers (No iterative loop to protect margins)
+    const resumeContext = stringifyProfile(selectedResume);
+
+    const buildHonestyContext = (critique: { feedback: string[] }, attempts: number) => {
+        const honestyInstruction = `
+            FINAL ATTEMPT: this draft has not met the internal quality bar after ${attempts} attempts.
+            CRITIQUE FEEDBACK: ${critique.feedback.join('; ')}
+            STRICT INSTRUCTION: Stop attempting further persuasion. Include one clear, plain-language sentence that honestly names the specific gap identified above (e.g. a missing credential, licence, or years of direct experience) rather than glossing over it. The letter should read as self-aware about the gap, not falsely confident. Keep everything else about the letter's real strengths intact.
+        `;
+        return additionalContext ? `${additionalContext}\n\n${honestyInstruction}` : honestyInstruction;
+    };
+
+    // Free and Plus receive one quality check and one honest rewrite when needed.
+    // This keeps the full multi-pass loop exclusive to Pro/Admin without shipping
+    // an unchecked, overconfident letter on lower tiers.
     if (userTier === USER_TIERS.FREE || userTier === USER_TIERS.PLUS) {
-        return { ...result, decision: 'Average', attempts };
+        if (onProgress) onProgress('Critiquing');
+        const critique = await critiqueCoverLetter(jobDescription, result.text, resumeContext, jobId);
+        if (critique.decision === 'Strong' || critique.decision === 'Exceptional') {
+            return { ...result, decision: critique.decision, attempts, critique };
+        }
+
+        if (onProgress) onProgress('Finalizing');
+        result = await generateCoverLetter(
+            jobDescription,
+            selectedResume,
+            tailoringInstructions,
+            buildHonestyContext(critique, attempts),
+            undefined,
+            trajectoryContext,
+            jobId,
+            canonicalTitle,
+            personalizedStyle,
+            candidateName,
+            coverLetterPreferences,
+            candidateSignals,
+            candidateProfileContext,
+            recipient
+        );
+        return { ...result, decision: critique.decision, attempts: attempts + 1, critique };
     }
 
     // Extreme mismatch: an honest admission of a ~5/100-fit gap will essentially
@@ -792,7 +828,6 @@ export const generateCoverLetterWithQuality = async (
     // 2. The Agent Loop (Pro/Admin only)
     let finalCritique: any = null;
     let currentDecision: 'Reject' | 'Weak' | 'Average' | 'Strong' | 'Exceptional' = 'Average';
-    const resumeContext = stringifyProfile(selectedResume);
 
     while (attempts <= AGENT_LOOP.MAX_RETRIES + 1) { // +1 for initial draft
         // Critique current draft
@@ -811,13 +846,7 @@ export const generateCoverLetterWithQuality = async (
         // the gap the critique keeps flagging, instead of another persuasion attempt.
         if (attempts > AGENT_LOOP.MAX_RETRIES) {
             if (onProgress) onProgress(`Finalizing`);
-            const honestyInstruction = `
-                FINAL ATTEMPT: this draft has not met the internal quality bar after ${attempts} attempts.
-                CRITIQUE FEEDBACK: ${critique.feedback.join('; ')}
-                STRICT INSTRUCTION: Stop attempting further persuasion. Include one clear, plain-language sentence that honestly names the specific gap identified above (e.g. a missing credential, licence, or years of direct experience) rather than glossing over it. The letter should read as self-aware about the gap, not falsely confident. Keep everything else about the letter's real strengths intact.
-            `;
-            const honestyContext = additionalContext ? `${additionalContext}\n\n${honestyInstruction}` : honestyInstruction;
-            result = await generateCoverLetter(jobDescription, selectedResume, tailoringInstructions, honestyContext, undefined, trajectoryContext, jobId, canonicalTitle, personalizedStyle, candidateName, coverLetterPreferences, candidateSignals, candidateProfileContext, recipient);
+            result = await generateCoverLetter(jobDescription, selectedResume, tailoringInstructions, buildHonestyContext(critique, attempts), undefined, trajectoryContext, jobId, canonicalTitle, personalizedStyle, candidateName, coverLetterPreferences, candidateSignals, candidateProfileContext, recipient);
             attempts++;
             break;
         }
