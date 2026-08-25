@@ -280,16 +280,16 @@ export const InterviewSessionScreen = ({
                             {/* Resume Suggestions */}
                             {resp.analysis.resumeSuggestions && resp.analysis.resumeSuggestions.length > 0 && (
                                 <div className="mt-3 pt-2 border-t border-neutral-200 dark:border-neutral-800/30 space-y-2">
-                                    <div className="flex items-center gap-2 text-[10px] font-black text-neutral-500">
+                                    <div className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-neutral-500">
                                         <FileText className="w-3 h-3" />
-                                        <span>Resume Suggestions Based on your Answer</span>
+                                        <span>Resume suggestion</span>
                                     </div>
                                     <div className="space-y-1.5">
                                         {resp.analysis.resumeSuggestions.map((suggestion: ResumeSuggestionItem, sIdx: number) => {
                                             const isBanked = resumes[0]?.suggestedUpdates?.some((u) => u.suggestion === suggestion.suggestion);
 
                                             return (
-                                                <div key={sIdx} className="bg-white dark:bg-neutral-900/50 rounded-lg p-2 border border-neutral-100 dark:border-neutral-500/10 group/suggest">
+                                                <div key={sIdx} className="rounded-lg p-2 bg-neutral-50/70 dark:bg-neutral-900/30 border border-neutral-100 dark:border-neutral-800/60 group/suggest">
                                                     <div className="flex items-start justify-between gap-3">
                                                         <div className="space-y-1">
                                                             <div className="flex items-center gap-1.5">
