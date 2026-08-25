@@ -15,6 +15,15 @@ const STAR_EXAMPLES = [
     'I noticed new team members were struggling with the same system (Situation), so I took responsibility for making onboarding clearer (Task). I wrote a short guide and paired with each new teammate (Action), which shortened the time it took them to work independently (Result).',
 ];
 
+const getAnswerFramework = (question: InterviewQuestion): { name: 'STAR' | 'ARC'; description: string } => {
+    const normalized = question.question.toLowerCase();
+    const isExperienceStory = /tell me about a time|describe a time|give me an example|walk me through a situation|experience where/.test(normalized);
+
+    return isExperienceStory
+        ? { name: 'STAR', description: 'Use a specific situation, your task, the actions you took, and the result.' }
+        : { name: 'ARC', description: 'Answer directly, add the relevant context, and connect it to the role or question.' };
+};
+
 interface SessionProps {
     questions: InterviewQuestion[];
     currentQuestionIndex: number;
@@ -139,6 +148,15 @@ export const InterviewSessionScreen = ({
                 content: q.question,
                 metadata: (
                     <>
+                        {isLastQ && !resp && (() => {
+                            const framework = getAnswerFramework(q);
+                            return (
+                                <div className="mt-3 px-3 py-2 rounded-xl bg-neutral-50 dark:bg-neutral-900/60 border border-neutral-100 dark:border-neutral-800">
+                                    <p className="text-[10px] font-black uppercase tracking-widest text-indigo-500">Suggested approach: {framework.name}</p>
+                                    <p className="mt-1 text-[11px] text-neutral-500 dark:text-neutral-400">{framework.description}</p>
+                                </div>
+                            );
+                        })()}
                         {/* Resume snippets (only on the current unanswered question) */}
                         {isLastQ && !resp && resumeSnippets.length > 0 && (
                             <motion.div
