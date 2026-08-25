@@ -6,6 +6,7 @@ import type { ChatMessage } from '../../../components/common/InterviewChat';
 import { handleBankSuggestion } from '../utils/interviewUtils';
 import type { InterviewQuestion, InterviewResponseAnalysis, SavedJob } from '../types';
 import type { ResumeProfile } from '../../resume/types';
+import type { CustomSkill } from '../../skills/types';
 
 type ResumeSuggestionItem = NonNullable<InterviewResponseAnalysis['resumeSuggestions']>[number];
 
@@ -24,6 +25,39 @@ const getAnswerFramework = (question: InterviewQuestion): { name: 'STAR' | 'ARC'
         : { name: 'ARC', description: 'Answer directly, add the relevant context, and connect it to the role or question.' };
 };
 
+const buildResumeGroundedIntroduction = (resumes: ResumeProfile[], verifiedSkills: CustomSkill[], job?: SavedJob): string | null => {
+    const profile = resumes[0];
+    if (!profile) return null;
+
+    const blocks = profile.blocks.filter(block => block.isVisible);
+    const experience = blocks.find(block => ['work', 'volunteer', 'project'].includes(block.type)) || blocks.find(block => block.type === 'education');
+    if (!experience) return null;
+
+    const role = experience.title || 'professional';
+    const organization = experience.organization ? ` at ${experience.organization}` : '';
+    const strongestBullet = experience.bullets.find(bullet => bullet.trim());
+    const otherExperience = blocks
+        .filter(block => block.id !== experience.id && ['work', 'volunteer', 'project'].includes(block.type))
+        .slice(0, 2)
+        .map(block => `${block.title}${block.organization ? ` at ${block.organization}` : ''}`)
+        .join(' and ');
+
+    const parts = [`I’m a ${role}${organization}.`];
+    if (strongestBullet) {
+        parts.push(`One example from my resume is: “${strongestBullet.trim().replace(/[.]$/, '')}.”`);
+    }
+    if (otherExperience) parts.push(`My background also includes ${otherExperience}.`);
+    const skillNames = verifiedSkills.map(skill => skill.name.trim()).filter(Boolean).slice(0, 3);
+    if (skillNames.length > 0) {
+        const expertise = skillNames.length === 1
+            ? skillNames[0]
+            : `${skillNames.slice(0, -1).join(', ')}, and ${skillNames[skillNames.length - 1]}`;
+        parts.push(`My expertise includes ${expertise}.`);
+    }
+    if (job?.position) parts.push(`I’m interested in this ${job.position} opportunity because it builds on that experience.`);
+    return parts.join(' ');
+};
+
 interface SessionProps {
     questions: InterviewQuestion[];
     currentQuestionIndex: number;
@@ -34,6 +68,7 @@ interface SessionProps {
     selectedJobId: string | null;
     onJobSelected: (id: string) => void;
     resumes: ResumeProfile[];
+    verifiedSkills: CustomSkill[];
     resumeSnippets: { text: string; source: string }[];
     isSessionLoading: boolean;
     isLoading: boolean;
@@ -48,7 +83,7 @@ interface SessionProps {
 
 export const InterviewSessionScreen = ({
     questions, currentQuestionIndex, responses, mode, sessionType, jobs, selectedJobId, onJobSelected,
-    resumes, resumeSnippets, isSessionLoading, isLoading, userResponse, setUserResponse, handleSubmit,
+    resumes, verifiedSkills, resumeSnippets, isSessionLoading, isLoading, userResponse, setUserResponse, handleSubmit,
     nextQuestion, isLastQuestion, handleUpdateResume, onSaveStory
 }: SessionProps) => {
     const [copiedText, setCopiedText] = useState<string | null>(null);
@@ -187,6 +222,13 @@ export const InterviewSessionScreen = ({
                 ),
             });
             if (resp) {
+                const isIntroQuestion = /^tell me about yourself\b/i.test(q.question.trim());
+                const isRejectedOrSkipped = resp.analysis?.decision === 'Reject' || resp.response === '[Skipped]' || /^(no|skip|prefer not to say)$/i.test(resp.response.trim());
+                const betterVersion = isIntroQuestion
+                    ? buildResumeGroundedIntroduction(resumes, verifiedSkills, job)
+                    : resp.analysis?.betterVersion && !/\[[^\]]+\]/.test(resp.analysis.betterVersion)
+                        ? resp.analysis.betterVersion
+                        : null;
                 msgs.push({
                     id: `r-${q.id}`,
                     role: 'user',
@@ -212,9 +254,9 @@ export const InterviewSessionScreen = ({
                                     {resp.savedAsStory ? 'Saved for future applications' : 'Save this story for future applications'}
                                 </button>
                             )}
-                            {resp.analysis.betterVersion && (
+                            {!isRejectedOrSkipped && betterVersion && (
                                 <div className="text-xs text-neutral-500 dark:text-neutral-500 pt-2 border-t border-indigo-200 dark:border-indigo-800/30">
-                                    <strong>Better:</strong> "{resp.analysis.betterVersion}"
+                                    <strong>Better:</strong> "{betterVersion}"
                                 </div>
                             )}
 

@@ -10,6 +10,7 @@ import { useSkillContext } from '../skills/context/SkillContext';
 import { useUser } from '../../contexts/UserContext';
 import { useInterview } from './hooks/useInterview';
 import { computeSnippets } from './utils/interviewUtils';
+import { useSkillDiscovery } from '../resume/hooks/useSkillDiscovery';
 import { InterviewSelection, PracticeModeSelection } from './components/InterviewSelection';
 import { InterviewSessionScreen } from './components/InterviewSessionScreen';
 import { CandidateProfileInterview } from './components/CandidateProfileInterview';
@@ -38,6 +39,7 @@ export const InterviewAdvisor: React.FC = () => {
 
     const { resumes, handleUpdateResume } = useResumeContext();
     const { skills } = useSkillContext();
+    const { verifiedSkills } = useSkillDiscovery(resumes[0]?.blocks || [], skills);
 
     const [mode, setMode] = useState<'selection' | 'practice-selection' | 'session'>('selection');
     const [sessionType, setSessionType] = useState<'general' | 'tailored' | null>(null);
@@ -231,6 +233,7 @@ export const InterviewAdvisor: React.FC = () => {
             selectedJobId={selectedJobId}
             onJobSelected={handleJobSelected}
             resumes={resumes}
+            verifiedSkills={verifiedSkills}
             resumeSnippets={resumeSnippets}
             isSessionLoading={!!isSessionLoading}
             isLoading={isLoading}

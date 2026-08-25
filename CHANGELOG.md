@@ -5,6 +5,7 @@ All notable changes to this project will be documented in this file.
 See [CHANGELOG_ARCHIVE.md](CHANGELOG_ARCHIVE.md) for earlier history.
 
 ## [Unreleased]
+- **Grounded interview introductions in user evidence**: “Tell me about yourself” coaching now assembles an answer from the resume and verified skills instead of generic placeholders.
 - Centralized feature lifecycle helpers and generated footer navigation from the feature registry.
 - Removed placeholder legal and privacy email addresses in favor of the contact form.
 - Removed unfinished Career/Education and job-alert claims from upgrade and comparison surfaces.
