@@ -24,7 +24,7 @@ export const MatchSidebar: React.FC<MatchSidebarProps> = ({
 
     if (job.status === 'analyzing' || analysisProgress) {
         return (
-            <Card variant="premium" className="p-8 border-accent-primary/10 shadow-indigo-500/10">
+            <Card variant="premium" className="p-8 border-accent-primary/10 shadow-neutral-500/10">
                 <div className="animate-pulse space-y-6">
                     <div className="flex justify-between items-center">
                         <div className="h-4 bg-neutral-100 dark:bg-neutral-800 rounded-full w-1/3"></div>
@@ -41,7 +41,7 @@ export const MatchSidebar: React.FC<MatchSidebarProps> = ({
     }
 
     return (
-        <Card variant="premium" className="p-8 border-accent-primary/10 shadow-indigo-500/10">
+        <Card variant="premium" className="p-8 border-accent-primary/10 shadow-neutral-500/10">
             <div className="flex items-end justify-between mb-3">
                 <div className="flex items-baseline gap-2">
                     <span className="text-3xl font-black text-neutral-900 dark:text-white">
@@ -72,7 +72,7 @@ export const MatchSidebar: React.FC<MatchSidebarProps> = ({
             </div>
 
             <div>
-                <h3 className="text-xs font-bold text-indigo-500 dark:text-indigo-400 mb-4 flex items-center gap-2">
+                <h3 className="text-xs font-bold text-neutral-500 dark:text-neutral-400 mb-4 flex items-center gap-2">
                     <Sparkles className="w-3.5 h-3.5" /> Professional Insight
                 </h3>
                 <div className="text-xs text-neutral-600 dark:text-neutral-300 leading-relaxed font-medium">
@@ -84,19 +84,19 @@ export const MatchSidebar: React.FC<MatchSidebarProps> = ({
                 <div className="mt-6 pt-6 border-t border-neutral-100 dark:border-neutral-800/50">
                     <button
                         onClick={() => openModal('UPGRADE', { initialView: 'compare' })}
-                        className="w-full group flex items-center justify-between gap-3 px-5 py-4 bg-gradient-to-r from-indigo-50 to-purple-50 dark:from-indigo-500/10 dark:to-purple-500/10 border border-indigo-100 dark:border-indigo-500/20 rounded-2xl hover:from-indigo-100 hover:to-purple-100 dark:hover:from-indigo-500/20 dark:hover:to-purple-500/20 transition-all"
+                        className="w-full group flex items-center justify-between gap-3 px-5 py-4 bg-gradient-to-r from-neutral-50 to-neutral-50 dark:from-neutral-500/10 dark:to-neutral-500/10 border border-neutral-100 dark:border-neutral-500/20 rounded-2xl hover:from-neutral-100 hover:to-neutral-100 dark:hover:from-neutral-500/20 dark:hover:to-neutral-500/20 transition-all"
                     >
                         <div className="text-left">
-                            <div className="text-xs font-black text-indigo-600 dark:text-indigo-400">
+                            <div className="text-xs font-black text-neutral-600 dark:text-neutral-400">
                                 {analysis.compatibilityScore >= SCORE_THRESHOLDS.STRONG
                                     ? "Strong match — tailor your resume to close it."
                                     : analysis.compatibilityScore >= SCORE_THRESHOLDS.FAIR
                                     ? "You're close. See which requirements to address."
                                     : "Review the main requirements to address."}
                             </div>
-                            <div className="text-[10px] font-bold text-indigo-400 dark:text-indigo-500 mt-0.5 tracking-wide">Available with Plus</div>
+                            <div className="text-[10px] font-bold text-neutral-400 dark:text-neutral-500 mt-0.5 tracking-wide">Available with Plus</div>
                         </div>
-                        <Sparkles className="w-4 h-4 text-indigo-400 shrink-0 group-hover:scale-110 transition-transform" />
+                        <Sparkles className="w-4 h-4 text-neutral-400 shrink-0 group-hover:scale-110 transition-transform" />
                     </button>
                 </div>
             )}

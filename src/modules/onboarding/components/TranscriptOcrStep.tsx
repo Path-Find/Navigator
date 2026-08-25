@@ -22,7 +22,7 @@ export const TranscriptOcrStep = ({ setTranscriptUploaded, setStep }: Transcript
         >
             <div className="card-premium p-10 shadow-2xl">
                 <div className="text-center mb-10">
-                    <div className="inline-flex items-center justify-center w-20 h-20 bg-violet-500/10 text-violet-600 dark:text-violet-400 rounded-3xl mb-6 shadow-xl ring-8 ring-violet-500/5">
+                    <div className="inline-flex items-center justify-center w-20 h-20 bg-neutral-500/10 text-neutral-600 dark:text-neutral-400 rounded-3xl mb-6 shadow-xl ring-8 ring-neutral-500/5">
                         <GraduationCap className="w-10 h-10" />
                     </div>
                     <h1 className="text-4xl font-black text-neutral-900 dark:text-white mb-3">

@@ -59,8 +59,8 @@ export const SettingsPage: React.FC = () => {
                         {/* Identity */}
                         <div>
                             <div className="flex items-center gap-3 mb-6">
-                                <div className="p-2 bg-indigo-500/10 rounded-xl">
-                                    <UserIcon className="w-5 h-5 text-indigo-500" />
+                                <div className="p-2 bg-neutral-500/10 rounded-xl">
+                                    <UserIcon className="w-5 h-5 text-neutral-500" />
                                 </div>
                                 <h4 className="font-bold text-neutral-900 dark:text-white tracking-tight">Account</h4>
                             </div>
@@ -73,7 +73,7 @@ export const SettingsPage: React.FC = () => {
                                     onChange={(e) => setNameInput(e.target.value)}
                                     onBlur={handleSaveName}
                                     placeholder="Used to sign your cover letters"
-                                    className="w-full bg-neutral-50 dark:bg-neutral-800/50 border border-neutral-100 dark:border-neutral-800 rounded-xl px-3 py-2 text-sm font-bold text-neutral-900 dark:text-white focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all mb-3"
+                                    className="w-full bg-neutral-50 dark:bg-neutral-800/50 border border-neutral-100 dark:border-neutral-800 rounded-xl px-3 py-2 text-sm font-bold text-neutral-900 dark:text-white focus:ring-2 focus:ring-neutral-500/20 focus:border-neutral-500 outline-none transition-all mb-3"
                                 />
                                 <div className="text-sm font-bold text-neutral-900 dark:text-white truncate">
                                     {user?.email || 'Not Signed In'}
@@ -97,7 +97,7 @@ export const SettingsPage: React.FC = () => {
                                 size="sm"
                                 onClick={handleResetPassword}
                                 icon={<Lock className="w-3.5 h-3.5" />}
-                                className="!px-0 !justify-start !text-neutral-500 hover:!text-indigo-600 dark:hover:!text-indigo-400 transition-colors"
+                                className="!px-0 !justify-start !text-neutral-500 hover:!text-neutral-600 dark:hover:!text-neutral-400 transition-colors"
                             >
                                 Change Password
                             </Button>
@@ -163,7 +163,7 @@ export const SettingsPage: React.FC = () => {
                             <div className="pt-8">
                                 <Button
                                     variant="premium"
-                                    className="w-full shadow-lg shadow-indigo-500/20"
+                                    className="w-full shadow-lg shadow-neutral-500/20"
                                     onClick={() => navigate(ROUTES.PLANS)}
                                     icon={<ArrowRight className="w-4 h-4" />}
                                 >
@@ -198,7 +198,7 @@ export const SettingsPage: React.FC = () => {
                         {/* Row 2: Alerts */}
                         <div className="pt-8 border-t border-neutral-100 dark:border-neutral-800 space-y-3">
                             <div className="flex items-center gap-2 mb-1">
-                                <Mail className="w-3.5 h-3.5 text-indigo-500" />
+                                <Mail className="w-3.5 h-3.5 text-neutral-500" />
                                 <span className="text-sm font-bold text-neutral-700 dark:text-neutral-300">Email Alerts</span>
                                 <span className="px-1.5 py-0.5 bg-neutral-100 dark:bg-white/5 text-[8px] font-black tracking-wider text-neutral-400 dark:text-neutral-500 rounded-md border border-neutral-200/50 dark:border-white/5 ml-1">
                                     Coming soon

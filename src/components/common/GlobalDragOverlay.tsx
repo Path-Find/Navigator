@@ -64,7 +64,7 @@ export const GlobalDragOverlay: React.FC<GlobalDragOverlayProps> = ({
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     exit={{ opacity: 0 }}
-                    className="fixed inset-0 z-[100] flex items-center justify-center p-8 bg-indigo-600/90 dark:bg-indigo-900/95 backdrop-blur-xl"
+                    className="fixed inset-0 z-[100] flex items-center justify-center p-8 bg-neutral-600/90 dark:bg-neutral-900/95 backdrop-blur-xl"
                 >
                     <motion.div
                         initial={{ scale: 0.9, opacity: 0 }}
@@ -85,7 +85,7 @@ export const GlobalDragOverlay: React.FC<GlobalDragOverlayProps> = ({
                                 }}
                                 className="w-24 h-24 bg-white rounded-3xl flex items-center justify-center shadow-2xl shadow-white/20"
                             >
-                                <Upload className="w-12 h-12 text-indigo-600" />
+                                <Upload className="w-12 h-12 text-neutral-600" />
                             </motion.div>
                             <motion.div
                                 animate={{ opacity: [0, 1, 0] }}
@@ -98,7 +98,7 @@ export const GlobalDragOverlay: React.FC<GlobalDragOverlayProps> = ({
 
                         <div className="text-center space-y-2">
                             <h2 className="text-4xl font-black tracking-tight">Drop to Analyze</h2>
-                            <p className="text-indigo-100 font-bold tracking-wide flex items-center justify-center gap-2">
+                            <p className="text-neutral-100 font-bold tracking-wide flex items-center justify-center gap-2">
                                 <FileText className="w-4 h-4" />
                                 Support for PDF Resume & Transcripts
                             </p>

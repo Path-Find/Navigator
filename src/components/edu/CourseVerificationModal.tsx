@@ -72,7 +72,7 @@ export const CourseVerificationModal: React.FC<CourseVerificationModalProps> = (
                                 type="text"
                                 value={editableTranscript.studentName || ''}
                                 onChange={(e) => setEditableTranscript({ ...editableTranscript, studentName: e.target.value })}
-                                className="w-full bg-transparent border-b border-neutral-200 dark:border-neutral-700 focus:border-indigo-500 p-1 text-sm font-semibold focus:ring-0 transition-colors"
+                                className="w-full bg-transparent border-b border-neutral-200 dark:border-neutral-700 focus:border-neutral-500 p-1 text-sm font-semibold focus:ring-0 transition-colors"
                                 placeholder="Student Name"
                             />
                         </div>
@@ -111,7 +111,7 @@ export const CourseVerificationModal: React.FC<CourseVerificationModalProps> = (
                                 <h3 className="font-bold text-neutral-800 dark:text-neutral-200 text-lg">{sem.term} {sem.year}</h3>
                                 <button
                                     onClick={() => addCourse(sIdx)}
-                                    className="text-xs flex items-center gap-1.5 px-3 py-1.5 bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 rounded-lg hover:bg-indigo-100 dark:hover:bg-indigo-900/50 font-medium transition-colors"
+                                    className="text-xs flex items-center gap-1.5 px-3 py-1.5 bg-neutral-50 dark:bg-neutral-900/30 text-neutral-600 dark:text-neutral-400 rounded-lg hover:bg-neutral-100 dark:hover:bg-neutral-900/50 font-medium transition-colors"
                                 >
                                     <Plus className="w-3.5 h-3.5" /> Add Course
                                 </button>
@@ -133,7 +133,7 @@ export const CourseVerificationModal: React.FC<CourseVerificationModalProps> = (
                                                 type="text"
                                                 value={course.code}
                                                 onChange={(e) => handleCourseChange(sIdx, cIdx, 'code', e.target.value)}
-                                                className="w-full bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-700 rounded px-2 py-1 text-xs font-semibold focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500"
+                                                className="w-full bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-700 rounded px-2 py-1 text-xs font-semibold focus:ring-1 focus:ring-neutral-500 focus:border-neutral-500"
                                                 placeholder="Code"
                                             />
                                         </div>
@@ -142,7 +142,7 @@ export const CourseVerificationModal: React.FC<CourseVerificationModalProps> = (
                                                 type="text"
                                                 value={course.title}
                                                 onChange={(e) => handleCourseChange(sIdx, cIdx, 'title', e.target.value)}
-                                                className="w-full bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-700 rounded px-2 py-1 text-xs focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500"
+                                                className="w-full bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-700 rounded px-2 py-1 text-xs focus:ring-1 focus:ring-neutral-500 focus:border-neutral-500"
                                                 placeholder="Course Title"
                                             />
                                         </div>
@@ -151,7 +151,7 @@ export const CourseVerificationModal: React.FC<CourseVerificationModalProps> = (
                                                 type="text"
                                                 value={course.grade}
                                                 onChange={(e) => handleCourseChange(sIdx, cIdx, 'grade', e.target.value)}
-                                                className="w-full bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-700 rounded px-2 py-1 text-xs font-bold text-center focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500 text-indigo-600 dark:text-indigo-400"
+                                                className="w-full bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-700 rounded px-2 py-1 text-xs font-bold text-center focus:ring-1 focus:ring-neutral-500 focus:border-neutral-500 text-neutral-600 dark:text-neutral-400"
                                                 placeholder="-"
                                             />
                                         </div>
@@ -161,7 +161,7 @@ export const CourseVerificationModal: React.FC<CourseVerificationModalProps> = (
                                                 step="0.1"
                                                 value={course.credits}
                                                 onChange={(e) => handleCourseChange(sIdx, cIdx, 'credits', parseFloat(e.target.value))}
-                                                className="w-full bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-700 rounded px-2 py-1 text-xs text-center focus:ring-1 focus:ring-indigo-500 focus:border-indigo-500"
+                                                className="w-full bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-700 rounded px-2 py-1 text-xs text-center focus:ring-1 focus:ring-neutral-500 focus:border-neutral-500"
                                             />
                                         </div>
                                         <div className="col-span-1 flex justify-end">

@@ -159,7 +159,7 @@ export const PlansOnboardingStep: React.FC<PlansOnboardingStepProps> = ({
         <div className="animate-in fade-in slide-in-from-bottom-8 duration-700 flex-1 flex flex-col absolute inset-0 p-8 overflow-hidden">
             {/* Immersive Background Elements */}
             <div className="absolute inset-0 pointer-events-none overflow-hidden">
-                <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-indigo-500/5 dark:bg-indigo-500/10 rounded-full blur-[120px] animate-pulse" />
+                <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-neutral-500/5 dark:bg-neutral-500/10 rounded-full blur-[120px] animate-pulse" />
                 <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-emerald-500/5 dark:bg-emerald-500/10 rounded-full blur-[120px] animate-pulse delay-700" />
             </div>
 
@@ -167,7 +167,7 @@ export const PlansOnboardingStep: React.FC<PlansOnboardingStepProps> = ({
 
             <div className="relative z-10 flex flex-col h-full overflow-y-auto custom-scrollbar pr-2">
                 <div className="text-center mb-10">
-                    <div className="inline-flex items-center gap-2 px-3 py-1 bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 rounded-full text-[10px] font-black uppercase tracking-widest mb-4 border border-indigo-100 dark:border-indigo-800/50">
+                    <div className="inline-flex items-center gap-2 px-3 py-1 bg-neutral-50 dark:bg-neutral-900/30 text-neutral-600 dark:text-neutral-400 rounded-full text-[10px] font-black uppercase tracking-widest mb-4 border border-neutral-100 dark:border-neutral-800/50">
                         <Zap className="w-3 h-3 fill-current" />
                         Premium Experience
                     </div>
@@ -189,27 +189,27 @@ export const PlansOnboardingStep: React.FC<PlansOnboardingStepProps> = ({
                             <div className="space-y-4">
                                 <div className="relative group">
                                     <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                                        <Mail className="w-4 h-4 text-neutral-400 group-focus-within:text-indigo-500 transition-colors" />
+                                        <Mail className="w-4 h-4 text-neutral-400 group-focus-within:text-neutral-500 transition-colors" />
                                     </div>
                                     <input
                                         type="email"
                                         value={email}
                                         onChange={(e) => setEmail(e.target.value)}
                                         placeholder="Email address"
-                                        className="w-full pl-11 pr-4 py-3 bg-neutral-50 dark:bg-neutral-900/50 border border-neutral-200 dark:border-neutral-700 rounded-2xl text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all outline-none"
+                                        className="w-full pl-11 pr-4 py-3 bg-neutral-50 dark:bg-neutral-900/50 border border-neutral-200 dark:border-neutral-700 rounded-2xl text-sm focus:ring-2 focus:ring-neutral-500 focus:border-neutral-500 transition-all outline-none"
                                     />
                                 </div>
                                 {authMode === 'password' && (
                                     <div className="relative group animate-in slide-in-from-top-2 duration-300">
                                         <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
-                                            <Lock className="w-4 h-4 text-neutral-400 group-focus-within:text-indigo-500 transition-colors" />
+                                            <Lock className="w-4 h-4 text-neutral-400 group-focus-within:text-neutral-500 transition-colors" />
                                         </div>
                                         <input
                                             type="password"
                                             value={password}
                                             onChange={(e) => setPassword(e.target.value)}
                                             placeholder="Create password"
-                                            className="w-full pl-11 pr-4 py-3 bg-neutral-50 dark:bg-neutral-900/50 border border-neutral-200 dark:border-neutral-700 rounded-2xl text-sm focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-all outline-none"
+                                            className="w-full pl-11 pr-4 py-3 bg-neutral-50 dark:bg-neutral-900/50 border border-neutral-200 dark:border-neutral-700 rounded-2xl text-sm focus:ring-2 focus:ring-neutral-500 focus:border-neutral-500 transition-all outline-none"
                                         />
                                     </div>
                                 )}
@@ -217,7 +217,7 @@ export const PlansOnboardingStep: React.FC<PlansOnboardingStepProps> = ({
                                 <div className="flex justify-center">
                                     <button
                                         onClick={() => setAuthMode(authMode === 'password' ? 'magic-link' : 'password')}
-                                        className="text-[10px] font-bold text-indigo-500 hover:text-indigo-600 transition-colors uppercase tracking-wider"
+                                        className="text-[10px] font-bold text-neutral-500 hover:text-neutral-600 transition-colors uppercase tracking-wider"
                                     >
                                         {authMode === 'password' ? 'Use Magic Link instead' : 'Use Password instead'}
                                     </button>

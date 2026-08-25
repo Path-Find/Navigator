@@ -111,7 +111,7 @@ export const UnifiedUploadHero: React.FC<UnifiedUploadHeroProps> = ({
                                 <ul className="space-y-3 pt-4">
                                     {activeCards.intelligence.benefits.map((item) => (
                                         <li key={item} className="flex items-center gap-3 text-xs font-bold text-neutral-400">
-                                            <div className={`w-1 h-1 rounded-full ${themeColor === 'amber' ? 'bg-amber-500' : 'bg-indigo-500'}`} />
+                                            <div className={`w-1 h-1 rounded-full ${themeColor === 'amber' ? 'bg-amber-500' : 'bg-neutral-500'}`} />
                                             {item}
                                         </li>
                                     ))}

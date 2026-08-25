@@ -32,9 +32,9 @@ export const SearchableInput: React.FC<SearchableInputProps> = ({
             bg: 'bg-amber-100 dark:bg-amber-900/30'
         },
         indigo: {
-            focus: 'focus:border-indigo-500',
-            text: 'text-indigo-600 dark:text-indigo-400',
-            bg: 'bg-indigo-100 dark:bg-indigo-900/30'
+            focus: 'focus:border-neutral-500',
+            text: 'text-neutral-600 dark:text-neutral-400',
+            bg: 'bg-neutral-100 dark:bg-neutral-900/30'
         },
         emerald: {
             focus: 'focus:border-emerald-500',

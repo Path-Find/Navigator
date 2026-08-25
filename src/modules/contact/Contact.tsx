@@ -39,11 +39,11 @@ export const Contact: React.FC = () => {
                     {/* Left Side: Content */}
                     <div className="space-y-8">
                         <div>
-                            <div className="inline-flex items-center justify-center p-3 bg-indigo-50 dark:bg-indigo-900/20 text-indigo-600 dark:text-indigo-400 rounded-2xl mb-6">
+                            <div className="inline-flex items-center justify-center p-3 bg-neutral-50 dark:bg-neutral-900/20 text-neutral-600 dark:text-neutral-400 rounded-2xl mb-6">
                                 <MessageSquare className="w-8 h-8" />
                             </div>
                             <h1 className="text-5xl md:text-6xl font-black tracking-tight mb-6">
-                                Get in <span className="text-indigo-600 dark:text-indigo-400">Touch</span>
+                                Get in <span className="text-neutral-600 dark:text-neutral-400">Touch</span>
                             </h1>
                             <p className="text-xl text-neutral-500 dark:text-neutral-400 leading-relaxed font-medium">
                                 Have questions about Navigator Pro, enterprise licensing, or just want to share feedback? We're here to help you scale your career.
@@ -57,7 +57,7 @@ export const Contact: React.FC = () => {
 
                     {/* Right Side: Form */}
                     <div className="relative">
-                        <div className="absolute inset-0 bg-indigo-500/10 blur-3xl rounded-[3rem]" />
+                        <div className="absolute inset-0 bg-neutral-500/10 blur-3xl rounded-[3rem]" />
                         <form
                             onSubmit={handleSubmit}
                             className="relative bg-white dark:bg-neutral-900 p-8 md:p-10 rounded-[2.5rem] border border-neutral-200 dark:border-neutral-800 shadow-2xl space-y-6"
@@ -69,7 +69,7 @@ export const Contact: React.FC = () => {
                                         type="text"
                                         required
                                         placeholder="Full Name"
-                                        className="w-full pl-12 pr-4 py-4 rounded-2xl bg-neutral-50 dark:bg-neutral-800 border-none focus:ring-2 focus:ring-indigo-500 dark:text-white transition-all text-sm font-bold"
+                                        className="w-full pl-12 pr-4 py-4 rounded-2xl bg-neutral-50 dark:bg-neutral-800 border-none focus:ring-2 focus:ring-neutral-500 dark:text-white transition-all text-sm font-bold"
                                     />
                                 </div>
 
@@ -79,7 +79,7 @@ export const Contact: React.FC = () => {
                                         type="email"
                                         required
                                         placeholder="Email Address"
-                                        className="w-full pl-12 pr-4 py-4 rounded-2xl bg-neutral-50 dark:bg-neutral-800 border-none focus:ring-2 focus:ring-indigo-500 dark:text-white transition-all text-sm font-bold"
+                                        className="w-full pl-12 pr-4 py-4 rounded-2xl bg-neutral-50 dark:bg-neutral-800 border-none focus:ring-2 focus:ring-neutral-500 dark:text-white transition-all text-sm font-bold"
                                     />
                                 </div>
 
@@ -88,7 +88,7 @@ export const Contact: React.FC = () => {
                                     <input
                                         type="text"
                                         placeholder="Company (Optional)"
-                                        className="w-full pl-12 pr-4 py-4 rounded-2xl bg-neutral-50 dark:bg-neutral-800 border-none focus:ring-2 focus:ring-indigo-500 dark:text-white transition-all text-sm font-bold"
+                                        className="w-full pl-12 pr-4 py-4 rounded-2xl bg-neutral-50 dark:bg-neutral-800 border-none focus:ring-2 focus:ring-neutral-500 dark:text-white transition-all text-sm font-bold"
                                     />
                                 </div>
 
@@ -96,13 +96,13 @@ export const Contact: React.FC = () => {
                                     required
                                     placeholder="Tell us how we can help..."
                                     rows={4}
-                                    className="w-full px-6 py-4 rounded-2xl bg-neutral-50 dark:bg-neutral-800 border-none focus:ring-2 focus:ring-indigo-500 dark:text-white transition-all text-sm font-bold resize-none"
+                                    className="w-full px-6 py-4 rounded-2xl bg-neutral-50 dark:bg-neutral-800 border-none focus:ring-2 focus:ring-neutral-500 dark:text-white transition-all text-sm font-bold resize-none"
                                 />
                             </div>
 
                             <button
                                 disabled={status === 'sending'}
-                                className="w-full py-4 bg-indigo-600 hover:bg-indigo-700 text-white font-black rounded-2xl shadow-xl shadow-indigo-500/20 flex items-center justify-center gap-2 group transition-all active:scale-[0.98] disabled:opacity-50"
+                                className="w-full py-4 bg-neutral-600 hover:bg-neutral-700 text-white font-black rounded-2xl shadow-xl shadow-neutral-500/20 flex items-center justify-center gap-2 group transition-all active:scale-[0.98] disabled:opacity-50"
                             >
                                 {status === 'sending' ? (
                                     <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />

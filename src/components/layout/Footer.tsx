@@ -72,7 +72,7 @@ export const Footer: React.FC = () => {
     return (
         <footer className="relative mt-20 pb-12 px-6 border-t border-neutral-200 dark:border-neutral-800 bg-white/50 dark:bg-black/50 backdrop-blur-xl">
             {/* Subtle Gradient Glow */}
-            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-4xl h-px bg-gradient-to-r from-transparent via-indigo-500/20 to-transparent" />
+            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-4xl h-px bg-gradient-to-r from-transparent via-neutral-500/20 to-transparent" />
 
             <div className="max-w-6xl mx-auto pt-16">
                 <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-12 mb-16">
@@ -82,7 +82,7 @@ export const Footer: React.FC = () => {
                             className="flex items-center gap-2 cursor-pointer group"
                             onClick={() => handleNavigate(ROUTES.HOME, 'home')}
                         >
-                            <div className="p-1.5 bg-indigo-600 text-white rounded-xl shadow-lg shadow-indigo-500/20 group-hover:scale-110 transition-transform">
+                            <div className="p-1.5 bg-neutral-600 text-white rounded-xl shadow-lg shadow-neutral-500/20 group-hover:scale-110 transition-transform">
                                 <TrendingUp className="w-5 h-5" />
                             </div>
                             <span className="text-xl font-black tracking-tight dark:text-white">Navigator</span>
@@ -98,7 +98,7 @@ export const Footer: React.FC = () => {
                                     <li key={item.label}>
                                         <button
                                             onClick={() => handleNavigate(item.path, item.view)}
-                                            className="group flex items-center gap-2.5 text-sm font-medium text-neutral-600 dark:text-neutral-400 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors text-left"
+                                            className="group flex items-center gap-2.5 text-sm font-medium text-neutral-600 dark:text-neutral-400 hover:text-neutral-600 dark:hover:text-neutral-400 transition-colors text-left"
                                         >
                                             <item.icon className="w-3.5 h-3.5 opacity-0 -ml-6 group-hover:opacity-100 group-hover:ml-0 transition-all duration-300" />
                                             {item.label}

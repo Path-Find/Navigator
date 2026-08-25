@@ -78,7 +78,7 @@ export const BentoCard: React.FC<BentoCardProps> = ({
                     : `perspective(1000px) rotateX(${tilt.x}deg) rotateY(${tilt.y}deg) translateY(-4px)`,
                 transition: tilt.x === 0 ? 'all 0.6s cubic-bezier(0.23, 1, 0.32, 1)' : 'transform 0.1s ease-out, box-shadow 0.3s ease-out'
             }}
-            className={`group relative bg-white dark:bg-neutral-900/40 backdrop-blur-2xl ${variant === 'compact' ? 'rounded-2xl p-4' : 'rounded-3xl p-6'} border ${borderAccentClass} h-full shadow-xl shadow-black/5 dark:shadow-none hover:shadow-2xl hover:shadow-indigo-500/10 text-left flex flex-col cursor-pointer overflow-hidden ${className}`}
+            className={`group relative bg-white dark:bg-neutral-900/40 backdrop-blur-2xl ${variant === 'compact' ? 'rounded-2xl p-4' : 'rounded-3xl p-6'} border ${borderAccentClass} h-full shadow-xl shadow-black/5 dark:shadow-none hover:shadow-2xl hover:shadow-neutral-500/10 text-left flex flex-col cursor-pointer overflow-hidden ${className}`}
             onClick={onAction}
         >
             {/* Dynamic Mouse Shimmer */}
@@ -106,7 +106,7 @@ export const BentoCard: React.FC<BentoCardProps> = ({
             )}
 
             <div className={`flex items-start justify-between relative z-10 ${variant === 'compact' ? 'mb-2' : 'mb-2'}`}>
-                <div className={`${variant === 'compact' ? 'w-8 h-8' : 'w-10 h-10'} shrink-0 ${iconBgClass} ${iconColorClass} rounded-xl flex items-center justify-center shadow-lg shadow-indigo-500/10 group-hover:scale-110 group-hover:rotate-6 transition-all duration-500 ease-out`}>
+                <div className={`${variant === 'compact' ? 'w-8 h-8' : 'w-10 h-10'} shrink-0 ${iconBgClass} ${iconColorClass} rounded-xl flex items-center justify-center shadow-lg shadow-neutral-500/10 group-hover:scale-110 group-hover:rotate-6 transition-all duration-500 ease-out`}>
                     <Icon className={`${variant === 'compact' ? 'w-4 h-4' : 'w-5 h-5'}`} />
                 </div>
 

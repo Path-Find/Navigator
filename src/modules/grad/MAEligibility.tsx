@@ -122,7 +122,7 @@ export const MAEligibility: React.FC<MAEligibilityProps> = ({ transcript, initia
                                     <div className="p-8 bg-white dark:bg-neutral-900 rounded-[2rem] border border-neutral-100 dark:border-neutral-800 shadow-sm relative group/bench">
                                         <div className="absolute top-4 right-4">
                                             <div className={`text-[10px] font-black px-3 py-1 rounded-full uppercase tracking-wider ${result.gpaBenchmark.standing === 'Safe' ? 'bg-emerald-100 text-emerald-600' :
-                                                result.gpaBenchmark.standing === 'Competitive' ? 'bg-indigo-100 text-indigo-600' :
+                                                result.gpaBenchmark.standing === 'Competitive' ? 'bg-neutral-100 text-neutral-600' :
                                                     'bg-rose-100 text-rose-600'
                                                 }`}>
                                                 {result.gpaBenchmark.standing}
@@ -130,7 +130,7 @@ export const MAEligibility: React.FC<MAEligibilityProps> = ({ transcript, initia
                                         </div>
                                         <h4 className="text-xs font-bold text-neutral-400 tracking-tight mb-8 text-left">The Competitive Curve</h4>
                                         <div className="relative h-2 w-full bg-neutral-100 dark:bg-neutral-800 rounded-full mb-8">
-                                            <div className="absolute inset-y-0 left-[20%] right-[30%] bg-indigo-500/20 rounded-full" title="Typical Intake Range" />
+                                            <div className="absolute inset-y-0 left-[20%] right-[30%] bg-neutral-500/20 rounded-full" title="Typical Intake Range" />
                                             <div className="absolute top-1/2 -translate-y-1/2 w-4 h-4 bg-rose-600 rounded-full border-2 border-white shadow-lg transition-all duration-1000" style={{ left: `calc(${result.gpaBenchmark.userGPA.replace('%', '')}% - 8px)` }}>
                                                 <div className="absolute -top-6 left-1/2 -translate-x-1/2 text-[10px] font-black text-rose-600 whitespace-nowrap">You ({result.gpaBenchmark.userGPA})</div>
                                             </div>
@@ -166,7 +166,7 @@ export const MAEligibility: React.FC<MAEligibilityProps> = ({ transcript, initia
                                 </div>
                                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                                     {result.prerequisites?.map((prereq, i) => (
-                                        <div key={i} className="flex flex-col p-5 bg-white dark:bg-neutral-900 rounded-3xl border border-neutral-100 dark:border-neutral-800 group/item hover:border-indigo-200 transition-all text-left">
+                                        <div key={i} className="flex flex-col p-5 bg-white dark:bg-neutral-900 rounded-3xl border border-neutral-100 dark:border-neutral-800 group/item hover:border-neutral-200 transition-all text-left">
                                             <div className="flex items-center justify-between mb-3">
                                                 <div className="flex items-center gap-2">
                                                     <div className={`w-3 h-3 rounded-full animate-pulse ${prereq.status === 'met' ? 'bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.5)]' :

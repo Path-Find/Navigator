@@ -27,7 +27,7 @@ export const ComparisonTable = () => {
                         <thead>
                             <tr className="border-b border-neutral-200 dark:border-neutral-800 bg-neutral-50/50 dark:bg-neutral-800/20">
                                 <th className="p-6 text-[10px] font-black text-neutral-400 tracking-[0.2em]">Feature</th>
-                                <th className="p-6 text-[10px] font-black text-indigo-600 dark:text-indigo-400 bg-indigo-50/50 dark:bg-indigo-900/10 tracking-[0.2em]">Navigator Plus</th>
+                                <th className="p-6 text-[10px] font-black text-neutral-600 dark:text-neutral-400 bg-neutral-50/50 dark:bg-neutral-900/10 tracking-[0.2em]">Navigator Plus</th>
                                 <th className="p-6 text-[10px] font-black text-neutral-900 dark:text-white tracking-[0.2em]">Jobscan</th>
                                 <th className="p-6 text-[10px] font-black text-neutral-900 dark:text-white tracking-[0.2em]">Teal</th>
                                 <th className="p-6 text-[10px] font-black text-neutral-900 dark:text-white tracking-[0.2em]">Rezi</th>
@@ -37,9 +37,9 @@ export const ComparisonTable = () => {
                             {features.map((feature, idx) => (
                                 <tr key={idx} className="hover:bg-neutral-50/50 dark:hover:bg-neutral-800/30 transition-colors">
                                     <td className="p-6 text-sm font-bold text-neutral-700 dark:text-neutral-300">{feature.name}</td>
-                                    <td className="p-6 text-sm font-bold text-indigo-600 dark:text-indigo-400 bg-indigo-50/30 dark:bg-indigo-900/10">
+                                    <td className="p-6 text-sm font-bold text-neutral-600 dark:text-neutral-400 bg-neutral-50/30 dark:bg-neutral-900/10">
                                         {typeof feature.nav === 'boolean' ? (
-                                            feature.nav ? <Check className="w-5 h-5 text-indigo-600 dark:text-indigo-400" /> : <span className="text-neutral-300">-</span>
+                                            feature.nav ? <Check className="w-5 h-5 text-neutral-600 dark:text-neutral-400" /> : <span className="text-neutral-300">-</span>
                                         ) : feature.nav}
                                     </td>
                                     <td className="p-6 text-sm text-neutral-600 dark:text-neutral-400">

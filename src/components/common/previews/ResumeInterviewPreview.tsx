@@ -34,8 +34,8 @@ const ResumeInterviewPreview: React.FC<{ color: FeatureColor }> = ({ color }) =>
         </div>
 
         {/* Small "Context" Floating Card */}
-        <div className="absolute -bottom-1 -right-2 bg-indigo-50 dark:bg-indigo-900/30 border border-indigo-100 dark:border-indigo-800 rounded-lg px-2 py-1 shadow-lg opacity-0 group-hover:opacity-100 group-hover:translate-x-2 transition-all duration-700 delay-200 z-20">
-            <span className="text-[8px] font-black text-indigo-600 dark:text-indigo-400">Context Added!</span>
+        <div className="absolute -bottom-1 -right-2 bg-neutral-50 dark:bg-neutral-900/30 border border-neutral-100 dark:border-neutral-800 rounded-lg px-2 py-1 shadow-lg opacity-0 group-hover:opacity-100 group-hover:translate-x-2 transition-all duration-700 delay-200 z-20">
+            <span className="text-[8px] font-black text-neutral-600 dark:text-neutral-400">Context Added!</span>
         </div>
     </div>
 );

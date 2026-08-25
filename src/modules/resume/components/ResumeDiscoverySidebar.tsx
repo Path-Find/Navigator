@@ -32,17 +32,17 @@ export const ResumeDiscoverySidebar: React.FC<ResumeDiscoverySidebarProps> = ({
         <aside className="hidden lg:block sticky top-32 w-80 shrink-0 space-y-6 no-print pt-14">
             {/* Discovery Bank */}
             {initialResume.suggestedUpdates && initialResume.suggestedUpdates.length > 0 && (
-                <Card variant="premium" className="p-5 border-indigo-100 dark:border-indigo-900/30 bg-indigo-50/10 dark:bg-indigo-950/5">
+                <Card variant="premium" className="p-5 border-neutral-100 dark:border-neutral-900/30 bg-neutral-50/10 dark:bg-neutral-950/5">
                     <div className="flex items-center gap-2 mb-4">
                         <div className="flex flex-col">
-                            <h3 className="text-[10px] font-black text-indigo-500 tracking-widest leading-none mb-1">Discovery Bank</h3>
+                            <h3 className="text-[10px] font-black text-neutral-500 tracking-widest leading-none mb-1">Discovery Bank</h3>
                             <p className="text-[9px] text-neutral-400 font-bold tracking-tight">AI Captured Suggestions</p>
                         </div>
                     </div>
 
                     <div className="space-y-3">
                         {initialResume.suggestedUpdates.map((suggestion) => (
-                            <div key={suggestion.id} className="p-3 bg-white dark:bg-neutral-900 rounded-xl border border-indigo-100 dark:border-indigo-500/10 space-y-2 group/sug">
+                            <div key={suggestion.id} className="p-3 bg-white dark:bg-neutral-900 rounded-xl border border-neutral-100 dark:border-neutral-500/10 space-y-2 group/sug">
                                 <div className="text-[11px] font-bold text-neutral-900 dark:text-neutral-100 leading-tight">
                                     {suggestion.suggestion}
                                 </div>
@@ -52,7 +52,7 @@ export const ResumeDiscoverySidebar: React.FC<ResumeDiscoverySidebarProps> = ({
                                 <div className="flex items-center gap-2 pt-1 border-t border-neutral-50 dark:border-neutral-800">
                                     <button
                                         onClick={() => onApplySuggestion(suggestion)}
-                                        className="px-2 py-1 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-[9px] font-black tracking-tight transition-all"
+                                        className="px-2 py-1 bg-neutral-600 hover:bg-neutral-700 text-white rounded-lg text-[9px] font-black tracking-tight transition-all"
                                     >
                                         Apply
                                     </button>
@@ -78,7 +78,7 @@ export const ResumeDiscoverySidebar: React.FC<ResumeDiscoverySidebarProps> = ({
                     </div>
                     <button
                         onClick={() => navigate(ROUTES.SKILLS)}
-                        className="text-[9px] font-black text-indigo-500 hover:text-indigo-600 flex items-center gap-1 transition-colors"
+                        className="text-[9px] font-black text-neutral-500 hover:text-neutral-600 flex items-center gap-1 transition-colors"
                     >
                         Manage
                         <ArrowRightLeft className="w-2.5 h-2.5" />
@@ -126,8 +126,8 @@ export const ResumeDiscoverySidebar: React.FC<ResumeDiscoverySidebarProps> = ({
             {/* Discovered Keywords */}
             {uniqueDiscovered.length > 0 && (
                 <Card variant="premium" className="p-5 border-neutral-100 dark:border-neutral-800">
-                    <div className="text-[10px] font-black text-indigo-500 tracking-tight mb-4 flex items-center gap-1.5">
-                        <div className="w-1 h-1 bg-indigo-500 rounded-full shadow-[0_0_8px_rgba(99,102,241,0.4)]" />
+                    <div className="text-[10px] font-black text-neutral-500 tracking-tight mb-4 flex items-center gap-1.5">
+                        <div className="w-1 h-1 bg-neutral-500 rounded-full shadow-[0_0_8px_rgba(99,102,241,0.4)]" />
                         Discovered Keywords
                     </div>
                     <div className="flex flex-wrap gap-2">
@@ -141,12 +141,12 @@ export const ResumeDiscoverySidebar: React.FC<ResumeDiscoverySidebarProps> = ({
                                     });
                                     onSkillsUpdated([...skills, newSkill]);
                                 }}
-                                className="group flex items-center gap-2 px-3 py-1 bg-neutral-50 dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-xl hover:border-indigo-500 hover:ring-1 hover:ring-indigo-500/20 transition-all shadow-sm"
+                                className="group flex items-center gap-2 px-3 py-1 bg-neutral-50 dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-xl hover:border-neutral-500 hover:ring-1 hover:ring-neutral-500/20 transition-all shadow-sm"
                             >
                                 <span className="text-[11px] font-bold text-neutral-600 dark:text-neutral-400 group-hover:text-neutral-900 dark:group-hover:text-white transition-colors">
                                     {s}
                                 </span>
-                                <Plus className="w-3 h-3 text-neutral-400 group-hover:text-indigo-600 transition-colors" />
+                                <Plus className="w-3 h-3 text-neutral-400 group-hover:text-neutral-600 transition-colors" />
                             </button>
                         ))}
                     </div>

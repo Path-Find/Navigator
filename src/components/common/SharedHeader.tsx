@@ -19,7 +19,7 @@ export const SharedHeader: React.FC<SharedHeaderProps> = ({
 }) => {
     const gradients = {
         job: "from-emerald-500 via-teal-500 to-emerald-500",
-        coach: "from-indigo-500 via-purple-500 to-indigo-500",
+        coach: "from-neutral-500 via-neutral-500 to-neutral-500",
         edu: "from-amber-500 via-orange-500 to-amber-500"
     };
 

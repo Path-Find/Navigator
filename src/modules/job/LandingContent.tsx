@@ -13,13 +13,13 @@ export const LandingContent = ({ onShowAuth }: LandingContentProps) => {
                 <div className="grid md:grid-cols-3 gap-8">
                     {[
                         { step: 1, title: 'Copy Job Link', desc: 'Find a job on LinkedIn, Indeed, or anywhere. Just copy the URL.', icon: Target, color: 'bg-neutral-100 dark:bg-neutral-800' },
-                        { step: 2, title: 'AI Analysis', desc: 'We extract keywords, required skills, and hidden criteria in seconds.', icon: Zap, color: 'bg-indigo-50/50 dark:bg-indigo-500/5' },
+                        { step: 2, title: 'AI Analysis', desc: 'We extract keywords, required skills, and hidden criteria in seconds.', icon: Zap, color: 'bg-neutral-50/50 dark:bg-neutral-500/5' },
                         { step: 3, title: 'Get Tailored', desc: 'Get a tailored cover letter and resume advice that beats the bots.', icon: FileSearch, color: 'bg-emerald-50/50 dark:bg-emerald-500/5' }
                     ].map((s, i) => (
                         <div key={i} className={`group relative ${s.color} backdrop-blur-xl rounded-[2.5rem] p-8 border border-white/10 shadow-xl transition-all duration-500 hover:-translate-y-2 text-center`}>
                             <div className="absolute top-4 right-8 text-4xl font-black text-neutral-200/50 dark:text-neutral-700/50 select-none">{s.step}</div>
                             <div className="w-16 h-16 bg-white dark:bg-neutral-900 rounded-3xl flex items-center justify-center mx-auto mb-6 shadow-lg group-hover:scale-110 transition-transform">
-                                <s.icon className={`w-8 h-8 ${s.step === 2 ? 'text-indigo-500' : s.step === 3 ? 'text-emerald-500' : 'text-neutral-400'}`} />
+                                <s.icon className={`w-8 h-8 ${s.step === 2 ? 'text-neutral-500' : s.step === 3 ? 'text-emerald-500' : 'text-neutral-400'}`} />
                             </div>
                             <h3 className="text-xl font-black text-neutral-900 dark:text-white mb-3">{s.title}</h3>
                             <p className="text-sm text-neutral-500 dark:text-neutral-400 leading-relaxed font-medium">

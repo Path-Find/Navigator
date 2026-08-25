@@ -138,11 +138,11 @@ export const GrowthPage: React.FC<GrowthPageProps> = ({
                             {/* Goal Header */}
                             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">
                                 <div>
-                                    <div className={`text-[10px] font-bold mb-1 ${tj.type === 'role_model' ? 'text-indigo-500' : 'text-emerald-600'}`}>
+                                    <div className={`text-[10px] font-bold mb-1 ${tj.type === 'role_model' ? 'text-neutral-500' : 'text-emerald-600'}`}>
                                         {tj.type === 'role_model' ? 'Emulation Path' : 'Target Goal'}
                                     </div>
                                     <h3 className="text-xl font-black text-neutral-900 dark:text-white flex items-center gap-2">
-                                        {tj.type === 'role_model' && <TrendingUp className="w-5 h-5 text-indigo-500" />}
+                                        {tj.type === 'role_model' && <TrendingUp className="w-5 h-5 text-neutral-500" />}
                                         {tj.title}
                                     </h3>
                                 </div>

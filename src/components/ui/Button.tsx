@@ -21,7 +21,7 @@ export const Button: React.FC<ButtonProps> = ({
 
     const variants = {
         premium: "btn-premium",
-        accent: "bg-indigo-600 text-white shadow-lg shadow-indigo-600/20 hover:shadow-indigo-600/40 hover:-translate-y-0.5",
+        accent: "bg-neutral-600 text-white shadow-lg shadow-neutral-600/20 hover:shadow-neutral-600/40 hover:-translate-y-0.5",
         secondary: "bg-neutral-100/50 dark:bg-neutral-900/40 backdrop-blur-xl border border-neutral-200/50 dark:border-neutral-800 text-neutral-500 dark:text-neutral-400 hover:text-neutral-900 dark:hover:text-white hover:bg-neutral-200/50 dark:hover:bg-neutral-800/50 hover:-translate-y-0.5",
         subtle: "bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 text-neutral-500 hover:text-neutral-900 dark:hover:text-white hover:border-neutral-300 dark:hover:border-neutral-700 shadow-sm hover:shadow-md hover:-translate-y-0.5",
         ghost: "bg-transparent text-neutral-500 hover:text-neutral-900 dark:hover:text-white hover:bg-neutral-100 dark:hover:bg-neutral-800",

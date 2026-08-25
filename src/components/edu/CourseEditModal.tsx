@@ -78,7 +78,7 @@ export const CourseEditModal: React.FC<CourseEditModalProps> = ({
                                 type="text"
                                 value={editedCourse.code}
                                 onChange={(e) => setEditedCourse({ ...editedCourse, code: e.target.value })}
-                                className="w-full px-3 py-2 bg-neutral-50 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-xl font-mono text-sm font-bold focus:ring-2 focus:ring-indigo-500 outline-none"
+                                className="w-full px-3 py-2 bg-neutral-50 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-xl font-mono text-sm font-bold focus:ring-2 focus:ring-neutral-500 outline-none"
                             />
                         </div>
                         <div className="col-span-2 space-y-1">
@@ -87,7 +87,7 @@ export const CourseEditModal: React.FC<CourseEditModalProps> = ({
                                 type="text"
                                 value={editedCourse.title}
                                 onChange={(e) => setEditedCourse({ ...editedCourse, title: e.target.value })}
-                                className="w-full px-3 py-2 bg-neutral-50 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-xl text-sm font-bold focus:ring-2 focus:ring-indigo-500 outline-none"
+                                className="w-full px-3 py-2 bg-neutral-50 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-xl text-sm font-bold focus:ring-2 focus:ring-neutral-500 outline-none"
                             />
                         </div>
                     </div>
@@ -100,7 +100,7 @@ export const CourseEditModal: React.FC<CourseEditModalProps> = ({
                                 type="text"
                                 value={editedCourse.grade}
                                 onChange={(e) => setEditedCourse({ ...editedCourse, grade: e.target.value })}
-                                className="w-full px-3 py-2 bg-neutral-50 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-xl text-sm font-black focus:ring-2 focus:ring-indigo-500 outline-none"
+                                className="w-full px-3 py-2 bg-neutral-50 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-xl text-sm font-black focus:ring-2 focus:ring-neutral-500 outline-none"
                             />
                         </div>
                         <div className="space-y-1">
@@ -110,7 +110,7 @@ export const CourseEditModal: React.FC<CourseEditModalProps> = ({
                                 step="0.5"
                                 value={editedCourse.credits || 0.5}
                                 onChange={(e) => setEditedCourse({ ...editedCourse, credits: parseFloat(e.target.value) })}
-                                className="w-full px-3 py-2 bg-neutral-50 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-xl text-sm font-bold focus:ring-2 focus:ring-indigo-500 outline-none"
+                                className="w-full px-3 py-2 bg-neutral-50 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-xl text-sm font-bold focus:ring-2 focus:ring-neutral-500 outline-none"
                             />
                         </div>
                         <div className="space-y-1">
@@ -118,7 +118,7 @@ export const CourseEditModal: React.FC<CourseEditModalProps> = ({
                             <select
                                 value={editedCourse.term || ''}
                                 onChange={(e) => setEditedCourse({ ...editedCourse, term: e.target.value })}
-                                className="w-full px-3 py-2 bg-neutral-50 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-xl text-sm font-bold focus:ring-2 focus:ring-indigo-500 outline-none appearance-none cursor-pointer"
+                                className="w-full px-3 py-2 bg-neutral-50 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-xl text-sm font-bold focus:ring-2 focus:ring-neutral-500 outline-none appearance-none cursor-pointer"
                             >
                                 <option value="">Default</option>
                                 <option value="Fall">Fall</option>
@@ -136,7 +136,7 @@ export const CourseEditModal: React.FC<CourseEditModalProps> = ({
                             <select
                                 value={targetSemIndex}
                                 onChange={(e) => setTargetSemIndex(parseInt(e.target.value))}
-                                className="w-full px-3 py-2 bg-neutral-50 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-xl text-sm font-bold focus:ring-2 focus:ring-indigo-500 outline-none appearance-none cursor-pointer"
+                                className="w-full px-3 py-2 bg-neutral-50 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-xl text-sm font-bold focus:ring-2 focus:ring-neutral-500 outline-none appearance-none cursor-pointer"
                             >
                                 {availableSemesters.map((sem, idx) => (
                                     <option key={idx} value={idx}>
@@ -193,7 +193,7 @@ export const CourseEditModal: React.FC<CourseEditModalProps> = ({
                     </button>
                     <button
                         onClick={handleSave}
-                        className="px-6 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl text-sm font-bold shadow-lg shadow-indigo-500/20 transition-all active:scale-95 flex items-center gap-2"
+                        className="px-6 py-2 bg-neutral-600 hover:bg-neutral-700 text-white rounded-xl text-sm font-bold shadow-lg shadow-neutral-500/20 transition-all active:scale-95 flex items-center gap-2"
                     >
                         <Save className="w-4 h-4" />
                         Save Changes

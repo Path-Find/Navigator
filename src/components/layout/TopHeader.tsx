@@ -34,7 +34,7 @@ export const TopHeader: React.FC = () => {
                     onClick={() => handleNavigate('home', ROUTES.HOME)}
                     className="flex items-center gap-3 cursor-pointer group pr-8"
                 >
-                    <div className="p-1.5 rounded-lg bg-indigo-600 text-white group-hover:scale-105 transition-transform">
+                    <div className="p-1.5 rounded-lg bg-neutral-600 text-white group-hover:scale-105 transition-transform">
                         <TrendingUp className="w-4 h-4" />
                     </div>
                     <span className="text-base font-black tracking-tight text-neutral-900 dark:text-white">
@@ -68,7 +68,7 @@ export const TopHeader: React.FC = () => {
                 <div className="flex items-center gap-3">
                     <button 
                         onClick={() => navigate(ROUTES.JOB_MATCH)}
-                        className="p-2 hover:bg-neutral-100 dark:hover:bg-neutral-800 rounded-lg text-indigo-600 transition-all active:scale-95"
+                        className="p-2 hover:bg-neutral-100 dark:hover:bg-neutral-800 rounded-lg text-neutral-600 transition-all active:scale-95"
                     >
                         <Plus className="w-4 h-4" />
                     </button>
@@ -87,7 +87,7 @@ export const TopHeader: React.FC = () => {
                     <div className="w-px h-4 bg-neutral-100 dark:bg-neutral-900 mx-1" />
 
                     <div className="flex items-center gap-2 cursor-pointer group">
-                        <div className="w-7 h-7 rounded-full bg-indigo-100 dark:bg-indigo-900/30 flex items-center justify-center text-indigo-600 dark:text-indigo-400 text-[10px] font-black">
+                        <div className="w-7 h-7 rounded-full bg-neutral-100 dark:bg-neutral-900/30 flex items-center justify-center text-neutral-600 dark:text-neutral-400 text-[10px] font-black">
                             {user?.email?.charAt(0).toUpperCase() || 'U'}
                         </div>
                     </div>

@@ -19,7 +19,7 @@ export const StandardSearchBar: React.FC<StandardSearchBarProps> = ({
     rightElement
 }) => {
     const focusColors = {
-        indigo: 'focus:ring-indigo-600/10 focus:border-indigo-600/50',
+        indigo: 'focus:ring-neutral-600/10 focus:border-neutral-600/50',
         emerald: 'focus:ring-emerald-600/10 focus:border-emerald-600/50',
         amber: 'focus:ring-amber-600/10 focus:border-amber-600/50',
         rose: 'focus:ring-rose-600/10 focus:border-rose-600/50',
@@ -27,7 +27,7 @@ export const StandardSearchBar: React.FC<StandardSearchBarProps> = ({
     };
 
     const iconFocusColor = {
-        indigo: 'group-focus-within:text-indigo-600',
+        indigo: 'group-focus-within:text-neutral-600',
         emerald: 'group-focus-within:text-emerald-600',
         amber: 'group-focus-within:text-amber-600',
         rose: 'group-focus-within:text-rose-600',

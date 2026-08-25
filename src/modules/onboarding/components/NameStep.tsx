@@ -12,7 +12,7 @@ export const NameStep = ({ applicationName, setApplicationName, setStep, handleN
             className="w-full max-w-xl"
         >
             <div className="card-premium p-10 shadow-2xl relative overflow-hidden">
-                <div className="absolute top-0 right-0 w-64 h-64 bg-indigo-500/5 rounded-full -translate-y-1/2 translate-x-1/2 blur-3xl pointer-events-none" />
+                <div className="absolute top-0 right-0 w-64 h-64 bg-neutral-500/5 rounded-full -translate-y-1/2 translate-x-1/2 blur-3xl pointer-events-none" />
 
                 <div className="relative text-center mb-10">
                     <h1 className="text-4xl font-black mb-3 text-neutral-900 dark:text-white">Nice to meet you</h1>
@@ -26,7 +26,7 @@ export const NameStep = ({ applicationName, setApplicationName, setStep, handleN
                             type="text"
                             value={applicationName}
                             onChange={(e) => setApplicationName(e.target.value)}
-                            className="w-full px-6 py-4 bg-neutral-50 dark:bg-neutral-900/50 border border-neutral-200 dark:border-neutral-800 rounded-2xl focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500 outline-none transition-all text-lg font-bold"
+                            className="w-full px-6 py-4 bg-neutral-50 dark:bg-neutral-900/50 border border-neutral-200 dark:border-neutral-800 rounded-2xl focus:ring-4 focus:ring-neutral-500/10 focus:border-neutral-500 outline-none transition-all text-lg font-bold"
                             placeholder="Jane Doe"
                         />
                     </div>

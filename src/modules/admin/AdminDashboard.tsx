@@ -7,7 +7,7 @@ const StatsCard = ({ title, value, subtext, icon: Icon, iconBg, iconColor }: {
     title: string, value: string, subtext?: string,
     icon: React.ElementType, iconBg: string, iconColor: string
 }) => (
-    <div className="flex flex-col bg-white/60 dark:bg-neutral-900/40 backdrop-blur-md rounded-2xl p-6 border border-neutral-200/50 dark:border-neutral-800/50 shadow-sm group hover:border-indigo-500/20 transition-all duration-300 hover:translate-y-[-2px]">
+    <div className="flex flex-col bg-white/60 dark:bg-neutral-900/40 backdrop-blur-md rounded-2xl p-6 border border-neutral-200/50 dark:border-neutral-800/50 shadow-sm group hover:border-neutral-500/20 transition-all duration-300 hover:translate-y-[-2px]">
         <div className="flex items-start justify-between mb-4">
             <div className={`p-2.5 rounded-xl ${iconBg} transition-all duration-300 group-hover:scale-105`}>
                 <Icon className={`w-4 h-4 ${iconColor}`} />
@@ -104,12 +104,12 @@ export const AdminDashboard: React.FC = () => {
             return (
                 <div
                     key={`${dateStr}-${i}`}
-                    className="w-4 h-4 rounded-[3px] relative group border border-neutral-100/10 dark:border-white/5 transition-all duration-300 hover:ring-2 hover:ring-indigo-500/30"
+                    className="w-4 h-4 rounded-[3px] relative group border border-neutral-100/10 dark:border-white/5 transition-all duration-300 hover:ring-2 hover:ring-neutral-500/30"
                     style={{ backgroundColor: count > 0 ? `rgba(99, 102, 241, ${intensity})` : 'rgba(99, 102, 241, 0.05)' }}
                 >
                     <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-1.5 px-2 py-1 bg-neutral-900 text-[9px] text-white rounded-md hidden group-hover:block whitespace-nowrap z-50 shadow-xl border border-white/10">
                         <div className="font-bold">{dateStr}</div>
-                        <div className="text-indigo-400">{count} ops</div>
+                        <div className="text-neutral-400">{count} ops</div>
                     </div>
                 </div>
             );
@@ -145,8 +145,8 @@ export const AdminDashboard: React.FC = () => {
                             value={activeStats.meanOutput.toLocaleString()}
                             subtext="Mean tokens per user"
                             icon={Activity}
-                            iconBg="bg-indigo-500/10"
-                            iconColor="text-indigo-600 dark:text-indigo-400"
+                            iconBg="bg-neutral-500/10"
+                            iconColor="text-neutral-600 dark:text-neutral-400"
                         />
                         <StatsCard
                             title="Avg efficiency"
@@ -158,14 +158,14 @@ export const AdminDashboard: React.FC = () => {
                         />
                     </div>
 
-                    <div className="bg-gradient-to-br from-indigo-600 to-indigo-700 rounded-2xl p-5 text-white shadow-lg shadow-indigo-500/20 flex flex-col justify-between overflow-hidden relative group">
+                    <div className="bg-gradient-to-br from-neutral-600 to-neutral-700 rounded-2xl p-5 text-white shadow-lg shadow-neutral-500/20 flex flex-col justify-between overflow-hidden relative group">
                         <div className="relative z-10">
-                            <p className="text-indigo-100 text-xs font-medium mb-1">System health</p>
+                            <p className="text-neutral-100 text-xs font-medium mb-1">System health</p>
                             <h4 className="text-lg font-bold flex items-center gap-2">
                                 Operational
                                 <div className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
                             </h4>
-                            <p className="text-indigo-100/70 text-xs mt-2 leading-relaxed">
+                            <p className="text-neutral-100/70 text-xs mt-2 leading-relaxed">
                                 Infrastructure scaling dynamically. Latency within normal bounds.
                             </p>
                         </div>
@@ -191,7 +191,7 @@ export const AdminDashboard: React.FC = () => {
 
                     {loading ? (
                         <div className="bg-white/50 dark:bg-neutral-900/40 backdrop-blur-xl rounded-2xl border border-neutral-200/50 dark:border-neutral-800/50 h-64 flex flex-col items-center justify-center space-y-3">
-                            <div className="w-8 h-8 rounded-full border-2 border-neutral-100 dark:border-neutral-800 border-t-indigo-500 animate-spin" />
+                            <div className="w-8 h-8 rounded-full border-2 border-neutral-100 dark:border-neutral-800 border-t-neutral-500 animate-spin" />
                             <p className="text-neutral-400 text-sm">Loading...</p>
                         </div>
                     ) : (
@@ -257,8 +257,8 @@ export const AdminDashboard: React.FC = () => {
                             <div className="bg-white/60 dark:bg-neutral-900/40 backdrop-blur-xl rounded-2xl p-5 border border-neutral-200/50 dark:border-neutral-800/50 shadow-sm flex flex-col">
                                 <div className="flex items-center justify-between mb-5">
                                     <div className="flex items-center gap-2">
-                                        <div className="p-1.5 bg-indigo-500/10 rounded-lg">
-                                            <Calendar className="w-3.5 h-3.5 text-indigo-500" />
+                                        <div className="p-1.5 bg-neutral-500/10 rounded-lg">
+                                            <Calendar className="w-3.5 h-3.5 text-neutral-500" />
                                         </div>
                                         <span className="text-sm font-semibold text-neutral-600 dark:text-neutral-300">Activity</span>
                                     </div>
@@ -279,14 +279,14 @@ export const AdminDashboard: React.FC = () => {
                                             <p className="text-xs font-medium text-neutral-400 mb-1">Peak utilization</p>
                                             <p className="text-xl font-black text-neutral-900 dark:text-white tabular-nums">
                                                 {dailyPulse.length > 0 ? Math.max(...dailyPulse.map(p => p.count)) : 0}
-                                                <span className="text-xs text-indigo-500 ml-1 font-semibold">req/day</span>
+                                                <span className="text-xs text-neutral-500 ml-1 font-semibold">req/day</span>
                                             </p>
                                         </div>
                                         <div className="text-right">
                                             <p className="text-xs font-medium text-neutral-400 mb-1">Total ({timeRange}d)</p>
                                             <p className="text-xl font-black text-neutral-900 dark:text-white tabular-nums">
                                                 {dailyPulse.reduce((sum, p) => sum + p.count, 0)}
-                                                <span className="text-xs text-indigo-500 ml-1 font-semibold">ops</span>
+                                                <span className="text-xs text-neutral-500 ml-1 font-semibold">ops</span>
                                             </p>
                                         </div>
                                     </div>

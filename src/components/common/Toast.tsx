@@ -19,7 +19,7 @@ const ToastItem: React.FC<ToastItemProps> = ({ id, message, type }) => {
             case 'error':
                 return 'border-rose-500/20 text-rose-600 dark:text-rose-400';
             case 'info':
-                return 'border-indigo-500/20 text-indigo-600 dark:text-indigo-400';
+                return 'border-neutral-500/20 text-neutral-600 dark:text-neutral-400';
         }
     };
 

@@ -204,7 +204,7 @@ export const FEATURE_REGISTRY: Record<string, FeatureDefinition> = {
         },
         action: { short: 'View feed', full: 'Open Feed' },
         iconName: 'Zap',
-        colorKey: 'indigo-dark',
+        colorKey: 'neutral-dark',
         category: 'JOB',
         tier: 'plus',
         targetView: 'feed',

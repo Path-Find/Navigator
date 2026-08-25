@@ -20,7 +20,7 @@ export const ApplicationProfilePage: React.FC = () => {
                 size="sm"
                 onClick={() => navigate(-1)}
                 icon={<ArrowLeft className="w-3.5 h-3.5" />}
-                className="!px-0 !text-neutral-500 hover:!text-indigo-600 dark:hover:!text-indigo-400"
+                className="!px-0 !text-neutral-500 hover:!text-neutral-600 dark:hover:!text-neutral-400"
             >
                 Back
             </Button>
@@ -35,15 +35,15 @@ export const ApplicationProfilePage: React.FC = () => {
                         size="sm"
                         onClick={() => navigate(ROUTES.PROFILE_INTERVIEW)}
                         icon={<ArrowRight className="w-3.5 h-3.5" />}
-                        className="!text-indigo-600 dark:!text-indigo-400 !border-indigo-100 dark:!border-indigo-500/20"
+                        className="!text-neutral-600 dark:!text-neutral-400 !border-neutral-100 dark:!border-neutral-500/20"
                     >
                         Add context with interview
                     </Button>
                 )}
             />
 
-            <div className="mt-8 flex items-start gap-3 rounded-2xl border border-violet-100 bg-violet-50/60 px-5 py-4 dark:border-violet-500/20 dark:bg-violet-500/10">
-                <Sparkles className="mt-0.5 h-4 w-4 shrink-0 text-violet-500" />
+            <div className="mt-8 flex items-start gap-3 rounded-2xl border border-neutral-100 bg-neutral-50/60 px-5 py-4 dark:border-neutral-500/20 dark:bg-neutral-500/10">
+                <Sparkles className="mt-0.5 h-4 w-4 shrink-0 text-neutral-500" />
                 <p className="text-sm leading-relaxed text-neutral-600 dark:text-neutral-300">
                     Set your job-search preferences and the extra context Navigator may reuse in applications. These choices do not change your account settings.
                 </p>

@@ -16,7 +16,7 @@ export const SuccessState: React.FC<SuccessStateProps> = ({ message, onClose }) 
             <p className="text-neutral-600 dark:text-neutral-400 mb-8 max-w-xs mx-auto leading-relaxed">{message}</p>
             <button
                 onClick={onClose}
-                className="text-indigo-600 dark:text-indigo-400 font-semibold hover:text-indigo-700 dark:hover:text-indigo-300 transition-colors flex items-center justify-center gap-2 w-full py-3 bg-neutral-100 dark:bg-neutral-800 rounded-xl"
+                className="text-neutral-600 dark:text-neutral-400 font-semibold hover:text-neutral-700 dark:hover:text-neutral-300 transition-colors flex items-center justify-center gap-2 w-full py-3 bg-neutral-100 dark:bg-neutral-800 rounded-xl"
             >
                 Close
             </button>

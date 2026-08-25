@@ -29,8 +29,8 @@ export const getSortDate = (dateRange: string): number => {
 
 export const getTypeColor = (type: string): string => {
     switch (type) {
-        case 'summary': return 'text-purple-600 bg-purple-50 border-purple-200';
-        case 'work': return 'text-indigo-600 bg-indigo-50 border-indigo-200';
+        case 'summary': return 'text-neutral-600 bg-neutral-50 border-neutral-200';
+        case 'work': return 'text-neutral-600 bg-neutral-50 border-neutral-200';
         case 'education': return 'text-emerald-600 bg-emerald-50 border-emerald-200';
         case 'volunteer': return 'text-rose-600 bg-rose-50 border-rose-200';
         case 'project': return 'text-amber-600 bg-amber-50 border-amber-200';

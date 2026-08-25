@@ -45,9 +45,9 @@ export const JobErrorState: React.FC<JobErrorStateProps> = ({
         <div className="theme-job animate-in fade-in slide-in-from-right-4 duration-300 p-6 bg-white dark:bg-neutral-900 h-full overflow-y-auto">
             <div className="max-w-5xl mx-auto space-y-6 pt-8">
                 <div className="grid md:grid-cols-2 gap-6">
-                    <Card variant="glass" className={`${isAiError ? 'bg-gradient-to-br from-indigo-50/50 to-violet-50/50 dark:from-indigo-950/10 dark:to-violet-950/10 border-indigo-200 dark:border-indigo-800/30' : 'bg-gradient-to-br from-orange-50/50 to-red-50/50 dark:from-orange-950/10 dark:to-red-950/10 border-orange-200 dark:border-orange-800/30'} p-6 flex flex-col justify-center`}>
+                    <Card variant="glass" className={`${isAiError ? 'bg-gradient-to-br from-neutral-50/50 to-neutral-50/50 dark:from-neutral-950/10 dark:to-neutral-950/10 border-neutral-200 dark:border-neutral-800/30' : 'bg-gradient-to-br from-orange-50/50 to-red-50/50 dark:from-orange-950/10 dark:to-red-950/10 border-orange-200 dark:border-orange-800/30'} p-6 flex flex-col justify-center`}>
                         <div className="flex items-center gap-4">
-                            <div className={`w-10 h-10 ${isAiError ? 'bg-indigo-100 dark:bg-indigo-900/40 text-indigo-600 dark:text-indigo-400' : 'bg-orange-100 dark:bg-orange-900/40 text-orange-600 dark:text-orange-400'} rounded-xl flex items-center justify-center`}>
+                            <div className={`w-10 h-10 ${isAiError ? 'bg-neutral-100 dark:bg-neutral-900/40 text-neutral-600 dark:text-neutral-400' : 'bg-orange-100 dark:bg-orange-900/40 text-orange-600 dark:text-orange-400'} rounded-xl flex items-center justify-center`}>
                                 {isAiError ? <Sparkles className="w-5 h-5" /> : <AlertCircle className="w-5 h-5" />}
                             </div>
                             <div className="flex-1">
@@ -67,7 +67,7 @@ export const JobErrorState: React.FC<JobErrorStateProps> = ({
                             {editUrl && (
                                 <button
                                     onClick={() => window.open(editUrl, '_blank')}
-                                    className="text-[10px] font-black tracking-widest text-indigo-500 hover:text-indigo-600 transition-colors flex items-center gap-1.5 group/link"
+                                    className="text-[10px] font-black tracking-widest text-neutral-500 hover:text-neutral-600 transition-colors flex items-center gap-1.5 group/link"
                                 >
                                     Visit Original <ExternalLink className="w-3 h-3 transition-transform group-hover/link:-translate-y-0.5 group-hover/link:translate-x-0.5" />
                                 </button>
@@ -102,7 +102,7 @@ export const JobErrorState: React.FC<JobErrorStateProps> = ({
                             <Button
                                 variant="accent"
                                 onClick={onManualRetry}
-                                className="bg-indigo-600 text-white hover:bg-indigo-500"
+                                className="bg-neutral-600 text-white hover:bg-neutral-500"
                                 disabled={!manualText.trim() || manualText.length < 100 || retrying}
                                 icon={retrying ? <Loader2 className="w-4 h-4 animate-spin" /> : <Sparkles className="w-4 h-4" />}
                             >

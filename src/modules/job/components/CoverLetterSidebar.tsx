@@ -15,16 +15,16 @@ export const CoverLetterSidebar: React.FC<CoverLetterSidebarProps> = ({ job }) =
     const tailoringFocus = job.analysis?.coverLetterTailoringInstructions || job.analysis?.tailoringInstructions || [];
 
     return (
-        <Card variant="premium" className="p-8 border-indigo-500/10 shadow-indigo-500/10">
+        <Card variant="premium" className="p-8 border-neutral-500/10 shadow-neutral-500/10">
             <div className="mb-6">
-                <h4 className="text-xs font-bold text-indigo-500 dark:text-indigo-400">Tailoring Strategy</h4>
+                <h4 className="text-xs font-bold text-neutral-500 dark:text-neutral-400">Tailoring Strategy</h4>
             </div>
 
             {critique?.feedback && critique.feedback.length > 0 && (
                 <div className="mb-8 space-y-4">
                     {critique.feedback.slice(0, 3).map((f: string, idx: number) => (
                         <div key={idx} className="flex gap-3 text-xs font-medium text-neutral-700 dark:text-neutral-300">
-                            <div className="w-1.5 h-1.5 rounded-full bg-indigo-400/50 mt-1.5 shrink-0" />
+                            <div className="w-1.5 h-1.5 rounded-full bg-neutral-400/50 mt-1.5 shrink-0" />
                             <span className="leading-relaxed">{toSentenceCase(f)}</span>
                         </div>
                     ))}
@@ -35,7 +35,7 @@ export const CoverLetterSidebar: React.FC<CoverLetterSidebarProps> = ({ job }) =
                 <div className="mb-8 space-y-4">
                     {tailoringFocus.slice(0, 3).map((item: string, idx: number) => (
                         <div key={idx} className="flex gap-3 text-xs font-medium text-neutral-700 dark:text-neutral-300">
-                            <div className="w-1.5 h-1.5 rounded-full bg-indigo-400/50 mt-1.5 shrink-0" />
+                            <div className="w-1.5 h-1.5 rounded-full bg-neutral-400/50 mt-1.5 shrink-0" />
                             <span className="leading-relaxed">{toSentenceCase(stripInternalIds(stripInternalLabelPrefix(item)))}</span>
                         </div>
                     ))}

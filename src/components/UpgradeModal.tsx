@@ -120,7 +120,7 @@ export const UpgradeModal: React.FC<UpgradeModalProps> = ({ limitInfo, onClose, 
                 <div className="overflow-y-auto p-8 sm:p-12 custom-scrollbar">
                     {view === 'upgrade' ? (
                         <div className="text-center">
-                            <div className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-3xl mb-8 shadow-xl shadow-indigo-500/20 rotate-3">
+                            <div className="inline-flex items-center justify-center w-20 h-20 bg-gradient-to-br from-neutral-500 to-neutral-600 rounded-3xl mb-8 shadow-xl shadow-neutral-500/20 rotate-3">
                                 <Sparkles className="w-10 h-10 text-white" />
                             </div>
 
@@ -139,7 +139,7 @@ export const UpgradeModal: React.FC<UpgradeModalProps> = ({ limitInfo, onClose, 
                                     </div>
                                     <div className="w-px h-10 bg-neutral-200 dark:bg-neutral-700" />
                                     <div className="text-center">
-                                        <div className="text-3xl font-black text-indigo-500 tracking-tight">{averageScore}%</div>
+                                        <div className="text-3xl font-black text-neutral-500 tracking-tight">{averageScore}%</div>
                                         <div className="text-[11px] font-bold text-neutral-400 uppercase tracking-widest mt-1">Avg Match Score</div>
                                     </div>
                                 </div>
@@ -152,7 +152,7 @@ export const UpgradeModal: React.FC<UpgradeModalProps> = ({ limitInfo, onClose, 
                             <div className="grid grid-cols-1 gap-4 mb-10">
                                 <button
                                     onClick={() => setView('compare')}
-                                    className="w-full py-4 bg-indigo-600 hover:bg-indigo-700 text-white rounded-2xl text-sm font-black uppercase tracking-widest transition-all shadow-lg shadow-indigo-500/25 active:scale-95"
+                                    className="w-full py-4 bg-neutral-600 hover:bg-neutral-700 text-white rounded-2xl text-sm font-black uppercase tracking-widest transition-all shadow-lg shadow-neutral-500/25 active:scale-95"
                                 >
                                     Compare plans
                                 </button>
@@ -179,11 +179,11 @@ export const UpgradeModal: React.FC<UpgradeModalProps> = ({ limitInfo, onClose, 
                                         key={plan.name}
                                         className={`relative group flex flex-col p-8 rounded-[2rem] border transition-all duration-300 ${plan.highlight
                                             ? 'bg-neutral-900 dark:bg-white text-white dark:text-neutral-900 border-transparent shadow-2xl scale-105 z-10'
-                                            : 'bg-neutral-50/50 dark:bg-neutral-900/30 border-neutral-100 dark:border-neutral-800 hover:border-indigo-500/30'
+                                            : 'bg-neutral-50/50 dark:bg-neutral-900/30 border-neutral-100 dark:border-neutral-800 hover:border-neutral-500/30'
                                             }`}
                                     >
                                         {plan.highlight && (
-                                            <div className="absolute -top-4 left-1/2 -translate-x-1/2 px-4 py-1.5 bg-indigo-500 text-white rounded-full text-[10px] font-black uppercase tracking-widest shadow-lg shadow-indigo-500/20">
+                                            <div className="absolute -top-4 left-1/2 -translate-x-1/2 px-4 py-1.5 bg-neutral-500 text-white rounded-full text-[10px] font-black uppercase tracking-widest shadow-lg shadow-neutral-500/20">
                                                 Recommended
                                             </div>
                                         )}
@@ -201,8 +201,8 @@ export const UpgradeModal: React.FC<UpgradeModalProps> = ({ limitInfo, onClose, 
                                         <div className="space-y-4 mb-10 flex-1">
                                             {plan.features.map((feature, i) => (
                                                 <div key={i} className="flex items-start gap-3">
-                                                    <div className={`mt-0.5 p-0.5 rounded-full ${plan.highlight ? 'bg-white/20 dark:bg-neutral-900/10' : 'bg-indigo-500/10'}`}>
-                                                        <Check className={`w-3 h-3 ${plan.highlight ? 'text-white dark:text-neutral-900' : 'text-indigo-500'}`} />
+                                                    <div className={`mt-0.5 p-0.5 rounded-full ${plan.highlight ? 'bg-white/20 dark:bg-neutral-900/10' : 'bg-neutral-500/10'}`}>
+                                                        <Check className={`w-3 h-3 ${plan.highlight ? 'text-white dark:text-neutral-900' : 'text-neutral-500'}`} />
                                                     </div>
                                                     <span className="text-xs font-semibold opacity-80 leading-relaxed">{feature}</span>
                                                 </div>
@@ -216,7 +216,7 @@ export const UpgradeModal: React.FC<UpgradeModalProps> = ({ limitInfo, onClose, 
                                                 ? 'bg-white dark:bg-neutral-900 text-neutral-900 dark:text-white hover:scale-[1.02] active:scale-95 shadow-xl'
                                                 : plan.disabled
                                                     ? 'bg-neutral-200 dark:bg-neutral-800 text-neutral-400 cursor-not-allowed'
-                                                    : 'bg-indigo-600 text-white hover:bg-indigo-700 hover:scale-[1.02] active:scale-95 shadow-lg shadow-indigo-500/20'
+                                                    : 'bg-neutral-600 text-white hover:bg-neutral-700 hover:scale-[1.02] active:scale-95 shadow-lg shadow-neutral-500/20'
                                                 }`}
                                         >
                                             {loadingPlan === plan.name ? (
@@ -231,7 +231,7 @@ export const UpgradeModal: React.FC<UpgradeModalProps> = ({ limitInfo, onClose, 
 
                             <div className="mt-12 pt-8 border-t border-neutral-100 dark:border-neutral-800 flex flex-wrap justify-center gap-x-12 gap-y-6">
                                 <div className="flex items-center gap-3">
-                                    <Shield className="w-5 h-5 text-indigo-500" />
+                                    <Shield className="w-5 h-5 text-neutral-500" />
                                     <span className="text-[10px] font-bold text-neutral-400 dark:text-neutral-500 uppercase tracking-widest">Secure Stripe Payment</span>
                                 </div>
                                 <div className="flex items-center gap-3">

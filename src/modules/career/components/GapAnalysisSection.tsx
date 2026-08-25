@@ -57,7 +57,7 @@ export const GapAnalysisSection: React.FC<GapAnalysisSectionProps> = ({
                 <div className="flex flex-col items-end gap-2">
                     {/* Academic Badge */}
                     {transcript && (
-                        <div className="flex items-center gap-1.5 px-3 py-1 bg-violet-50 dark:bg-violet-900/20 text-violet-600 dark:text-violet-300 rounded-lg border border-violet-100 dark:border-violet-800/30">
+                        <div className="flex items-center gap-1.5 px-3 py-1 bg-neutral-50 dark:bg-neutral-900/20 text-neutral-600 dark:text-neutral-300 rounded-lg border border-neutral-100 dark:border-neutral-800/30">
                             <GraduationCap className="w-3 h-3" />
                             <span className="text-[10px] font-bold">Academic Context Active</span>
                         </div>
@@ -102,11 +102,11 @@ export const GapAnalysisSection: React.FC<GapAnalysisSectionProps> = ({
                         <div key={tj.id} className="bg-white dark:bg-neutral-900 rounded-[2.5rem] p-8 border border-neutral-200 dark:border-neutral-800 shadow-sm">
                             <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 mb-10">
                                 <div>
-                                    <div className={`text-[10px] font-bold mb-1 ${tj.type === 'role_model' ? 'text-indigo-500' : 'text-emerald-600'}`}>
+                                    <div className={`text-[10px] font-bold mb-1 ${tj.type === 'role_model' ? 'text-neutral-500' : 'text-emerald-600'}`}>
                                         {tj.type === 'role_model' ? 'Emulation Path' : 'Target Goal'}
                                     </div>
                                     <h3 className="text-2xl font-black text-neutral-900 dark:text-white flex items-center gap-2">
-                                        {tj.type === 'role_model' && <TrendingUp className="w-6 h-6 text-indigo-500" />}
+                                        {tj.type === 'role_model' && <TrendingUp className="w-6 h-6 text-neutral-500" />}
                                         {tj.title}
                                     </h3>
                                 </div>
@@ -114,7 +114,7 @@ export const GapAnalysisSection: React.FC<GapAnalysisSectionProps> = ({
                                     <button
                                         onClick={() => onRunGapAnalysis(tj.id)}
                                         disabled={activeAnalysisIds?.has(tj.id)}
-                                        className={`px-6 py-3 text-white rounded-xl font-bold flex items-center gap-2 hover:scale-105 transition-transform disabled:opacity-50 ${tj.type === 'role_model' ? 'bg-indigo-600 hover:bg-indigo-500' : 'bg-neutral-900 dark:bg-emerald-600'}`}
+                                        className={`px-6 py-3 text-white rounded-xl font-bold flex items-center gap-2 hover:scale-105 transition-transform disabled:opacity-50 ${tj.type === 'role_model' ? 'bg-neutral-600 hover:bg-neutral-500' : 'bg-neutral-900 dark:bg-emerald-600'}`}
                                     >
                                         {activeAnalysisIds?.has(tj.id) ? (
                                             <Loader2 className="w-4 h-4 animate-spin" />
@@ -132,7 +132,7 @@ export const GapAnalysisSection: React.FC<GapAnalysisSectionProps> = ({
                                         {tj.type === 'role_model' && tj.roleModelId && onCompare && (
                                             <button
                                                 onClick={() => onCompare(tj.roleModelId!)}
-                                                className="px-4 py-2 bg-indigo-50 dark:bg-indigo-900/20 text-indigo-600 dark:text-indigo-400 rounded-xl font-bold flex items-center gap-2 hover:bg-indigo-100 transition-colors border border-indigo-100 dark:border-indigo-800/30"
+                                                className="px-4 py-2 bg-neutral-50 dark:bg-neutral-900/20 text-neutral-600 dark:text-neutral-400 rounded-xl font-bold flex items-center gap-2 hover:bg-neutral-100 transition-colors border border-neutral-100 dark:border-neutral-800/30"
                                             >
                                                 Compare Trajectory
                                                 <ArrowRight className="w-4 h-4" />

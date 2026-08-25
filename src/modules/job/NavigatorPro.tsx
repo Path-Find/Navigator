@@ -86,7 +86,7 @@ export const NavigatorPro: React.FC = () => {
                                 <select
                                     value={sort}
                                     onChange={(e) => setSort(e.target.value as 'date' | 'match')}
-                                    className="h-10 pl-3 pr-8 text-xs font-bold rounded-2xl border border-neutral-200/50 dark:border-neutral-800 bg-neutral-100/50 dark:bg-neutral-900/40 text-neutral-700 dark:text-neutral-300 appearance-none cursor-pointer focus:outline-none focus:ring-2 focus:ring-indigo-500/20 transition-colors"
+                                    className="h-10 pl-3 pr-8 text-xs font-bold rounded-2xl border border-neutral-200/50 dark:border-neutral-800 bg-neutral-100/50 dark:bg-neutral-900/40 text-neutral-700 dark:text-neutral-300 appearance-none cursor-pointer focus:outline-none focus:ring-2 focus:ring-neutral-500/20 transition-colors"
                                 >
                                     <option value="date">Newest</option>
                                     <option value="match">Best Fit</option>

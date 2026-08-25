@@ -13,7 +13,7 @@ export const CoverLetterEmptyState: React.FC = () => {
             </p>
             <button
                 onClick={() => window.location.href = '/resume'}
-                className="px-8 py-3 bg-indigo-600 hover:bg-indigo-500 text-white rounded-2xl text-sm font-bold transition-all shadow-lg shadow-indigo-600/20 active:scale-95"
+                className="px-8 py-3 bg-neutral-600 hover:bg-neutral-500 text-white rounded-2xl text-sm font-bold transition-all shadow-lg shadow-neutral-600/20 active:scale-95"
             >
                 Upload My Resume
             </button>

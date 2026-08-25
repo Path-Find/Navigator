@@ -30,14 +30,14 @@
   --color-background: hsl(var(--background));
   --color-foreground: hsl(var(--foreground));
 
-  --accent-primary: 79,
-    70,
-    229;
-  --accent-glow: 79,
-    70,
-    229;
-  --accent-primary-hex: #4f46e5;
-  --accent-secondary-hex: #7c3aed;
+  --accent-primary: 82,
+    82,
+    91;
+  --accent-glow: 82,
+    82,
+    91;
+  --accent-primary-hex: #52525b;
+  --accent-secondary-hex: #71717a;
   --background-image-accent-gradient: linear-gradient(135deg, var(--accent-primary-hex) 0%, var(--accent-secondary-hex) 100%);
 
   @keyframes blob {
@@ -218,11 +218,11 @@
 
 @layer base {
   .theme-job {
-    --accent-primary: 79, 70, 229;
-    --accent-glow: 79, 70, 229;
-    --accent-primary-hex: #4f46e5;
-    --accent-secondary-hex: #7c3aed;
-    --background-image-accent-gradient: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+    --accent-primary: 82, 82, 91;
+    --accent-glow: 82, 82, 91;
+    --accent-primary-hex: #52525b;
+    --accent-secondary-hex: #71717a;
+    --background-image-accent-gradient: linear-gradient(135deg, #52525b 0%, #71717a 100%);
   }
 
   .theme-coach {
@@ -280,11 +280,12 @@
 }
 
 .text-gradient {
-  @apply bg-clip-text text-transparent bg-gradient-to-r from-indigo-600 to-violet-600;
+  @apply bg-clip-text text-transparent;
+  background-image: var(--background-image-accent-gradient);
 }
 
 .dark .text-gradient {
-  @apply from-indigo-400 to-violet-400;
+  background-image: var(--background-image-accent-gradient);
 }
 
 .card-premium {

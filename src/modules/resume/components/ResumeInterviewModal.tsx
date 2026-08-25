@@ -137,7 +137,7 @@ export const ResumeInterviewModal: React.FC<ResumeInterviewModalProps> = ({ bloc
             <div className="w-full max-w-4xl flex-1 min-h-0 flex flex-col pt-16">
                 <div className="flex items-start justify-between gap-4 px-5 pb-4">
                     <div>
-                        <p className="text-xs font-black uppercase tracking-widest text-indigo-500 mb-1">Resume story interview</p>
+                        <p className="text-xs font-black uppercase tracking-widest text-neutral-500 mb-1">Resume story interview</p>
                         <h1 className="text-2xl font-black text-neutral-900 dark:text-white">{block.title}</h1>
                         <p className="text-sm font-medium text-neutral-500 dark:text-neutral-400">{block.organization}</p>
                     </div>
@@ -154,7 +154,7 @@ export const ResumeInterviewModal: React.FC<ResumeInterviewModalProps> = ({ bloc
                 {phase !== 'loading' && questions.length > 0 && (
                     <div className="h-1 bg-neutral-100 dark:bg-neutral-800 shrink-0">
                         <motion.div
-                            className="h-full bg-gradient-to-r from-indigo-500 to-violet-500"
+                            className="h-full bg-gradient-to-r from-neutral-500 to-neutral-500"
                             animate={{ width: `${phase === 'done' ? 100 : progressPct}%` }}
                             transition={{ duration: 0.4, ease: 'easeOut' }}
                         />
@@ -185,8 +185,8 @@ export const ResumeInterviewModal: React.FC<ResumeInterviewModalProps> = ({ bloc
                                 exit={{ opacity: 0 }}
                                 className="flex-1 flex flex-col items-center justify-center gap-5 px-8 text-center"
                             >
-                                <div className="w-12 h-12 bg-indigo-100 dark:bg-indigo-900/40 rounded-2xl flex items-center justify-center">
-                                    <Sparkles className="w-6 h-6 text-indigo-600 dark:text-indigo-400" />
+                                <div className="w-12 h-12 bg-neutral-100 dark:bg-neutral-900/40 rounded-2xl flex items-center justify-center">
+                                    <Sparkles className="w-6 h-6 text-neutral-600 dark:text-neutral-400" />
                                 </div>
                                 <div>
                                     <p className="text-sm font-black text-neutral-900 dark:text-white mb-1">Resume Interview is a Pro feature</p>
@@ -194,7 +194,7 @@ export const ResumeInterviewModal: React.FC<ResumeInterviewModalProps> = ({ bloc
                                 </div>
                                 <button
                                     onClick={onClose}
-                                    className="px-6 py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white rounded-2xl text-xs font-black transition-all"
+                                    className="px-6 py-2.5 bg-neutral-600 hover:bg-neutral-500 text-white rounded-2xl text-xs font-black transition-all"
                                 >
                                     Upgrade to Pro
                                 </button>
@@ -224,7 +224,7 @@ export const ResumeInterviewModal: React.FC<ResumeInterviewModalProps> = ({ bloc
                                     inputHint={phase === 'done' ? '' : `Question ${Math.min(currentQ + 1, questions.length)} of ${questions.length}`}
                                     inputDisabled={phase === 'saving' || phase === 'done'}
                                     hideInput={phase === 'done'}
-                                    accentGradient="from-indigo-600 to-violet-600"
+                                    accentGradient="from-neutral-600 to-neutral-600"
                                 />
 
                                 {phase === 'done' && (
@@ -234,14 +234,14 @@ export const ResumeInterviewModal: React.FC<ResumeInterviewModalProps> = ({ bloc
                                         className="px-6 pb-6 shrink-0 space-y-3"
                                     >
                                         {savedContext && (
-                                            <div className="p-4 bg-indigo-50 dark:bg-indigo-950/20 border border-indigo-100 dark:border-indigo-800/30 rounded-2xl">
-                                                <p className="text-[10px] font-black text-indigo-500 tracking-widest mb-2">SAVED STORY</p>
+                                            <div className="p-4 bg-neutral-50 dark:bg-neutral-950/20 border border-neutral-100 dark:border-neutral-800/30 rounded-2xl">
+                                                <p className="text-[10px] font-black text-neutral-500 tracking-widest mb-2">SAVED STORY</p>
                                                 <p className="text-sm text-neutral-700 dark:text-neutral-300 leading-relaxed font-medium">{savedContext}</p>
                                             </div>
                                         )}
                                         <button
                                             onClick={onClose}
-                                            className="w-full py-3 bg-indigo-600 hover:bg-indigo-500 text-white rounded-2xl text-xs font-black transition-all flex items-center justify-center gap-2"
+                                            className="w-full py-3 bg-neutral-600 hover:bg-neutral-500 text-white rounded-2xl text-xs font-black transition-all flex items-center justify-center gap-2"
                                         >
                                             <CheckCircle2 className="w-4 h-4" />
                                             Done

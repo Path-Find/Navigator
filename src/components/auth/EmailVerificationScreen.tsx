@@ -56,8 +56,8 @@ export const EmailVerificationScreen: React.FC = () => {
         <div className="min-h-screen bg-neutral-50 dark:bg-[#000000] flex items-center justify-center p-4 overflow-hidden relative">
             {/* Animated background elements */}
             <div className="absolute inset-0 overflow-hidden pointer-events-none">
-                <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-indigo-500/10 rounded-full blur-[120px] animate-pulse" />
-                <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-violet-500/10 rounded-full blur-[120px] animate-pulse delay-700" />
+                <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-neutral-500/10 rounded-full blur-[120px] animate-pulse" />
+                <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-neutral-500/10 rounded-full blur-[120px] animate-pulse delay-700" />
             </div>
 
             <motion.div
@@ -68,7 +68,7 @@ export const EmailVerificationScreen: React.FC = () => {
                 <div className="bg-white/70 dark:bg-neutral-900/70 backdrop-blur-2xl p-10 rounded-[2.5rem] shadow-2xl border border-white/20 dark:border-neutral-800 ring-1 ring-black/5 dark:ring-white/5">
                     <div className="flex flex-col items-center text-center">
                         <div className="relative mb-8">
-                            <div className="w-24 h-24 bg-gradient-to-br from-indigo-500 to-violet-600 rounded-3xl flex items-center justify-center shadow-2xl shadow-indigo-500/30 transform rotate-12">
+                            <div className="w-24 h-24 bg-gradient-to-br from-neutral-500 to-neutral-600 rounded-3xl flex items-center justify-center shadow-2xl shadow-neutral-500/30 transform rotate-12">
                                 <Mail className="w-12 h-12 text-white -rotate-12" />
                             </div>
                             <motion.div
@@ -107,7 +107,7 @@ export const EmailVerificationScreen: React.FC = () => {
                         <div className="w-full space-y-4">
                             <button
                                 onClick={() => refreshUser()}
-                                className="w-full bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 text-white font-black py-4 rounded-2xl shadow-xl shadow-indigo-500/25 transition-all flex items-center justify-center gap-3 active:scale-[0.98] group"
+                                className="w-full bg-gradient-to-r from-neutral-600 to-neutral-600 hover:from-neutral-500 hover:to-neutral-500 text-white font-black py-4 rounded-2xl shadow-xl shadow-neutral-500/25 transition-all flex items-center justify-center gap-3 active:scale-[0.98] group"
                             >
                                 <span>I've verified my email</span>
                                 <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />

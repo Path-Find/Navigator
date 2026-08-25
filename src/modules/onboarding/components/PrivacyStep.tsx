@@ -45,15 +45,15 @@ export const PrivacyStep = ({ privacyAccepted, setPrivacyAccepted, setStep, hand
                                 type="checkbox"
                                 checked={privacyAccepted}
                                 onChange={(e) => setPrivacyAccepted(e.target.checked)}
-                                className="peer h-6 w-6 cursor-pointer appearance-none rounded-lg border-2 border-neutral-200 dark:border-neutral-700 checked:bg-indigo-600 checked:border-indigo-600 transition-all"
+                                className="peer h-6 w-6 cursor-pointer appearance-none rounded-lg border-2 border-neutral-200 dark:border-neutral-700 checked:bg-neutral-600 checked:border-neutral-600 transition-all"
                             />
                             <Check className="absolute h-4 w-4 text-white opacity-0 peer-checked:opacity-100 top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 pointer-events-none transition-opacity stroke-[3px]" />
                         </div>
                         <span className="text-sm font-bold text-neutral-600 dark:text-neutral-400 select-none">
                             I agree to the{' '}
-                            <a href="/terms" target="_blank" className="text-indigo-600 hover:text-indigo-700 font-black underline underline-offset-4">Terms</a>
+                            <a href="/terms" target="_blank" className="text-neutral-600 hover:text-neutral-700 font-black underline underline-offset-4">Terms</a>
                             {' '}and{' '}
-                            <a href="/privacy" target="_blank" className="text-indigo-600 hover:text-indigo-700 font-black underline underline-offset-4">Privacy Policy</a>
+                            <a href="/privacy" target="_blank" className="text-neutral-600 hover:text-neutral-700 font-black underline underline-offset-4">Privacy Policy</a>
                         </span>
                     </label>
                 </div>

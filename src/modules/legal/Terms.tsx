@@ -32,10 +32,10 @@ export const Terms: React.FC = () => {
             title: 'Simple Agreement',
             description: "By using Navigator, you agree to these fair rules. If you don't agree, please don't use the service.",
             colors: {
-                bg: 'bg-indigo-50/50 dark:bg-indigo-500/5',
-                text: 'text-indigo-600 dark:text-indigo-400',
-                accent: 'border-indigo-500/10 dark:border-indigo-500/20',
-                iconBg: 'bg-indigo-600',
+                bg: 'bg-neutral-50/50 dark:bg-neutral-500/5',
+                text: 'text-neutral-600 dark:text-neutral-400',
+                accent: 'border-neutral-500/10 dark:border-neutral-500/20',
+                iconBg: 'bg-neutral-600',
             },
             colSpan: 'md:col-span-1'
         },
@@ -84,10 +84,10 @@ export const Terms: React.FC = () => {
             title: 'Fair Usage',
             description: "We reserve the right to end service for accounts that abuse the platform or violate these terms.",
             colors: {
-                bg: 'bg-violet-50/50 dark:bg-violet-500/5',
-                text: 'text-violet-600 dark:text-violet-400',
-                accent: 'border-violet-500/10 dark:border-violet-500/20',
-                iconBg: 'bg-violet-600',
+                bg: 'bg-neutral-50/50 dark:bg-neutral-500/5',
+                text: 'text-neutral-600 dark:text-neutral-400',
+                accent: 'border-neutral-500/10 dark:border-neutral-500/20',
+                iconBg: 'bg-neutral-600',
             },
             colSpan: 'md:col-span-1'
         }
@@ -97,11 +97,11 @@ export const Terms: React.FC = () => {
         <div className="min-h-screen bg-white dark:bg-black text-neutral-900 dark:text-white pt-24 pb-20">
             <div className="max-w-5xl mx-auto px-4">
                 <div className="max-w-3xl mx-auto text-center mb-16">
-                    <div className="inline-flex items-center justify-center p-3 bg-indigo-50 dark:bg-indigo-900/20 text-indigo-600 dark:text-indigo-400 rounded-2xl mb-6">
+                    <div className="inline-flex items-center justify-center p-3 bg-neutral-50 dark:bg-neutral-900/20 text-neutral-600 dark:text-neutral-400 rounded-2xl mb-6">
                         <Scale className="w-8 h-8" />
                     </div>
                     <h1 className="text-4xl md:text-5xl font-black tracking-tight mb-6">
-                        Terms of <span className="text-indigo-600 dark:text-indigo-400">Service</span>
+                        Terms of <span className="text-neutral-600 dark:text-neutral-400">Service</span>
                     </h1>
                     <p className="text-xl text-neutral-500 dark:text-neutral-400 leading-relaxed">
                         By using Navigator, you agree to these terms. We keep them simple and fair because we believe in transparency.
@@ -128,7 +128,7 @@ export const Terms: React.FC = () => {
                             Effective Date: February 17, 2026
                         </p>
 
-                        <div className="prose prose-neutral dark:prose-invert prose-lg md:prose-xl prose-headings:font-black prose-headings:tracking-tight prose-a:text-indigo-600 dark:prose-a:text-indigo-400 prose-a:no-underline hover:prose-a:underline">
+                        <div className="prose prose-neutral dark:prose-invert prose-lg md:prose-xl prose-headings:font-black prose-headings:tracking-tight prose-a:text-neutral-600 dark:prose-a:text-neutral-400 prose-a:no-underline hover:prose-a:underline">
                             <div className="space-y-20 mt-12 [&>section>p]:leading-relaxed">
                                 <section>
                                     <h3 className="text-lg md:text-xl font-bold mb-4">
@@ -219,7 +219,7 @@ export const Terms: React.FC = () => {
                                         Questions about the Terms of Service should be sent to:
                                     </p>
                                     <p className="mt-6">
-                                        Please use the <a href="/contact" className="font-bold text-indigo-600 dark:text-indigo-400">Contact page</a> so we can route your question correctly.
+                                        Please use the <a href="/contact" className="font-bold text-neutral-600 dark:text-neutral-400">Contact page</a> so we can route your question correctly.
                                     </p>
                                 </section>
                             </div>

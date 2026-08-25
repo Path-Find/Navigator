@@ -183,7 +183,7 @@ export const CoachHero: React.FC<CoachHeroProps> = ({
                                     <ul className="space-y-3 pt-4">
                                         {['12-Month Plan', 'Weekly Milestones', 'Progress Tracking'].map(item => (
                                             <li key={item} className="flex items-center gap-3 text-xs font-bold text-neutral-400">
-                                                <div className="w-1 h-1 rounded-full bg-violet-500" />
+                                                <div className="w-1 h-1 rounded-full bg-neutral-500" />
                                                 {item}
                                             </li>
                                         ))}

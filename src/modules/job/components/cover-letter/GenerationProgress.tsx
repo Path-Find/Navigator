@@ -50,7 +50,7 @@ export const GenerationProgress: React.FC<GenerationProgressProps> = ({
                             exit={{ y: -20, opacity: 0 }}
                             transition={{ type: "spring", stiffness: 300, damping: 30 }}
                         >
-                            <currentStep.icon className="w-14 h-14 text-indigo-600 dark:text-indigo-400 drop-shadow-sm" />
+                            <currentStep.icon className="w-14 h-14 text-neutral-600 dark:text-neutral-400 drop-shadow-sm" />
                         </motion.div>
                     </AnimatePresence>
                 </div>
@@ -75,7 +75,7 @@ export const GenerationProgress: React.FC<GenerationProgressProps> = ({
                         strokeWidth="2"
                         strokeDasharray="100 100"
                         animate={{ strokeDasharray: [`${progress} 100`] }}
-                        className="text-indigo-500 dark:text-indigo-400"
+                        className="text-neutral-500 dark:text-neutral-400"
                         transition={{ duration: 0.5 }}
                     />
                 </svg>

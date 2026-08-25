@@ -96,7 +96,7 @@ export const RoleModelComparison: React.FC<RoleModelComparisonProps> = ({
                     {/* Column 2: Role Model Trajectory (B) */}
                     <div className="space-y-8">
                         <div className="flex items-center gap-4 mb-4">
-                            <div className="w-12 h-12 bg-indigo-600 rounded-2xl flex items-center justify-center text-white shadow-lg shadow-indigo-500/20">
+                            <div className="w-12 h-12 bg-neutral-600 rounded-2xl flex items-center justify-center text-white shadow-lg shadow-neutral-500/20">
                                 <Users className="w-6 h-6" />
                             </div>
                             <div>
@@ -105,7 +105,7 @@ export const RoleModelComparison: React.FC<RoleModelComparisonProps> = ({
                             </div>
                         </div>
 
-                        <div className="space-y-12 pl-4 border-l-2 border-indigo-500/10 dark:border-indigo-500/5">
+                        <div className="space-y-12 pl-4 border-l-2 border-neutral-500/10 dark:border-neutral-500/5">
                             {sortedRoleModelExp.map((block, i) => (
                                 <TimelineBlock
                                     key={i}
@@ -153,9 +153,9 @@ const TimelineBlock: React.FC<TimelineBlockProps> = ({ block, variant, index }) 
     return (
         <div className="relative group">
             {/* Dot */}
-            <div className={`absolute -left-[1.35rem] top-1.5 w-6 h-6 rounded-full bg-white dark:bg-neutral-950 border-2 flex items-center justify-center z-10 transition-all ${variant === 'user' ? 'border-emerald-500 hover:bg-emerald-500' : 'border-indigo-500 hover:bg-indigo-500'
+            <div className={`absolute -left-[1.35rem] top-1.5 w-6 h-6 rounded-full bg-white dark:bg-neutral-950 border-2 flex items-center justify-center z-10 transition-all ${variant === 'user' ? 'border-emerald-500 hover:bg-emerald-500' : 'border-neutral-500 hover:bg-neutral-500'
                 }`}>
-                <div className={`w-1.5 h-1.5 rounded-full ${variant === 'user' ? 'bg-emerald-500 group-hover:bg-white' : 'bg-indigo-500 group-hover:bg-white'
+                <div className={`w-1.5 h-1.5 rounded-full ${variant === 'user' ? 'bg-emerald-500 group-hover:bg-white' : 'bg-neutral-500 group-hover:bg-white'
                     }`} />
             </div>
 
@@ -163,7 +163,7 @@ const TimelineBlock: React.FC<TimelineBlockProps> = ({ block, variant, index }) 
                 <div className="text-[10px] font-black uppercase tracking-widest text-neutral-400 mb-2 flex items-center gap-2">
                     {block.dateRange}
                     {variant === 'role-model' && index < 2 && (
-                        <span className="px-1.5 py-0.5 bg-indigo-500/10 text-indigo-500 rounded-md text-[8px] font-black">LEAP POINT</span>
+                        <span className="px-1.5 py-0.5 bg-neutral-500/10 text-neutral-500 rounded-md text-[8px] font-black">LEAP POINT</span>
                     )}
                 </div>
                 <div className="p-6 bg-white dark:bg-neutral-900 rounded-3xl border border-neutral-100 dark:border-neutral-800 shadow-sm hover:shadow-md transition-all group/card overflow-hidden relative text-left">
@@ -179,7 +179,7 @@ const TimelineBlock: React.FC<TimelineBlockProps> = ({ block, variant, index }) 
                     <ul className="space-y-3">
                         {block.bullets.map((bullet, idx) => (
                             <li key={idx} className="flex gap-3 text-xs text-neutral-600 dark:text-neutral-400 leading-relaxed font-medium">
-                                <CheckCircle2 className={`w-3 h-3 mt-0.5 shrink-0 ${variant === 'user' ? 'text-emerald-500' : 'text-indigo-500'}`} />
+                                <CheckCircle2 className={`w-3 h-3 mt-0.5 shrink-0 ${variant === 'user' ? 'text-emerald-500' : 'text-neutral-500'}`} />
                                 {bullet}
                             </li>
                         ))}

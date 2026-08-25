@@ -128,17 +128,17 @@ export const ResumeEditor: React.FC = () => {
             <SharedPageLayout>
                 <div className="flex flex-col items-center justify-center min-h-[70vh] space-y-12">
                     <div className="relative group">
-                        <div className="absolute inset-x-[-100px] inset-y-[-100px] bg-indigo-500/10 blur-[100px] rounded-full animate-pulse transition-all duration-1000" />
+                        <div className="absolute inset-x-[-100px] inset-y-[-100px] bg-neutral-500/10 blur-[100px] rounded-full animate-pulse transition-all duration-1000" />
 
                         <div className="relative">
-                            <div className="absolute inset-0 rounded-full border-2 border-dashed border-indigo-200/50 animate-[spin_10s_linear_infinite]" />
+                            <div className="absolute inset-0 rounded-full border-2 border-dashed border-neutral-200/50 animate-[spin_10s_linear_infinite]" />
 
-                            <Card variant="glass" className="relative w-32 h-32 flex items-center justify-center rounded-[2.5rem] shadow-2xl border-indigo-100/50 dark:border-white/5 bg-white/40 dark:bg-neutral-900/40 backdrop-blur-xl overflow-hidden group-hover:scale-105 transition-transform duration-500">
-                                <div className="absolute inset-0 bg-gradient-to-tr from-indigo-500/10 to-purple-500/10 opacity-0 group-hover:opacity-100 transition-opacity" />
-                                <CurrentIcon className="w-10 h-10 text-indigo-600 dark:text-indigo-400 animate-in zoom-in-50 fade-in duration-500" key={parsingMessageIndex} />
+                            <Card variant="glass" className="relative w-32 h-32 flex items-center justify-center rounded-[2.5rem] shadow-2xl border-neutral-100/50 dark:border-white/5 bg-white/40 dark:bg-neutral-900/40 backdrop-blur-xl overflow-hidden group-hover:scale-105 transition-transform duration-500">
+                                <div className="absolute inset-0 bg-gradient-to-tr from-neutral-500/10 to-neutral-500/10 opacity-0 group-hover:opacity-100 transition-opacity" />
+                                <CurrentIcon className="w-10 h-10 text-neutral-600 dark:text-neutral-400 animate-in zoom-in-50 fade-in duration-500" key={parsingMessageIndex} />
                             </Card>
 
-                            <div className="absolute -top-2 -right-2 w-4 h-4 bg-indigo-500 rounded-full shadow-[0_0_15px_rgba(99,102,241,0.5)] animate-bounce" />
+                            <div className="absolute -top-2 -right-2 w-4 h-4 bg-neutral-500 rounded-full shadow-[0_0_15px_rgba(99,102,241,0.5)] animate-bounce" />
                         </div>
                     </div>
 
@@ -154,9 +154,9 @@ export const ResumeEditor: React.FC = () => {
                     </div>
 
                     <div className="flex flex-col items-center gap-4">
-                        <div className="flex items-center gap-3 px-6 py-3 bg-indigo-50 dark:bg-indigo-900/20 rounded-2xl border border-indigo-100/50 dark:border-indigo-800/50 shadow-sm animate-in fade-in slide-in-from-bottom-8 duration-1000 delay-300">
-                            <Sparkles className="w-5 h-5 text-indigo-500 animate-pulse" />
-                            <span className="text-sm font-black text-indigo-600 dark:text-indigo-400 tracking-wider">
+                        <div className="flex items-center gap-3 px-6 py-3 bg-neutral-50 dark:bg-neutral-900/20 rounded-2xl border border-neutral-100/50 dark:border-neutral-800/50 shadow-sm animate-in fade-in slide-in-from-bottom-8 duration-1000 delay-300">
+                            <Sparkles className="w-5 h-5 text-neutral-500 animate-pulse" />
+                            <span className="text-sm font-black text-neutral-600 dark:text-neutral-400 tracking-wider">
                                 Intelligence Engine Active
                             </span>
                         </div>
@@ -165,7 +165,7 @@ export const ResumeEditor: React.FC = () => {
                             {PARSING_MESSAGES.map((_, i) => (
                                 <div
                                     key={i}
-                                    className={`h-1.5 rounded-full transition-all duration-500 ${i === parsingMessageIndex ? 'w-8 bg-indigo-500' : 'w-1.5 bg-neutral-200 dark:bg-neutral-800'}`}
+                                    className={`h-1.5 rounded-full transition-all duration-500 ${i === parsingMessageIndex ? 'w-8 bg-neutral-500' : 'w-1.5 bg-neutral-200 dark:bg-neutral-800'}`}
                                 />
                             ))}
                         </div>
@@ -219,9 +219,9 @@ export const ResumeEditor: React.FC = () => {
             <GlobalDragOverlay onDrop={(files) => onImport(files[0])} />
 
             <div className="fixed inset-0 pointer-events-none overflow-hidden -z-10">
-                <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-indigo-500/5 blur-[120px] rounded-full animate-pulse" />
+                <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-neutral-500/5 blur-[120px] rounded-full animate-pulse" />
                 <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-emerald-500/5 blur-[120px] rounded-full animate-pulse" style={{ animationDelay: '1s' }} />
-                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[60%] h-[60%] bg-purple-500/5 blur-[150px] rounded-full" />
+                <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[60%] h-[60%] bg-neutral-500/5 blur-[150px] rounded-full" />
             </div>
 
             <input
@@ -443,7 +443,7 @@ export const ResumeEditor: React.FC = () => {
                     <div className="relative bg-neutral-100 dark:bg-neutral-950 w-full max-w-5xl h-full rounded-[2rem] shadow-2xl overflow-hidden border border-white/10 flex flex-col">
                         <div className="px-8 py-6 border-b border-neutral-200 dark:border-neutral-800 flex justify-between items-center bg-white dark:bg-neutral-900">
                             <div className="flex items-center gap-3">
-                                <div className="p-2 bg-indigo-500/10 rounded-xl text-indigo-600">
+                                <div className="p-2 bg-neutral-500/10 rounded-xl text-neutral-600">
                                     <FileText className="w-5 h-5" />
                                 </div>
                                 <h3 className="font-black text-xl text-neutral-900 dark:text-white">Preview</h3>

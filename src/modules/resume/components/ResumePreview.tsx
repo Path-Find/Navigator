@@ -64,7 +64,7 @@ export const ResumePreview: React.FC<ResumePreviewProps> = ({ blocks }) => {
         if (sectionBlocks.length === 0) return null;
         return (
             <div className="mb-8">
-                <h3 className="text-xs font-black text-indigo-600 dark:text-indigo-400 mb-4 border-b border-indigo-100 dark:border-indigo-900/50 pb-1">
+                <h3 className="text-xs font-black text-neutral-600 dark:text-neutral-400 mb-4 border-b border-neutral-100 dark:border-neutral-900/50 pb-1">
                     {title}
                 </h3>
                 <div className="space-y-6">

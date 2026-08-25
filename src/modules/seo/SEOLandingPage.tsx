@@ -33,13 +33,13 @@ export const SEOLandingPage: React.FC = () => {
 
                 {/* Hero Section */}
                 <div className="text-center space-y-6">
-                    <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 text-xs font-bold uppercase tracking-wider">
+                    <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-neutral-100 dark:bg-neutral-900/30 text-neutral-600 dark:text-neutral-400 text-xs font-bold uppercase tracking-wider">
                         <Star className="w-3 h-3" />
                         2025 Resume Guide
                     </div>
                     <h1 className="text-4xl md:text-6xl font-black text-neutral-900 dark:text-white tracking-tight">
                         The Best Resume for <br />
-                        <span className="text-transparent bg-clip-text bg-gradient-to-r from-indigo-500 to-purple-600">
+                        <span className="text-transparent bg-clip-text bg-gradient-to-r from-neutral-500 to-neutral-600">
                             {displayTitle}
                         </span>
                     </h1>
@@ -49,7 +49,7 @@ export const SEOLandingPage: React.FC = () => {
 
                     <button
                         onClick={handleStartBuilding}
-                        className="inline-flex items-center gap-2 px-8 py-4 bg-indigo-600 hover:bg-indigo-700 text-white rounded-2xl font-bold text-lg transition-all hover:scale-105 shadow-xl shadow-indigo-500/20"
+                        className="inline-flex items-center gap-2 px-8 py-4 bg-neutral-600 hover:bg-neutral-700 text-white rounded-2xl font-bold text-lg transition-all hover:scale-105 shadow-xl shadow-neutral-500/20"
                     >
                         Build This Resume Now
                         <ArrowRight className="w-5 h-5" />
@@ -91,8 +91,8 @@ export const SEOLandingPage: React.FC = () => {
                 </div>
 
                 {/* Pro Tip Section */}
-                <div className="bg-indigo-50 dark:bg-indigo-900/10 rounded-3xl p-8 border border-indigo-100 dark:border-indigo-800/30 text-center">
-                    <div className="inline-block p-3 bg-indigo-100 dark:bg-indigo-900/50 rounded-xl mb-4 text-indigo-600 dark:text-indigo-400">
+                <div className="bg-neutral-50 dark:bg-neutral-900/10 rounded-3xl p-8 border border-neutral-100 dark:border-neutral-800/30 text-center">
+                    <div className="inline-block p-3 bg-neutral-100 dark:bg-neutral-900/50 rounded-xl mb-4 text-neutral-600 dark:text-neutral-400">
                         <Briefcase className="w-6 h-6" />
                     </div>
                     <h3 className="text-lg font-bold text-neutral-900 dark:text-white mb-2">Expert Tip for {displayTitle}s</h3>
@@ -109,14 +109,14 @@ export const SEOLandingPage: React.FC = () => {
                             <Link
                                 key={b.slug}
                                 to={ROUTES.SEO_LANDING.replace(':role', b.slug)}
-                                className="px-4 py-2 bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-lg text-sm font-medium text-neutral-600 dark:text-neutral-400 hover:border-indigo-500 hover:text-indigo-500 transition-colors"
+                                className="px-4 py-2 bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-lg text-sm font-medium text-neutral-600 dark:text-neutral-400 hover:border-neutral-500 hover:text-neutral-500 transition-colors"
                             >
                                 {b.title} Resume
                             </Link>
                         ))}
                         <Link
                             to={ROUTES.SEO_LANDING.replace(':role', 'digital-marketing-specialist')}
-                            className="px-4 py-2 bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-lg text-sm font-medium text-neutral-600 dark:text-neutral-400 hover:border-indigo-500 hover:text-indigo-500 transition-colors"
+                            className="px-4 py-2 bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-800 rounded-lg text-sm font-medium text-neutral-600 dark:text-neutral-400 hover:border-neutral-500 hover:text-neutral-500 transition-colors"
                         >
                             Digital Marketing Specialist
                         </Link>

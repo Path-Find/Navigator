@@ -81,8 +81,8 @@ export const PlanCard = ({
                 {subText ? (
                     <div className={`mt-2 text-[11px] font-bold
                         ${isEmerald ? 'text-emerald-500/80' :
-                            isViolet ? 'text-violet-500/80' :
-                                isIndigo ? 'text-indigo-500/80' :
+                            isViolet ? 'text-neutral-500/80' :
+                                isIndigo ? 'text-neutral-500/80' :
                                     'text-neutral-500'
                         } `}>
                         {subText}
@@ -100,8 +100,8 @@ export const PlanCard = ({
                         <div key={i} className="flex gap-3 text-sm group/item items-start">
                             <div className={`mt-0.5 w-5 h-5 rounded-full flex items-center justify-center shrink-0 transition-colors
                                 ${isEmerald ? 'bg-emerald-500/10 text-emerald-500 group-hover/item:bg-emerald-500 group-hover/item:text-white' :
-                                    isIndigo ? 'bg-indigo-500/10 text-indigo-500 group-hover/item:bg-indigo-500 group-hover/item:text-white' :
-                                        isViolet ? 'bg-violet-500/10 text-violet-500 group-hover/item:bg-violet-500 group-hover/item:text-white' :
+                                    isIndigo ? 'bg-neutral-500/10 text-neutral-500 group-hover/item:bg-neutral-500 group-hover/item:text-white' :
+                                        isViolet ? 'bg-neutral-500/10 text-neutral-500 group-hover/item:bg-neutral-500 group-hover/item:text-white' :
                                             'bg-neutral-100 dark:bg-neutral-800 text-neutral-400'
                                 } `}>
                                 <Check className="w-3 h-3 stroke-[3]" />
@@ -134,8 +134,8 @@ export const PlanCard = ({
                             </div>
                             <span className={`font-black text-neutral-900 dark:text-white transition-colors
                                 ${isEmerald ? 'group-hover:text-emerald-500' :
-                                    isIndigo ? 'group-hover:text-indigo-500' :
-                                        isViolet ? 'group-hover:text-violet-500' :
+                                    isIndigo ? 'group-hover:text-neutral-500' :
+                                        isViolet ? 'group-hover:text-neutral-500' :
                                             accentColor === 'amber' ? 'group-hover:text-amber-500' :
                                                 'group-hover:text-neutral-500'
                                 }`}>
@@ -163,9 +163,9 @@ export const PlanCard = ({
                         ${isPopular
                             ? 'bg-emerald-500 hover:bg-emerald-400 text-white shadow-lg shadow-emerald-500/25'
                             : isIndigo
-                                ? 'bg-indigo-600 hover:bg-indigo-500 text-white shadow-lg shadow-indigo-600/25'
+                                ? 'bg-neutral-600 hover:bg-neutral-500 text-white shadow-lg shadow-neutral-600/25'
                                 : isViolet
-                                    ? 'bg-violet-600 hover:bg-violet-500 text-white shadow-lg shadow-violet-600/25'
+                                    ? 'bg-neutral-600 hover:bg-neutral-500 text-white shadow-lg shadow-neutral-600/25'
                                     : 'bg-neutral-100 dark:bg-neutral-800 hover:bg-neutral-200 dark:hover:bg-neutral-700 text-neutral-900 dark:text-white border border-neutral-200/50 dark:border-neutral-700/50'
                         } `}
                 >

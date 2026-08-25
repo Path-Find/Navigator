@@ -40,10 +40,10 @@ export const WaitlistForm: React.FC<WaitlistFormProps> = ({
 
     return (
         <div className="space-y-6 animate-in fade-in slide-in-from-right-4 duration-300">
-            <div className="p-4 bg-indigo-50 dark:bg-indigo-900/20 border border-indigo-100 dark:border-indigo-800 rounded-2xl flex items-start gap-3">
-                <Clock className="w-5 h-5 text-indigo-600 dark:text-indigo-400 shrink-0 mt-0.5" />
+            <div className="p-4 bg-neutral-50 dark:bg-neutral-900/20 border border-neutral-100 dark:border-neutral-800 rounded-2xl flex items-start gap-3">
+                <Clock className="w-5 h-5 text-neutral-600 dark:text-neutral-400 shrink-0 mt-0.5" />
                 <div>
-                    <h5 className="text-sm font-bold text-indigo-900 dark:text-indigo-100 mb-1">Invite Required</h5>
+                    <h5 className="text-sm font-bold text-neutral-900 dark:text-neutral-100 mb-1">Invite Required</h5>
                     Navigator is currently invite-only
                 </div>
             </div>
@@ -58,7 +58,7 @@ export const WaitlistForm: React.FC<WaitlistFormProps> = ({
                     <button
                         type="button"
                         onClick={onEmailChange}
-                        className="text-xs font-bold text-indigo-600 dark:text-indigo-400 hover:underline"
+                        className="text-xs font-bold text-neutral-600 dark:text-neutral-400 hover:underline"
                     >
                         Change
                     </button>

@@ -5,6 +5,7 @@ All notable changes to this project will be documented in this file.
 See [CHANGELOG_ARCHIVE.md](CHANGELOG_ARCHIVE.md) for earlier history.
 
 ## [Unreleased]
+- **Replaced the purple application-wide accent system**: general UI now uses a neutral grey palette, with colour reserved for meaningful states and feature categories.
 - **Placed interview progression beside the completed response**: “Next Question” now appears directly after the answer and coaching instead of below the disabled composer.
 - **Grounded interview introductions in user evidence**: “Tell me about yourself” coaching now assembles an answer from the resume and verified skills instead of generic placeholders.
 - Centralized feature lifecycle helpers and generated footer navigation from the feature registry.

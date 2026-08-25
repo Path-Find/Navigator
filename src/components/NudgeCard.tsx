@@ -28,7 +28,7 @@ export const NudgeCard: React.FC<NudgeCardProps> = ({ job, onUpdateStatus, onDis
                 <div className="relative z-10 flex flex-col md:flex-row items-center md:items-start gap-6">
                     {/* Icon Column */}
                     <div className="shrink-0">
-                        <div className="w-14 h-14 bg-indigo-50 dark:bg-indigo-500/10 rounded-2xl flex items-center justify-center text-indigo-600 dark:text-indigo-400 border border-indigo-100 dark:border-indigo-500/20 group-hover:scale-105 transition-transform duration-500">
+                        <div className="w-14 h-14 bg-neutral-50 dark:bg-neutral-500/10 rounded-2xl flex items-center justify-center text-neutral-600 dark:text-neutral-400 border border-neutral-100 dark:border-neutral-500/20 group-hover:scale-105 transition-transform duration-500">
                             <Sparkles className="w-6 h-6" />
                         </div>
                     </div>
@@ -37,9 +37,9 @@ export const NudgeCard: React.FC<NudgeCardProps> = ({ job, onUpdateStatus, onDis
                     <div className="flex-1 text-center md:text-left">
                         <div className="flex flex-col md:flex-row md:items-center gap-2 mb-2">
                             <h2 className="text-xl font-black text-neutral-900 dark:text-white tracking-tight">
-                                Any news from <span className="text-indigo-600 dark:text-indigo-400">{job.company}</span>?
+                                Any news from <span className="text-neutral-600 dark:text-neutral-400">{job.company}</span>?
                             </h2>
-                            <span className="text-[9px] font-black uppercase tracking-widest text-indigo-600/70 dark:text-indigo-400/70 bg-indigo-50 dark:bg-indigo-500/10 px-2 py-0.5 rounded-md border border-indigo-100 dark:border-indigo-500/20 w-fit mx-auto md:mx-0">
+                            <span className="text-[9px] font-black uppercase tracking-widest text-neutral-600/70 dark:text-neutral-400/70 bg-neutral-50 dark:bg-neutral-500/10 px-2 py-0.5 rounded-md border border-neutral-100 dark:border-neutral-500/20 w-fit mx-auto md:mx-0">
                                 Navigator reminder
                             </span>
                         </div>
@@ -76,7 +76,7 @@ export const NudgeCard: React.FC<NudgeCardProps> = ({ job, onUpdateStatus, onDis
 
                             <button
                                 onClick={() => onUpdateStatus('ghosted')}
-                                className="flex items-center gap-2 px-4 py-2.5 bg-violet-50 dark:bg-violet-500/10 hover:bg-violet-100 dark:hover:bg-violet-500/20 text-violet-700 dark:text-violet-400 border border-violet-200 dark:border-violet-500/20 rounded-xl text-xs font-black transition-all hover:-translate-y-0.5"
+                                className="flex items-center gap-2 px-4 py-2.5 bg-neutral-50 dark:bg-neutral-500/10 hover:bg-neutral-100 dark:hover:bg-neutral-500/20 text-neutral-700 dark:text-neutral-400 border border-neutral-200 dark:border-neutral-500/20 rounded-xl text-xs font-black transition-all hover:-translate-y-0.5"
                             >
                                 <Ghost className="w-3.5 h-3.5" />
                                 Ghosted

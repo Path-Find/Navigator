@@ -18,9 +18,9 @@ export const LoadingState: React.FC<LoadingStateProps> = ({
             className="min-h-[60vh] flex flex-col items-center justify-center p-8 text-center"
         >
             <div className="relative mb-8">
-                <div className="absolute inset-0 bg-indigo-500/30 blur-3xl rounded-full animate-pulse" />
+                <div className="absolute inset-0 bg-neutral-500/30 blur-3xl rounded-full animate-pulse" />
                 <div className="relative p-4 bg-white dark:bg-neutral-900 rounded-2xl shadow-xl border border-neutral-100 dark:border-neutral-800">
-                    <Loader2 className="w-8 h-8 text-indigo-600 dark:text-indigo-400 animate-spin" />
+                    <Loader2 className="w-8 h-8 text-neutral-600 dark:text-neutral-400 animate-spin" />
                 </div>
             </div>
             <div className="space-y-2">

@@ -53,9 +53,9 @@ export const ResumeTab: React.FC<ResumeTabProps> = ({
         <div className="pb-8">
             <div className="space-y-8 p-6 bg-white dark:bg-neutral-900 rounded-3xl border border-neutral-100 dark:border-neutral-800 shadow-sm">
                 {userTier === 'free' && (
-                    <div className="flex items-start justify-between gap-4 px-6 py-4 rounded-2xl border border-indigo-200 dark:border-indigo-500/20 bg-indigo-50/70 dark:bg-indigo-950/20">
+                    <div className="flex items-start justify-between gap-4 px-6 py-4 rounded-2xl border border-neutral-200 dark:border-neutral-500/20 bg-neutral-50/70 dark:bg-neutral-950/20">
                         <div className="flex items-start gap-3 min-w-0">
-                            <Wand2 className="w-4 h-4 text-indigo-500 shrink-0" />
+                            <Wand2 className="w-4 h-4 text-neutral-500 shrink-0" />
                             <p className="text-xs font-bold text-neutral-600 dark:text-neutral-400 leading-relaxed">
                                 Use Plus or Pro to rewrite resume bullets for this specific role.
                             </p>
@@ -64,7 +64,7 @@ export const ResumeTab: React.FC<ResumeTabProps> = ({
                             onClick={() => openModal('UPGRADE', { initialView: 'upgrade' })}
                             variant="accent"
                             size="sm"
-                            className="shrink-0 text-xs shadow-md shadow-indigo-500/20"
+                            className="shrink-0 text-xs shadow-md shadow-neutral-500/20"
                         >
                             Upgrade
                         </Button>
@@ -73,7 +73,7 @@ export const ResumeTab: React.FC<ResumeTabProps> = ({
                 {userTier !== 'free' && (
                     <section>
                         <div className="flex justify-between items-start mb-6 border-b border-neutral-100 dark:border-neutral-800/50 pb-4">
-                            <h3 className="text-xs font-bold text-indigo-500 dark:text-indigo-400">Professional Summary</h3>
+                            <h3 className="text-xs font-bold text-neutral-500 dark:text-neutral-400">Professional Summary</h3>
                             <Button
                                 onClick={handleGenerateSummary}
                                 disabled={generatingSummary}
@@ -87,7 +87,7 @@ export const ResumeTab: React.FC<ResumeTabProps> = ({
                         </div>
                         {job.tailoredSummary ? (
                             <div className="relative group">
-                                <p className="text-sm text-neutral-700 dark:text-neutral-300 leading-relaxed font-medium border-l-2 border-indigo-500/20 pl-6 py-1">
+                                <p className="text-sm text-neutral-700 dark:text-neutral-300 leading-relaxed font-medium border-l-2 border-neutral-500/20 pl-6 py-1">
                                     {job.tailoredSummary}
                                 </p>
                             </div>
@@ -151,7 +151,7 @@ export const ResumeTab: React.FC<ResumeTabProps> = ({
                                                 key={i}
                                                 className={`relative pl-6 text-sm leading-relaxed ${tailoredBullets ? 'text-neutral-800 dark:text-neutral-200 font-bold' : 'text-neutral-600 dark:text-neutral-400 font-medium'}`}
                                             >
-                                                <div className={`absolute left-0 top-2 w-1.5 h-1.5 rounded-full ${tailoredBullets ? 'bg-indigo-50 shadow-[0_0_8px_rgba(99,102,241,0.4)]' : 'bg-neutral-300 dark:bg-neutral-700'}`} />
+                                                <div className={`absolute left-0 top-2 w-1.5 h-1.5 rounded-full ${tailoredBullets ? 'bg-neutral-50 shadow-[0_0_8px_rgba(99,102,241,0.4)]' : 'bg-neutral-300 dark:bg-neutral-700'}`} />
                                                 {bullet}
                                             </li>
                                         ))}
@@ -176,7 +176,7 @@ export const ResumeTab: React.FC<ResumeTabProps> = ({
                                 return (
                                     <section key={section.type}>
                                         <div className="flex justify-between items-start mb-8 border-b border-neutral-100 dark:border-neutral-800/50 pb-4">
-                                            <h3 className="text-xs font-bold text-indigo-500 dark:text-indigo-400">{section.label}</h3>
+                                            <h3 className="text-xs font-bold text-neutral-500 dark:text-neutral-400">{section.label}</h3>
                                             {isFirstTailorable && (
                                                 <div className="flex items-start gap-2">
                                                     {userTier !== 'free' && (

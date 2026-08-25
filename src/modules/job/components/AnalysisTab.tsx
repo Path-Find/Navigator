@@ -42,8 +42,8 @@ export const AnalysisTab: React.FC<AnalysisTabProps> = ({
     return (
         <div className="space-y-8 pb-8">
             {analysis?.reasoning && (
-                <Card variant="premium" className="p-6 border-accent-primary/10 shadow-indigo-500/10">
-                    <h4 className="text-xs font-bold text-indigo-500 dark:text-indigo-400 mb-4">Insight</h4>
+                <Card variant="premium" className="p-6 border-accent-primary/10 shadow-neutral-500/10">
+                    <h4 className="text-xs font-bold text-neutral-500 dark:text-neutral-400 mb-4">Insight</h4>
                     <p className="text-xs text-neutral-600 dark:text-neutral-300 leading-relaxed font-medium">
                         {toSentenceCase(analysis.reasoning)}
                     </p>
@@ -51,19 +51,19 @@ export const AnalysisTab: React.FC<AnalysisTabProps> = ({
                         <div className="mt-6 pt-6 border-t border-neutral-100 dark:border-neutral-800/50">
                             <button
                                 onClick={() => openModal('UPGRADE', { initialView: 'compare' })}
-                                className="w-full group flex items-center justify-between gap-3 px-5 py-4 bg-gradient-to-r from-indigo-50 to-purple-50 dark:from-indigo-500/10 dark:to-purple-500/10 border border-indigo-100 dark:border-indigo-500/20 rounded-2xl hover:from-indigo-100 hover:to-purple-100 dark:hover:from-indigo-500/20 dark:hover:to-purple-500/20 transition-all"
+                                className="w-full group flex items-center justify-between gap-3 px-5 py-4 bg-gradient-to-r from-neutral-50 to-neutral-50 dark:from-neutral-500/10 dark:to-neutral-500/10 border border-neutral-100 dark:border-neutral-500/20 rounded-2xl hover:from-neutral-100 hover:to-neutral-100 dark:hover:from-neutral-500/20 dark:hover:to-neutral-500/20 transition-all"
                             >
                                 <div className="text-left">
-                                    <div className="text-xs font-black text-indigo-600 dark:text-indigo-400">
+                                    <div className="text-xs font-black text-neutral-600 dark:text-neutral-400">
                                         {analysis.compatibilityScore >= SCORE_THRESHOLDS.STRONG
                                             ? "Strong match — tailor your resume to close it."
                                             : analysis.compatibilityScore >= SCORE_THRESHOLDS.FAIR
                                                 ? "You're close. See which requirements to address."
                                                 : "Review the main requirements to address."}
                                     </div>
-                                    <div className="text-[10px] font-bold text-indigo-400 dark:text-indigo-500 mt-0.5 tracking-wide">Available with Plus</div>
+                                    <div className="text-[10px] font-bold text-neutral-400 dark:text-neutral-500 mt-0.5 tracking-wide">Available with Plus</div>
                                 </div>
-                                <Sparkles className="w-4 h-4 text-indigo-400 shrink-0 group-hover:scale-110 transition-transform" />
+                                <Sparkles className="w-4 h-4 text-neutral-400 shrink-0 group-hover:scale-110 transition-transform" />
                             </button>
                         </div>
                     )}
@@ -80,8 +80,8 @@ export const AnalysisTab: React.FC<AnalysisTabProps> = ({
                 </Card>
             ) : (
                 analysis?.distilledJob?.requiredSkills && analysis.distilledJob.requiredSkills.length > 0 && (
-                    <Card variant="premium" className="p-6 border-indigo-500/10 shadow-indigo-500/5">
-                        <h4 className="text-xs font-bold text-indigo-500 dark:text-indigo-400 mb-4">Skills</h4>
+                    <Card variant="premium" className="p-6 border-neutral-500/10 shadow-neutral-500/5">
+                        <h4 className="text-xs font-bold text-neutral-500 dark:text-neutral-400 mb-4">Skills</h4>
                         <div className="flex flex-wrap gap-2">
                             {analysis.distilledJob.requiredSkills.map((req: { name: string; level: 'learning' | 'comfortable' | 'expert' }, i: number) => {
                                 const mySkill = userSkills.find(s => s.name.toLowerCase().includes(req.name.toLowerCase()));
@@ -155,7 +155,7 @@ export const AnalysisTab: React.FC<AnalysisTabProps> = ({
             ) : null}
 
             <Card variant="glass" className="p-6">
-                <h4 className="text-xs font-bold text-indigo-500 dark:text-indigo-400 mb-6">Competencies</h4>
+                <h4 className="text-xs font-bold text-neutral-500 dark:text-neutral-400 mb-6">Competencies</h4>
                 <div className="flex flex-wrap gap-2">
                     {(analysis?.distilledJob?.keySkills || []).map((skill: string, i: number) => (
                         <SkillPill key={i} name={toTitleCase(skill)} variant="indigo" />
@@ -167,11 +167,11 @@ export const AnalysisTab: React.FC<AnalysisTabProps> = ({
             </Card>
 
             <Card variant="glass" className="p-6 border-neutral-200/50 dark:border-white/5">
-                <h4 className="text-xs font-bold text-indigo-500 dark:text-indigo-400 mb-4">Responsibilities</h4>
+                <h4 className="text-xs font-bold text-neutral-500 dark:text-neutral-400 mb-4">Responsibilities</h4>
                 <div className="space-y-3">
                     {(analysis?.distilledJob?.coreResponsibilities || []).map((resp: string, i: number) => (
                         <div key={i} className="flex gap-3 text-xs font-medium text-neutral-700 dark:text-neutral-300">
-                            <div className="w-1.5 h-1.5 rounded-full bg-indigo-400/50 mt-1.5 shrink-0" />
+                            <div className="w-1.5 h-1.5 rounded-full bg-neutral-400/50 mt-1.5 shrink-0" />
                             {toSentenceCase(resp)}
                         </div>
                     ))}

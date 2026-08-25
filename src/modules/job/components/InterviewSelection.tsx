@@ -62,7 +62,7 @@ export const InterviewSelection = ({ limitError, handleStartPractice, handleStar
                                 <ul className="space-y-3 pt-2">
                                     {['General or job-specific practice', 'STAR guidance when you need it', 'Feedback on each answer'].map(feature => (
                                         <li key={feature} className="flex items-center gap-3 text-[11px] font-bold text-neutral-400">
-                                            <div className="w-1.5 h-1.5 rounded-full bg-indigo-500" />
+                                            <div className="w-1.5 h-1.5 rounded-full bg-neutral-500" />
                                             {feature}
                                         </li>
                                     ))}

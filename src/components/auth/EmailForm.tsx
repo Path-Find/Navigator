@@ -32,7 +32,7 @@ export const EmailForm: React.FC<EmailFormProps> = ({
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
                         required
-                        className="w-full pl-14 pr-16 py-3.5 rounded-2xl border border-neutral-200 dark:border-neutral-700 bg-neutral-50 dark:bg-neutral-800/50 focus:bg-white dark:focus:bg-neutral-800 focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 outline-none transition-all text-neutral-900 dark:text-white"
+                        className="w-full pl-14 pr-16 py-3.5 rounded-2xl border border-neutral-200 dark:border-neutral-700 bg-neutral-50 dark:bg-neutral-800/50 focus:bg-white dark:focus:bg-neutral-800 focus:border-neutral-500 focus:ring-4 focus:ring-neutral-500/10 outline-none transition-all text-neutral-900 dark:text-white"
                         placeholder="you@email.com"
                     />
                     <div className="absolute inset-y-0 right-1.5 flex items-center">

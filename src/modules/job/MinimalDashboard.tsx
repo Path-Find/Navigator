@@ -54,8 +54,8 @@ export const MinimalDashboard: React.FC = () => {
                     </div>
 
                     <form onSubmit={handleQuickAnalyze} className="relative group">
-                        <div className="absolute inset-0 bg-indigo-500/5 blur-3xl rounded-full opacity-0 group-focus-within:opacity-100 transition-opacity" />
-                        <div className="relative flex items-center bg-white dark:bg-[#050505] border border-neutral-100 dark:border-neutral-900 rounded-2xl p-1 transition-all focus-within:border-indigo-500/50 shadow-2xl shadow-neutral-900/5">
+                        <div className="absolute inset-0 bg-neutral-500/5 blur-3xl rounded-full opacity-0 group-focus-within:opacity-100 transition-opacity" />
+                        <div className="relative flex items-center bg-white dark:bg-[#050505] border border-neutral-100 dark:border-neutral-900 rounded-2xl p-1 transition-all focus-within:border-neutral-500/50 shadow-2xl shadow-neutral-900/5">
                             <div className="pl-5 text-neutral-400">
                                 <Search className="w-5 h-5" />
                             </div>
@@ -88,10 +88,10 @@ export const MinimalDashboard: React.FC = () => {
                     >
                         <div className="flex items-center justify-between mb-8">
                             <h2 className="text-xs font-bold text-neutral-400 flex items-center gap-2">
-                                <Briefcase className="w-3.5 h-3.5 text-indigo-500" />
+                                <Briefcase className="w-3.5 h-3.5 text-neutral-500" />
                                 Active pipeline
                             </h2>
-                            <button onClick={() => navigate(ROUTES.HISTORY)} className="text-[10px] font-bold text-indigo-600 hover:underline">View all</button>
+                            <button onClick={() => navigate(ROUTES.HISTORY)} className="text-[10px] font-bold text-neutral-600 hover:underline">View all</button>
                         </div>
 
                         <div className="space-y-1 flex-1">
@@ -107,7 +107,7 @@ export const MinimalDashboard: React.FC = () => {
                                         className="w-full flex items-center gap-4 p-4 rounded-xl hover:bg-neutral-50 dark:hover:bg-neutral-900/50 transition-all group text-left border border-transparent hover:border-neutral-100 dark:hover:border-neutral-800"
                                     >
                                         <div className={`w-1.5 h-1.5 rounded-full shrink-0 ${
-                                            (job.analysis?.compatibilityScore ?? 0) >= 80 ? 'bg-emerald-500' : 'bg-indigo-500'
+                                            (job.analysis?.compatibilityScore ?? 0) >= 80 ? 'bg-emerald-500' : 'bg-neutral-500'
                                         }`} />
                                         <div className="flex-1 min-w-0">
                                             <div className="text-[11px] font-bold text-neutral-900 dark:text-white truncate">
@@ -142,7 +142,7 @@ export const MinimalDashboard: React.FC = () => {
                             </div>
                             <div className="grid grid-cols-2 gap-4">
                                 <button onClick={() => navigate(ROUTES.RESUMES)} className="p-4 rounded-2xl bg-neutral-50 dark:bg-neutral-900 border border-neutral-100 dark:border-neutral-800 text-left hover:scale-[1.02] transition-transform text-neutral-900 dark:text-white font-bold text-[10px] tracking-tight">
-                                    <FileText className="w-4 h-4 text-indigo-500 mb-3" />
+                                    <FileText className="w-4 h-4 text-neutral-500 mb-3" />
                                     Resumes
                                 </button>
                                 <button onClick={() => navigate(ROUTES.SETTINGS)} className="p-4 rounded-2xl bg-neutral-50 dark:bg-neutral-900 border border-neutral-100 dark:border-neutral-800 text-left hover:scale-[1.02] transition-transform text-neutral-900 dark:text-white font-bold text-[10px] tracking-tight">

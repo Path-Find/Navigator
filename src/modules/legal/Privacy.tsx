@@ -32,10 +32,10 @@ export const Privacy: React.FC = () => {
             title: 'We Don\'t Train on Your Work',
             description: "Navigator uses Google's Gemini API. Your data is not used to train Google's global models under the API terms we use.",
             colors: {
-                bg: 'bg-indigo-50/50 dark:bg-indigo-500/5',
-                text: 'text-indigo-600 dark:text-indigo-400',
-                accent: 'border-indigo-500/10 dark:border-indigo-500/20',
-                iconBg: 'bg-indigo-600',
+                bg: 'bg-neutral-50/50 dark:bg-neutral-500/5',
+                text: 'text-neutral-600 dark:text-neutral-400',
+                accent: 'border-neutral-500/10 dark:border-neutral-500/20',
+                iconBg: 'bg-neutral-600',
             },
             colSpan: 'md:col-span-1'
         },
@@ -58,10 +58,10 @@ export const Privacy: React.FC = () => {
             title: 'Syncs Safely',
             description: "When you sync across devices, your account data travels through encrypted connections and remains protected by account access controls.",
             colors: {
-                bg: 'bg-violet-50/50 dark:bg-violet-500/5',
-                text: 'text-violet-600 dark:text-violet-400',
-                accent: 'border-violet-500/10 dark:border-violet-500/20',
-                iconBg: 'bg-violet-600',
+                bg: 'bg-neutral-50/50 dark:bg-neutral-500/5',
+                text: 'text-neutral-600 dark:text-neutral-400',
+                accent: 'border-neutral-500/10 dark:border-neutral-500/20',
+                iconBg: 'bg-neutral-600',
             },
             colSpan: 'md:col-span-1'
         },

@@ -35,7 +35,7 @@ export const DropZone: React.FC<DropZoneProps> = ({
     const [isDragging, setIsDragging] = useState(false);
 
     const themes = {
-        indigo: 'border-indigo-500/50 bg-indigo-50/30 dark:bg-indigo-500/5 text-indigo-600',
+        indigo: 'border-neutral-500/50 bg-neutral-50/30 dark:bg-neutral-500/5 text-neutral-600',
         emerald: 'border-emerald-500/50 bg-emerald-50/30 dark:bg-emerald-500/5 text-emerald-600',
         amber: 'border-amber-500/50 bg-amber-50/30 dark:bg-amber-500/5 text-amber-600',
         rose: 'border-rose-500/50 bg-rose-50/30 dark:bg-rose-500/5 text-rose-600',
@@ -43,7 +43,7 @@ export const DropZone: React.FC<DropZoneProps> = ({
     };
 
     const iconColors = {
-        indigo: 'bg-indigo-100 dark:bg-indigo-500/20 text-indigo-600 dark:text-indigo-400',
+        indigo: 'bg-neutral-100 dark:bg-neutral-500/20 text-neutral-600 dark:text-neutral-400',
         emerald: 'bg-emerald-100 dark:bg-emerald-500/20 text-emerald-600 dark:text-emerald-400',
         amber: 'bg-amber-100 dark:bg-amber-500/20 text-amber-600 dark:text-amber-400',
         rose: 'bg-rose-100 dark:bg-rose-500/20 text-rose-600 dark:text-rose-400',
@@ -94,7 +94,7 @@ export const DropZone: React.FC<DropZoneProps> = ({
                 border
                 ${isDragging
                     ? themes[themeColor]
-                    : 'bg-white dark:bg-neutral-900/40 backdrop-blur-2xl border-neutral-200 dark:border-white/10 shadow-xl shadow-black/5 dark:shadow-none hover:shadow-2xl hover:shadow-indigo-500/10'
+                    : 'bg-white dark:bg-neutral-900/40 backdrop-blur-2xl border-neutral-200 dark:border-white/10 shadow-xl shadow-black/5 dark:shadow-none hover:shadow-2xl hover:shadow-neutral-500/10'
                 }
             `}>
                 {/* Ambient Background Glow for Card Variant */}
@@ -114,7 +114,7 @@ export const DropZone: React.FC<DropZoneProps> = ({
                                 ${isDragging
                                     ? iconColors[themeColor]
                                     : variant === 'card'
-                                        ? `${FEATURE_COLORS[themeColor]?.iconBg || 'bg-neutral-100 dark:bg-white/5'} ${FEATURE_COLORS[themeColor] ? 'text-white' : 'text-neutral-700 dark:text-neutral-300'} shadow-lg shadow-indigo-500/10 group-hover:scale-110 group-hover:rotate-6 transition-all duration-500 ease-out`
+                                        ? `${FEATURE_COLORS[themeColor]?.iconBg || 'bg-neutral-100 dark:bg-white/5'} ${FEATURE_COLORS[themeColor] ? 'text-white' : 'text-neutral-700 dark:text-neutral-300'} shadow-lg shadow-neutral-500/10 group-hover:scale-110 group-hover:rotate-6 transition-all duration-500 ease-out`
                                         : 'bg-neutral-100 dark:bg-neutral-800 text-neutral-400 group-hover:scale-110 group-hover:rotate-3 group-hover:bg-white dark:group-hover:bg-neutral-700 shadow-sm'
                                 }
                             `}>

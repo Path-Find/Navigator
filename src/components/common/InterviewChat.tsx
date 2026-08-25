@@ -50,7 +50,7 @@ export const InterviewChat: React.FC<InterviewChatProps> = ({
     showNextButton = false,
     onNext,
     inputDisabled = false,
-    accentGradient = "from-indigo-600 to-violet-600",
+    accentGradient = "from-neutral-600 to-neutral-600",
     hideInput = false
 }) => {
     const scrollRef = useRef<HTMLDivElement>(null);
@@ -121,7 +121,7 @@ export const InterviewChat: React.FC<InterviewChatProps> = ({
                                 <div className="space-y-3">
                                     <div className={`rounded-2xl px-4 py-3 shadow-sm relative overflow-hidden ${msg.role === 'ai'
                                         ? 'bg-white dark:bg-neutral-800 text-neutral-900 dark:text-white rounded-tl-none border border-neutral-100 dark:border-neutral-700'
-                                        : `bg-gradient-to-br ${accentGradient} text-white rounded-tr-none shadow-lg shadow-indigo-500/10`
+                                        : `bg-gradient-to-br ${accentGradient} text-white rounded-tr-none shadow-lg shadow-neutral-500/10`
                                         }`}>
                                         <p className="text-sm leading-relaxed whitespace-pre-wrap">{msg.content}</p>
                                     </div>
@@ -135,15 +135,15 @@ export const InterviewChat: React.FC<InterviewChatProps> = ({
                                                     onClick={pill.onClick}
                                                     className={pill.variant === 'action'
                                                         ? `flex flex-col items-start px-5 py-3 rounded-2xl border shadow-sm transition-all group ${pill.id === 'continue-interview'
-                                                            ? 'bg-indigo-600 border-indigo-600 text-white hover:bg-indigo-700'
-                                                            : 'bg-white dark:bg-neutral-900 border-neutral-200 dark:border-neutral-700 hover:border-indigo-500'}`
-                                                        : 'flex flex-col items-start px-3.5 py-1.5 bg-white dark:bg-neutral-900 border border-neutral-100 dark:border-neutral-800 rounded-xl hover:border-indigo-500 dark:hover:border-indigo-500/50 shadow-sm transition-all group'}
+                                                            ? 'bg-neutral-600 border-neutral-600 text-white hover:bg-neutral-700'
+                                                            : 'bg-white dark:bg-neutral-900 border-neutral-200 dark:border-neutral-700 hover:border-neutral-500'}`
+                                                        : 'flex flex-col items-start px-3.5 py-1.5 bg-white dark:bg-neutral-900 border border-neutral-100 dark:border-neutral-800 rounded-xl hover:border-neutral-500 dark:hover:border-neutral-500/50 shadow-sm transition-all group'}
                                                 >
-                                                    <span className={`font-bold group-hover:text-indigo-600 dark:group-hover:text-indigo-400 ${pill.variant === 'action' ? 'text-sm' : 'text-[11px]'} ${pill.id === 'continue-interview' ? 'text-white group-hover:text-white' : 'text-neutral-700 dark:text-neutral-200'}`}>
+                                                    <span className={`font-bold group-hover:text-neutral-600 dark:group-hover:text-neutral-400 ${pill.variant === 'action' ? 'text-sm' : 'text-[11px]'} ${pill.id === 'continue-interview' ? 'text-white group-hover:text-white' : 'text-neutral-700 dark:text-neutral-200'}`}>
                                                         {pill.label}
                                                     </span>
                                                     {pill.sublabel && (
-                                                        <span className={`text-[9px] ${pill.id === 'continue-interview' ? 'text-indigo-100' : 'text-neutral-400 dark:text-neutral-500'}`}>
+                                                        <span className={`text-[9px] ${pill.id === 'continue-interview' ? 'text-neutral-100' : 'text-neutral-400 dark:text-neutral-500'}`}>
                                                             {pill.sublabel}
                                                         </span>
                                                     )}
@@ -201,9 +201,9 @@ export const InterviewChat: React.FC<InterviewChatProps> = ({
                             </div>
                             <div className="bg-white dark:bg-neutral-800 p-3 rounded-xl rounded-tl-none border border-neutral-100 dark:border-neutral-700 shadow-sm flex items-center">
                                 <div className="flex gap-1.5">
-                                    <div className="w-1.5 h-1.5 rounded-full bg-indigo-400 animate-bounce [animation-delay:-0.3s]" />
-                                    <div className="w-1.5 h-1.5 rounded-full bg-indigo-400 animate-bounce [animation-delay:-0.15s]" />
-                                    <div className="w-1.5 h-1.5 rounded-full bg-indigo-400 animate-bounce" />
+                                    <div className="w-1.5 h-1.5 rounded-full bg-neutral-400 animate-bounce [animation-delay:-0.3s]" />
+                                    <div className="w-1.5 h-1.5 rounded-full bg-neutral-400 animate-bounce [animation-delay:-0.15s]" />
+                                    <div className="w-1.5 h-1.5 rounded-full bg-neutral-400 animate-bounce" />
                                 </div>
                             </div>
                         </div>
@@ -216,7 +216,7 @@ export const InterviewChat: React.FC<InterviewChatProps> = ({
                             initial={{ opacity: 0, y: 8 }}
                             animate={{ opacity: 1, y: 0 }}
                             onClick={onNext}
-                            className={`flex items-center gap-2 px-6 py-2.5 bg-gradient-to-r ${accentGradient} text-white rounded-full text-xs font-black tracking-widest shadow-lg shadow-indigo-500/20 active:scale-95 transition-all`}
+                            className={`flex items-center gap-2 px-6 py-2.5 bg-gradient-to-r ${accentGradient} text-white rounded-full text-xs font-black tracking-widest shadow-lg shadow-neutral-500/20 active:scale-95 transition-all`}
                         >
                             <span>Next Question</span>
                             <ArrowRight className="w-3.5 h-3.5" />
@@ -229,7 +229,7 @@ export const InterviewChat: React.FC<InterviewChatProps> = ({
             {!hideInput && (
                 <div className="px-4 pb-6 pt-2 bg-transparent">
                     <div className="relative group">
-                        <div className="absolute inset-0 bg-gradient-to-r from-indigo-500/5 to-violet-500/5 rounded-[2rem] blur-xl opacity-0 group-focus-within:opacity-100 transition-opacity" />
+                        <div className="absolute inset-0 bg-gradient-to-r from-neutral-500/5 to-neutral-500/5 rounded-[2rem] blur-xl opacity-0 group-focus-within:opacity-100 transition-opacity" />
                         <div className="relative flex flex-col gap-4">
                             <div className="relative">
                                 <textarea
@@ -238,14 +238,14 @@ export const InterviewChat: React.FC<InterviewChatProps> = ({
                                     onKeyDown={handleKeyDown}
                                     disabled={inputDisabled}
                                     placeholder={placeholder}
-                                    className="w-full bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-700 rounded-3xl p-4 pr-20 text-sm text-neutral-900 dark:text-white font-medium placeholder:text-neutral-400 focus:ring-4 focus:ring-indigo-500/10 focus:border-indigo-500/30 disabled:opacity-50 disabled:bg-neutral-100 dark:disabled:bg-neutral-800 transition-all shadow-sm min-h-[80px] leading-relaxed"
+                                    className="w-full bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-700 rounded-3xl p-4 pr-20 text-sm text-neutral-900 dark:text-white font-medium placeholder:text-neutral-400 focus:ring-4 focus:ring-neutral-500/10 focus:border-neutral-500/30 disabled:opacity-50 disabled:bg-neutral-100 dark:disabled:bg-neutral-800 transition-all shadow-sm min-h-[80px] leading-relaxed"
                                 />
 
                                 <div className="absolute right-2.5 bottom-2.5 flex items-center gap-3">
                                     <button
                                         onClick={onSubmit}
                                         disabled={!inputValue.trim() || inputDisabled}
-                                        className="w-9 h-9 rounded-full flex items-center justify-center transition-all disabled:opacity-30 bg-indigo-600 hover:bg-indigo-700 text-white shadow-lg shadow-indigo-500/20 active:scale-95"
+                                        className="w-9 h-9 rounded-full flex items-center justify-center transition-all disabled:opacity-30 bg-neutral-600 hover:bg-neutral-700 text-white shadow-lg shadow-neutral-500/20 active:scale-95"
                                     >
                                         <Send className="w-4 h-4" />
                                     </button>

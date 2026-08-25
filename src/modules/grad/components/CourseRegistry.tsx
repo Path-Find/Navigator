@@ -128,12 +128,12 @@ export const CourseRegistry: React.FC<CourseRegistryProps> = ({
 
                                                 <div className="flex items-center gap-4 flex-1 min-w-0">
                                                     <div className="flex flex-col items-center justify-center min-w-[60px] py-1 border-r border-neutral-100 dark:border-white/5 pr-3">
-                                                        <span className="text-xs font-bold text-indigo-600 dark:text-indigo-400">
+                                                        <span className="text-xs font-bold text-neutral-600 dark:text-neutral-400">
                                                             {c.code}
                                                         </span>
                                                     </div>
                                                     <div className="flex-1 truncate">
-                                                        <h5 className="text-sm font-semibold text-neutral-900 dark:text-white truncate group-hover/course:text-indigo-600 transition-colors">{c.title}</h5>
+                                                        <h5 className="text-sm font-semibold text-neutral-900 dark:text-white truncate group-hover/course:text-neutral-600 transition-colors">{c.title}</h5>
                                                         <div className="flex items-center gap-2">
                                                             <span className="text-[10px] font-medium text-neutral-400">{c.credits || 3.0} Credits</span>
                                                             {c.term && (
@@ -166,7 +166,7 @@ export const CourseRegistry: React.FC<CourseRegistryProps> = ({
                                         {sem.courses.length === 0 && (
                                             <div
                                                 onClick={() => addCourse(i)}
-                                                className="flex flex-col items-center justify-center py-6 text-neutral-400 hover:text-indigo-500 cursor-pointer transition-colors"
+                                                className="flex flex-col items-center justify-center py-6 text-neutral-400 hover:text-neutral-500 cursor-pointer transition-colors"
                                             >
                                                 <div className="w-8 h-8 rounded-full bg-neutral-100 dark:bg-neutral-800 flex items-center justify-center mb-2">
                                                     <Plus className="w-4 h-4 opacity-30" />

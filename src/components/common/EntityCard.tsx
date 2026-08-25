@@ -36,7 +36,7 @@ export const EntityCard: React.FC<EntityCardProps> = ({
 }) => {
     const getScoreColor = (s: number) => {
         if (s >= 90) return 'text-green-600 bg-green-50 border-green-100';
-        if (s >= 70) return 'text-indigo-600 bg-indigo-50 border-indigo-100';
+        if (s >= 70) return 'text-neutral-600 bg-neutral-50 border-neutral-100';
         if (s >= 50) return 'text-yellow-600 bg-yellow-50 border-yellow-100';
         return 'text-red-600 bg-red-50 border-red-100';
     };
@@ -49,22 +49,22 @@ export const EntityCard: React.FC<EntityCardProps> = ({
             onClick={() => !isAnalyzing && onClick?.()}
             className={`group relative bg-white dark:bg-neutral-900 rounded-[2rem] p-6 border border-neutral-200 dark:border-neutral-800 shadow-sm transition-all duration-300 flex flex-col h-full
                 ${isAnalyzing
-                    ? 'opacity-90 border-indigo-100 dark:border-indigo-900/30'
+                    ? 'opacity-90 border-neutral-100 dark:border-neutral-900/30'
                     : isError
                         ? 'border-red-100 bg-red-50/10 hover:border-red-200 hover:shadow-red-500/5 cursor-pointer'
-                        : 'hover:shadow-xl hover:shadow-indigo-500/5 hover:-translate-y-1 cursor-pointer hover:border-indigo-200 dark:hover:border-indigo-800'
+                        : 'hover:shadow-xl hover:shadow-neutral-500/5 hover:-translate-y-1 cursor-pointer hover:border-neutral-200 dark:hover:border-neutral-800'
                 }`}
         >
             {/* Card Header: Icon & Status */}
             <div className="flex justify-between items-start mb-4">
                 <div className={`w-12 h-12 rounded-2xl flex items-center justify-center text-xl font-bold
                     ${isAnalyzing
-                        ? 'bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 animate-pulse'
+                        ? 'bg-neutral-50 dark:bg-neutral-900/30 text-neutral-600 animate-pulse'
                         : isError
                             ? 'bg-red-50 dark:bg-red-900/30 text-red-600'
                             : variant === 'role-model'
                                 ? 'bg-emerald-50 dark:bg-emerald-900/30 text-emerald-600'
-                                : 'bg-gradient-to-br from-indigo-50 to-blue-50 dark:from-indigo-900/30 dark:to-blue-900/30 text-indigo-600'
+                                : 'bg-gradient-to-br from-neutral-50 to-blue-50 dark:from-neutral-900/30 dark:to-blue-900/30 text-neutral-600'
                     }`}>
                     {isAnalyzing ? <Loader2 className="w-6 h-6 animate-spin" /> :
                         isError ? <AlertCircle className="w-6 h-6" /> :
@@ -106,7 +106,7 @@ export const EntityCard: React.FC<EntityCardProps> = ({
                     </div>
                 ) : (
                     <>
-                        <h3 className={`text-lg font-bold text-neutral-900 dark:text-white transition-colors line-clamp-2 mb-1 ${variant === 'role-model' ? 'group-hover:text-emerald-600' : 'group-hover:text-indigo-600'}`} title={title}>
+                        <h3 className={`text-lg font-bold text-neutral-900 dark:text-white transition-colors line-clamp-2 mb-1 ${variant === 'role-model' ? 'group-hover:text-emerald-600' : 'group-hover:text-neutral-600'}`} title={title}>
                             {title}
                         </h3>
                         <div className="flex items-center gap-2 text-sm font-medium text-neutral-500 dark:text-neutral-400 mb-4">
@@ -150,7 +150,7 @@ export const EntityCard: React.FC<EntityCardProps> = ({
                     {!isAnalyzing && (
                         <div className={`p-2 rounded-xl transition-colors ${isError ? 'text-red-400 bg-red-50 dark:bg-red-900/20' :
                             variant === 'role-model' ? 'text-emerald-600 bg-emerald-50 dark:bg-emerald-900/20 group-hover:bg-emerald-100 dark:group-hover:bg-emerald-900/40' :
-                                'text-indigo-600 bg-indigo-50 dark:bg-indigo-900/20 group-hover:bg-indigo-100 dark:group-hover:bg-indigo-900/40'}`}>
+                                'text-neutral-600 bg-neutral-50 dark:bg-neutral-900/20 group-hover:bg-neutral-100 dark:group-hover:bg-neutral-900/40'}`}>
                             <ArrowRight className="w-4 h-4" />
                         </div>
                     )}

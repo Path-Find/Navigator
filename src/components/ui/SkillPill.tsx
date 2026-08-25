@@ -18,7 +18,7 @@ export const SkillPill: React.FC<SkillPillProps> = ({ name, proficiency, variant
                 ? 'border-orange-200 dark:border-orange-800/50'
                 : 'border-neutral-200 dark:border-neutral-800'
         : variant === 'indigo'
-            ? 'border-indigo-200 dark:border-indigo-800/50'
+            ? 'border-neutral-200 dark:border-neutral-800/50'
             : 'border-neutral-200 dark:border-neutral-800';
 
     const dotColor = proficiency
@@ -28,7 +28,7 @@ export const SkillPill: React.FC<SkillPillProps> = ({ name, proficiency, variant
                 ? 'bg-orange-500 shadow-[0_0_8px_rgba(249,115,22,0.4)]'
                 : 'bg-neutral-300 dark:bg-neutral-600'
         : variant === 'indigo'
-            ? 'bg-indigo-300 dark:bg-indigo-600'
+            ? 'bg-neutral-300 dark:bg-neutral-600'
             : 'bg-neutral-300 dark:bg-neutral-600';
 
     return (

@@ -60,12 +60,12 @@ export const SkillExtractor: React.FC<SkillExtractorProps> = ({ transcript, onAd
     };
 
     return (
-        <div className="bg-white/70 dark:bg-neutral-800/70 backdrop-blur-xl rounded-3xl border border-white/50 dark:border-neutral-700/50 p-8 shadow-2xl shadow-violet-500/5 relative overflow-hidden group">
-            <div className="absolute top-0 right-0 -mr-16 -mt-16 w-64 h-64 bg-violet-500/5 rounded-full blur-3xl group-hover:bg-violet-500/10 transition-colors duration-700" />
+        <div className="bg-white/70 dark:bg-neutral-800/70 backdrop-blur-xl rounded-3xl border border-white/50 dark:border-neutral-700/50 p-8 shadow-2xl shadow-neutral-500/5 relative overflow-hidden group">
+            <div className="absolute top-0 right-0 -mr-16 -mt-16 w-64 h-64 bg-neutral-500/5 rounded-full blur-3xl group-hover:bg-neutral-500/10 transition-colors duration-700" />
 
             <div className="flex items-center justify-between mb-8 relative">
                 <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 bg-violet-600 text-white rounded-2xl flex items-center justify-center shadow-lg shadow-violet-500/30">
+                    <div className="w-12 h-12 bg-neutral-600 text-white rounded-2xl flex items-center justify-center shadow-lg shadow-neutral-500/30">
                         <Award className="w-6 h-6" />
                     </div>
                     <div>
@@ -83,7 +83,7 @@ export const SkillExtractor: React.FC<SkillExtractorProps> = ({ transcript, onAd
                     <button
                         onClick={handleExtraction}
                         disabled={isAnalyzing}
-                        className="px-8 py-4 bg-violet-600 hover:bg-violet-700 text-white rounded-2xl font-black transition-all shadow-xl shadow-violet-500/30 flex items-center gap-2 mx-auto active:scale-95 disabled:opacity-50"
+                        className="px-8 py-4 bg-neutral-600 hover:bg-neutral-700 text-white rounded-2xl font-black transition-all shadow-xl shadow-neutral-500/30 flex items-center gap-2 mx-auto active:scale-95 disabled:opacity-50"
                     >
                         {isAnalyzing ? (
                             <>
@@ -106,7 +106,7 @@ export const SkillExtractor: React.FC<SkillExtractorProps> = ({ transcript, onAd
                         <button
                             onClick={handleSave}
                             disabled={isSaving || extractedSkills.filter(s => s.selected).length === 0}
-                            className="bg-violet-600 hover:bg-violet-700 text-white px-6 py-2.5 rounded-xl text-xs font-black disabled:opacity-50 flex items-center gap-2 transition-all active:scale-95"
+                            className="bg-neutral-600 hover:bg-neutral-700 text-white px-6 py-2.5 rounded-xl text-xs font-black disabled:opacity-50 flex items-center gap-2 transition-all active:scale-95"
                         >
                             {isSaving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Plus className="w-4 h-4" />}
                             Store in Vault
@@ -116,7 +116,7 @@ export const SkillExtractor: React.FC<SkillExtractorProps> = ({ transcript, onAd
                     {/* Hard Skills */}
                     <div className="space-y-4">
                         <h4 className="text-[11px] font-black text-neutral-400 uppercase tracking-[0.2em] flex items-center gap-2 pl-2">
-                            <div className="p-1 bg-violet-100 text-violet-600 rounded">
+                            <div className="p-1 bg-neutral-100 text-neutral-600 rounded">
                                 <Hammer className="w-3 h-3" />
                             </div>
                             Technical Mastery
@@ -156,8 +156,8 @@ const SkillCard: React.FC<{ skill: ExtractedSkill; idx: number; toggleSkill: (i:
     <div
         onClick={() => toggleSkill(idx)}
         className={`p-5 rounded-[2rem] border-2 cursor-pointer transition-all flex items-start gap-4 group relative overflow-hidden ${skill.selected
-            ? 'bg-violet-600 border-violet-500 text-white shadow-xl shadow-violet-500/20'
-            : 'bg-white dark:bg-neutral-900 border-neutral-100 dark:border-neutral-800 opacity-60 hover:opacity-100 hover:border-violet-200'
+            ? 'bg-neutral-600 border-neutral-500 text-white shadow-xl shadow-neutral-500/20'
+            : 'bg-white dark:bg-neutral-900 border-neutral-100 dark:border-neutral-800 opacity-60 hover:opacity-100 hover:border-neutral-200'
             }`}
     >
         {skill.selected && (
@@ -165,7 +165,7 @@ const SkillCard: React.FC<{ skill: ExtractedSkill; idx: number; toggleSkill: (i:
         )}
 
         <div className={`w-6 h-6 rounded-full flex items-center justify-center border-2 mt-0.5 transition-all ${skill.selected
-            ? 'bg-white border-white text-violet-600'
+            ? 'bg-white border-white text-neutral-600'
             : 'border-neutral-200 dark:border-neutral-700'
             }`}>
             {skill.selected && <Check className="w-4 h-4 scale-110 font-black" />}

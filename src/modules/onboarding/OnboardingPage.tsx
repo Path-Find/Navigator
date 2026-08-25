@@ -233,8 +233,8 @@ export const OnboardingPage: React.FC = () => {
         <div className="min-h-screen bg-neutral-50 dark:bg-neutral-900 flex items-center justify-center p-4">
             {/* Simple Background Decor */}
             <div className="fixed inset-0 overflow-hidden pointer-events-none">
-                <div className="absolute top-0 left-1/4 w-96 h-96 bg-indigo-500/10 rounded-full blur-3xl mix-blend-multiply dark:mix-blend-screen animate-blob" />
-                <div className="absolute top-0 right-1/4 w-96 h-96 bg-violet-500/10 rounded-full blur-3xl mix-blend-multiply dark:mix-blend-screen animate-blob animation-delay-2000" />
+                <div className="absolute top-0 left-1/4 w-96 h-96 bg-neutral-500/10 rounded-full blur-3xl mix-blend-multiply dark:mix-blend-screen animate-blob" />
+                <div className="absolute top-0 right-1/4 w-96 h-96 bg-neutral-500/10 rounded-full blur-3xl mix-blend-multiply dark:mix-blend-screen animate-blob animation-delay-2000" />
                 <div className="absolute bottom-0 left-1/3 w-96 h-96 bg-pink-500/10 rounded-full blur-3xl mix-blend-multiply dark:mix-blend-screen animate-blob animation-delay-4000" />
             </div>
 
@@ -254,9 +254,9 @@ export const OnboardingPage: React.FC = () => {
                                 <div
                                     key={s}
                                     className={`h-1.5 rounded-full transition-all duration-500 ${s === step
-                                        ? 'w-8 bg-gradient-to-r from-indigo-600 to-violet-600'
+                                        ? 'w-8 bg-gradient-to-r from-neutral-600 to-neutral-600'
                                         : thisStepIndex < currentStepIndex
-                                            ? 'w-2 bg-indigo-200 dark:bg-indigo-900'
+                                            ? 'w-2 bg-neutral-200 dark:bg-neutral-900'
                                             : 'w-2 bg-neutral-100 dark:bg-neutral-800'
                                         }`}
                                 />

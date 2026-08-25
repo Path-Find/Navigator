@@ -319,7 +319,7 @@ const JobMatchInput: React.FC = () => {
                 <div className="space-y-4 animate-in fade-in slide-in-from-bottom-4 mb-12">
                     <div className="relative">
                         <textarea
-                            className={`w-full h-64 p-4 text-sm bg-white dark:bg-neutral-900 border-2 rounded-2xl focus:outline-none focus:ring-4 focus:ring-indigo-50/50 dark:focus:ring-indigo-900/30 transition-all resize-none text-neutral-900 dark:text-neutral-100 placeholder:text-neutral-400 ${error ? 'border-red-300 focus:border-red-500' : 'border-neutral-200 dark:border-neutral-700 focus:border-indigo-500'}`}
+                            className={`w-full h-64 p-4 text-sm bg-white dark:bg-neutral-900 border-2 rounded-2xl focus:outline-none focus:ring-4 focus:ring-neutral-50/50 dark:focus:ring-neutral-900/30 transition-all resize-none text-neutral-900 dark:text-neutral-100 placeholder:text-neutral-400 ${error ? 'border-red-300 focus:border-red-500' : 'border-neutral-200 dark:border-neutral-700 focus:border-neutral-500'}`}
                             placeholder="Paste the job description here..."
                             value={manualDescription}
                             onChange={(e) => setManualDescription(e.target.value)}
@@ -367,7 +367,7 @@ const JobMatchInput: React.FC = () => {
                                 <ul className="space-y-3 pt-4">
                                     {['Fit Score Breakdown', 'Missing Keywords', 'Red Flag Detection'].map(item => (
                                         <li key={item} className="flex items-center gap-3 text-xs font-bold text-neutral-400">
-                                            <div className="w-1 h-1 rounded-full bg-indigo-500" />
+                                            <div className="w-1 h-1 rounded-full bg-neutral-500" />
                                             {item}
                                         </li>
                                     ))}
@@ -388,7 +388,7 @@ const JobMatchInput: React.FC = () => {
                                 <ul className="space-y-3 pt-4">
                                     {['Skill Pattern Analysis', 'Seniority Detection', 'Culture Signals'].map(item => (
                                         <li key={item} className="flex items-center gap-3 text-xs font-bold text-neutral-400">
-                                            <div className="w-1 h-1 rounded-full bg-violet-500" />
+                                            <div className="w-1 h-1 rounded-full bg-neutral-500" />
                                             {item}
                                         </li>
                                     ))}

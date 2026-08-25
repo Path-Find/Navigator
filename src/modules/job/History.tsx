@@ -60,7 +60,7 @@ export default function History() {
     const getStatusParams = (status?: SavedJob['status']) => {
         switch (status) {
             case 'offer': return { label: 'Offer', color: 'bg-green-100 text-green-700 border-green-200 dark:bg-green-900/30 dark:text-green-400 dark:border-green-800' };
-            case 'interview': return { label: 'Interview', color: 'bg-purple-100 text-purple-700 border-purple-200 dark:bg-purple-900/30 dark:text-purple-400 dark:border-purple-800' };
+            case 'interview': return { label: 'Interview', color: 'bg-neutral-100 text-neutral-700 border-neutral-200 dark:bg-neutral-900/30 dark:text-neutral-400 dark:border-neutral-800' };
             case 'rejected': return { label: 'Rejected', color: 'bg-rose-100 text-rose-700 border-rose-200 dark:bg-rose-900/30 dark:text-rose-400 dark:border-rose-800' };
             case 'ghosted': return { label: 'Ghosted', color: 'bg-neutral-100 text-neutral-500 border-neutral-200 dark:bg-neutral-800 dark:text-neutral-400 dark:border-neutral-700' };
             case 'applied': return { label: 'Applied', color: 'bg-blue-100 text-blue-700 border-blue-200 dark:bg-blue-900/30 dark:text-blue-400 dark:border-blue-800' };
@@ -104,7 +104,7 @@ export default function History() {
                             <select
                                 value={statusFilter}
                                 onChange={(e) => setStatusFilter(e.target.value as StatusFilter)}
-                                className="h-10 pl-3 pr-8 text-xs font-bold rounded-2xl border border-neutral-200/50 dark:border-neutral-800 bg-neutral-100/50 dark:bg-neutral-900/40 text-neutral-700 dark:text-neutral-300 appearance-none cursor-pointer focus:outline-none focus:ring-2 focus:ring-indigo-500/20 transition-colors"
+                                className="h-10 pl-3 pr-8 text-xs font-bold rounded-2xl border border-neutral-200/50 dark:border-neutral-800 bg-neutral-100/50 dark:bg-neutral-900/40 text-neutral-700 dark:text-neutral-300 appearance-none cursor-pointer focus:outline-none focus:ring-2 focus:ring-neutral-500/20 transition-colors"
                             >
                                 {FILTER_OPTIONS.map(opt => {
                                     const count = getCount(opt.id);
@@ -124,7 +124,7 @@ export default function History() {
             {/* Content */}
             <div className="space-y-4">
                 {jobs.length === 0 ? (
-                    <div className="card-premium p-12 text-center space-y-8 max-w-2xl mx-auto shadow-2xl shadow-indigo-500/5 border-neutral-100 dark:border-white/5">
+                    <div className="card-premium p-12 text-center space-y-8 max-w-2xl mx-auto shadow-2xl shadow-neutral-500/5 border-neutral-100 dark:border-white/5">
                         <div className="w-20 h-20 bg-gradient-to-br from-neutral-50 to-neutral-100 dark:from-neutral-800 dark:to-neutral-900 rounded-[2rem] flex items-center justify-center mx-auto mb-4 shadow-inner">
                             <Clock className="w-10 h-10 text-neutral-300 dark:text-neutral-600" />
                         </div>

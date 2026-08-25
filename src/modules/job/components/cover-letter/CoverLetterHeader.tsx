@@ -26,7 +26,7 @@ export const CoverLetterHeader: React.FC<CoverLetterHeaderProps> = ({
 }) => {
     return (
         <div className="p-6 border-b border-neutral-100 dark:border-white/5 flex justify-between items-start bg-white dark:bg-neutral-900/50">
-            <h3 className="text-xs font-bold text-indigo-500 dark:text-indigo-400">Cover Letter</h3>
+            <h3 className="text-xs font-bold text-neutral-500 dark:text-neutral-400">Cover Letter</h3>
             <div className="flex items-center gap-2">
                 {coverLetter && (
                     <>

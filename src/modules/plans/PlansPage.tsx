@@ -124,7 +124,7 @@ export const PlansPage: React.FC = () => {
             className="relative overflow-hidden bg-white dark:bg-[#0a0a0a] min-h-screen pb-20"
         >
             {/* Ambient Background Elements */}
-            <div className="absolute top-0 left-1/4 w-[500px] h-[500px] bg-indigo-500/10 rounded-full blur-[120px] -z-10 animate-pulse" />
+            <div className="absolute top-0 left-1/4 w-[500px] h-[500px] bg-neutral-500/10 rounded-full blur-[120px] -z-10 animate-pulse" />
             <div className="absolute bottom-0 right-1/4 w-[500px] h-[500px] bg-emerald-500/10 rounded-full blur-[120px] -z-10 animate-pulse-slow" />
 
             <div className="max-w-6xl mx-auto relative z-10 px-4 sm:px-6">
@@ -136,7 +136,7 @@ export const PlansPage: React.FC = () => {
                 />
 
                 <div className="flex flex-wrap justify-center items-center gap-8 mb-16 -mt-4 animate-in fade-in slide-in-from-top-4 duration-700">
-                    <div className="inline-flex items-center gap-2 px-4 py-2 bg-indigo-50 dark:bg-indigo-900/40 border border-indigo-100 dark:border-indigo-800 rounded-2xl text-indigo-600 dark:text-indigo-400 text-xs font-bold">
+                    <div className="inline-flex items-center gap-2 px-4 py-2 bg-neutral-50 dark:bg-neutral-900/40 border border-neutral-100 dark:border-neutral-800 rounded-2xl text-neutral-600 dark:text-neutral-400 text-xs font-bold">
                         <Zap className="w-4 h-4" />
                         Navigator is currently invite-only
                     </div>
@@ -194,7 +194,7 @@ export const PlansPage: React.FC = () => {
                         <div className="flex items-center shrink-0">
                             <Link
                                 to={ROUTES.FEATURES}
-                                className="group flex items-center gap-2 text-sm font-bold text-neutral-400 hover:text-indigo-500 dark:hover:text-indigo-400 transition-colors"
+                                className="group flex items-center gap-2 text-sm font-bold text-neutral-400 hover:text-neutral-500 dark:hover:text-neutral-400 transition-colors"
                             >
                                 Explore all features
                                 <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
@@ -265,8 +265,8 @@ export const PlansPage: React.FC = () => {
                 className="mt-24 pt-12 border-t border-neutral-100 dark:border-neutral-800 grid grid-cols-1 md:grid-cols-3 gap-12 max-w-6xl mx-auto px-4 sm:px-6"
             >
                 <div className="flex gap-4 items-start text-left">
-                    <div className="w-10 h-10 rounded-xl bg-indigo-500/10 flex items-center justify-center shrink-0">
-                        <Zap className="w-5 h-5 text-indigo-500" />
+                    <div className="w-10 h-10 rounded-xl bg-neutral-500/10 flex items-center justify-center shrink-0">
+                        <Zap className="w-5 h-5 text-neutral-500" />
                     </div>
                     <div>
                         <h4 className="font-bold text-neutral-900 dark:text-white mb-1">Instant Activation</h4>

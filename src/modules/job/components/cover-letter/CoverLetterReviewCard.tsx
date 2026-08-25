@@ -23,7 +23,7 @@ export const CoverLetterReviewCard: React.FC<CoverLetterReviewCardProps> = ({
                     <button
                         onClick={handleRunCritique}
                         disabled={generating}
-                        className="text-[10px] font-black text-indigo-600 hover:underline"
+                        className="text-[10px] font-black text-neutral-600 hover:underline"
                     >
                         Rerun Review
                     </button>
@@ -53,7 +53,7 @@ export const CoverLetterReviewCard: React.FC<CoverLetterReviewCardProps> = ({
                         <div className="grid gap-3">
                             {critique.feedback.map((f: string, i: number) => (
                                 <div key={i} className="text-xs font-bold leading-relaxed text-neutral-700 dark:text-neutral-300 bg-neutral-50 dark:bg-neutral-800/50 p-4 rounded-2xl border border-neutral-100 dark:border-white/5 flex gap-4">
-                                    <div className="w-1.5 h-1.5 rounded-full bg-indigo-500/30 mt-1.5 shrink-0" />
+                                    <div className="w-1.5 h-1.5 rounded-full bg-neutral-500/30 mt-1.5 shrink-0" />
                                     {f}
                                 </div>
                             ))}

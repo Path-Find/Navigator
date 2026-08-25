@@ -237,11 +237,11 @@ export const CandidateProfileContextManager: React.FC = () => {
     };
 
     return (
-        <section className="mt-12 bg-white dark:bg-neutral-900/50 rounded-3xl border border-indigo-100 dark:border-indigo-500/20 p-8 shadow-sm">
+        <section className="mt-12 bg-white dark:bg-neutral-900/50 rounded-3xl border border-neutral-100 dark:border-neutral-500/20 p-8 shadow-sm">
             <div className="flex flex-col gap-5 sm:flex-row sm:items-start sm:justify-between">
                 <div className="flex items-start gap-3">
-                    <div className="p-2 bg-violet-500/10 rounded-xl">
-                        <Sparkles className="w-5 h-5 text-violet-500" />
+                    <div className="p-2 bg-neutral-500/10 rounded-xl">
+                        <Sparkles className="w-5 h-5 text-neutral-500" />
                     </div>
                     <div>
                         <h4 className="font-bold text-neutral-900 dark:text-white tracking-tight">Application preferences</h4>
@@ -253,7 +253,7 @@ export const CandidateProfileContextManager: React.FC = () => {
 
             </div>
 
-            <div className="mt-8 pt-6 border-t border-indigo-100/70 dark:border-indigo-500/10">
+            <div className="mt-8 pt-6 border-t border-neutral-100/70 dark:border-neutral-500/10">
                 <div className="flex items-start justify-between gap-4 mb-4">
                     <div>
                         <h5 className="text-sm font-semibold text-neutral-700 dark:text-neutral-300">Availability</h5>
@@ -265,7 +265,7 @@ export const CandidateProfileContextManager: React.FC = () => {
                         variant="subtle"
                         size="sm"
                         onClick={() => { void handleSaveAvailability(); }}
-                        className="shrink-0 !text-indigo-600 dark:!text-indigo-300 !border-indigo-100 dark:!border-indigo-500/20"
+                        className="shrink-0 !text-neutral-600 dark:!text-neutral-300 !border-neutral-100 dark:!border-neutral-500/20"
                     >
                         Save availability
                     </Button>
@@ -278,7 +278,7 @@ export const CandidateProfileContextManager: React.FC = () => {
                             onChange={event => setAvailabilityCity(event.target.value)}
                             placeholder="e.g. Toronto"
                             maxLength={80}
-                            className="mt-2 w-full bg-indigo-50/40 dark:bg-indigo-500/5 border border-indigo-100 dark:border-indigo-500/20 rounded-xl px-3 py-3 text-sm font-medium text-neutral-900 dark:text-white focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all"
+                            className="mt-2 w-full bg-neutral-50/40 dark:bg-neutral-500/5 border border-neutral-100 dark:border-neutral-500/20 rounded-xl px-3 py-3 text-sm font-medium text-neutral-900 dark:text-white focus:ring-2 focus:ring-neutral-500/20 focus:border-neutral-500 outline-none transition-all"
                         />
                     </label>
                     <label className="text-xs font-bold text-neutral-600 dark:text-neutral-300">
@@ -286,7 +286,7 @@ export const CandidateProfileContextManager: React.FC = () => {
                         <select
                             value={relocation}
                             onChange={event => setRelocation(event.target.value as CandidateRelocationPreference)}
-                            className="mt-2 w-full bg-indigo-50/40 dark:bg-indigo-500/5 border border-indigo-100 dark:border-indigo-500/20 rounded-xl px-3 py-3 text-sm font-bold text-neutral-900 dark:text-white focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all"
+                            className="mt-2 w-full bg-neutral-50/40 dark:bg-neutral-500/5 border border-neutral-100 dark:border-neutral-500/20 rounded-xl px-3 py-3 text-sm font-bold text-neutral-900 dark:text-white focus:ring-2 focus:ring-neutral-500/20 focus:border-neutral-500 outline-none transition-all"
                         >
                             {RELOCATION_OPTIONS.map(option => <option key={option.value} value={option.value}>{option.label}</option>)}
                         </select>
@@ -295,12 +295,12 @@ export const CandidateProfileContextManager: React.FC = () => {
                         <legend className="text-xs font-bold text-neutral-600 dark:text-neutral-300 mb-2">Work arrangement</legend>
                         <div className="flex flex-wrap gap-2">
                             {WORK_ARRANGEMENT_OPTIONS.map(option => (
-                                <label key={option.value} className="inline-flex items-center gap-2 rounded-xl border border-indigo-100 dark:border-indigo-500/20 bg-indigo-50/40 dark:bg-indigo-500/5 px-3 py-2 text-xs text-neutral-700 dark:text-neutral-200 cursor-pointer">
+                                <label key={option.value} className="inline-flex items-center gap-2 rounded-xl border border-neutral-100 dark:border-neutral-500/20 bg-neutral-50/40 dark:bg-neutral-500/5 px-3 py-2 text-xs text-neutral-700 dark:text-neutral-200 cursor-pointer">
                                     <input
                                         type="checkbox"
                                         checked={workArrangements.includes(option.value)}
                                         onChange={() => setWorkArrangements(current => toggleOption(current, option.value))}
-                                        className="accent-indigo-600"
+                                        className="accent-neutral-600"
                                     />
                                     {option.label}
                                 </label>
@@ -311,12 +311,12 @@ export const CandidateProfileContextManager: React.FC = () => {
                         <legend className="text-xs font-bold text-neutral-600 dark:text-neutral-300 mb-2">Employment type</legend>
                         <div className="flex flex-wrap gap-2">
                             {EMPLOYMENT_TYPE_OPTIONS.map(option => (
-                                <label key={option.value} className="inline-flex items-center gap-2 rounded-xl border border-indigo-100 dark:border-indigo-500/20 bg-indigo-50/40 dark:bg-indigo-500/5 px-3 py-2 text-xs text-neutral-700 dark:text-neutral-200 cursor-pointer">
+                                <label key={option.value} className="inline-flex items-center gap-2 rounded-xl border border-neutral-100 dark:border-neutral-500/20 bg-neutral-50/40 dark:bg-neutral-500/5 px-3 py-2 text-xs text-neutral-700 dark:text-neutral-200 cursor-pointer">
                                     <input
                                         type="checkbox"
                                         checked={employmentTypes.includes(option.value)}
                                         onChange={() => setEmploymentTypes(current => toggleOption(current, option.value))}
-                                        className="accent-indigo-600"
+                                        className="accent-neutral-600"
                                     />
                                     {option.label}
                                 </label>
@@ -328,7 +328,7 @@ export const CandidateProfileContextManager: React.FC = () => {
                         <select
                             value={startTiming}
                             onChange={event => setStartTiming(event.target.value as CandidateStartTiming)}
-                            className="mt-2 w-full bg-indigo-50/40 dark:bg-indigo-500/5 border border-indigo-100 dark:border-indigo-500/20 rounded-xl px-3 py-3 text-sm font-bold text-neutral-900 dark:text-white focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all"
+                            className="mt-2 w-full bg-neutral-50/40 dark:bg-neutral-500/5 border border-neutral-100 dark:border-neutral-500/20 rounded-xl px-3 py-3 text-sm font-bold text-neutral-900 dark:text-white focus:ring-2 focus:ring-neutral-500/20 focus:border-neutral-500 outline-none transition-all"
                         >
                             {START_TIMING_OPTIONS.map(option => <option key={option.value} value={option.value}>{option.label}</option>)}
                         </select>
@@ -340,7 +340,7 @@ export const CandidateProfileContextManager: React.FC = () => {
                                 type="date"
                                 value={startDate}
                                 onChange={event => setStartDate(event.target.value)}
-                                className="mt-2 w-full bg-indigo-50/40 dark:bg-indigo-500/5 border border-indigo-100 dark:border-indigo-500/20 rounded-xl px-3 py-3 text-sm font-medium text-neutral-900 dark:text-white focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all"
+                                className="mt-2 w-full bg-neutral-50/40 dark:bg-neutral-500/5 border border-neutral-100 dark:border-neutral-500/20 rounded-xl px-3 py-3 text-sm font-medium text-neutral-900 dark:text-white focus:ring-2 focus:ring-neutral-500/20 focus:border-neutral-500 outline-none transition-all"
                             />
                         </label>
                     ) : null}
@@ -348,7 +348,7 @@ export const CandidateProfileContextManager: React.FC = () => {
             </div>
 
             {educationContext?.courses.length ? (
-                <div className="mt-8 pt-6 border-t border-indigo-100/70 dark:border-indigo-500/10">
+                <div className="mt-8 pt-6 border-t border-neutral-100/70 dark:border-neutral-500/10">
                     <div className="flex items-start gap-3 mb-4">
                         <GraduationCap className="w-4 h-4 text-emerald-500 mt-0.5" />
                         <div>
@@ -385,8 +385,8 @@ export const CandidateProfileContextManager: React.FC = () => {
                 </div>
             ) : null}
 
-            <div className="mt-8 pt-6 border-t border-indigo-100/70 dark:border-indigo-500/10">
-                <div className="pb-6 border-b border-indigo-100/70 dark:border-indigo-500/10">
+            <div className="mt-8 pt-6 border-t border-neutral-100/70 dark:border-neutral-500/10">
+                <div className="pb-6 border-b border-neutral-100/70 dark:border-neutral-500/10">
                     <h5 className="text-sm font-semibold text-neutral-700 dark:text-neutral-300 mb-2">Cover-letter style</h5>
                     <p className="text-xs text-neutral-400 leading-relaxed mb-4 max-w-2xl">
                         Applies to every cover letter. Use this for tone, voice, or length—not facts about a specific job.
@@ -398,7 +398,7 @@ export const CandidateProfileContextManager: React.FC = () => {
                         maxLength={1000}
                         rows={3}
                         placeholder="e.g. Keep letters concise, confident, and warm. Use Canadian spelling."
-                        className="w-full bg-indigo-50/40 dark:bg-indigo-500/5 border border-indigo-100 dark:border-indigo-500/20 rounded-xl px-3 py-3 text-sm font-medium leading-relaxed text-neutral-900 dark:text-white focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all resize-none"
+                        className="w-full bg-neutral-50/40 dark:bg-neutral-500/5 border border-neutral-100 dark:border-neutral-500/20 rounded-xl px-3 py-3 text-sm font-medium leading-relaxed text-neutral-900 dark:text-white focus:ring-2 focus:ring-neutral-500/20 focus:border-neutral-500 outline-none transition-all resize-none"
                     />
                 </div>
 
@@ -415,7 +415,7 @@ export const CandidateProfileContextManager: React.FC = () => {
                             onChange={(event) => {
                                 void updateProfile({ journey: event.target.value }).catch(() => showError('Failed to save current focus.'));
                             }}
-                            className="w-full appearance-none bg-indigo-50/60 dark:bg-indigo-500/10 border border-indigo-100 dark:border-indigo-500/20 rounded-xl px-4 py-3 text-sm font-bold text-neutral-900 dark:text-white focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all cursor-pointer pr-10"
+                            className="w-full appearance-none bg-neutral-50/60 dark:bg-neutral-500/10 border border-neutral-100 dark:border-neutral-500/20 rounded-xl px-4 py-3 text-sm font-bold text-neutral-900 dark:text-white focus:ring-2 focus:ring-neutral-500/20 focus:border-neutral-500 outline-none transition-all cursor-pointer pr-10"
                         >
                             {[
                                 { id: 'job-hunter', label: 'Job Search' },
@@ -433,7 +433,7 @@ export const CandidateProfileContextManager: React.FC = () => {
             </div>
 
             {reviewCount > 0 || storedInsights.length > 0 ? (
-                <div className="mt-8 pt-6 border-t border-violet-100/70 dark:border-violet-500/10 flex flex-wrap items-center justify-between gap-3">
+                <div className="mt-8 pt-6 border-t border-neutral-100/70 dark:border-neutral-500/10 flex flex-wrap items-center justify-between gap-3">
                     <p className="text-xs text-neutral-400">
                         {reviewCount > 0 ? `${reviewCount} profile observation${reviewCount === 1 ? '' : 's'} ready to review.` : 'Profile review is up to date.'}
                     </p>
@@ -453,9 +453,9 @@ export const CandidateProfileContextManager: React.FC = () => {
             {isLoading ? (
                 <p className="text-sm text-neutral-400 mt-8">Loading your saved context…</p>
             ) : !hasContext ? (
-                <div className="mt-8 rounded-2xl bg-violet-50/70 dark:bg-violet-500/10 border border-violet-100 dark:border-violet-500/20 px-5 py-4">
+                <div className="mt-8 rounded-2xl bg-neutral-50/70 dark:bg-neutral-500/10 border border-neutral-100 dark:border-neutral-500/20 px-5 py-4">
                     <div className="flex items-start gap-3">
-                        <BookOpen className="w-4 h-4 text-violet-500 mt-0.5 shrink-0" />
+                        <BookOpen className="w-4 h-4 text-neutral-500 mt-0.5 shrink-0" />
                         <p className="text-sm text-neutral-600 dark:text-neutral-300">
                             Nothing saved yet. Build your profile once and Navigator can use the useful pieces only when an application calls for them.
                         </p>
@@ -468,9 +468,9 @@ export const CandidateProfileContextManager: React.FC = () => {
                             <h5 className="text-sm font-semibold text-neutral-700 dark:text-neutral-300 mb-3">Signals</h5>
                             <div className="space-y-3">
                                 {signals.map(signal => (
-                                    <div key={signal.id} className="flex items-start gap-3 rounded-2xl bg-indigo-50/70 dark:bg-indigo-500/10 border border-indigo-100 dark:border-indigo-500/20 px-4 py-3">
+                                    <div key={signal.id} className="flex items-start gap-3 rounded-2xl bg-neutral-50/70 dark:bg-neutral-500/10 border border-neutral-100 dark:border-neutral-500/20 px-4 py-3">
                                         <div className="min-w-0 flex-1">
-                                            <p className="text-[10px] font-black uppercase tracking-wide text-indigo-500 dark:text-indigo-300">{SIGNAL_LABELS[signal.key]}</p>
+                                            <p className="text-[10px] font-black uppercase tracking-wide text-neutral-500 dark:text-neutral-300">{SIGNAL_LABELS[signal.key]}</p>
                                             <p className="text-sm text-neutral-700 dark:text-neutral-200 mt-1">{signal.value}</p>
                                         </div>
                                         <button

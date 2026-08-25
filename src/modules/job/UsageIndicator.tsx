@@ -20,7 +20,7 @@ export const UsageIndicator: React.FC<UsageIndicatorProps> = ({ usageStats }) =>
     const dotColor = isLast ? 'bg-amber-500' : 'bg-blue-500';
     const containerColor = isLast
         ? 'bg-gradient-to-r from-amber-50 to-orange-50 dark:from-amber-900/20 dark:to-orange-900/20 border-amber-200/50 dark:border-amber-800/50'
-        : 'bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-900/20 dark:to-purple-900/20 border-blue-200/50 dark:border-blue-800/50';
+        : 'bg-gradient-to-r from-blue-50 to-neutral-50 dark:from-blue-900/20 dark:to-neutral-900/20 border-blue-200/50 dark:border-blue-800/50';
     const label = isLast ? '1 trial analysis remaining' : `Trial: ${used} of ${limit} analyses used`;
 
     return (
@@ -35,7 +35,7 @@ export const UsageIndicator: React.FC<UsageIndicatorProps> = ({ usageStats }) =>
                 {used >= 2 && (
                     <button
                         onClick={() => navigate(ROUTES.PLANS)}
-                        className="ml-2 px-3 py-1 bg-gradient-to-r from-blue-600 to-purple-600 text-white text-xs font-bold rounded-full hover:from-blue-700 hover:to-purple-700 transition-all"
+                        className="ml-2 px-3 py-1 bg-gradient-to-r from-blue-600 to-neutral-600 text-white text-xs font-bold rounded-full hover:from-blue-700 hover:to-neutral-700 transition-all"
                     >
                         Upgrade
                     </button>

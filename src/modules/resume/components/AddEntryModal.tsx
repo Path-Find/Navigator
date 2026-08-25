@@ -62,7 +62,7 @@ export const AddEntryModal: React.FC<AddEntryModalProps> = ({ type, sectionLabel
                                 value={title}
                                 onChange={e => setTitle(e.target.value)}
                                 placeholder={type === 'work' ? 'e.g. Product Manager' : type === 'education' ? 'e.g. B.Sc. Urban Planning' : 'e.g. Transit Dashboard'}
-                                className="w-full px-3 py-2.5 rounded-xl border border-neutral-200 dark:border-neutral-700 bg-neutral-50 dark:bg-neutral-800 text-neutral-900 dark:text-white placeholder:text-neutral-300 dark:placeholder:text-neutral-600 text-sm font-medium focus:outline-none focus:border-indigo-300 dark:focus:border-indigo-700 focus:ring-2 focus:ring-indigo-500/10 transition-all"
+                                className="w-full px-3 py-2.5 rounded-xl border border-neutral-200 dark:border-neutral-700 bg-neutral-50 dark:bg-neutral-800 text-neutral-900 dark:text-white placeholder:text-neutral-300 dark:placeholder:text-neutral-600 text-sm font-medium focus:outline-none focus:border-neutral-300 dark:focus:border-neutral-700 focus:ring-2 focus:ring-neutral-500/10 transition-all"
                             />
                         </div>
                     )}
@@ -77,7 +77,7 @@ export const AddEntryModal: React.FC<AddEntryModalProps> = ({ type, sectionLabel
                                 value={organization}
                                 onChange={e => setOrganization(e.target.value)}
                                 placeholder={type === 'education' ? 'e.g. York University' : type === 'project' ? 'e.g. Personal / Course / Work' : 'e.g. Canada Life'}
-                                className="w-full px-3 py-2.5 rounded-xl border border-neutral-200 dark:border-neutral-700 bg-neutral-50 dark:bg-neutral-800 text-neutral-900 dark:text-white placeholder:text-neutral-300 dark:placeholder:text-neutral-600 text-sm font-medium focus:outline-none focus:border-indigo-300 dark:focus:border-indigo-700 focus:ring-2 focus:ring-indigo-500/10 transition-all"
+                                className="w-full px-3 py-2.5 rounded-xl border border-neutral-200 dark:border-neutral-700 bg-neutral-50 dark:bg-neutral-800 text-neutral-900 dark:text-white placeholder:text-neutral-300 dark:placeholder:text-neutral-600 text-sm font-medium focus:outline-none focus:border-neutral-300 dark:focus:border-neutral-700 focus:ring-2 focus:ring-neutral-500/10 transition-all"
                             />
                         </div>
                     )}
@@ -92,7 +92,7 @@ export const AddEntryModal: React.FC<AddEntryModalProps> = ({ type, sectionLabel
                                     value={dateRange}
                                     onChange={e => setDateRange(e.target.value)}
                                     placeholder="Jan 2024 – Present"
-                                    className="w-full pl-8 pr-3 py-2.5 rounded-xl border border-neutral-200 dark:border-neutral-700 bg-neutral-50 dark:bg-neutral-800 text-neutral-900 dark:text-white placeholder:text-neutral-300 dark:placeholder:text-neutral-600 text-sm font-medium focus:outline-none focus:border-indigo-300 dark:focus:border-indigo-700 focus:ring-2 focus:ring-indigo-500/10 transition-all"
+                                    className="w-full pl-8 pr-3 py-2.5 rounded-xl border border-neutral-200 dark:border-neutral-700 bg-neutral-50 dark:bg-neutral-800 text-neutral-900 dark:text-white placeholder:text-neutral-300 dark:placeholder:text-neutral-600 text-sm font-medium focus:outline-none focus:border-neutral-300 dark:focus:border-neutral-700 focus:ring-2 focus:ring-neutral-500/10 transition-all"
                                 />
                             </div>
                             <p className="text-[11px] text-neutral-400 leading-snug">

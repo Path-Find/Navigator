@@ -13,7 +13,7 @@ import type { FeatureColor } from '../../featureRegistry';
 // Create a generic Loading placeholder for previews
 const PreviewLoading = () => (
     <div className="w-full h-24 flex items-center justify-center">
-        <div className="w-8 h-8 rounded-full border-2 border-neutral-100 dark:border-neutral-800 border-t-indigo-500 animate-spin" />
+        <div className="w-8 h-8 rounded-full border-2 border-neutral-100 dark:border-neutral-800 border-t-neutral-500 animate-spin" />
     </div>
 );
 

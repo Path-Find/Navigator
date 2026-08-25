@@ -37,8 +37,8 @@ export const NextGenCalibration: React.FC = () => {
             {/* Header */}
             <div className="flex items-center justify-between mb-8">
                 <div className="flex items-center gap-3">
-                    <div className="p-2 bg-indigo-500/10 rounded-xl">
-                        <Cpu className="w-5 h-5 text-indigo-500" />
+                    <div className="p-2 bg-neutral-500/10 rounded-xl">
+                        <Cpu className="w-5 h-5 text-neutral-500" />
                     </div>
                     <div>
                         <h4 className="font-bold text-neutral-900 dark:text-white">NextGen Engine</h4>
@@ -53,8 +53,8 @@ export const NextGenCalibration: React.FC = () => {
                 <div className="bg-neutral-50 dark:bg-neutral-900/50 rounded-2xl p-5 border border-neutral-100 dark:border-neutral-800">
                     <div className="flex items-center justify-between mb-4">
                         <div className="flex items-center gap-2">
-                            <div className="p-1.5 bg-indigo-500/10 rounded-lg">
-                                <Cpu className="w-3.5 h-3.5 text-indigo-500" />
+                            <div className="p-1.5 bg-neutral-500/10 rounded-lg">
+                                <Cpu className="w-3.5 h-3.5 text-neutral-500" />
                             </div>
                             <span className="text-sm font-semibold text-neutral-700 dark:text-neutral-300">Learned writing style</span>
                         </div>
@@ -74,7 +74,7 @@ export const NextGenCalibration: React.FC = () => {
                     </p>
                     <div className="min-h-[80px] flex items-center justify-center">
                         {style ? (
-                            <p className="text-xs text-neutral-600 dark:text-neutral-400 leading-relaxed italic border-l-2 border-indigo-500/30 pl-3">
+                            <p className="text-xs text-neutral-600 dark:text-neutral-400 leading-relaxed italic border-l-2 border-neutral-500/30 pl-3">
                                 "{style}"
                             </p>
                         ) : (
@@ -86,7 +86,7 @@ export const NextGenCalibration: React.FC = () => {
                             <motion.div
                                 initial={{ width: 0 }}
                                 animate={{ width: style ? '100%' : '0%' }}
-                                className="h-full bg-indigo-500"
+                                className="h-full bg-neutral-500"
                             />
                         </div>
                         <span className="text-[10px] font-medium text-neutral-400">{style ? 'Ready' : 'Empty'}</span>
@@ -120,7 +120,7 @@ export const NextGenCalibration: React.FC = () => {
                     </div>
                     <div className="mt-3 pt-3 border-t border-neutral-100 dark:border-neutral-800 flex justify-between items-center">
                         <span className="text-xs text-neutral-400">{stats?.total || 0} signals recorded</span>
-                        <span className="text-xs font-medium text-indigo-500">{stats?.total ? 'Active' : 'Waiting'}</span>
+                        <span className="text-xs font-medium text-neutral-500">{stats?.total ? 'Active' : 'Waiting'}</span>
                     </div>
                 </div>
             </div>

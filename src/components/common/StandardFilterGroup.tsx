@@ -25,8 +25,8 @@ export function StandardFilterGroup<T extends string>({
     const themes = {
         indigo: {
             active: 'text-white',
-            inactive: 'text-neutral-500 hover:text-indigo-600 dark:text-neutral-400 dark:hover:text-indigo-400',
-            pill: 'bg-indigo-600 shadow-lg shadow-indigo-600/20',
+            inactive: 'text-neutral-500 hover:text-neutral-600 dark:text-neutral-400 dark:hover:text-neutral-400',
+            pill: 'bg-neutral-600 shadow-lg shadow-neutral-600/20',
             countActive: 'bg-white/20 text-white',
             countInactive: 'bg-neutral-100 text-neutral-500 dark:bg-neutral-800'
         },
@@ -55,7 +55,7 @@ export function StandardFilterGroup<T extends string>({
             active: 'text-neutral-900 dark:text-white',
             inactive: 'text-neutral-500 hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-white',
             pill: 'bg-white dark:bg-neutral-800 shadow-md border border-neutral-200 dark:border-neutral-700',
-            countActive: 'bg-indigo-50 dark:bg-indigo-900/40 text-indigo-600 dark:text-indigo-400',
+            countActive: 'bg-neutral-50 dark:bg-neutral-900/40 text-neutral-600 dark:text-neutral-400',
             countInactive: 'bg-neutral-100/50 text-neutral-400'
         }
     };

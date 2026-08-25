@@ -226,7 +226,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({ isOpen, onClose, featureCo
                         </div>
                     )}
                     <div className="flex-1 flex flex-col bg-neutral-50 dark:bg-neutral-900/50">
-                        <div className="px-8 py-6 border-b border-neutral-200/50 dark:border-neutral-800/50 flex justify-between items-center bg-gradient-to-r from-indigo-50/50 to-violet-50/50 dark:from-indigo-900/20 dark:to-violet-900/20">
+                        <div className="px-8 py-6 border-b border-neutral-200/50 dark:border-neutral-800/50 flex justify-between items-center bg-gradient-to-r from-neutral-50/50 to-neutral-50/50 dark:from-neutral-900/20 dark:to-neutral-900/20">
                             <h3 className="font-bold text-xl text-neutral-900 dark:text-white tracking-tight">
                                 {getHeading()}
                             </h3>

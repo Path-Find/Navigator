@@ -22,7 +22,7 @@ export const PageLayout: React.FC<PageLayoutProps> = ({
     fullWidth = false
 }) => {
     const themeStyles = {
-        indigo: 'bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 border-indigo-500/20',
+        indigo: 'bg-neutral-100 dark:bg-neutral-900/30 text-neutral-600 dark:text-neutral-400 border-neutral-500/20',
         emerald: 'bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 border-emerald-500/20',
         amber: 'bg-amber-100 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400 border-amber-500/20',
         rose: 'bg-rose-100 dark:bg-rose-900/30 text-rose-600 dark:text-rose-400 border-rose-500/20',

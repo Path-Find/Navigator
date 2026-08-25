@@ -33,8 +33,8 @@ export const SkillsStats: React.FC<SkillsStatsProps> = ({
                 previewContent={
                     <div className="flex items-center justify-center gap-6 h-16 w-full relative">
                         <div className="flex flex-col items-center relative">
-                            <div className="absolute -inset-4 bg-indigo-500/10 blur-xl rounded-full scale-150 group-hover:bg-indigo-500/20 transition-all duration-700" />
-                            <div className="text-4xl font-black text-indigo-600 dark:text-indigo-400 tracking-tighter leading-none hover:scale-110 transition-transform duration-500 drop-shadow-2xl relative z-10">{skills.length}</div>
+                            <div className="absolute -inset-4 bg-neutral-500/10 blur-xl rounded-full scale-150 group-hover:bg-neutral-500/20 transition-all duration-700" />
+                            <div className="text-4xl font-black text-neutral-600 dark:text-neutral-400 tracking-tighter leading-none hover:scale-110 transition-transform duration-500 drop-shadow-2xl relative z-10">{skills.length}</div>
                             <div className="text-[10px] font-black text-neutral-400 dark:text-white/40 mt-2 relative z-10">Active</div>
                         </div>
 
@@ -133,7 +133,7 @@ export const SkillsStats: React.FC<SkillsStatsProps> = ({
                     <div className="relative w-full h-20 flex items-center justify-center overflow-hidden">
                         {/* Asymmetrical Nebula Glow */}
                         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-48 h-32 bg-[radial-gradient(ellipse_at_center,rgba(139,92,246,0.08)_0%,transparent_70%)] group-hover:bg-[radial-gradient(ellipse_at_center,rgba(139,92,246,0.12)_0%,transparent_70%)] transition-all duration-1000 rotate-12" />
-                        <div className="absolute top-1/3 left-1/4 w-24 h-24 bg-violet-500/5 blur-3xl opacity-40 group-hover:translate-x-4 transition-transform duration-1000" />
+                        <div className="absolute top-1/3 left-1/4 w-24 h-24 bg-neutral-500/5 blur-3xl opacity-40 group-hover:translate-x-4 transition-transform duration-1000" />
 
                         {/* Organic Sparkle Field - No more concentric circles */}
                         <div className="relative group-hover:scale-110 transition-transform duration-700">
@@ -143,9 +143,9 @@ export const SkillsStats: React.FC<SkillsStatsProps> = ({
                             {/* Icons stack with randomized placement */}
                             <div className="relative scale-90">
                                 <Sparkles className={`w-11 h-11 text-amber-500 drop-shadow-[0_0_15px_rgba(245,158,11,0.4)] ${isSuggesting ? 'animate-spin' : 'animate-[bounce_6s_infinite]'}`} />
-                                <Sparkles className="absolute -top-4 left-6 w-3 h-3 text-violet-400/40 animate-pulse delay-75" />
+                                <Sparkles className="absolute -top-4 left-6 w-3 h-3 text-neutral-400/40 animate-pulse delay-75" />
                                 <Sparkles className="absolute top-2 -left-6 w-4 h-4 text-amber-300/30 animate-bounce" />
-                                <Sparkles className="absolute -bottom-3 right-2 w-2.5 h-2.5 text-violet-300/40 animate-ping delay-200" />
+                                <Sparkles className="absolute -bottom-3 right-2 w-2.5 h-2.5 text-neutral-300/40 animate-ping delay-200" />
                             </div>
                         </div>
                     </div>

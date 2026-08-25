@@ -46,7 +46,7 @@ export const ResumeSectionEditor: React.FC<ResumeSectionEditorProps> = ({
             <Card
                 variant="premium"
                 overflow="visible"
-                className={`group relative transition-all duration-300 border-neutral-200 dark:border-neutral-800 hover:border-indigo-200 dark:hover:border-indigo-900/50 shadow-sm hover:shadow-xl print-card ${!block.isVisible ? 'opacity-50 no-print' : ''}`}
+                className={`group relative transition-all duration-300 border-neutral-200 dark:border-neutral-800 hover:border-neutral-200 dark:hover:border-neutral-900/50 shadow-sm hover:shadow-xl print-card ${!block.isVisible ? 'opacity-50 no-print' : ''}`}
             >
                 <div className="p-6 md:p-8">
                     {CURRENT_FLAG_TYPES.includes(block.type) && (
@@ -55,7 +55,7 @@ export const ResumeSectionEditor: React.FC<ResumeSectionEditorProps> = ({
                                 type="button"
                                 onClick={() => onToggleCurrent(block.id)}
                                 aria-pressed={current}
-                                className={`whitespace-nowrap rounded-xl border px-2.5 py-1.5 text-[10px] font-black transition-colors ${current ? 'text-indigo-600 bg-indigo-50 border-indigo-200 dark:text-indigo-300 dark:bg-indigo-500/10 dark:border-indigo-500/30' : 'text-neutral-400 border-neutral-200 hover:text-indigo-600 hover:border-indigo-200 dark:border-neutral-700'}`}
+                                className={`whitespace-nowrap rounded-xl border px-2.5 py-1.5 text-[10px] font-black transition-colors ${current ? 'text-neutral-600 bg-neutral-50 border-neutral-200 dark:text-neutral-300 dark:bg-neutral-500/10 dark:border-neutral-500/30' : 'text-neutral-400 border-neutral-200 hover:text-neutral-600 hover:border-neutral-200 dark:border-neutral-700'}`}
                             >
                                 {current ? 'Current' : 'Mark as current'}
                             </button>
@@ -110,7 +110,7 @@ export const ResumeSectionEditor: React.FC<ResumeSectionEditorProps> = ({
                                     />
                                 </div>
 
-                                <div className="flex items-center gap-2 text-neutral-400 bg-neutral-50/50 dark:bg-neutral-800/50 px-3 py-1 rounded-full border border-neutral-100 dark:border-neutral-800 transition-all focus-within:border-indigo-200/50 focus-within:bg-white dark:focus-within:bg-neutral-800">
+                                <div className="flex items-center gap-2 text-neutral-400 bg-neutral-50/50 dark:bg-neutral-800/50 px-3 py-1 rounded-full border border-neutral-100 dark:border-neutral-800 transition-all focus-within:border-neutral-200/50 focus-within:bg-white dark:focus-within:bg-neutral-800">
                                     <Calendar className="w-3.5 h-3.5 opacity-50" />
                                     <div className="flex flex-col">
                                         <span className="text-[8px] font-black uppercase tracking-wider text-neutral-400">Month + year</span>
@@ -133,7 +133,7 @@ export const ResumeSectionEditor: React.FC<ResumeSectionEditorProps> = ({
                                 {block.bullets.map((bullet: string, idx: number) => (
                                     <div key={idx} className="group/line flex items-start gap-3 relative">
                                         {block.type !== 'summary' && (
-                                            <div className={`mt-2 w-1.5 h-1.5 rounded-full shrink-0 transition-all duration-500 ${bullet.trim() ? 'bg-indigo-500 shadow-[0_0_8px_rgba(99,102,241,0.5)]' : 'bg-neutral-200 dark:bg-neutral-800'}`} />
+                                            <div className={`mt-2 w-1.5 h-1.5 rounded-full shrink-0 transition-all duration-500 ${bullet.trim() ? 'bg-neutral-500 shadow-[0_0_8px_rgba(99,102,241,0.5)]' : 'bg-neutral-200 dark:bg-neutral-800'}`} />
                                         )}
                                         <textarea
                                             value={bullet}
@@ -171,7 +171,7 @@ export const ResumeSectionEditor: React.FC<ResumeSectionEditorProps> = ({
                                                         disabled={idx === 0}
                                                         variant="ghost"
                                                         size="xs"
-                                                        className="w-6 h-6 p-0 hover:text-indigo-600 hover:bg-indigo-50 dark:hover:bg-indigo-900/20 disabled:opacity-0"
+                                                        className="w-6 h-6 p-0 hover:text-neutral-600 hover:bg-neutral-50 dark:hover:bg-neutral-900/20 disabled:opacity-0"
                                                         title="Move Up"
                                                         icon={<ChevronUp className="w-3 h-3" />}
                                                     />
@@ -180,7 +180,7 @@ export const ResumeSectionEditor: React.FC<ResumeSectionEditorProps> = ({
                                                         disabled={idx === block.bullets.length - 1}
                                                         variant="ghost"
                                                         size="xs"
-                                                        className="w-6 h-6 p-0 hover:text-indigo-600 hover:bg-indigo-50 dark:hover:bg-indigo-900/20 disabled:opacity-0"
+                                                        className="w-6 h-6 p-0 hover:text-neutral-600 hover:bg-neutral-50 dark:hover:bg-neutral-900/20 disabled:opacity-0"
                                                         title="Move Down"
                                                         icon={<ChevronDown className="w-3 h-3" />}
                                                     />

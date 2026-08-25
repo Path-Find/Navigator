@@ -11,7 +11,7 @@ interface HeroHeaderProps {
 export const HeroHeader: React.FC<HeroHeaderProps> = ({
     title,
     highlight,
-    highlightGradient = "from-indigo-500 via-purple-500 to-indigo-500",
+    highlightGradient = "from-neutral-500 via-neutral-500 to-neutral-500",
     subtitle,
     className = ""
 }) => {

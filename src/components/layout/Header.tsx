@@ -71,7 +71,7 @@ export const Header: React.FC = () => {
                         className="group flex items-center gap-2.5 cursor-pointer"
                         onClick={() => isFocusedMode ? handleExit() : onViewChange('home')}
                     >
-                        <div className={`p-1.5 rounded-xl shadow-lg transition-all duration-500 group-hover:scale-105 active:scale-95 bg-indigo-600 text-white shadow-indigo-600/20`}>
+                        <div className={`p-1.5 rounded-xl shadow-lg transition-all duration-500 group-hover:scale-105 active:scale-95 bg-neutral-600 text-white shadow-neutral-600/20`}>
                             {isFocusedMode ? <ShieldCheck className="w-5 h-5" /> : <TrendingUp className="w-5 h-5" />}
                         </div>
                         <div className="flex flex-col">
@@ -91,7 +91,7 @@ export const Header: React.FC = () => {
                     >
                         {isFocusedMode ? (
                             <div className="px-4 py-1 flex items-center gap-2">
-                                <div className={`p-1.5 rounded-xl ${currentView === 'skills-interview' ? 'bg-emerald-500/10 text-emerald-600' : 'bg-indigo-500/10 text-indigo-600'}`}>
+                                <div className={`p-1.5 rounded-xl ${currentView === 'skills-interview' ? 'bg-emerald-500/10 text-emerald-600' : 'bg-neutral-500/10 text-neutral-600'}`}>
                                     {currentView === 'skills-interview' ? <Target className="w-3.5 h-3.5" /> : <MessageSquare className="w-3.5 h-3.5" />}
                                 </div>
                                 <span className="text-[11px] font-bold text-neutral-900 dark:text-white leading-none tracking-tight">
@@ -119,8 +119,8 @@ export const Header: React.FC = () => {
                                         <div className="relative z-10 flex items-center gap-1">
                                             <button
                                                 onClick={() => onViewChange(group.defaultView || group.items[0].id)}
-                                                className={`px-2 py-1.5 rounded-2xl text-[11px] font-bold transition-all duration-300 flex items-center gap-1.5 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500/50 cursor-pointer ${group.isActive
-                                                    ? (group.id === 'plans' ? 'text-amber-500' : 'text-indigo-600')
+                                                className={`px-2 py-1.5 rounded-2xl text-[11px] font-bold transition-all duration-300 flex items-center gap-1.5 focus:outline-none focus-visible:ring-2 focus-visible:ring-neutral-500/50 cursor-pointer ${group.isActive
+                                                    ? (group.id === 'plans' ? 'text-amber-500' : 'text-neutral-600')
                                                     : (group.id === 'plans' ? 'text-amber-500/80 hover:text-amber-600' : 'text-neutral-500 hover:text-neutral-800 dark:text-neutral-400 dark:hover:text-neutral-200')
                                                     } ${group.id === 'plans' ? '!py-1.5 !px-2.5' : ''}`}
                                             >
@@ -140,8 +140,8 @@ export const Header: React.FC = () => {
                                                             <button
                                                                 key={item.id}
                                                                 onClick={() => onViewChange(item.id)}
-                                                                className={`relative px-2 py-1.5 rounded-xl text-[10px] font-black transition-all whitespace-nowrap tracking-wide overflow-hidden focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500/50 cursor-pointer ${currentView === item.id
-                                                                    ? 'text-indigo-600'
+                                                                className={`relative px-2 py-1.5 rounded-xl text-[10px] font-black transition-all whitespace-nowrap tracking-wide overflow-hidden focus:outline-none focus-visible:ring-2 focus-visible:ring-neutral-500/50 cursor-pointer ${currentView === item.id
+                                                                    ? 'text-neutral-600'
                                                                     : 'text-neutral-400 hover:text-neutral-700 dark:text-neutral-500 dark:hover:text-neutral-300 hover:bg-neutral-50 dark:hover:bg-neutral-800/50'
                                                                     }`}
                                                             >
@@ -171,7 +171,7 @@ export const Header: React.FC = () => {
                             </button>
                             <button
                                 onClick={() => openModal('AUTH', { authMode: 'sign-up' })}
-                                className="px-4 py-2 text-xs font-black text-white bg-indigo-600 hover:bg-indigo-700 rounded-xl transition-all shadow-lg shadow-indigo-500/20 active:scale-95 cursor-pointer"
+                                className="px-4 py-2 text-xs font-black text-white bg-neutral-600 hover:bg-neutral-700 rounded-xl transition-all shadow-lg shadow-neutral-500/20 active:scale-95 cursor-pointer"
                             >
                                 Sign Up
                             </button>
@@ -183,7 +183,7 @@ export const Header: React.FC = () => {
                                     {isAdmin && (
                                         <button
                                             onClick={() => onViewChange('admin')}
-                                            className="p-1.5 text-neutral-400 hover:text-indigo-600 dark:text-neutral-500 dark:hover:text-indigo-400 transition-all active:scale-90 cursor-pointer"
+                                            className="p-1.5 text-neutral-400 hover:text-neutral-600 dark:text-neutral-500 dark:hover:text-neutral-400 transition-all active:scale-90 cursor-pointer"
                                             title="Admin Console"
                                         >
                                             <ShieldCheck className="w-4 h-4" />

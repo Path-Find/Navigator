@@ -91,7 +91,7 @@ export const FeaturesPage: React.FC = () => {
                     className="text-4xl md:text-6xl font-extrabold text-neutral-900 dark:text-white tracking-tight mb-6"
                 >
                     One platform.{' '}
-                    <span className="bg-gradient-to-r from-indigo-500 via-violet-500 to-emerald-500 bg-clip-text text-transparent">
+                    <span className="bg-gradient-to-r from-neutral-500 via-neutral-500 to-emerald-500 bg-clip-text text-transparent">
                         Every advantage.
                     </span>
                 </motion.h1>
@@ -118,7 +118,7 @@ export const FeaturesPage: React.FC = () => {
                             <button
                                 key={tab.key}
                                 onClick={() => setActiveTier(tab.key)}
-                                className={`relative flex items-center gap-1.5 px-4 py-2 rounded-2xl text-[11px] md:text-xs font-bold transition-all duration-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500/50 cursor-pointer ${activeTier === tab.key
+                                className={`relative flex items-center gap-1.5 px-4 py-2 rounded-2xl text-[11px] md:text-xs font-bold transition-all duration-300 focus:outline-none focus-visible:ring-2 focus-visible:ring-neutral-500/50 cursor-pointer ${activeTier === tab.key
                                     ? 'text-neutral-900 dark:text-white'
                                     : 'text-neutral-500 hover:text-neutral-800 dark:text-neutral-400 dark:hover:text-neutral-200'
                                     }`}
