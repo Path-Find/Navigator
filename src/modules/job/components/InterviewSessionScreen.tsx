@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Sparkles, FileText, CheckCircle2, ShieldCheck, Check, Copy, Loader2, BookmarkPlus } from 'lucide-react';
+import { Sparkles, FileText, CheckCircle2, ShieldCheck, Check, Copy, Loader2 } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { InterviewChat } from '../../../components/common/InterviewChat';
 import type { ChatMessage } from '../../../components/common/InterviewChat';
@@ -264,18 +264,6 @@ export const InterviewSessionScreen = ({
                             <p className="text-xs text-neutral-600 dark:text-neutral-400">
                                 {resp.analysis.feedback}
                             </p>
-                                    {sessionType === 'general' && resp.analysis.decision !== 'Reject' && resp.response !== '[Skipped]' && (
-                                <button
-                                    onClick={() => { void onSaveStory(q.id); }}
-                                    disabled={resp.savedAsStory}
-                                    className={`inline-flex items-center gap-2 px-3 py-1.5 rounded-lg text-[10px] font-black transition-colors ${resp.savedAsStory
-                                        ? 'bg-emerald-50 text-emerald-600 dark:bg-emerald-500/10 dark:text-emerald-400'
-                                        : 'bg-neutral-50 text-neutral-600 hover:bg-neutral-100 dark:bg-neutral-500/10 dark:text-neutral-400 dark:hover:bg-neutral-500/20'}`}
-                                >
-                                    {resp.savedAsStory ? <Check className="w-3 h-3" /> : <BookmarkPlus className="w-3 h-3" />}
-                                    {resp.savedAsStory ? 'Saved for future applications' : 'Save this story for future applications'}
-                                </button>
-                            )}
                             {!isRejectedOrSkipped && betterVersion && (
                                 <div className="text-xs text-neutral-500 dark:text-neutral-500 pt-2 border-t border-neutral-200 dark:border-neutral-800/30">
                                     <strong>Better:</strong> "{betterVersion}"
@@ -363,6 +351,13 @@ export const InterviewSessionScreen = ({
 
         const currentQ = questions?.[currentQuestionIndex];
         const hasResponse = currentQ && !!responses[currentQ.id];
+        const currentResponse = currentQ ? responses[currentQ.id] : undefined;
+        const canSaveCurrentStory = !!currentQ
+            && sessionType === 'general'
+            && !!currentResponse?.analysis
+            && currentResponse.analysis.decision !== 'Reject'
+            && currentResponse.response !== '[Skipped]'
+            && !/^(no|skip|prefer not to say)$/i.test(currentResponse.response.trim());
 
         let placeholder = 'Type your answer...';
         let inputHint = 'Press Enter to Submit';
@@ -391,6 +386,12 @@ export const InterviewSessionScreen = ({
                         inputHint={inputHint}
                         showNextButton={hasResponse && !isLastQuestion}
                         onNext={nextQuestion}
+                        secondaryAction={canSaveCurrentStory ? {
+                            label: currentResponse?.savedAsStory ? 'Saved for future applications' : 'Save example',
+                            onClick: () => { if (currentQ) void onSaveStory(currentQ.id); },
+                            disabled: currentResponse?.savedAsStory,
+                            completed: currentResponse?.savedAsStory,
+                        } : undefined}
                         inputDisabled={(!!currentQ && hasResponse) || isLoading || shouldDisableInput}
                         accentGradient="from-neutral-700 to-neutral-500"
                     />
