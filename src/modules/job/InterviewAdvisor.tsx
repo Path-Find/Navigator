@@ -178,17 +178,19 @@ export const InterviewAdvisor: React.FC = () => {
         if (sessionType === 'tailored' && !selectedJobId) {
             const query = userResponse.toLowerCase().trim();
             const matchedJob = jobs.find(j => 
-                j.analysis && (
+                j.status !== 'feed' && (
                     j.position.toLowerCase().includes(query) || 
                     j.company.toLowerCase().includes(query)
                 )
             );
 
-            if (matchedJob) {
+            if (matchedJob?.analysis) {
                 handleJobSelected(matchedJob.id);
                 setUserResponse('');
+            } else if (matchedJob) {
+                showError("That saved job hasn't been analyzed yet. Analyze it first, then try again.");
             } else {
-                showError("I couldn't find a job matching that. Please select from the suggestions or type a position name.");
+                showError("I couldn't find a saved job matching that. Try its job title or company name.");
             }
             return;
         }
@@ -211,7 +213,11 @@ export const InterviewAdvisor: React.FC = () => {
     }
 
     if (mode === 'practice-selection') {
-        return <PracticeModeSelection onGeneral={() => { void handleStartGeneral(); }} onTailored={() => { void handleStartTailored(); }} />;
+        return <PracticeModeSelection
+            hasSavedJobs={jobs.some(job => job.status !== 'feed')}
+            onGeneral={() => { void handleStartGeneral(); }}
+            onTailored={() => { void handleStartTailored(); }}
+        />;
     }
 
     if (mode === 'session') {
@@ -242,6 +248,7 @@ export const InterviewAdvisor: React.FC = () => {
         limitError={limitError}
         handleStartPractice={handleStartPractice}
         handleStartProfile={handleStartProfile}
+        hasSavedJobs={jobs.some(job => job.status !== 'feed')}
     />;
 };
 

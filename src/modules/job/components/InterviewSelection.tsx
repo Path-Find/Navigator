@@ -13,9 +13,10 @@ interface SelectionProps {
     limitError: string | null;
     handleStartPractice: () => Promise<void>;
     handleStartProfile: () => Promise<void>;
+    hasSavedJobs: boolean;
 }
 
-export const InterviewSelection = ({ limitError, handleStartPractice, handleStartProfile }: SelectionProps) => {
+export const InterviewSelection = ({ limitError, handleStartPractice, handleStartProfile, hasSavedJobs }: SelectionProps) => {
     const navigate = useNavigate();
     return (
         <SharedPageLayout className="theme-job" spacing="compact" maxWidth="6xl">
@@ -51,7 +52,9 @@ export const InterviewSelection = ({ limitError, handleStartPractice, handleStar
                             id="practice"
                             icon={MessageSquare}
                             title="Practice interview"
-                            description="Choose general practice or questions tailored to a specific job after you start."
+                            description={hasSavedJobs
+                                ? "Choose general practice or questions tailored to a specific job after you start."
+                                : "Start with general practice. Save a job to unlock questions tailored to that role."}
                             color={FEATURE_COLORS.indigo}
                             actionLabel="Start practice"
                             onAction={handleStartPractice}
@@ -126,14 +129,16 @@ export const InterviewSelection = ({ limitError, handleStartPractice, handleStar
     );
 };
 
-export const PracticeModeSelection = ({ onGeneral, onTailored }: { onGeneral: () => void; onTailored: () => void }) => {
+export const PracticeModeSelection = ({ onGeneral, onTailored, hasSavedJobs }: { onGeneral: () => void; onTailored: () => void; hasSavedJobs: boolean }) => {
     const messages: ChatMessage[] = [{
         id: 'practice-mode-question',
         role: 'ai',
-        content: 'What kind of practice would you like to do?',
+        content: hasSavedJobs
+            ? 'What kind of practice would you like to do?'
+            : 'Let\'s start with general practice. Save a job first if you want questions tailored to a specific role.',
         suggestionPills: [
             { id: 'general', label: 'General practice', sublabel: 'Common behavioral questions', onClick: onGeneral },
-            { id: 'tailored', label: 'Specific job practice', sublabel: 'Questions for an analyzed job', onClick: onTailored },
+            ...(hasSavedJobs ? [{ id: 'tailored', label: 'Specific job practice', sublabel: 'Questions for an analyzed job', onClick: onTailored }] : []),
         ],
     }];
 
