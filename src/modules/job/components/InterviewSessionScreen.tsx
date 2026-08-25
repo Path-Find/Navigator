@@ -103,10 +103,10 @@ export const InterviewSessionScreen = ({
             role: 'ai',
             content: `${intro}${showStarHelp ? '\n\nSTAR is a simple structure for answering experience-based questions:\n\n• Situation — set the context.\n• Task — explain what needed to be done.\n• Action — focus on what you personally did.\n• Result — share what changed or what you learned.\n\nExample: “Our team was missing deadlines (Situation), and I was asked to improve the process (Task). I created a shared tracker and weekly check-ins (Action), which helped us deliver the next project on time (Result).”' : '\n\nYou can ask for STAR guidance before you begin if you want a structure for your answer.'}${hasStartedInterview ? '\n\nTake a moment, then answer as you would in the interview.' : ''}`,
             suggestionPills: showStarHelp
-                ? [{ id: 'continue-interview', label: 'Continue interview', onClick: continueInterview }]
+                ? [{ id: 'continue-interview', label: 'Continue interview', onClick: continueInterview, variant: 'action' as const }]
                 : [
-                    { id: 'continue-interview', label: 'Continue interview', onClick: continueInterview },
-                    { id: 'star-help', label: "What's STAR?", onClick: () => setShowStarHelp(true) },
+                    { id: 'continue-interview', label: 'Continue interview', onClick: continueInterview, variant: 'action' as const },
+                    { id: 'star-help', label: "What's STAR?", onClick: () => setShowStarHelp(true), variant: 'action' as const },
                 ],
         });
 
