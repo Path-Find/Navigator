@@ -362,6 +362,44 @@ export const InterviewSessionScreen = ({
         const hasResponse = currentQ && !!responses[currentQ.id];
         const currentResponse = currentQ ? responses[currentQ.id] : undefined;
         const hasCompletedResponse = !!currentResponse?.analysis && !isLoading;
+        const isInterviewComplete = isLastQuestion && hasCompletedResponse;
+        const analyzedResponses = Object.values(responses).filter((response) => response.analysis);
+        const verdictCounts = analyzedResponses.reduce<Record<string, number>>((counts, response) => {
+            const decision = response.analysis?.decision;
+            if (decision) counts[decision] = (counts[decision] || 0) + 1;
+            return counts;
+        }, {});
+        const summaryStrengths = Array.from(new Set(analyzedResponses.flatMap((response) => response.analysis?.strengths || []))).slice(0, 3);
+        const summaryImprovements = Array.from(new Set(analyzedResponses.flatMap((response) => response.analysis?.improvements || []))).slice(0, 3);
+        const completionSummary = isInterviewComplete ? (
+            <div className="mt-3 rounded-xl border border-neutral-200 bg-white px-4 py-3 text-xs dark:border-neutral-800 dark:bg-neutral-950">
+                <p className="font-black uppercase tracking-widest text-neutral-500">Session summary</p>
+                <p className="mt-1 text-neutral-500 dark:text-neutral-400">
+                    {analyzedResponses.length} answers reviewed
+                    {Object.entries(verdictCounts).map(([decision, count]) => ` · ${count} ${decision.toLowerCase()}`)}
+                </p>
+                {(summaryStrengths.length > 0 || summaryImprovements.length > 0) && (
+                    <div className="mt-3 grid gap-3 sm:grid-cols-2">
+                        {summaryStrengths.length > 0 && (
+                            <div>
+                                <p className="font-bold text-neutral-700 dark:text-neutral-300">What went well</p>
+                                <ul className="mt-1 list-disc space-y-1 pl-4 text-neutral-500 dark:text-neutral-400">
+                                    {summaryStrengths.map((item) => <li key={item}>{item}</li>)}
+                                </ul>
+                            </div>
+                        )}
+                        {summaryImprovements.length > 0 && (
+                            <div>
+                                <p className="font-bold text-neutral-700 dark:text-neutral-300">Focus next</p>
+                                <ul className="mt-1 list-disc space-y-1 pl-4 text-neutral-500 dark:text-neutral-400">
+                                    {summaryImprovements.map((item) => <li key={item}>{item}</li>)}
+                                </ul>
+                            </div>
+                        )}
+                    </div>
+                )}
+            </div>
+        ) : undefined;
         const canSaveCurrentStory = !!currentQ
             && sessionType === 'general'
             && !!currentResponse?.analysis
@@ -402,7 +440,8 @@ export const InterviewSessionScreen = ({
                             disabled: currentResponse?.savedAsStory,
                             completed: currentResponse?.savedAsStory,
                         } : undefined}
-                        completionMessage={isLastQuestion && hasCompletedResponse ? 'Interview complete — you reached the end of this session.' : undefined}
+                        completionMessage={isInterviewComplete ? 'Interview complete — you reached the end of this session.' : undefined}
+                        completionSummary={completionSummary}
                         progressLabel={!isInitialJobSelection ? `Question ${currentQuestionIndex + 1} of ${questions.length}` : undefined}
                         inputDisabled={(!!currentQ && hasResponse) || isLoading || shouldDisableInput}
                         accentGradient="from-neutral-700 to-neutral-500"

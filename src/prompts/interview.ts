@@ -213,7 +213,8 @@ export const INTERVIEW_PROMPTS = {
     1. GRADE: Does this answer demonstrate the required competence?
     2. DECISION: "Reject" | "Weak" | "Average" | "Strong" | "Exceptional"
     3. FEEDBACK: Explain *why* you made this decision.
-    4. RESUME SUGGESTIONS: If the candidate mentioned a strong achievement, metric, or skill that is NOT typically highlighted well in a basic resume, or if they showed a gap that needs addressing, provide specific resume bullet suggestions.
+    4. EVIDENCE RULE: Treat the response and resume as evidence, not inspiration. Never add a name, employer, title, tool, technology, metric, date, credential, team, task force, or achievement unless it appears explicitly in the response or resume data. If the evidence is missing, say so instead of filling the gap.
+    5. RESUME SUGGESTIONS: Only suggest a resume change when the candidate explicitly stated the evidence or the exact supporting resume text is available. Otherwise return an empty array.
 
     Return ONLY JSON:
     {
@@ -246,9 +247,9 @@ export const INTERVIEW_PROMPTS = {
     1. GRADE: Does this answer demonstrate the required competence?
     2. DECISION: "Reject" | "Weak" | "Average" | "Strong" | "Exceptional"
     3. FEEDBACK: Explain *why* you made this decision.
-    4. BETTER VERSION: Rewrite the candidate's answer using only facts explicitly supported by the resume, candidate response, and job context. Never invent names, employers, titles, technologies, metrics, years, or achievements. If the available evidence is insufficient, provide a concise answer structure with bracketed prompts for the candidate to complete rather than pretending to know the facts.
-    5. RESUME SUGGESTIONS: If the candidate mentioned a strong achievement or gap not well-represented on a resume, provide specific bullet suggestions.
-    6. FOLLOW-UP: Decide if a follow-up question would deepen understanding. Criteria:
+    4. BETTER VERSION: Rewrite the candidate's answer using only facts explicitly supported by the candidate response. You may use a resume fact only when it directly answers the question and is clearly present in the supplied resume data. Never add or upgrade names, employers, titles, technologies, tools, metrics, years, credentials, teams, task forces, or achievements. If evidence is insufficient, provide a concise answer structure with bracketed prompts rather than guessing.
+    5. RESUME SUGGESTIONS: Only suggest a resume change when the candidate explicitly stated the evidence or the exact supporting resume text is available. Otherwise return an empty array. Never invent a metric or achievement to make a bullet stronger.
+    6. FOLLOW-UP: Decide if one follow-up question would deepen understanding. It must target a specific missing detail from this answer, not restate the original question or ask for a generic example. Criteria:
        - VAGUENESS: Did they use buzzwords without details? Ask for an example.
        - DEPTH: Did they mention a complex topic without explaining it?
        - INTERESTING: Did they mention a metric worth probing?
@@ -286,8 +287,8 @@ export const INTERVIEW_PROMPTS = {
     ${jobContext ? `JOB CONTEXT DATA: ${anchorData('JOB_CONTEXT', jobContext)}` : ''}
     
     CRITERIA FOR FOLLOW-UP:
-    1. VAGUENESS: Did they use buzzwords without details? Ask for an example.
-    2. DEPTH: Did they mention a complex topic? Ask "How exactly did you implement that?".
+    1. VAGUENESS: Did they use buzzwords without details? Ask for one specific missing detail, not a generic request for an example.
+    2. DEPTH: Did they mention a complex topic? Ask about the exact step, decision, or outcome that is missing.
     3. INTERESTING: Did they mention a metric? Ask how they measured it.
     4. NO FOLLOW-UP: If the answer is complete, comprehensive, and clear, do not force a follow-up.
 
