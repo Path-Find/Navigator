@@ -114,7 +114,7 @@ export const Footer: React.FC = () => {
                     <div className="flex items-center gap-6">
                         <span>Building For Your Career</span>
                         <div className="w-1 h-1 rounded-full bg-neutral-200 dark:bg-neutral-800" />
-                        <span>Privacy-First AI</span>
+                        <span>Privacy-conscious AI</span>
                     </div>
                     <div className="flex items-center gap-6">
                         <p>© {new Date().getFullYear()} Navigator. All Rights Reserved.</p>

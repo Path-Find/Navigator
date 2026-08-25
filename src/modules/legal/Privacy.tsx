@@ -30,7 +30,7 @@ export const Privacy: React.FC = () => {
             id: 'no-training',
             icon: EyeOff,
             title: 'We Don\'t Train on Your Work',
-            description: "We use the paid Enterprise tier of Google's Gemini API, which contractually guarantees your data is never used to train their models.",
+            description: "Navigator uses Google's Gemini API. Your data is not used to train Google's global models under the API terms we use.",
             colors: {
                 bg: 'bg-indigo-50/50 dark:bg-indigo-500/5',
                 text: 'text-indigo-600 dark:text-indigo-400',
@@ -43,7 +43,7 @@ export const Privacy: React.FC = () => {
             id: 'encryption',
             icon: Lock,
             title: 'Locked on Your Device',
-            description: "Your resumes and keys stay on your computer, encrypted so only you can read them.",
+            description: "Your account data is protected with access controls and encryption in transit and at rest.",
             colors: {
                 bg: 'bg-emerald-50/50 dark:bg-emerald-500/5',
                 text: 'text-emerald-600 dark:text-emerald-400',
@@ -56,7 +56,7 @@ export const Privacy: React.FC = () => {
             id: 'cloud',
             icon: Server,
             title: 'Syncs Safely',
-            description: "When you switch devices, your data travels through a secure tunnel that even we can't see inside.",
+            description: "When you sync across devices, your account data travels through encrypted connections and remains protected by account access controls.",
             colors: {
                 bg: 'bg-violet-50/50 dark:bg-violet-500/5',
                 text: 'text-violet-600 dark:text-violet-400',
@@ -126,7 +126,7 @@ export const Privacy: React.FC = () => {
                 <div className="relative max-w-3xl mx-auto">
                     <div className="relative z-10">
                         <p className="text-sm font-medium text-neutral-400 dark:text-neutral-500 mb-4 uppercase tracking-widest">
-                            Effective Date: February 17, 2026
+                            Effective Date: August 24, 2026
                         </p>
 
                         <div className="prose prose-neutral dark:prose-invert prose-lg md:prose-xl prose-headings:font-black prose-headings:tracking-tight prose-a:text-emerald-600 dark:prose-a:text-emerald-400 prose-a:no-underline hover:prose-a:underline">
@@ -150,7 +150,7 @@ export const Privacy: React.FC = () => {
                                             <strong>Usage Data:</strong> We collect non-identifiable usage patterns, such as features used, time spent, and engagement with new designs. This data helps us prioritize improvements and ensure the tool remains intuitive.
                                         </p>
                                         <p>
-                                            <strong>AI Quality Logs:</strong> To prevent "hallucinations" and improve accuracy, we log certain AI interactions (prompts and responses). However, all personal identifiers (such as email addresses and phone numbers) are programmatically redacted on your device before these logs ever leave your machine.
+                                            <strong>AI Quality and Safety Logs:</strong> Navigator and Google may process AI prompts and responses to improve letter quality, troubleshoot failures, and investigate abuse. Google AI Studio logging is currently enabled during active product testing and may retain these interactions for up to 55 days. Do not submit information you are not comfortable sending to Google Gemini.
                                         </p>
                                     </div>
                                 </section>
@@ -178,7 +178,7 @@ export const Privacy: React.FC = () => {
                                             </li>
                                         </ul>
                                         <p>
-                                            <strong>AI Processing:</strong> Navigator uses Google&apos;s Vertex AI and Gemini models. We operate on enterprise-tier APIs where data is <strong>never used for model training</strong>. Your resumes and job match analyses remain yours.
+                                            <strong>AI Processing:</strong> Navigator uses Google&apos;s Gemini API. The content you submit may include resumes, job descriptions, and other career information. It is <strong>not used to train Google&apos;s global models</strong> under the API terms we use, but current Google AI Studio logging may retain prompts and responses for up to 55 days for quality, debugging, and abuse review.
                                         </p>
                                     </div>
                                 </section>

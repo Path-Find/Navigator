@@ -18,14 +18,14 @@ export const PrivacyStep = ({ privacyAccepted, setPrivacyAccepted, setStep, hand
                     <div className="w-20 h-20 rounded-3xl bg-emerald-500/10 flex items-center justify-center mb-6 ring-8 ring-emerald-500/5">
                         <Shield className="w-10 h-10 text-emerald-500" />
                     </div>
-                    <h1 className="text-4xl font-black mb-3 text-neutral-900 dark:text-white">Privacy First</h1>
-                    <p className="text-neutral-500 dark:text-neutral-400 text-lg font-medium">Before we start, our promise to you.</p>
+                    <h1 className="text-4xl font-black mb-3 text-neutral-900 dark:text-white">Privacy & AI Processing</h1>
+                    <p className="text-neutral-500 dark:text-neutral-400 text-lg font-medium">Before we start, here is how your data is handled.</p>
                 </div>
 
                 <div className="space-y-3 mb-10">
                     {[
                         { icon: <Lock className="w-5 h-5 text-emerald-500" />, title: 'Secure Cloud Sync', desc: 'Your resume data is stored securely in your account and syncs across devices.', bg: 'bg-emerald-500/5' },
-                        { icon: <Zap className="w-5 h-5 text-amber-500" />, title: 'AI Processing', desc: 'We send anonymous text to Google Gemini for analysis. It is not used for training.', bg: 'bg-amber-500/5' },
+                        { icon: <Zap className="w-5 h-5 text-amber-500" />, title: 'AI Processing', desc: 'We send your resume and job content to Google Gemini for analysis. It is not used to train Google\'s models, but Google logging is currently enabled for up to 55 days during product testing.', bg: 'bg-amber-500/5' },
                         { icon: <span className="font-black text-rose-500">X</span>, title: 'Zero Tracking', desc: 'No analytics. No cookies. No creepiness.', bg: 'bg-rose-500/5' }
                     ].map((item, i) => (
                         <div key={i} className={`flex items-start gap-5 p-5 rounded-2xl border border-neutral-100 dark:border-neutral-800/50 ${item.bg}`}>

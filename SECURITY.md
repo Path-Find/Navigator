@@ -5,9 +5,9 @@ Navigator is built with privacy and security as its foundation.
 - **Authentication & Authorization**: A multi-tier model using Supabase Auth with secure login methods and email verification.
 - **Data Ownership**: Row Level Security (RLS) ensures users only access their own resumes and analysis history.
 - **AI Privacy**: Navigator uses Gemini to analyze resumes and job descriptions.
-    - **Privacy Commitment**: Covered by [Google's Enterprise Privacy protections](https://cloud.google.com/vertex-ai/docs/generative-ai/learn/privacy).
-    - **No Training**: Your resumes, job descriptions, and chats are never used to train global AI models.
-    - **Isolation**: Data is processed in isolated sessions and is not shared with other users.
+    - **No Training**: Your resumes, job descriptions, and chats are not used to train Google's global AI models under the API terms we use.
+    - **Quality and abuse monitoring**: Google AI Studio's GenerateContent API logging is currently enabled for active product testing. Prompts and responses may be retained by Google for up to 55 days for debugging, quality review, and abuse investigation.
+    - **Isolation**: Data is processed for the requesting account and is not shared with other Navigator users.
 - **Secure Integration**: Operations like job scraping are handled in isolated server-side environments (Supabase Edge Functions).
 - **Abuse Prevention**: Implements device fingerprinting and email normalization to protect platform integrity.
 
