@@ -91,8 +91,8 @@ export const InterviewSessionScreen = ({
         const positionName = job?.position || 'this';
 
         const intro = sessionType === 'tailored' && job
-            ? `Great pick! Let's practice for your ${positionName} role${companyName ? ` at ${companyName}` : ''}. We'll focus on behavioral questions.`
-            : 'Welcome! Let\'s get started with some general behavioral practice.';
+            ? `Great pick! We'll practice for your ${positionName} role${companyName ? ` at ${companyName}` : ''}. I'll ask one question at a time, and after each answer I'll give you practical coaching to make it stronger.`
+            : 'Welcome! We\'ll run this like a real behavioral interview. I\'ll ask one question at a time, and after each answer I\'ll give you practical coaching to help you improve.';
         const continueInterview = () => {
             setShowStarHelp(false);
             setHasStartedInterview(true);
@@ -101,7 +101,7 @@ export const InterviewSessionScreen = ({
         msgs.push({
             id: 'intro-msg',
             role: 'ai',
-            content: `${intro}${showStarHelp ? '\n\nSTAR is a simple structure for answering experience-based questions:\n\n• Situation — set the context.\n• Task — explain what needed to be done.\n• Action — focus on what you personally did.\n• Result — share what changed or what you learned.\n\nExample: “Our team was missing deadlines (Situation), and I was asked to improve the process (Task). I created a shared tracker and weekly check-ins (Action), which helped us deliver the next project on time (Result).”' : ''}${hasStartedInterview ? '\n\nHere\'s your first question:' : ''}`,
+            content: `${intro}${showStarHelp ? '\n\nSTAR is a simple structure for answering experience-based questions:\n\n• Situation — set the context.\n• Task — explain what needed to be done.\n• Action — focus on what you personally did.\n• Result — share what changed or what you learned.\n\nExample: “Our team was missing deadlines (Situation), and I was asked to improve the process (Task). I created a shared tracker and weekly check-ins (Action), which helped us deliver the next project on time (Result).”' : '\n\nYou can ask for STAR guidance before you begin if you want a structure for your answer.'}${hasStartedInterview ? '\n\nTake a moment, then answer as you would in the interview.' : ''}`,
             suggestionPills: showStarHelp
                 ? [{ id: 'continue-interview', label: 'Continue interview', onClick: continueInterview }]
                 : [
