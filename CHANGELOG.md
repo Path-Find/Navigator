@@ -63,6 +63,8 @@ See [CHANGELOG_ARCHIVE.md](CHANGELOG_ARCHIVE.md) for earlier history.
 
 ### Fixed
 
+- Interview question guidance now keeps the approach and resume prompts together.
+- Interview progress no longer advertises a fixed question count.
 - Interview guidance choices now appear as user replies before Navigator responds.
 - **NextGen diagnostics no longer duplicate profile preferences**: personal learned-style and activity details now live in Application Profile, alongside editable cover-letter style.
 - **NextGen is automatic for admins and no longer has a confusing toggle**: eligible users see it in Application Profile, where its personal learned context belongs.

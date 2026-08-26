@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { Sparkles, FileText, CheckCircle2, ShieldCheck, Check, Copy, Loader2 } from 'lucide-react';
-import { motion } from 'framer-motion';
 import { InterviewChat } from '../../../components/common/InterviewChat';
 import type { ChatMessage } from '../../../components/common/InterviewChat';
 import { handleBankSuggestion } from '../utils/interviewUtils';
@@ -255,37 +254,27 @@ export const InterviewSessionScreen = ({
                         {isLastQ && !resp && (() => {
                             const framework = getAnswerFramework(q);
                             return (
-                                <div className="mt-3 flex flex-wrap items-baseline gap-x-2 gap-y-1 text-[11px] text-neutral-500 dark:text-neutral-400">
+                                <div className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-1 text-[11px] text-neutral-500 dark:text-neutral-400">
                                     <span className="font-black uppercase tracking-widest text-neutral-500">Suggested approach:</span>
                                     <span className="font-black uppercase tracking-widest text-neutral-700 dark:text-neutral-300">{framework.name}</span>
                                     <span>{framework.description}</span>
+                                    {resumeSnippets.length > 0 && (
+                                        <>
+                                            <span className="font-black text-neutral-400">Think about:</span>
+                                            {resumeSnippets.map((snippet, sIdx) => (
+                                                <span
+                                                    key={sIdx}
+                                                    className="max-w-[12rem] truncate rounded-full border border-neutral-200 bg-neutral-100 px-2.5 py-1 font-bold text-neutral-600 dark:border-neutral-700 dark:bg-neutral-800/80 dark:text-neutral-400"
+                                                    title={snippet.source}
+                                                >
+                                                    {snippet.text}
+                                                </span>
+                                            ))}
+                                        </>
+                                    )}
                                 </div>
                             );
                         })()}
-                        {/* Resume snippets (only on the current unanswered question) */}
-                        {isLastQ && !resp && resumeSnippets.length > 0 && (
-                            <motion.div
-                                initial={{ opacity: 0, y: 5 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                transition={{ delay: 0.3 }}
-                                className="mt-3 pt-1 flex flex-wrap items-center gap-2"
-                            >
-                                <div className="text-[10px] font-black text-neutral-400 mr-1">
-                                    Think about:
-                                </div>
-                                {resumeSnippets.map((snippet, sIdx) => (
-                                    <div
-                                        key={sIdx}
-                                        className="group flex items-center gap-1.5 px-2.5 py-1 bg-neutral-100 dark:bg-neutral-800/80 border border-neutral-200 dark:border-neutral-700 rounded-full shadow-sm hover:bg-neutral-200 dark:hover:bg-neutral-700 transition-all cursor-default max-w-[12rem]"
-                                        title={snippet.source}
-                                    >
-                                        <span className="text-[10px] font-bold text-neutral-600 dark:text-neutral-400 truncate">
-                                            {snippet.text}
-                                        </span>
-                                    </div>
-                                ))}
-                            </motion.div>
-                        )}
                     </>
                 ),
             });
@@ -522,7 +511,7 @@ export const InterviewSessionScreen = ({
                         } : undefined}
                         completionMessage={isInterviewComplete ? 'Interview complete — you reached the end of this session.' : undefined}
                         completionSummary={completionSummary}
-                        progressLabel={!isInitialJobSelection ? `Question ${currentQuestionIndex + 1} of ${questions.length}` : undefined}
+                        progressLabel={!isInitialJobSelection ? `Question ${currentQuestionIndex + 1}` : undefined}
                         inputDisabled={(!!currentQ && hasResponse) || isLoading || shouldDisableInput}
                         accentGradient="from-neutral-700 to-neutral-500"
                     />
