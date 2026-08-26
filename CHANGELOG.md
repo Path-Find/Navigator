@@ -5,6 +5,8 @@ All notable changes to this project will be documented in this file.
 See [CHANGELOG_ARCHIVE.md](CHANGELOG_ARCHIVE.md) for earlier history.
 
 ## [Unreleased]
+- **Consolidated duplicate communication skills**: “Communication,” “Communications,” and “Communications Skills” now behave as one skill in the Skills view and interview flow.
+- **Made Skills interview selection user-controlled**: saved jobs influence the default ranking, users choose up to five skills, and unselected skills are never silently dropped.
 - **Clarified the Skills interview**: the flow now explains what will happen, shows question progress, and uses measured completion language instead of “mastery” or “banking” claims.
 - **Structured education credentials**: education entries now use a consistent credential-type selector while keeping the full degree or program name in the title.
 - **Refined resume date controls**: styled month/year selectors now replace the native picker, and existing entries use one current-state control.

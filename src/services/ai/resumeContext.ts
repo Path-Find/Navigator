@@ -67,7 +67,7 @@ export const serializeResumeBlocks = (
     reference = '',
     maxBlocks: number = AI_CONTEXT_BUDGETS.resumeBlocks,
 ): string => JSON.stringify(selectRelevantResumeBlocks(profile, reference, maxBlocks)
-    .map(({ type, title, organization, dateRange, bullets, narrativeContext }) => ({
+    .map(({ type, title, organization, credentialType, dateRange, bullets, narrativeContext }) => ({
         type, title, organization, credentialType, dateRange, bullets,
         ...(narrativeContext ? { narrativeContext } : {}),
     })));
@@ -79,8 +79,8 @@ export const serializeResumeProfile = (
 ): string => JSON.stringify({
     name: profile.name,
     blocks: selectRelevantResumeBlocks(profile, reference, maxBlocks)
-        .map(({ type, title, organization, dateRange, bullets, narrativeContext }) => ({
-        type, title, organization, credentialType, dateRange, bullets,
+        .map(({ type, title, organization, credentialType, dateRange, bullets, narrativeContext }) => ({
+            type, title, organization, credentialType, dateRange, bullets,
             ...(narrativeContext ? { narrativeContext } : {}),
         })),
 });

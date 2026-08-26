@@ -27,7 +27,7 @@ interface InterviewMessage {
     skillResults?: { skill: string; demonstrated: boolean; note: string }[];
 }
 
-const MAX_SKILLS_PER_SESSION = 8;
+const MAX_SKILLS_PER_SESSION = 5;
 
 export const SkillInterviewPage: React.FC = () => {
     const location = useLocation();
@@ -38,8 +38,9 @@ export const SkillInterviewPage: React.FC = () => {
 
     // Accept array of skills from router state, enforced cap for quality
     const locationSkills = location.state?.skills as { name: string; proficiency: string }[] | undefined;
-    const skills = React.useMemo(() => (locationSkills ?? []).slice(0, MAX_SKILLS_PER_SESSION), [locationSkills]);
-    const isCapped = (locationSkills?.length ?? 0) > MAX_SKILLS_PER_SESSION;
+    const skills = React.useMemo(() => locationSkills ?? [], [locationSkills]);
+    const [selectedSkillNames, setSelectedSkillNames] = useState<string[]>(() => skills.slice(0, MAX_SKILLS_PER_SESSION).map(skill => skill.name));
+    const selectedSkills = React.useMemo(() => skills.filter(skill => selectedSkillNames.includes(skill.name)), [skills, selectedSkillNames]);
 
     const [step, setStep] = useState<InterviewStep>('intro');
     const [isLoading, setIsLoading] = useState(false);
@@ -91,6 +92,7 @@ export const SkillInterviewPage: React.FC = () => {
 
 
     const handleStart = async () => {
+        if (selectedSkills.length === 0) return;
         setIsLoading(true);
         setLimitError(null);
 
@@ -108,13 +110,13 @@ export const SkillInterviewPage: React.FC = () => {
                 return;
             }
 
-            const qs = await generateUnifiedQuestions(skills);
+            const qs = await generateUnifiedQuestions(selectedSkills);
             setQuestions(qs);
             setStep('interview');
 
             // Initialize skill scores
             const initialScores: Record<string, { demonstrated: number; total: number }> = {};
-            skills.forEach(s => { initialScores[s.name] = { demonstrated: 0, total: 0 }; });
+            selectedSkills.forEach(s => { initialScores[s.name] = { demonstrated: 0, total: 0 }; });
             setSkillScores(initialScores);
 
             // Add greeting + first question
@@ -263,7 +265,11 @@ export const SkillInterviewPage: React.FC = () => {
                             usageInfo={usageInfo}
                             handleStart={handleStart}
                             skills={skills}
-                            isCapped={isCapped}
+                            selectedSkillNames={selectedSkillNames}
+                            onToggleSkill={(skillName: string) => setSelectedSkillNames(current => current.includes(skillName)
+                                ? current.filter(name => name !== skillName)
+                                : current.length < MAX_SKILLS_PER_SESSION ? [...current, skillName] : current)}
+                            maxSelected={MAX_SKILLS_PER_SESSION}
                             MAX_SKILLS_PER_SESSION={MAX_SKILLS_PER_SESSION}
                         />
                     )}
@@ -281,7 +287,7 @@ export const SkillInterviewPage: React.FC = () => {
                     {step === 'summary' && (
                         <SkillInterviewSummary
                             verifiedCount={verifiedCount}
-                            skills={skills}
+                            skills={selectedSkills}
                             skillScores={skillScores}
                             verifiedSkills={verifiedSkills}
                             handleClose={handleClose}

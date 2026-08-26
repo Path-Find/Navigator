@@ -17,11 +17,15 @@ import { STORAGE_KEYS } from '../../constants';
 import { useNavigate } from 'react-router';
 import { useSkillContext } from '../../modules/skills/context/SkillContext';
 import { useResumeContext } from '../../modules/resume/context/ResumeContext';
+import { useJobContext } from '../../modules/job/context/JobContext';
+import { canonicalSkillKey, canonicalSkillName, mergeSkillRecords } from '../../modules/skills/skillUtils';
 
 export const SkillsView: React.FC = () => {
     const navigate = useNavigate();
     const { skills, updateSkills: onSkillsUpdated } = useSkillContext();
     const { resumes } = useResumeContext();
+    const { jobs } = useJobContext();
+    const uniqueSkills = useMemo(() => mergeSkillRecords(skills), [skills]);
 
     const onStartUnifiedInterview = (skillsToVerify: { name: string; proficiency: string }[]) => {
         navigate('/career/skills/interview', { state: { skills: skillsToVerify } });
@@ -39,18 +43,22 @@ export const SkillsView: React.FC = () => {
 
     // Dynamically filter suggestions: Include only those NOT in current skills
     const displayedSuggestions = suggestions.filter(s =>
-        !skills.some(existing => existing.name.toLowerCase() === s.name.toLowerCase())
+        !uniqueSkills.some(existing => canonicalSkillKey(existing.name) === canonicalSkillKey(s.name))
     );
 
     // Skills that haven't been verified yet
-    const unverifiedSkills = skills.filter(s => !s.evidence);
+    const unverifiedSkills = uniqueSkills.filter(s => !s.evidence);
 
     const handleAddSkill = async (newSkillName: string) => {
         if (!newSkillName.trim()) return;
+        if (uniqueSkills.some(skill => canonicalSkillKey(skill.name) === canonicalSkillKey(newSkillName))) {
+            setIsAdding(false);
+            return;
+        }
 
         try {
             const newSkill = await Storage.saveSkill({
-                name: newSkillName.trim(),
+                name: canonicalSkillName(newSkillName),
                 proficiency: 'learning'
             });
             onSkillsUpdated([...skills, newSkill]);
@@ -61,8 +69,9 @@ export const SkillsView: React.FC = () => {
     };
 
     const handleDeleteSkill = async (name: string) => {
-        await Storage.deleteSkill(name);
-        onSkillsUpdated(skills.filter(s => s.name !== name));
+        const matchingNames = skills.filter(skill => canonicalSkillKey(skill.name) === canonicalSkillKey(name)).map(skill => skill.name);
+        await Promise.all(matchingNames.map(skillName => Storage.deleteSkill(skillName)));
+        onSkillsUpdated(skills.filter(s => !matchingNames.includes(s.name)));
         showSuccess(`Removed ${name}`);
     };
 
@@ -78,14 +87,14 @@ export const SkillsView: React.FC = () => {
     const [filter, setFilter] = useState<ProficiencyFilter>('all');
 
     const filteredSkills = useMemo(() => {
-        return skills
+        return uniqueSkills
             .filter(s => {
                 const matchesSearch = s.name.toLowerCase().includes(searchTerm.toLowerCase());
                 const matchesFilter = filter === 'all' || s.proficiency === filter;
                 return matchesSearch && matchesFilter;
             })
             .sort((a, b) => a.name.localeCompare(b.name));
-    }, [skills, searchTerm, filter]);
+    }, [uniqueSkills, searchTerm, filter]);
 
 
     const handleSuggestSkills = async () => {
@@ -101,9 +110,11 @@ export const SkillsView: React.FC = () => {
     };
 
     const handleAddSuggestedSkill = async (name: string, description?: string) => {
+        if (uniqueSkills.some(skill => canonicalSkillKey(skill.name) === canonicalSkillKey(name))) return;
+
         try {
             const newSkill = await Storage.saveSkill({
-                name,
+                name: canonicalSkillName(name),
                 proficiency: 'learning',
                 description
             });
@@ -114,7 +125,19 @@ export const SkillsView: React.FC = () => {
     };
 
     const handleStartVerification = () => {
-        const skillsToVerify = unverifiedSkills.map(s => ({
+        const jobText = jobs.map(job => [
+            job.position,
+            job.description,
+            ...(job.analysis?.distilledJob.keySkills || []),
+            ...(job.analysis?.distilledJob.requiredSkills || []).map(skill => skill.name),
+            ...(job.analysis?.distilledJob.coreResponsibilities || []),
+        ].join(' ').toLowerCase()).join(' ');
+        const rankedSkills = [...unverifiedSkills].sort((a, b) => {
+            const aMatch = jobText.includes(a.name.toLowerCase()) ? 1 : 0;
+            const bMatch = jobText.includes(b.name.toLowerCase()) ? 1 : 0;
+            return bMatch - aMatch || a.name.localeCompare(b.name);
+        });
+        const skillsToVerify = rankedSkills.map(s => ({
             name: s.name,
             proficiency: s.proficiency,
         }));
@@ -125,7 +148,7 @@ export const SkillsView: React.FC = () => {
         <SharedPageLayout className="theme-coach" spacing="compact" maxWidth="6xl">
             {/* Quick Stats */}
             <SkillsStats
-                skills={skills}
+                skills={uniqueSkills}
                 onSuggestSkills={handleSuggestSkills}
                 isSuggesting={isSuggesting}
                 onAddSkill={() => setIsAdding(true)}
@@ -159,7 +182,7 @@ export const SkillsView: React.FC = () => {
             </div>
 
             {/* Skills Grid */}
-            {skills.length === 0 ? (
+            {uniqueSkills.length === 0 ? (
                 <div className="text-center py-32 bg-neutral-50 dark:bg-neutral-900/50 rounded-[3rem] border-2 border-dashed border-neutral-200 dark:border-neutral-800">
                     <div className="w-20 h-20 bg-white dark:bg-neutral-800 rounded-3xl flex items-center justify-center mx-auto mb-6 shadow-sm">
                         <Zap className="w-10 h-10 text-neutral-200" />

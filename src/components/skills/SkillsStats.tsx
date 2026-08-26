@@ -88,7 +88,7 @@ export const SkillsStats: React.FC<SkillsStatsProps> = ({
                 id="verify-skills"
                 icon={ShieldCheck}
                 title="Verify skills"
-                description={unverifiedCount > 0 ? `Answer questions to verify ${unverifiedCount} skill${unverifiedCount === 1 ? '' : 's'}.` : "All listed skills have interview evidence."}
+                description={unverifiedCount > 0 ? `Choose up to 5 skills to verify in one interview.` : "All listed skills have interview evidence."}
                 onAction={onVerifySkills}
                 actionLabel={unverifiedCount > 0 ? "Start interview" : undefined}
                 color={FEATURE_COLORS.amber}

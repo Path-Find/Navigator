@@ -3,7 +3,19 @@ import { motion } from 'framer-motion';
 import { ROUTES } from '../../../constants';
 import { useNavigate } from 'react-router';
 
-export const SkillInterviewIntro = ({ isLoading, limitError, usageInfo, handleStart, skills, isCapped, MAX_SKILLS_PER_SESSION }: any) => {
+interface SkillInterviewIntroProps {
+    isLoading: boolean;
+    limitError: string | null;
+    usageInfo: { used: number; total: number } | null;
+    handleStart: () => void;
+    skills: { name: string; proficiency: string }[];
+    selectedSkillNames: string[];
+    onToggleSkill: (skillName: string) => void;
+    maxSelected: number;
+    MAX_SKILLS_PER_SESSION: number;
+}
+
+export const SkillInterviewIntro = ({ isLoading, limitError, usageInfo, handleStart, skills, selectedSkillNames, onToggleSkill, maxSelected, MAX_SKILLS_PER_SESSION }: SkillInterviewIntroProps) => {
     const navigate = useNavigate();
     return (
         <motion.div
@@ -43,7 +55,7 @@ export const SkillInterviewIntro = ({ isLoading, limitError, usageInfo, handleSt
 
                     <button
                         onClick={handleStart}
-                        disabled={isLoading || !!limitError}
+                        disabled={isLoading || !!limitError || selectedSkillNames.length === 0}
                         className="w-full md:w-auto px-10 py-5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-2xl font-bold text-lg transition-all hover:scale-105 active:scale-95 shadow-lg shadow-emerald-500/20 flex flex-col items-center gap-1 disabled:opacity-50"
                     >
                         <div className="flex items-center gap-3">
@@ -75,26 +87,30 @@ export const SkillInterviewIntro = ({ isLoading, limitError, usageInfo, handleSt
                             <div className="text-sm font-bold text-neutral-400 tracking-widest uppercase">
                                 Skills to verify
                             </div>
-                            {isCapped && (
-                                <div className="text-[10px] text-amber-600 dark:text-amber-500 font-extrabold uppercase tracking-tight">
-                                    Capped at {MAX_SKILLS_PER_SESSION} for quality focus
-                                </div>
-                            )}
+                            <div className="text-[10px] text-neutral-500 font-bold uppercase tracking-tight">
+                                Choose up to {MAX_SKILLS_PER_SESSION} skills
+                            </div>
                         </div>
-                        <div className="text-xs font-bold text-emerald-500 bg-emerald-500/10 px-3 py-1 rounded-full">
-                            {skills.length} items
+                            <div className="text-xs font-bold text-emerald-500 bg-emerald-500/10 px-3 py-1 rounded-full">
+                            {selectedSkillNames.length} selected
                         </div>
                     </div>
 
                     <div className="flex flex-wrap gap-2.5">
-                        {[...skills].sort((a, b) => a.name.localeCompare(b.name)).map(s => (
-                            <span
+                        {[...skills].sort((a, b) => a.name.localeCompare(b.name)).map(s => {
+                            const selected = selectedSkillNames.includes(s.name);
+                            return <button
+                                type="button"
                                 key={s.name}
-                                className="px-4 py-2 bg-neutral-50 dark:bg-neutral-800 border border-neutral-100 dark:border-neutral-700 rounded-2xl text-sm font-semibold text-neutral-700 dark:text-neutral-300 shadow-sm"
+                                onClick={() => onToggleSkill(s.name)}
+                                disabled={!selected && selectedSkillNames.length >= maxSelected}
+                                className={`px-4 py-2 rounded-2xl text-sm font-semibold shadow-sm transition-colors ${selected
+                                    ? 'bg-emerald-50 border border-emerald-300 text-emerald-700 dark:bg-emerald-900/30 dark:border-emerald-700 dark:text-emerald-300'
+                                    : 'bg-neutral-50 dark:bg-neutral-800 border border-neutral-100 dark:border-neutral-700 text-neutral-700 dark:text-neutral-300 disabled:opacity-40'}`}
                             >
                                 {s.name}
-                            </span>
-                        ))}
+                            </button>;
+                        })}
                     </div>
                 </div>
             </div>
