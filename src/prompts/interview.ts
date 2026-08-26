@@ -102,7 +102,27 @@ export const INTERVIEW_PROMPTS = {
     `;
   },
 
-  ANALYZE_UNIFIED_RESPONSE: (question: string, targetSkills: string[], userResponse: string) => `
+  UNIFIED_SKILL_QUESTION: (skills: { name: string; proficiency: string }[]) => `
+    You are conducting a practical skills interview one question at a time.
+    ${UNTRUSTED_DATA_RULE}
+
+    SELECTED SKILLS:
+    ${anchorData('SKILLS', skills.map(s => `- ${s.name} (self-assessed: ${s.proficiency})`).join('\n'))}
+
+    Write the first interview question. It should be a concise, realistic scenario that tests one or two selected skills, not trivia.
+    Return ONLY JSON:
+    { "question": "The question text.", "targetSkills": ["Skill Name"] }
+  `,
+
+  ANALYZE_UNIFIED_RESPONSE: (
+    question: string,
+    targetSkills: string[],
+    userResponse: string,
+    selectedSkills: string[] = [],
+    history: { question: string; answer: string }[] = [],
+    questionNumber = 1,
+    maxQuestions = 6,
+  ) => `
     You are a strict but fair interviewer evaluating a candidate's response. Speak DIRECTLY to the candidate.
 
     ${UNTRUSTED_DATA_RULE}
@@ -110,11 +130,15 @@ export const INTERVIEW_PROMPTS = {
     QUESTION DATA: ${anchorData('QUESTION', question)}
     TARGET SKILLS DATA: ${anchorData('TARGET_SKILLS', targetSkills.join(', '))}
     CANDIDATE RESPONSE DATA: ${anchorData('CANDIDATE_RESPONSE', userResponse)}
+    SELECTED SKILLS DATA: ${anchorData('SELECTED_SKILLS', selectedSkills.join(', '))}
+    RECENT INTERVIEW HISTORY: ${anchorData('INTERVIEW_HISTORY', history.slice(-5).map((turn, index) => `Q${index + 1}: ${turn.question}\nA${index + 1}: ${turn.answer}`).join('\n---\n'))}
+    THIS IS QUESTION ${questionNumber} OF A MAXIMUM OF ${maxQuestions}.
 
     TASK:
     1. Evaluate the response quality overall. Address the candidate DIRECTLY using "you" (do NOT use third-person like "the candidate").
     2. For EACH target skill listed, determine if the response demonstrates competence in that skill.
     3. Provide concise feedback.
+    4. Decide whether the interview should continue. Continue until there is enough evidence across the selected skills, but never exceed ${maxQuestions} questions. If it continues, write one new question that does not repeat the recent history and targets one or two selected skills.
 
     Return ONLY JSON:
     {
@@ -125,8 +149,11 @@ export const INTERVIEW_PROMPTS = {
           "skill": "Skill Name",
           "demonstrated": boolean,
           "note": "One sentence on why/why not"
-        }
-      ]
+          }
+      ],
+      "shouldContinue": boolean,
+      "nextQuestion": "The next question text, or null when the interview is complete.",
+      "nextTargetSkills": ["Skill Name"]
     }
     `,
 

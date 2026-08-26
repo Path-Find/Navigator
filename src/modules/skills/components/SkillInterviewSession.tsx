@@ -3,7 +3,7 @@ import { motion } from 'framer-motion';
 import { InterviewChat } from '../../../components/common/InterviewChat';
 import type { ChatMessage } from '../../../components/common/InterviewChat';
 
-export const SkillInterviewSession = ({ messages, userAnswer, setUserAnswer, handleSubmitAnswer, isAnalyzing, currentQuestionIndex, totalQuestions }: any) => {
+export const SkillInterviewSession = ({ messages, userAnswer, setUserAnswer, handleSubmitAnswer, isAnalyzing, currentQuestionIndex }: any) => {
     return (
         <motion.div
             key="interview"
@@ -14,7 +14,7 @@ export const SkillInterviewSession = ({ messages, userAnswer, setUserAnswer, han
         >
             <div className="mb-4 flex items-center justify-between text-xs font-bold text-neutral-400">
                 <span>Skills interview</span>
-                <span>{Math.min(currentQuestionIndex + 1, totalQuestions)} of {totalQuestions}</span>
+                <span>Question {currentQuestionIndex + 1}</span>
             </div>
             <InterviewChat
                 messages={messages.map((msg: any, idx: number): ChatMessage => ({

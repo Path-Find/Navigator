@@ -4,7 +4,7 @@ import { SkillInterviewSummary } from './components/SkillInterviewSummary';
 import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate, Navigate } from 'react-router';
 import type { CustomSkill } from '../../types';
-import { generateUnifiedQuestions, analyzeUnifiedResponse } from '../../services/geminiService';
+import { generateUnifiedQuestion, analyzeUnifiedResponse } from '../../services/geminiService';
 import { useSkillContext } from './context/SkillContext';
 import { useGlobalUI } from '../../contexts/GlobalUIContext';
 import { checkInterviewLimit, getUsageStats } from '../../services/usageLimits';
@@ -28,6 +28,7 @@ interface InterviewMessage {
 }
 
 const MAX_SKILLS_PER_SESSION = 5;
+const MAX_QUESTIONS_PER_SESSION = 6;
 
 export const SkillInterviewPage: React.FC = () => {
     const location = useLocation();
@@ -51,6 +52,7 @@ export const SkillInterviewPage: React.FC = () => {
     const [userAnswer, setUserAnswer] = useState('');
     const [isAnalyzing, setIsAnalyzing] = useState(false);
     const [messages, setMessages] = useState<InterviewMessage[]>([]);
+    const [interviewHistory, setInterviewHistory] = useState<{ question: string; answer: string }[]>([]);
     const [limitError, setLimitError] = useState<string | null>(null);
     const [usageInfo, setUsageInfo] = useState<{ used: number; total: number } | null>(null);
 
@@ -110,8 +112,8 @@ export const SkillInterviewPage: React.FC = () => {
                 return;
             }
 
-            const qs = await generateUnifiedQuestions(selectedSkills);
-            setQuestions(qs);
+            const firstQuestion = await generateUnifiedQuestion(selectedSkills);
+            setQuestions([firstQuestion]);
             setStep('interview');
 
             // Initialize skill scores
@@ -119,13 +121,14 @@ export const SkillInterviewPage: React.FC = () => {
             selectedSkills.forEach(s => { initialScores[s.name] = { demonstrated: 0, total: 0 }; });
             setSkillScores(initialScores);
 
-            // Add greeting + first question
+            // Add a short greeting, then reveal the first question.
             setMessages([
-                { role: 'ai', content: `Great, let's get started! I'll ask you ${qs.length} questions that cover your skills. Answer naturally — each question may touch on multiple skills at once.` },
+                { role: 'ai', content: "Great, let's get started. I'll ask one practical question at a time, give you feedback after each answer, and adapt the next question to what you tell me." },
             ]);
+            setInterviewHistory([]);
 
             setTimeout(() => {
-                setMessages(prev => [...prev, { role: 'ai', content: qs[0].question }]);
+                setMessages(prev => [...prev, { role: 'ai', content: firstQuestion.question }]);
             }, 800);
         } catch (error) {
             console.error('Failed to generate questions:', error);
@@ -142,6 +145,8 @@ export const SkillInterviewPage: React.FC = () => {
         const answer = userAnswer;
         setUserAnswer('');
         setIsAnalyzing(true);
+        const updatedHistory = [...interviewHistory, { question: currentQ.question, answer }];
+        setInterviewHistory(updatedHistory);
 
         setMessages(prev => [...prev, { role: 'user', content: answer }]);
 
@@ -149,7 +154,13 @@ export const SkillInterviewPage: React.FC = () => {
             const analysis = await analyzeUnifiedResponse(
                 currentQ.question,
                 currentQ.targetSkills,
-                answer
+                answer,
+                {
+                    selectedSkills: selectedSkills.map(skill => skill.name),
+                    history: updatedHistory,
+                    questionNumber: currentQuestionIndex + 1,
+                    maxQuestions: MAX_QUESTIONS_PER_SESSION,
+                },
             );
 
             // Update skill scores
@@ -189,12 +200,17 @@ export const SkillInterviewPage: React.FC = () => {
                 }
             });
 
-            // Next question or finish
-            if (currentQuestionIndex < questions.length - 1) {
+            // The analysis response decides whether there is another question.
+            if (analysis.shouldContinue && analysis.nextQuestion && currentQuestionIndex < MAX_QUESTIONS_PER_SESSION - 1) {
                 const nextIdx = currentQuestionIndex + 1;
+                const nextQuestion = {
+                    question: analysis.nextQuestion,
+                    targetSkills: analysis.nextTargetSkills,
+                };
+                setQuestions(prev => [...prev, nextQuestion]);
                 setCurrentQuestionIndex(nextIdx);
                 setTimeout(() => {
-                    setMessages(prev => [...prev, { role: 'ai', content: questions[nextIdx].question }]);
+                    setMessages(prev => [...prev, { role: 'ai', content: nextQuestion.question }]);
                     setIsAnalyzing(false);
                 }, 1200);
             } else {
@@ -206,16 +222,9 @@ export const SkillInterviewPage: React.FC = () => {
         } catch (error) {
             console.error('Analysis failed:', error);
             setIsAnalyzing(false);
-            if (currentQuestionIndex < questions.length - 1) {
-                const nextIdx = currentQuestionIndex + 1;
-                setCurrentQuestionIndex(nextIdx);
-                setMessages(prev => [...prev,
-                { role: 'ai', content: "I couldn't analyze that response, but let's continue." },
-                { role: 'ai', content: questions[nextIdx].question }
-                ]);
-            } else {
-                setStep('summary');
-            }
+            setInterviewHistory(previous => previous.slice(0, -1));
+            setUserAnswer(answer);
+            setMessages(prev => [...prev, { role: 'ai', content: "I couldn't analyze that response. Please try submitting it again." }]);
         }
     };
 
@@ -281,7 +290,6 @@ export const SkillInterviewPage: React.FC = () => {
                             handleSubmitAnswer={handleSubmitAnswer}
                             isAnalyzing={isAnalyzing}
                             currentQuestionIndex={currentQuestionIndex}
-                            totalQuestions={questions.length}
                         />
                     )}
                     {step === 'summary' && (

@@ -52,16 +52,46 @@ export const generateUnifiedQuestions = async (
     }, { event_type: 'unified_skill_interview_generation', prompt, model: 'dynamic' });
 };
 
+export const generateUnifiedQuestion = async (
+    skills: { name: string; proficiency: string }[],
+): Promise<{ question: string; targetSkills: string[] }> => {
+    const prompt = INTERVIEW_PROMPTS.UNIFIED_SKILL_QUESTION(skills);
+
+    return callWithRetry(async (metadata) => {
+        const model = await getModel({ task: 'interview', generationConfig: { responseMimeType: "application/json" } });
+        const response = await model.generateContent({ contents: [{ role: "user", parts: [{ text: prompt }] }] });
+        metadata.token_usage = response.response.usageMetadata;
+        return JSON.parse(cleanJsonOutput(response.response.text()));
+    }, { event_type: 'unified_skill_question_generation', prompt, model: 'dynamic' });
+};
+
 export const analyzeUnifiedResponse = async (
     question: string,
     targetSkills: string[],
-    userResponse: string
+    userResponse: string,
+    options: {
+        selectedSkills: string[];
+        history: { question: string; answer: string }[];
+        questionNumber: number;
+        maxQuestions: number;
+    },
 ): Promise<{
     feedback: string;
     overallPassed: boolean;
     skillResults: { skill: string; demonstrated: boolean; note: string }[];
+    shouldContinue: boolean;
+    nextQuestion: string | null;
+    nextTargetSkills: string[];
 }> => {
-    const prompt = INTERVIEW_PROMPTS.ANALYZE_UNIFIED_RESPONSE(question, targetSkills, userResponse);
+    const prompt = INTERVIEW_PROMPTS.ANALYZE_UNIFIED_RESPONSE(
+        question,
+        targetSkills,
+        userResponse,
+        options.selectedSkills,
+        options.history,
+        options.questionNumber,
+        options.maxQuestions,
+    );
 
     return callWithRetry(async (metadata) => {
         const model = await getModel({ task: 'interview', generationConfig: { responseMimeType: "application/json" } });
