@@ -104,6 +104,7 @@ export const InterviewSessionScreen = ({
     const [copiedText, setCopiedText] = useState<string | null>(null);
     const [helpTopics, setHelpTopics] = useState<AnswerHelpTopic[]>([]);
     const [hasStartedInterview, setHasStartedInterview] = useState(false);
+    const [showContinueChoice, setShowContinueChoice] = useState(false);
     const [interviewerQuestions, setInterviewerQuestions] = useState('');
     const [questionReview, setQuestionReview] = useState<InterviewerQuestionReview | null>(null);
     const [isReviewingQuestions, setIsReviewingQuestions] = useState(false);
@@ -184,6 +185,7 @@ export const InterviewSessionScreen = ({
             : 'Welcome! We\'ll run this like a real behavioral interview. I\'ll ask one question at a time, and after each answer I\'ll give you practical coaching to help you improve.';
         const continueInterview = () => {
             setHasStartedInterview(true);
+            setShowContinueChoice(true);
         };
         const requestHelp = (topic: AnswerHelpTopic) => {
             setHelpTopics(current => current.includes(topic) ? current : [...current, topic]);
@@ -204,6 +206,11 @@ export const InterviewSessionScreen = ({
             const isStar = topic === 'STAR';
             const otherTopic = isStar ? 'ARC' : 'STAR';
             msgs.push({
+                id: `${topic.toLowerCase()}-help-request`,
+                role: 'user',
+                content: `What's ${topic}?`,
+            });
+            msgs.push({
                 id: `${topic.toLowerCase()}-help`,
                 role: 'ai',
                 content: isStar
@@ -217,6 +224,14 @@ export const InterviewSessionScreen = ({
         });
 
         if (!hasStartedInterview) return msgs;
+
+        if (showContinueChoice) {
+            msgs.splice(1 + helpTopics.length * 2, 0, {
+                id: 'continue-interview-choice',
+                role: 'user',
+                content: 'Continue interview',
+            });
+        }
 
         msgs.push({
             id: 'interview-ready',
@@ -375,7 +390,7 @@ export const InterviewSessionScreen = ({
         }
 
         return msgs;
-    }, [questions, currentQuestionIndex, responses, mode, resumes, copiedText, resumeSnippets, onBankSuggestion, onSaveStory, sessionType, selectedJobId, jobs, onJobSelected, isSessionLoading, isLoading, isLastQuestion, helpTopics, hasStartedInterview, starExample]);
+    }, [questions, currentQuestionIndex, responses, mode, resumes, copiedText, resumeSnippets, onBankSuggestion, onSaveStory, sessionType, selectedJobId, jobs, onJobSelected, isSessionLoading, isLoading, isLastQuestion, helpTopics, hasStartedInterview, showContinueChoice, starExample]);
 
     if (mode === 'session') {
         const isInitialJobSelection = sessionType === 'tailored' && !selectedJobId;

@@ -63,6 +63,7 @@ See [CHANGELOG_ARCHIVE.md](CHANGELOG_ARCHIVE.md) for earlier history.
 
 ### Fixed
 
+- Interview guidance choices now appear as user replies before Navigator responds.
 - **NextGen diagnostics no longer duplicate profile preferences**: personal learned-style and activity details now live in Application Profile, alongside editable cover-letter style.
 - **NextGen is automatic for admins and no longer has a confusing toggle**: eligible users see it in Application Profile, where its personal learned context belongs.
 - **Application Profile is now reachable from Resume**: resume context and preferences are linked from the workflow where they are used instead of living under account settings.
