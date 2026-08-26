@@ -117,6 +117,8 @@ export const ResumeSectionEditor: React.FC<ResumeSectionEditorProps> = ({
                                     <ResumeDateRangeFields
                                         value={block.dateRange}
                                         onChange={value => onUpdateBlock(block.id, 'dateRange', value)}
+                                        hideCurrentToggle
+                                        isCurrentOverride={current}
                                     />
                                 </div>
                             </div>

@@ -245,7 +245,7 @@ export const ResumeEditor: React.FC = () => {
                             size="xs"
                             icon={<UserRound className="w-3.5 h-3.5" />}
                         >
-                            <span className="hidden sm:inline">Application Preferences</span>
+                            <span className="hidden sm:inline">Preferences</span>
                             <span className="sm:hidden">Profile</span>
                         </Button>
                         <Button

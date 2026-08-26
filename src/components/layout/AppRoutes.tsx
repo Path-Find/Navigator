@@ -165,7 +165,7 @@ export const AppRoutes: React.FC = () => {
                         </Suspense>
                     } />
                     <Route path={ROUTES.APPLICATION_PROFILE} element={
-                        <Suspense fallback={<LoadingState message="Loading Application Preferences..." />}>
+                        <Suspense fallback={<LoadingState message="Loading Preferences..." />}>
                             <ApplicationProfilePage />
                         </Suspense>
                     } />

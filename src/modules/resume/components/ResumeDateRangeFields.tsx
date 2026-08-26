@@ -8,6 +8,9 @@ interface DateRangeParts {
     isCurrent: boolean;
 }
 
+const CURRENT_YEAR = new Date().getFullYear();
+const YEAR_OPTIONS = Array.from({ length: 91 }, (_, index) => String(CURRENT_YEAR + 10 - index));
+
 const parseMonth = (value: string): string => {
     const numeric = value.match(/^(\d{4})-(\d{1,2})$/);
     if (numeric) return `${numeric[1]}-${numeric[2].padStart(2, '0')}`;
@@ -45,47 +48,68 @@ interface ResumeDateRangeFieldsProps {
     value: string;
     onChange: (value: string) => void;
     compact?: boolean;
+    hideCurrentToggle?: boolean;
+    isCurrentOverride?: boolean;
 }
 
-export const ResumeDateRangeFields: React.FC<ResumeDateRangeFieldsProps> = ({ value, onChange, compact = false }) => {
+const MonthYearSelect: React.FC<{ value: string; onChange: (value: string) => void; label: string }> = ({ value, onChange, label }) => {
+    const [year = '', month = ''] = value.split('-');
+    const update = (nextYear: string, nextMonth: string) => onChange(nextYear && nextMonth ? `${nextYear}-${nextMonth}` : '');
+
+    return (
+        <div className="flex items-center gap-1">
+            <select
+                value={month}
+                onChange={event => update(year, event.target.value)}
+                aria-label={`${label} month`}
+                className="rounded-lg border border-neutral-200 bg-white px-1.5 py-1.5 text-xs font-bold text-neutral-600 outline-none focus:border-neutral-400 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-300"
+            >
+                <option value="">Month</option>
+                {MONTHS.map((monthName, index) => <option key={monthName} value={String(index + 1).padStart(2, '0')}>{monthName}</option>)}
+            </select>
+            <select
+                value={year}
+                onChange={event => update(event.target.value, month)}
+                aria-label={`${label} year`}
+                className="rounded-lg border border-neutral-200 bg-white px-1.5 py-1.5 text-xs font-bold text-neutral-600 outline-none focus:border-neutral-400 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-300"
+            >
+                <option value="">Year</option>
+                {YEAR_OPTIONS.map(option => <option key={option} value={option}>{option}</option>)}
+            </select>
+        </div>
+    );
+};
+
+export const ResumeDateRangeFields: React.FC<ResumeDateRangeFieldsProps> = ({ value, onChange, compact = false, hideCurrentToggle = false, isCurrentOverride }) => {
     const parts = useMemo(() => parseDateRange(value), [value]);
-    const update = (next: DateRangeParts) => onChange(formatDateRange(next));
+    const isCurrent = isCurrentOverride ?? parts.isCurrent;
+    const update = (next: DateRangeParts) => onChange(formatDateRange({ ...next, isCurrent }));
 
     return (
         <div className={compact ? 'space-y-2' : 'flex flex-wrap items-center gap-2'}>
             <div className="flex items-center gap-1.5">
                 <label className="text-[10px] font-bold text-neutral-400">From</label>
-                <input
-                    type="month"
-                    value={parts.startMonth}
-                    onChange={event => update({ ...parts, startMonth: event.target.value })}
-                    aria-label="Start month"
-                    className="rounded-lg border border-neutral-200 bg-white px-2 py-1.5 text-xs font-bold text-neutral-600 outline-none focus:border-neutral-400 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-300"
-                />
+                <MonthYearSelect value={parts.startMonth} onChange={startMonth => update({ ...parts, startMonth })} label="Start" />
             </div>
             {!compact && <span className="text-neutral-300">–</span>}
             <div className="flex items-center gap-1.5">
                 <label className="text-[10px] font-bold text-neutral-400">To</label>
-                {!parts.isCurrent && (
-                    <input
-                        type="month"
-                        value={parts.endMonth}
-                        onChange={event => update({ ...parts, endMonth: event.target.value })}
-                        aria-label="End month"
-                        className="rounded-lg border border-neutral-200 bg-white px-2 py-1.5 text-xs font-bold text-neutral-600 outline-none focus:border-neutral-400 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-300"
-                    />
+                {!isCurrent && (
+                    <MonthYearSelect value={parts.endMonth} onChange={endMonth => update({ ...parts, endMonth })} label="End" />
                 )}
-                {parts.isCurrent && <span className="px-1 text-xs font-bold text-neutral-500">Present</span>}
+                {isCurrent && <span className="px-1 text-xs font-bold text-neutral-500">Present</span>}
             </div>
-            <label className="flex items-center gap-1.5 text-[10px] font-bold text-neutral-500">
-                <input
-                    type="checkbox"
-                    checked={parts.isCurrent}
-                    onChange={event => update({ ...parts, isCurrent: event.target.checked, endMonth: event.target.checked ? '' : parts.endMonth })}
-                    className="rounded border-neutral-300 text-neutral-600 focus:ring-neutral-400"
-                />
-                Current
-            </label>
+            {!hideCurrentToggle && (
+                <label className="flex items-center gap-1.5 text-[10px] font-bold text-neutral-500">
+                    <input
+                        type="checkbox"
+                        checked={isCurrent}
+                        onChange={event => update({ ...parts, isCurrent: event.target.checked, endMonth: event.target.checked ? '' : parts.endMonth })}
+                        className="rounded border-neutral-300 text-neutral-600 focus:ring-neutral-400"
+                    />
+                    Current
+                </label>
+            )}
         </div>
     );
 };
