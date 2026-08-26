@@ -1,7 +1,7 @@
 import { getModel, callWithRetry, cleanJsonOutput } from "./aiCore";
 import { INTERVIEW_PROMPTS } from "../../prompts/index";
 import { AI_MODELS } from "../../constants";
-import type { CandidateProfileSignal, CustomSkill, InterviewQuestion, InterviewResponseAnalysis, ResumeProfile } from "../../types";
+import type { CandidateProfileSignal, CustomSkill, ExperienceBlock, InterviewQuestion, InterviewResponseAnalysis, ResumeProfile } from "../../types";
 import { formatCandidateProfileContext, formatVerifiedSkills } from '../candidateProfileContext';
 import { formatInterviewBlocks } from './interviewContext';
 
@@ -192,26 +192,34 @@ export const reviewInterviewerQuestions = async (
 // ─── Resume Interview ────────────────────────────────────────────────────────
 // Surfaces narrative depth behind resume bullets, saved as narrativeContext on the block.
 
-const RESUME_INTERVIEW_GENERATE_PROMPT = (title: string, organization: string, bullets: string[]) => `
-You are helping a job applicant capture the real story behind their resume experience.
+const getResumeInterviewFocus = (entryType: ExperienceBlock['type']): string => {
+    if (entryType === 'project') return 'Focus on the project goal, your specific contribution, approach, constraints, decisions, outcome, and lessons learned.';
+    if (entryType === 'volunteer') return 'Focus on the community need, your responsibilities, collaboration, decisions, and measurable or meaningful impact.';
+    return 'Focus on responsibilities, decisions, challenges, collaboration, and concrete impact beyond the surface-level bullets.';
+};
+
+const RESUME_INTERVIEW_GENERATE_PROMPT = (entryType: ExperienceBlock['type'], title: string, organization: string, bullets: string[]) => `
+You are helping a job applicant capture the real story behind a resume entry.
 
 EXPERIENCE BLOCK:
+Entry type: ${entryType}
 Role: ${title}
 Organization: ${organization}
 Bullets:
 ${bullets.map(b => `- ${b}`).join('\n')}
 
 Generate exactly 3 interview questions that surface detail NOT already captured in the bullets above.
-Focus on: what made the work technically complex, what the day-to-day reality was like, specific challenges or decisions, anything that shows depth beyond the surface-level bullet points.
+${getResumeInterviewFocus(entryType)}
 
 Return a JSON array of 3 strings. Example: ["Question 1?", "Question 2?", "Question 3?"]
 Return ONLY the JSON array, no other text.
 `;
 
-const RESUME_INTERVIEW_SUMMARIZE_PROMPT = (title: string, organization: string, bullets: string[], qaPairs: { question: string; answer: string }[]) => `
-You are synthesizing a candidate's answers into narrative context for their resume experience.
+const RESUME_INTERVIEW_SUMMARIZE_PROMPT = (entryType: ExperienceBlock['type'], title: string, organization: string, bullets: string[], qaPairs: { question: string; answer: string }[]) => `
+You are synthesizing a candidate's answers into narrative context for a resume ${entryType} entry.
 
 EXPERIENCE BLOCK:
+Entry type: ${entryType}
 Role: ${title}
 Organization: ${organization}
 Bullets:
@@ -221,6 +229,7 @@ INTERVIEW ANSWERS:
 ${qaPairs.map((qa, i) => `Q${i + 1}: ${qa.question}\nA: ${qa.answer}`).join('\n\n')}
 
 Write 2-4 sentences of narrative context that captures the depth revealed in these answers.
+Preserve the entry type accurately. ${getResumeInterviewFocus(entryType)}
 Write in first person. Be specific and concrete. Do not restate the bullets — add what is behind them.
 Use no colons, semicolons, or em dashes. Return only the narrative text, no labels or formatting.
 `;
@@ -231,11 +240,12 @@ export interface ResumeInterviewQA {
 }
 
 export const generateResumeInterviewQuestions = async (
+    entryType: ExperienceBlock['type'],
     title: string,
     organization: string,
     bullets: string[]
 ): Promise<string[]> => {
-    const prompt = RESUME_INTERVIEW_GENERATE_PROMPT(title, organization, bullets);
+    const prompt = RESUME_INTERVIEW_GENERATE_PROMPT(entryType, title, organization, bullets);
     return callWithRetry(async (metadata) => {
         const model = await getModel({ task: 'interview', generationConfig: { responseMimeType: "application/json" } });
         const response = await model.generateContent({ contents: [{ role: "user", parts: [{ text: prompt }] }] });
@@ -245,12 +255,13 @@ export const generateResumeInterviewQuestions = async (
 };
 
 export const summarizeResumeInterview = async (
+    entryType: ExperienceBlock['type'],
     title: string,
     organization: string,
     bullets: string[],
     qaPairs: ResumeInterviewQA[]
 ): Promise<string> => {
-    const prompt = RESUME_INTERVIEW_SUMMARIZE_PROMPT(title, organization, bullets, qaPairs);
+    const prompt = RESUME_INTERVIEW_SUMMARIZE_PROMPT(entryType, title, organization, bullets, qaPairs);
     return callWithRetry(async (metadata) => {
         const model = await getModel({ task: 'analysis' });
         const response = await model.generateContent({ contents: [{ role: "user", parts: [{ text: prompt }] }] });

@@ -5,6 +5,7 @@ All notable changes to this project will be documented in this file.
 See [CHANGELOG_ARCHIVE.md](CHANGELOG_ARCHIVE.md) for earlier history.
 
 ## [Unreleased]
+- **Made resume-story interviews type-aware**: project and volunteer entries now receive questions tailored to their goals, contributions, and impact instead of generic work-interview wording.
 - **Removed resume-story interviews from education entries**: the action now appears only where capturing work or project depth is useful.
 - **Standardized career-model AI context**: trajectory and role-gap analysis now use target-relevant resume evidence and the shared retry, usage, and logging controls.
 - **Centralized AI context selection**: unrelated approved profile details are filtered out consistently, with shared resume and course limits preventing prompt rules from drifting across features.

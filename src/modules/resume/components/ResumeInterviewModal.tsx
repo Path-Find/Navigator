@@ -45,6 +45,7 @@ export const ResumeInterviewModal: React.FC<ResumeInterviewModalProps> = ({ bloc
                 }
 
                 const qs = await generateResumeInterviewQuestions(
+                    block.type,
                     block.title,
                     block.organization,
                     block.bullets.filter(b => b.trim())
@@ -106,6 +107,7 @@ export const ResumeInterviewModal: React.FC<ResumeInterviewModalProps> = ({ bloc
             setPhase('saving');
             try {
                 const context = await summarizeResumeInterview(
+                    block.type,
                     block.title,
                     block.organization,
                     block.bullets.filter(b => b.trim()),
