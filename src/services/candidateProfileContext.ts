@@ -11,6 +11,7 @@ import type {
 import type { CustomSkill } from '../modules/skills/types';
 import type { Transcript } from '../modules/grad/types';
 import { getCourseCompletionStatus } from '../modules/grad/types';
+import { AI_CONTEXT_BUDGETS } from './ai/contextBudgets';
 
 const STOP_WORDS = new Set([
     'about', 'after', 'also', 'before', 'between', 'candidate', 'experience',
@@ -63,6 +64,12 @@ const profileFactMatchesJob = (fact: CandidateProfileFact, jobContext: string): 
     const jobTerms = new Set(normalize(jobContext));
     return fact.tags.some(tag => normalize(tag).some(term => jobTerms.has(term)))
         || normalize(fact.value).some(term => jobTerms.has(term));
+};
+
+const textMatchesJob = (value: string, jobContext: string): boolean => {
+    if (!jobContext.trim()) return true;
+    const jobTerms = new Set(normalize(jobContext));
+    return normalize(value).some(term => jobTerms.has(term));
 };
 
 const EDUCATION_TERM_ALIASES: string[][] = [
@@ -165,26 +172,29 @@ const formatConfirmedInsight = (insight: CandidateProfileInsight): string => {
 export const formatCandidateProfileContext = (
     profile?: ResumeProfile | null,
     jobContext = '',
-    maxStories = 3
+    maxStories = AI_CONTEXT_BUDGETS.profileStories
 ): string => {
     const context = getCandidateProfileContext(profile);
     if (!context) return '';
     const sourceVersion = getCandidateProfileSourceVersion(profile);
 
     const signals = context.signals
+        .filter(signal => textMatchesJob(`${signal.key} ${signal.value}`, jobContext))
         .map(signal => `- ${signal.key}: ${signal.value}`)
         .join('\n');
     const confirmedInsights = (context.insights || [])
         .filter((insight: CandidateProfileInsight) => insight.status === 'confirmed' && insight.sourceVersion === sourceVersion)
+        .filter(insight => textMatchesJob(`${insight.key} ${insight.value}`, jobContext))
         .map(insight => `- ${insight.key}: ${formatConfirmedInsight(insight)}`)
         .join('\n');
     const confirmedFacts = (context.facts || [])
         .filter(fact => fact.status === 'confirmed' && profileFactMatchesJob(fact, jobContext))
-        .slice(0, 8)
+        .slice(0, AI_CONTEXT_BUDGETS.profileFacts)
         .map(fact => `- ${fact.value}`)
         .join('\n');
     const currentBlocks = profile?.blocks
         .filter(block => context.currentBlockIds?.includes(block.id))
+        .filter(block => textMatchesJob(`${block.title} ${block.organization} ${block.dateRange}`, jobContext))
         .map(block => `- Current: ${block.title}${block.organization ? ` at ${block.organization}` : ''}${block.dateRange ? ` (${block.dateRange})` : ''}`)
         .join('\n') || '';
     const education = context.education;
@@ -192,7 +202,7 @@ export const formatCandidateProfileContext = (
         ? education.courses
             .filter(course => course.status !== 'withdrawn')
             .filter(course => educationCourseMatchesJob(`${course.code} ${course.title}`, jobContext))
-            .slice(0, 5)
+            .slice(0, AI_CONTEXT_BUDGETS.educationCourses)
             .map(course => course.status === 'completed'
                 ? `- Completed course: ${course.title} (${course.code})`
                 : `- Upcoming coursework (not yet completed): ${course.title} (${course.code})`)
@@ -213,7 +223,7 @@ export const formatCandidateProfileContext = (
         : '';
     const stories = context.stories
         .filter(story => storyMatchesJob(story, jobContext))
-        .slice(0, maxStories)
+        .slice(0, Math.min(maxStories, AI_CONTEXT_BUDGETS.profileStories))
         .map(story => `- ${story.text}${story.tags.length ? ` [tags: ${story.tags.join(', ')}]` : ''}`)
         .join('\n');
 
@@ -280,7 +290,7 @@ export const formatVerifiedSkills = (skills: CustomSkill[], jobContext = ''): st
             const skillTerms = normalize(`${skill.name} ${skill.evidence || ''}`);
             return !jobContext.trim() || skillTerms.some(term => jobTerms.has(term));
         })
-        .slice(0, 8);
+        .slice(0, AI_CONTEXT_BUDGETS.verifiedSkills);
 
     if (relevantSkills.length === 0) return '';
     return [

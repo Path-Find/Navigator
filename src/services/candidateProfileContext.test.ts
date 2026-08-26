@@ -27,6 +27,32 @@ describe('candidate profile prompt context', () => {
         expect(context).not.toContain('Led a retail team');
     });
 
+    it('filters unrelated approved signals, insights, and current entries', () => {
+        const profile = {
+            id: 'resume-filtering',
+            name: 'Primary',
+            blocks: [
+                { id: 'planning', type: 'work' as const, title: 'Planning Assistant', organization: 'City', dateRange: '2024 - Present', bullets: [], isVisible: true },
+                { id: 'retail', type: 'work' as const, title: 'Retail Supervisor', organization: 'Shop', dateRange: '2020 - 2023', bullets: [], isVisible: true },
+            ],
+            candidateProfile: {
+                signals: [
+                    { id: 'signal-planning', key: 'planning_focus', value: 'Urban planning and transit', source: 'profile_interview' as const, approvedAt: 1 },
+                    { id: 'signal-retail', key: 'retail_focus', value: 'Retail operations', source: 'profile_interview' as const, approvedAt: 1 },
+                ],
+                stories: [],
+                currentBlockIds: ['planning', 'retail'],
+            },
+        };
+
+        const context = formatCandidateProfileContext(profile, 'transit planning role');
+
+        expect(context).toContain('Urban planning and transit');
+        expect(context).toContain('Current: Planning Assistant at City');
+        expect(context).not.toContain('Retail operations');
+        expect(context).not.toContain('Current: Retail Supervisor at Shop');
+    });
+
     it('keeps only verified skills that match the job context', () => {
         const context = formatVerifiedSkills([
             { id: 'skill-1', user_id: 'user-1', name: 'ArcGIS', proficiency: 'comfortable', evidence: 'Verified in a skill interview', created_at: '', updated_at: '' },

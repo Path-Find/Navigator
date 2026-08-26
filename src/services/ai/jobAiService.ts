@@ -15,15 +15,11 @@ import { JOB_ANALYSIS_PROMPTS, COVER_LETTER_PROMPTS, COVER_LETTER_STYLE_METADATA
 import { BucketStorage } from "../storage/bucketStorage";
 import { formatCandidateProfileContext } from '../candidateProfileContext';
 import { getCourseCompletionStatus } from '../../modules/grad/types';
-import { selectInterviewBlocks } from './interviewContext';
+import { AI_CONTEXT_BUDGETS } from './contextBudgets';
+import { formatResumeBlocks } from './resumeContext';
 
-const stringifyProfile = (profile: ResumeProfile, reference = '', maxBlocks = 8): string => {
-    return selectInterviewBlocks(profile, reference, maxBlocks)
-        .map(b => {
-            return `BLOCK_ID: ${b.id}\nROLE: ${b.title}\nORG: ${b.organization}\nDATE: ${b.dateRange}\nDETAILS:\n${b.bullets.map(bull => `- ${bull}`).join('\n')}${b.narrativeContext ? `\nSTORY CONTEXT:\n${b.narrativeContext}` : ''}\n`;
-        })
-        .join('\n---\n');
-};
+const stringifyProfile = (profile: ResumeProfile, reference = '', maxBlocks: number = AI_CONTEXT_BUDGETS.resumeBlocks): string =>
+    formatResumeBlocks(profile, reference, maxBlocks, true);
 
 export const deriveCoverLetterSignals = (profile: ResumeProfile, job?: DistilledJob): string[] => {
     const visibleBlocks = profile.blocks.filter(block => block.isVisible !== false);
@@ -214,7 +210,7 @@ export const buildJobCandidateContext = (
     transcript: Transcript | null | undefined,
     parsedJob: DistilledJob
 ): JobCandidateContext => {
-    const resumeContext = resumes.map(profile => stringifyProfile(profile, '', 50)).filter(Boolean).join('\n---\n');
+    const resumeContext = resumes.map(profile => stringifyProfile(profile, '', AI_CONTEXT_BUDGETS.broadResumeBlocks)).filter(Boolean).join('\n---\n');
     const jobRequirements = getJobRequirements(parsedJob);
     const jobSkillText = [
         ...(parsedJob.keySkills || []),

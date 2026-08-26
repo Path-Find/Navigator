@@ -8,13 +8,11 @@ import { PARSING_PROMPTS, JOB_ANALYSIS_PROMPTS, CAREER_PROMPTS } from "../../pro
 import { anchorData, UNTRUSTED_DATA_RULE } from "../../prompts/anchoring";
 import { AI_MODELS } from "../../constants";
 import { extractPdfText } from "../../utils/pdfExtractor";
+import { AI_CONTEXT_BUDGETS } from './contextBudgets';
+import { serializeResumeBlocks } from './resumeContext';
 
-const stringifyProfile = (profile: ResumeProfile): string => {
-    const blocks = profile.blocks
-        .filter(b => b.isVisible)
-        .map(({ type, title, organization, dateRange, bullets }) => ({ type, title, organization, dateRange, bullets }));
-    return JSON.stringify(blocks);
-};
+const stringifyProfile = (profile: ResumeProfile): string =>
+    serializeResumeBlocks(profile, '', AI_CONTEXT_BUDGETS.broadResumeBlocks);
 
 export const parseResumeFile = async (
     fileBase64: string,

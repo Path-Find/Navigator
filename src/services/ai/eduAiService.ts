@@ -13,6 +13,7 @@ import { AI_MODELS, AI_TEMPERATURE } from "../../constants";
 import { EDUCATION_PROMPTS, CAREER_PROMPTS, PARSING_PROMPTS } from "../../prompts/index";
 import { extractPdfText } from "../../utils/pdfExtractor";
 import { getCourseCompletionStatus } from '../../modules/grad/types';
+import { AI_CONTEXT_BUDGETS } from './contextBudgets';
 
 const stringifyResumeForCareer = (profile: ResumeProfile): string => JSON.stringify({
     name: profile.name,
@@ -56,7 +57,7 @@ const transcriptTerms = (value: string): Set<string> => new Set(
     value.toLowerCase().replace(/[^a-z0-9]+/g, ' ').split(/\s+/).filter(term => term.length >= 4)
 );
 
-const stringifyTranscriptForCareer = (transcript: Transcript, reference = '', maxCourses = 40): string => {
+const stringifyTranscriptForCareer = (transcript: Transcript, reference = '', maxCourses = AI_CONTEXT_BUDGETS.transcriptCourses): string => {
     const referenceTerms = transcriptTerms(reference);
     const courses = transcript.semesters
         .flatMap(semester => semester.courses.map(course => ({
@@ -76,7 +77,7 @@ const stringifyTranscriptForCareer = (transcript: Transcript, reference = '', ma
     });
 };
 
-const stringifyCourses = (transcript: Transcript, maxCourses = 60): string => JSON.stringify(
+const stringifyCourses = (transcript: Transcript, maxCourses = AI_CONTEXT_BUDGETS.courseExtractionCourses): string => JSON.stringify(
     transcript.semesters.flatMap(semester => semester.courses.map(({ code, title, grade, credits }) => ({
         code,
         title,
