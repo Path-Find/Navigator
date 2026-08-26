@@ -5,6 +5,8 @@ All notable changes to this project will be documented in this file.
 See [CHANGELOG_ARCHIVE.md](CHANGELOG_ARCHIVE.md) for earlier history.
 
 ## [Unreleased]
+### Changed
+
 - **Made Skills interviews adaptive**: questions now arrive one at a time, with the next question chosen from the answer and the interview ending when enough evidence is collected.
 - **Added conservative skill canonicalization**: obvious spelling, abbreviation, and product-name variants now share one canonical skill without merging merely similar skills.
 - **Consolidated duplicate communication skills**: “Communication,” “Communications,” and “Communications Skills” now behave as one skill in the Skills view and interview flow.
