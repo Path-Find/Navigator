@@ -274,6 +274,8 @@ export const SkillInterviewPage: React.FC = () => {
                             setUserAnswer={setUserAnswer}
                             handleSubmitAnswer={handleSubmitAnswer}
                             isAnalyzing={isAnalyzing}
+                            currentQuestionIndex={currentQuestionIndex}
+                            totalQuestions={questions.length}
                         />
                     )}
                     {step === 'summary' && (

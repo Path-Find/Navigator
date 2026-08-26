@@ -17,12 +17,12 @@ export const SkillInterviewSummary = ({ verifiedCount, skills, skillScores, veri
             </div>
 
             <h4 className="text-4xl font-bold text-neutral-900 dark:text-white mb-3 tracking-tight">
-                {verifiedCount > 0 ? 'Mastery Achieved' : 'Practice Session Over'}
+                Skills interview complete
             </h4>
             <p className="text-lg text-neutral-500 dark:text-neutral-400 font-medium mb-10 max-w-lg">
                 {verifiedCount > 0
-                    ? `You've successfully banked ${verifiedCount} skill${verifiedCount !== 1 ? 's' : ''} in your profile.`
-                    : `You didn't hit the verification threshold this time. Your progress was saved, but these skills need more proof.`
+                    ? `${verifiedCount} skill${verifiedCount !== 1 ? 's' : ''} now has interview evidence in your profile.`
+                    : `No skills met the evidence threshold this time. You can practice again when you’re ready.`
                 }
             </p>
 
@@ -51,7 +51,7 @@ export const SkillInterviewSummary = ({ verifiedCount, skills, skillScores, veri
                                         {s.name}
                                     </span>
                                     <span className="text-[10px] text-neutral-400 font-bold uppercase tracking-wider">
-                                        {verified ? 'Verified & Banked' : 'In Development'}
+                                        {verified ? 'Verified' : 'Needs more evidence'}
                                     </span>
                                 </div>
                             </div>
@@ -77,7 +77,7 @@ export const SkillInterviewSummary = ({ verifiedCount, skills, skillScores, veri
                         onClick={handleFinish}
                         className="px-10 py-4 bg-emerald-600 hover:bg-emerald-700 text-white rounded-2xl font-bold text-base hover:scale-105 active:scale-95 transition-all shadow-lg shadow-emerald-500/20"
                     >
-                        Return to Dashboard
+                        Return to skills
                     </button>
                 )}
             </div>

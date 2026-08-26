@@ -51,14 +51,14 @@ export const SkillsStats: React.FC<SkillsStatsProps> = ({
                 }
             />
 
-            {/* Action: Add Skill */}
+            {/* Action: Add skills */}
             <BentoCard
                 id="add-skill"
                 icon={Plus}
-                title="Add Skill"
-                description="Manually expand your skill tracking."
+                title="Add skills"
+                description="Add skills to your profile."
                 onAction={onAddSkill}
-                actionLabel="Add New"
+                actionLabel="Add a skill"
                 color={FEATURE_COLORS.emerald}
                 previewContent={
                     <div className="relative w-full h-20 flex items-center justify-center overflow-hidden">
@@ -83,14 +83,14 @@ export const SkillsStats: React.FC<SkillsStatsProps> = ({
                 }
             />
 
-            {/* Action: Verify Skills (Conditional) */}
+            {/* Action: Verify skills */}
             <BentoCard
                 id="verify-skills"
                 icon={ShieldCheck}
-                title="Verify Skill"
-                description={unverifiedCount > 0 ? `Prove expertise for ${unverifiedCount} skills.` : "All skills verified by AI coach."}
+                title="Verify skills"
+                description={unverifiedCount > 0 ? `Answer questions to verify ${unverifiedCount} skill${unverifiedCount === 1 ? '' : 's'}.` : "All listed skills have interview evidence."}
                 onAction={onVerifySkills}
-                actionLabel={unverifiedCount > 0 ? "Start Proof" : undefined}
+                actionLabel={unverifiedCount > 0 ? "Start interview" : undefined}
                 color={FEATURE_COLORS.amber}
                 previewContent={
                     <div className="relative w-full h-20 flex items-center justify-center">
@@ -120,14 +120,14 @@ export const SkillsStats: React.FC<SkillsStatsProps> = ({
                 }
             />
 
-            {/* Action: Skill Discovery */}
+            {/* Action: Find skills */}
             <BentoCard
                 id="skill-discovery"
                 icon={Sparkles}
-                title="Discover Skill"
-                description="Extract latent skills from your resumes."
+                title="Find skills"
+                description="Find skills already reflected in your resumes."
                 onAction={isSuggesting ? undefined : onSuggestSkills}
-                actionLabel={isSuggesting ? "Finding..." : "Discover"}
+                actionLabel={isSuggesting ? "Finding skills..." : "Find skills"}
                 color={FEATURE_COLORS.violet}
                 previewContent={
                     <div className="relative w-full h-20 flex items-center justify-center overflow-hidden">

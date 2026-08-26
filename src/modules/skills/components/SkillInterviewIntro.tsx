@@ -19,10 +19,10 @@ export const SkillInterviewIntro = ({ isLoading, limitError, usageInfo, handleSt
                 <div className="space-y-8">
                     <div>
                         <h4 className="text-4xl lg:text-5xl font-bold text-neutral-900 dark:text-white mb-6 tracking-tight">
-                            Ready to verify your skills?
+                            Skills interview
                         </h4>
                         <p className="text-lg lg:text-xl text-neutral-500 dark:text-neutral-400 leading-relaxed font-medium">
-                            I'll ask cross-cutting questions that cover multiple skills at once. Answer naturally — no need to treat each skill separately.
+                            I’ll ask one question at a time and give you practical feedback as we go. Some questions may cover more than one skill, so answer with a real example when you can.
                         </p>
                     </div>
 
@@ -52,13 +52,13 @@ export const SkillInterviewIntro = ({ isLoading, limitError, usageInfo, handleSt
                             ) : (
                                 <Sparkles className="w-5 h-5" />
                             )}
-                            <span>{isLoading ? 'Preparing questions...' : 'Begin assessment'}</span>
+                        <span>{isLoading ? 'Preparing questions...' : 'Start interview'}</span>
                         </div>
                         {!isLoading && !limitError && usageInfo && (
                             <span className="text-[10px] opacity-70 uppercase tracking-widest font-bold">
                                 {usageInfo.total === Infinity
-                                    ? 'Unlimited credits'
-                                    : `${usageInfo.used} / ${usageInfo.total} credits used`}
+                                ? 'Unlimited interviews'
+                                    : `${usageInfo.used} / ${usageInfo.total} interviews used`}
                             </span>
                         )}
                     </button>
