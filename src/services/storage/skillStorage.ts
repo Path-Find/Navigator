@@ -3,6 +3,7 @@ import { Vault, getUserId } from './storageCore';
 import { STORAGE_KEYS } from '../../constants';
 import { withTimeout } from '../../utils/promiseUtils';
 import type { CustomSkill } from '../../types';
+import { canonicalSkillName } from '../../modules/skills/skillUtils';
 
 export const SkillStorage = {
     async getSkills(): Promise<CustomSkill[]> {
@@ -55,6 +56,10 @@ export const SkillStorage = {
 
     async saveSkills(skillsList: Partial<CustomSkill>[]): Promise<CustomSkill[]> {
         if (skillsList.length === 0) return [];
+        const normalizedSkills = skillsList.map(skill => ({
+            ...skill,
+            ...(typeof skill.name === 'string' ? { name: canonicalSkillName(skill.name) } : {}),
+        }));
 
         const userId = await getUserId();
         if (!userId) {
@@ -64,7 +69,7 @@ export const SkillStorage = {
                 return [];
             }
             const skills: CustomSkill[] = localResult || [];
-            const newSkills = skillsList.map(skill => {
+            const newSkills = normalizedSkills.map(skill => {
                 const existingIdx = skills.findIndex(s => s.name === skill.name);
                 return {
                     ...skill,
@@ -85,7 +90,7 @@ export const SkillStorage = {
             return newSkills;
         }
 
-        const payload = skillsList.map(skill => ({
+        const payload = normalizedSkills.map(skill => ({
             user_id: userId,
             name: skill.name,
             proficiency: skill.proficiency,
@@ -101,7 +106,7 @@ export const SkillStorage = {
         if (error) throw error;
 
         let localSkills: CustomSkill[] = await Vault.getSecure(STORAGE_KEYS.SKILLS) || [];
-        const namesToUpdate = new Set(skillsList.map(s => s.name));
+        const namesToUpdate = new Set(normalizedSkills.map(s => s.name));
         localSkills = localSkills.filter(s => !namesToUpdate.has(s.name));
         localSkills.push(...(data as CustomSkill[]));
         await Vault.setSecure(STORAGE_KEYS.SKILLS, localSkills);
@@ -110,6 +115,10 @@ export const SkillStorage = {
     },
 
     async saveSkill(skill: Partial<CustomSkill>): Promise<CustomSkill> {
+        const normalizedSkill = {
+            ...skill,
+            ...(typeof skill.name === 'string' ? { name: canonicalSkillName(skill.name) } : {}),
+        };
         const userId = await getUserId();
         if (!userId) {
             const localResult = await Vault.getSecure<CustomSkill[]>(STORAGE_KEYS.SKILLS);
@@ -118,9 +127,9 @@ export const SkillStorage = {
                 throw new Error("Secure storage is temporarily unavailable.");
             }
             const skills: CustomSkill[] = localResult || [];
-            const existingIdx = skills.findIndex(s => s.name === skill.name);
+            const existingIdx = skills.findIndex(s => s.name === normalizedSkill.name);
             const newSkill = {
-                ...skill,
+                ...normalizedSkill,
                 id: existingIdx !== -1 ? skills[existingIdx].id : crypto.randomUUID(),
                 user_id: 'anonymous',
                 created_at: existingIdx !== -1 ? skills[existingIdx].created_at : new Date().toISOString(),
@@ -139,9 +148,9 @@ export const SkillStorage = {
                 .from('user_skills')
                 .upsert({
                     user_id: userId,
-                    name: skill.name,
-                    proficiency: skill.proficiency,
-                    evidence: skill.evidence,
+                    name: normalizedSkill.name,
+                    proficiency: normalizedSkill.proficiency,
+                    evidence: normalizedSkill.evidence,
                     updated_at: new Date().toISOString()
                 }, { onConflict: 'user_id,name' })
                 .select()
@@ -151,7 +160,7 @@ export const SkillStorage = {
         if (error) throw error;
 
         const localSkills: CustomSkill[] = await Vault.getSecure(STORAGE_KEYS.SKILLS) || [];
-        const updated = localSkills.filter(s => s.name !== skill.name);
+        const updated = localSkills.filter(s => s.name !== normalizedSkill.name);
         updated.push(data);
         await Vault.setSecure(STORAGE_KEYS.SKILLS, updated);
 

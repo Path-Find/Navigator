@@ -8,6 +8,13 @@ describe('skill normalization', () => {
         expect(canonicalSkillKey('Communication')).toBe('communication');
     });
 
+    it('handles obvious product-name and abbreviation variants', () => {
+        expect(canonicalSkillKey('MS Excel')).toBe('microsoft excel');
+        expect(canonicalSkillKey('PowerBI')).toBe('power bi');
+        expect(canonicalSkillKey('Arc GIS')).toBe('arcgis');
+        expect(canonicalSkillKey('Data Analytics')).toBe('data analytics');
+    });
+
     it('keeps the strongest duplicate record and its evidence', () => {
         const merged = mergeSkillRecords([
             { id: 'one', user_id: 'user', name: 'Communications Skills', proficiency: 'learning', created_at: '', updated_at: '' },

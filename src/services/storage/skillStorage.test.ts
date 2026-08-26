@@ -111,6 +111,14 @@ describe('SkillStorage.saveSkill — anonymous user', () => {
         const saved = vi.mocked(Vault.setSecure).mock.calls[0][1] as CustomSkill[];
         expect(saved).toHaveLength(1);
     });
+
+    it('stores known aliases under their canonical name', async () => {
+        vi.mocked(Vault.getSecure).mockResolvedValue([]);
+
+        const result = await SkillStorage.saveSkill({ name: 'Communications Skills', proficiency: 'learning' });
+
+        expect(result.name).toBe('Communication');
+    });
 });
 
 describe('SkillStorage.saveSkills — anonymous user', () => {
