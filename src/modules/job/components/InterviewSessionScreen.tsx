@@ -251,6 +251,11 @@ export const InterviewSessionScreen = ({
                 content: q.question,
                 metadata: (
                     <>
+                        {isLastQ && !resp && (
+                            <div className="mt-3 text-[10px] font-bold uppercase tracking-widest text-neutral-400">
+                                Question {qIdx + 1}
+                            </div>
+                        )}
                         {isLastQ && !resp && (() => {
                             const framework = getAnswerFramework(q);
                             return (
@@ -511,7 +516,6 @@ export const InterviewSessionScreen = ({
                         } : undefined}
                         completionMessage={isInterviewComplete ? 'Interview complete — you reached the end of this session.' : undefined}
                         completionSummary={completionSummary}
-                        progressLabel={!isInitialJobSelection ? `Question ${currentQuestionIndex + 1}` : undefined}
                         inputDisabled={(!!currentQ && hasResponse) || isLoading || shouldDisableInput}
                         accentGradient="from-neutral-700 to-neutral-500"
                     />

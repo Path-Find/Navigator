@@ -42,7 +42,6 @@ interface InterviewChatProps {
     };
     completionMessage?: string;
     completionSummary?: React.ReactNode;
-    progressLabel?: string;
     inputDisabled?: boolean;
     accentGradient?: string;
     hideInput?: boolean;
@@ -63,7 +62,6 @@ export const InterviewChat: React.FC<InterviewChatProps> = ({
     secondaryAction,
     completionMessage,
     completionSummary,
-    progressLabel,
     inputDisabled = false,
     accentGradient = "from-neutral-700 to-neutral-500",
     hideInput = false
@@ -264,11 +262,6 @@ export const InterviewChat: React.FC<InterviewChatProps> = ({
                     </motion.div>
                 )}
                 {completionSummary}
-                {progressLabel && (
-                    <div className="mt-3 text-center text-[10px] font-bold uppercase tracking-widest text-neutral-400">
-                        {progressLabel}
-                    </div>
-                )}
             </div>
 
             {/* Input Area */}
