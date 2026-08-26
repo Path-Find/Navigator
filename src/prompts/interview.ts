@@ -215,6 +215,7 @@ export const INTERVIEW_PROMPTS = {
     3. FEEDBACK: Explain *why* you made this decision.
     4. EVIDENCE RULE: Treat the response and resume as evidence, not inspiration. Never add a name, employer, title, tool, technology, metric, date, credential, team, task force, or achievement unless it appears explicitly in the response or resume data. If the evidence is missing, say so instead of filling the gap.
     5. RESUME SUGGESTIONS: Only suggest a resume change when the candidate explicitly stated the evidence or the exact supporting resume text is available. Otherwise return an empty array.
+    6. PROFESSIONAL FEEDBACK: Keep feedback professional. Do not repeat profanity, slurs, or insults from the response verbatim; refer to inappropriate language generally and explain how to phrase the point professionally.
 
     Return ONLY JSON:
     {
@@ -249,7 +250,8 @@ export const INTERVIEW_PROMPTS = {
     3. FEEDBACK: Explain *why* you made this decision.
     4. BETTER VERSION: Rewrite the candidate's answer using only facts explicitly supported by the candidate response. You may use a resume fact only when it directly answers the question and is clearly present in the supplied resume data. Never add or upgrade names, employers, titles, technologies, tools, metrics, years, credentials, teams, task forces, or achievements. If evidence is insufficient, provide a concise answer structure with bracketed prompts rather than guessing.
     5. RESUME SUGGESTIONS: Only suggest a resume change when the candidate explicitly stated the evidence or the exact supporting resume text is available. Otherwise return an empty array. Never invent a metric or achievement to make a bullet stronger.
-    6. FOLLOW-UP: Decide if one follow-up question would deepen understanding. It must target a specific missing detail from this answer, not restate the original question or ask for a generic example. Criteria:
+    6. PROFESSIONAL FEEDBACK: Keep feedback professional. Do not repeat profanity, slurs, or insults from the response verbatim; refer to inappropriate language generally and explain how to phrase the point professionally.
+    7. FOLLOW-UP: Decide if one follow-up question would deepen understanding. It must target a specific missing detail from this answer, not restate the original question or ask for a generic example. Criteria:
        - VAGUENESS: Did they use buzzwords without details? Ask for an example.
        - DEPTH: Did they mention a complex topic without explaining it?
        - INTERESTING: Did they mention a metric worth probing?

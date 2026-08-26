@@ -10,6 +10,9 @@ import { extractText, type GeminiResponse } from './_lib/types.js';
 const sql = neon(process.env.NEON_DATABASE_URL!);
 
 const MAX_LOG_LENGTH = 200;
+const MAX_REQUEST_BODY_LENGTH = 1_000_000;
+const MAX_INTERVIEW_REQUEST_BODY_LENGTH = 80_000;
+const MAX_INTERVIEW_REQUESTS_PER_MINUTE = 12;
 const sanitizeLog = (val: unknown) => {
     // eslint-disable-next-line no-control-regex
     const str = String(val).replace(/[\n\r\t\0\x08\x09\x1a\x1b]/g, ' ');
@@ -75,13 +78,28 @@ async function handler(req: Request): Promise<Response> {
         }
 
         // 2. PARSE REQUEST & RESOLVE MODEL
-        const { payload, task = 'analysis', generationConfig, feature, model } = await req.json() as {
+        const rawBody = await req.text();
+        if (rawBody.length > MAX_REQUEST_BODY_LENGTH) {
+            return new Response(JSON.stringify({ error: 'request_too_large' }), {
+                headers: { ...getCorsHeaders(req), 'Content-Type': 'application/json' },
+                status: 413,
+            });
+        }
+
+        const { payload, task = 'analysis', generationConfig, feature, model } = JSON.parse(rawBody) as {
             payload?: Record<string, unknown>; task?: string; generationConfig?: Record<string, unknown>;
             feature?: string; model?: string;
         };
 
         const validTasks = ['extraction', 'analysis', 'interview', 'embedding'];
         const safeTask = validTasks.includes(task) ? task : 'analysis';
+
+        if (safeTask === 'interview' && rawBody.length > MAX_INTERVIEW_REQUEST_BODY_LENGTH) {
+            return new Response(JSON.stringify({ error: 'interview_request_too_large' }), {
+                headers: { ...getCorsHeaders(req), 'Content-Type': 'application/json' },
+                status: 413,
+            });
+        }
 
         if (safeTask === 'interview' && userTier === 'free') {
             return new Response(JSON.stringify({
@@ -121,6 +139,28 @@ async function handler(req: Request): Promise<Response> {
                 }
             } catch (countError) {
                 console.error('Interview count error:', sanitizeLog(countError));
+            }
+        }
+
+        if (safeTask === 'interview') {
+            try {
+                const recentRows = await sql`
+                    SELECT COUNT(*)::int AS count FROM logs
+                    WHERE user_id = ${userId}
+                      AND event_type = 'interview_generation'
+                      AND created_at >= NOW() - INTERVAL '1 minute'
+                `;
+                if ((recentRows[0]?.count ?? 0) >= MAX_INTERVIEW_REQUESTS_PER_MINUTE) {
+                    return new Response(JSON.stringify({
+                        error: 'rate_limit_exceeded',
+                        message: 'Too many interview requests. Please wait a minute and try again.',
+                    }), {
+                        headers: { ...getCorsHeaders(req), 'Content-Type': 'application/json' },
+                        status: 429,
+                    });
+                }
+            } catch (throttleError) {
+                console.error('Interview throttle check error:', sanitizeLog(throttleError));
             }
         }
 

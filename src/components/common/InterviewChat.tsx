@@ -48,6 +48,8 @@ interface InterviewChatProps {
     hideInput?: boolean;
 }
 
+const MAX_INTERVIEW_ANSWER_LENGTH = 12_000;
+
 export const InterviewChat: React.FC<InterviewChatProps> = ({
     messages,
     inputValue,
@@ -282,6 +284,7 @@ export const InterviewChat: React.FC<InterviewChatProps> = ({
                                     onKeyDown={handleKeyDown}
                                     disabled={inputDisabled}
                                     placeholder={placeholder}
+                                    maxLength={MAX_INTERVIEW_ANSWER_LENGTH}
                                     className="w-full bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-700 rounded-3xl p-4 pr-20 text-sm text-neutral-900 dark:text-white font-medium placeholder:text-neutral-400 focus:ring-4 focus:ring-neutral-500/10 focus:border-neutral-500/30 disabled:opacity-50 disabled:bg-neutral-100 dark:disabled:bg-neutral-800 transition-all shadow-sm min-h-[80px] leading-relaxed"
                                 />
 

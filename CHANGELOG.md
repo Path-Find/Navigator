@@ -5,6 +5,8 @@ All notable changes to this project will be documented in this file.
 See [CHANGELOG_ARCHIVE.md](CHANGELOG_ARCHIVE.md) for earlier history.
 
 ## [Unreleased]
+- **Hardened interview inputs**: answer length is capped, oversized AI requests are rejected server-side, and repeated interview requests are throttled.
+- **Kept interview feedback professional**: profanity and insults in answers are not repeated verbatim in coaching.
 - **Removed duplicate interview actions**: opening both STAR and ARC guidance now leaves one clear way to continue.
 - **Gave feature cards distinct accents**: the homepage and Features page now use the shared palette so cards are easier to tell apart without bringing purple or pink back.
 - **Made interview answer-framework help additive**: users can learn STAR and ARC independently without replacing earlier explanations.
