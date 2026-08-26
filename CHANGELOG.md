@@ -5,6 +5,7 @@ All notable changes to this project will be documented in this file.
 See [CHANGELOG_ARCHIVE.md](CHANGELOG_ARCHIVE.md) for earlier history.
 
 ## [Unreleased]
+- **Replaced freeform resume dates**: entries now use month selectors and a Current checkbox so date ranges are consistent.
 - **Made resume-story interviews type-aware**: project and volunteer entries now receive questions tailored to their goals, contributions, and impact instead of generic work-interview wording.
 - **Removed resume-story interviews from education entries**: the action now appears only where capturing work or project depth is useful.
 - **Standardized career-model AI context**: trajectory and role-gap analysis now use target-relevant resume evidence and the shared retry, usage, and logging controls.

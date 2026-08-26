@@ -3,6 +3,7 @@ import { X, Plus, Calendar } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { Button } from '../../../components/ui/Button';
 import type { SectionType } from '../constants';
+import { ResumeDateRangeFields } from './ResumeDateRangeFields';
 
 interface AddEntryModalProps {
     type: SectionType;
@@ -85,19 +86,10 @@ export const AddEntryModal: React.FC<AddEntryModalProps> = ({ type, sectionLabel
                     {!isSkill && !isSummary && (
                         <div className="space-y-1.5">
                             <label className="text-xs font-bold text-neutral-500 uppercase tracking-wide">Dates</label>
-                            <div className="relative">
-                                <Calendar className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-neutral-400 pointer-events-none" />
-                                <input
-                                    type="text"
-                                    value={dateRange}
-                                    onChange={e => setDateRange(e.target.value)}
-                                    placeholder="Jan 2024 – Present"
-                                    className="w-full pl-8 pr-3 py-2.5 rounded-xl border border-neutral-200 dark:border-neutral-700 bg-neutral-50 dark:bg-neutral-800 text-neutral-900 dark:text-white placeholder:text-neutral-300 dark:placeholder:text-neutral-600 text-sm font-medium focus:outline-none focus:border-neutral-300 dark:focus:border-neutral-700 focus:ring-2 focus:ring-neutral-500/10 transition-all"
-                                />
+                            <div className="flex items-center gap-2 rounded-xl border border-neutral-200 bg-neutral-50 px-3 py-2.5 dark:border-neutral-700 dark:bg-neutral-800">
+                                <Calendar className="w-3.5 h-3.5 shrink-0 text-neutral-400" />
+                                <ResumeDateRangeFields value={dateRange} onChange={setDateRange} compact />
                             </div>
-                            <p className="text-[11px] text-neutral-400 leading-snug">
-                                Use Month + Year — e.g. <span className="font-mono">Jan 2024 – Mar 2025</span> or <span className="font-mono">Sep 2022 – Present</span>
-                            </p>
                         </div>
                     )}
 
