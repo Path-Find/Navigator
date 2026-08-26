@@ -14,20 +14,10 @@ import { EDUCATION_PROMPTS, CAREER_PROMPTS, PARSING_PROMPTS } from "../../prompt
 import { extractPdfText } from "../../utils/pdfExtractor";
 import { getCourseCompletionStatus } from '../../modules/grad/types';
 import { AI_CONTEXT_BUDGETS } from './contextBudgets';
+import { serializeResumeProfile } from './resumeContext';
 
-const stringifyResumeForCareer = (profile: ResumeProfile): string => JSON.stringify({
-    name: profile.name,
-    blocks: profile.blocks
-        .filter(block => block.isVisible)
-        .map(({ type, title, organization, dateRange, bullets, narrativeContext }) => ({
-            type,
-            title,
-            organization,
-            dateRange,
-            bullets,
-            ...(narrativeContext ? { narrativeContext } : {}),
-        })),
-});
+const stringifyResumeForCareer = (profile: ResumeProfile, reference = '') =>
+    serializeResumeProfile(profile, reference);
 
 const stringifyRoleModelForCareer = (roleModel: RoleModelProfile): string => JSON.stringify({
     name: roleModel.name,
@@ -134,7 +124,8 @@ export const analyzeGap = async (
     transcript: Transcript | null = null,
 ): Promise<GapAnalysisResult> => {
     const roleModelContext = roleModels.map(stringifyRoleModelForCareer).join('\n---\n');
-    const resumeContext = userResumes.map(stringifyResumeForCareer).join('\n---\n');
+    const roleReference = roleModels.map(role => [role.name, role.headline, role.organization, ...(role.topSkills || []), role.careerSnapshot].filter(Boolean).join(' ')).join(' ');
+    const resumeContext = userResumes.map(resume => stringifyResumeForCareer(resume, roleReference)).join('\n---\n');
     const skillContext = stringifySkillsForCareer(userSkills);
     const transcriptContext = transcript ? stringifyTranscriptForCareer(transcript) : '';
     const prompt = CAREER_PROMPTS.GAP_ANALYSIS(roleModelContext, resumeContext, skillContext, transcriptContext);
@@ -168,7 +159,8 @@ export const analyzeRoleModelGap = async (
 ): Promise<GapAnalysisResult> => {
     if (onProgress) onProgress("Simulating career emulation...", 1, 1);
     const roleModelContext = stringifyRoleModelForCareer(roleModel);
-    const resumeContext = resumes.map(stringifyResumeForCareer).join('\n---\n');
+    const roleReference = [roleModel.name, roleModel.headline, roleModel.organization, ...(roleModel.topSkills || []), roleModel.careerSnapshot].filter(Boolean).join(' ');
+    const resumeContext = resumes.map(resume => stringifyResumeForCareer(resume, roleReference)).join('\n---\n');
     const skillsContext = stringifySkillsForCareer(userSkills);
     const analysisPrompt = CAREER_PROMPTS.ROLE_MODEL_GAP_ANALYSIS(roleModelContext, resumeContext, skillsContext);
 

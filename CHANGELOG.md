@@ -5,6 +5,7 @@ All notable changes to this project will be documented in this file.
 See [CHANGELOG_ARCHIVE.md](CHANGELOG_ARCHIVE.md) for earlier history.
 
 ## [Unreleased]
+- **Standardized career-model AI context**: trajectory and role-gap analysis now use target-relevant resume evidence and the shared retry, usage, and logging controls.
 - **Centralized AI context selection**: unrelated approved profile details are filtered out consistently, with shared resume and course limits preventing prompt rules from drifting across features.
 - **Focused AI context beyond interviews**: cover letters and education tools now send only relevant resume blocks and capped coursework, while AI logs record prompt-size metrics for cost review.
 - **Focused interview AI context**: each prompt now receives only the most relevant resume blocks, skills, and approved profile details needed for that task.

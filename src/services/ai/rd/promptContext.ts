@@ -1,6 +1,7 @@
 import type { ResumeProfile } from '../../../types';
 import { anchorData } from '../../../prompts/anchoring';
 import { MODELING_DISTILLER, TRAJECTORY_MAPPER_PROMPT } from '../../../prompts/modeling';
+import { formatResumeBlocks } from '../resumeContext';
 
 export interface HistoricalSignal {
     source_type?: string | null;
@@ -21,17 +22,8 @@ ${anchorData('USER_SIGNALS', signalSummary)}
 STYLE GUIDE:
 `.trim();
 
-export const formatTrajectoryProfile = (profile: ResumeProfile): string => JSON.stringify({
-    blocks: profile.blocks
-        .filter(block => block.isVisible)
-        .map(({ type, title, organization, dateRange, bullets }) => ({
-            type,
-            title,
-            organization,
-            dateRange,
-            bullets,
-        })),
-});
+export const formatTrajectoryProfile = (profile: ResumeProfile, targetTitle = ''): string =>
+    formatResumeBlocks(profile, targetTitle);
 
 export const formatHistoricalSignals = (signals: HistoricalSignal[]): string => signals
     .map(signal => `- [${signal.source_type || 'unknown'}]: ${signal.metadata?.text_checksum || '(no summary)'}`)
@@ -48,7 +40,7 @@ TARGET ROLE DATA:
 ${anchorData('TARGET_ROLE', targetTitle)}
 
 CURRENT PROFILE DATA:
-${anchorData('CURRENT_PROFILE', formatTrajectoryProfile(currentProfile))}
+${anchorData('CURRENT_PROFILE', formatTrajectoryProfile(currentProfile, targetTitle))}
 
 HISTORICAL SIGNALS DATA:
 ${anchorData('HISTORICAL_SIGNALS', formatHistoricalSignals(historicalSignals))}

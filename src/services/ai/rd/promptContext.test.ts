@@ -22,6 +22,7 @@ describe('R&D prompt context boundaries', () => {
             name: 'Primary Resume',
             blocks: [
                 { id: 'visible-id', type: 'work', title: 'Planner', organization: 'Transit Co.', dateRange: '2022', bullets: ['Planned projects'], isVisible: true },
+                { id: 'other-visible-id', type: 'work', title: 'Retail Supervisor', organization: 'Shop Co.', dateRange: '2020', bullets: ['Managed retail operations'], isVisible: true },
                 { id: 'hidden-id', type: 'work', title: 'Hidden', organization: 'Other Co.', dateRange: '2020', bullets: ['Do not send'], isVisible: false },
             ],
         } as any;
@@ -35,6 +36,7 @@ describe('R&D prompt context boundaries', () => {
 
         expect(formatted).toContain('Planned projects');
         expect(formatted).not.toContain('Hidden');
+        expect(buildTrajectoryPrompt('transit planner', profile, []).toLowerCase()).not.toContain('retail supervisor');
         expect(formatted).not.toContain('resume-id');
         expect(prompt).toContain('<<<TARGET_ROLE_START>>>');
         expect(prompt).toContain('<<<CURRENT_PROFILE_START>>>');

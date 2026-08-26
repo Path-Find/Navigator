@@ -1,4 +1,4 @@
-import { getModel } from '../aiCore';
+import { getModel, callWithRetry, cleanJsonOutput } from '../aiCore';
 import { RdEmbeddingService } from './embeddingService';
 import type { GrowthTrajectory } from './types';
 import { ResumeStorage } from '../../storage/resumeStorage';
@@ -28,27 +28,15 @@ export class RdTrajectoryService {
             );
 
             // 4. Call AI
-            const model = await getModel({
-                task: 'generation',
-                feature: 'role_model'
-            });
-            const result = await model.generateContent({
-                contents: [{ role: 'user', parts: [{ text: prompt }] }]
-            });
-            const response = await result.response;
-            const text = response.text();
-
-            // 5. Parse JSON
-            try {
-                const jsonMatch = text.match(/\{[\s\S]*\}/);
-                if (jsonMatch) {
-                    return JSON.parse(jsonMatch[0]) as GrowthTrajectory;
-                }
-            } catch (e) {
-                console.error('[RdTrajectoryService] Failed to parse trajectory JSON:', e);
-            }
-
-            return null;
+            return await callWithRetry(async (metadata) => {
+                const model = await getModel({ task: 'generation', feature: 'role_model' });
+                const response = await model.generateContent({
+                    contents: [{ role: 'user', parts: [{ text: prompt }] }],
+                    generationConfig: { responseMimeType: 'application/json' },
+                });
+                metadata.token_usage = response.response.usageMetadata;
+                return JSON.parse(cleanJsonOutput(response.response.text())) as GrowthTrajectory;
+            }, { event_type: 'trajectory_projection', prompt, model: 'dynamic' });
         } catch (err) {
             console.error('[RdTrajectoryService] Unexpected error:', err);
             return null;

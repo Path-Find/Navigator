@@ -31,9 +31,20 @@ export const selectRelevantResumeBlocks = (
         block.isVisible !== false && ['work', 'volunteer', 'project', 'education'].includes(block.type)
     );
     const referenceTerms = terms(reference);
-    return visibleBlocks
-        .map((block, index) => ({ block, index, score: scoreBlock(block, referenceTerms) }))
-        .sort((a, b) => b.score - a.score || a.index - b.index)
+    const scoredBlocks = visibleBlocks
+        .map((block, index) => ({
+            block,
+            index,
+            score: scoreBlock(block, referenceTerms),
+            overlap: [...terms(blockText(block))].filter(term => referenceTerms.has(term)).length,
+        }))
+        .sort((a, b) => b.score - a.score || a.index - b.index);
+    const relevantBlocks = reference.trim()
+        ? scoredBlocks.filter(({ overlap }) => overlap > 0)
+        : scoredBlocks;
+    const selectedBlocks = relevantBlocks.length > 0 ? relevantBlocks : scoredBlocks.slice(0, 1);
+
+    return selectedBlocks
         .slice(0, maxBlocks)
         .map(({ block }) => ({
             ...block,
@@ -60,3 +71,16 @@ export const serializeResumeBlocks = (
         type, title, organization, dateRange, bullets,
         ...(narrativeContext ? { narrativeContext } : {}),
     })));
+
+export const serializeResumeProfile = (
+    profile: ResumeProfile,
+    reference = '',
+    maxBlocks: number = AI_CONTEXT_BUDGETS.resumeBlocks,
+): string => JSON.stringify({
+    name: profile.name,
+    blocks: selectRelevantResumeBlocks(profile, reference, maxBlocks)
+        .map(({ type, title, organization, dateRange, bullets, narrativeContext }) => ({
+            type, title, organization, dateRange, bullets,
+            ...(narrativeContext ? { narrativeContext } : {}),
+        })),
+});
