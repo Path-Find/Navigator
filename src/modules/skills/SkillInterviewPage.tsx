@@ -262,7 +262,7 @@ export const SkillInterviewPage: React.FC = () => {
     return (
         <div className="min-h-screen bg-white dark:bg-[#0a0a0a] animate-in fade-in duration-500">
             {/* Main Content */}
-            <div className="pt-24 min-h-screen flex flex-col relative overflow-hidden bg-neutral-50/50 dark:bg-black/50">
+            <div className="pt-24 flex-1 min-h-0 flex flex-col relative overflow-hidden bg-neutral-50/50 dark:bg-black/50">
                 <div className="fixed top-20 right-0 w-96 h-96 bg-emerald-500/5 rounded-full blur-[100px] pointer-events-none" />
                 <div className="fixed bottom-0 left-0 w-96 h-96 bg-teal-500/5 rounded-full blur-[100px] pointer-events-none" />
 
