@@ -15,10 +15,10 @@ import { JOB_ANALYSIS_PROMPTS, COVER_LETTER_PROMPTS, COVER_LETTER_STYLE_METADATA
 import { BucketStorage } from "../storage/bucketStorage";
 import { formatCandidateProfileContext } from '../candidateProfileContext';
 import { getCourseCompletionStatus } from '../../modules/grad/types';
+import { selectInterviewBlocks } from './interviewContext';
 
-const stringifyProfile = (profile: ResumeProfile): string => {
-    return profile.blocks
-        .filter(b => b.isVisible)
+const stringifyProfile = (profile: ResumeProfile, reference = '', maxBlocks = 8): string => {
+    return selectInterviewBlocks(profile, reference, maxBlocks)
         .map(b => {
             return `BLOCK_ID: ${b.id}\nROLE: ${b.title}\nORG: ${b.organization}\nDATE: ${b.dateRange}\nDETAILS:\n${b.bullets.map(bull => `- ${bull}`).join('\n')}${b.narrativeContext ? `\nSTORY CONTEXT:\n${b.narrativeContext}` : ''}\n`;
         })
@@ -214,7 +214,7 @@ export const buildJobCandidateContext = (
     transcript: Transcript | null | undefined,
     parsedJob: DistilledJob
 ): JobCandidateContext => {
-    const resumeContext = resumes.map(stringifyProfile).filter(Boolean).join('\n---\n');
+    const resumeContext = resumes.map(profile => stringifyProfile(profile, '', 50)).filter(Boolean).join('\n---\n');
     const jobRequirements = getJobRequirements(parsedJob);
     const jobSkillText = [
         ...(parsedJob.keySkills || []),
@@ -674,7 +674,7 @@ export const generateCoverLetter = async (
     styleLabel: string;
     styleDescription: string;
 }> => {
-    const resumeText = stringifyProfile(selectedResume);
+    const resumeText = stringifyProfile(selectedResume, jobDescription);
     const styles = COVER_LETTER_PROMPTS.COVER_LETTER.STYLE_MODULES;
     const selectedPromptVersion = forceVariant && forceVariant in styles
         ? forceVariant as keyof typeof styles
@@ -774,7 +774,7 @@ export const generateCoverLetterWithQuality = async (
     let result = await generateCoverLetter(jobDescription, selectedResume, tailoringInstructions, initialContext, undefined, trajectoryContext, jobId, canonicalTitle, personalizedStyle, candidateName, coverLetterPreferences, candidateSignals, candidateProfileContext, recipient);
     let attempts = 1;
 
-    const resumeContext = stringifyProfile(selectedResume);
+    const resumeContext = stringifyProfile(selectedResume, jobDescription);
 
     const buildHonestyContext = (critique: { feedback: string[] }, attempts: number) => {
         const honestyInstruction = `
@@ -821,7 +821,7 @@ export const generateCoverLetterWithQuality = async (
     // decision label, then stop.
     if (isExtremeMismatch) {
         if (onProgress) onProgress('Critiquing');
-        const critique = await critiqueCoverLetter(jobDescription, result.text, stringifyProfile(selectedResume), jobId);
+        const critique = await critiqueCoverLetter(jobDescription, result.text, stringifyProfile(selectedResume, jobDescription), jobId);
         return { ...result, decision: critique.decision, attempts, critique };
     }
 
@@ -875,7 +875,7 @@ export const generateTailoredSummary = async (
     resumes: ResumeProfile[],
     jobId?: string
 ): Promise<string> => {
-    const resumeContext = resumes.map(stringifyProfile).join('\n---\n');
+    const resumeContext = resumes.map(resume => stringifyProfile(resume, jobDescription)).join('\n---\n');
     const prompt = JOB_ANALYSIS_PROMPTS.TAILORED_SUMMARY(jobDescription, resumeContext);
 
     return callWithRetry(async (metadata) => {

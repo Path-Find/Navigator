@@ -158,6 +158,10 @@ export const callWithRetry = async <T>(
 ): Promise<T> => {
     let currentDelay = initialDelay;
     const startTime = Date.now();
+    const promptMetrics = {
+        prompt_chars: context.prompt.length,
+        prompt_approx_tokens: Math.ceil(context.prompt.length / 4),
+    };
 
     for (let i = 0; i < retries; i++) {
         if (abortSignal?.aborted) throw new Error("AbortError");
@@ -173,7 +177,7 @@ export const callWithRetry = async <T>(
                 response_text: typeof result === 'string' ? result : JSON.stringify(result),
                 latency_ms: latency,
                 status: 'success',
-                metadata: { ...context.metadata, ...executionMetadata },
+                metadata: { ...context.metadata, ...promptMetrics, ...executionMetadata },
                 job_id: context.job_id
             });
             return result;
@@ -226,7 +230,7 @@ export const callWithRetry = async <T>(
                     status: 'error',
                     error_message: errorMessage,
                     latency_ms: Date.now() - startTime,
-                    metadata: { attempt: i + 1 },
+                    metadata: { ...promptMetrics, attempt: i + 1 },
                     job_id: context.job_id
                 });
                 if (isQuotaError) throw new Error(getUserFriendlyError("RATE_LIMIT_EXCEEDED"), { cause: error });

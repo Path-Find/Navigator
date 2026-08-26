@@ -52,39 +52,45 @@ const stringifySkillsForCareer = (skills: CustomSkill[]): string => JSON.stringi
     ...(evidence ? { evidence } : {}),
 })));
 
-const stringifyTranscriptForCareer = (transcript: Transcript): string => JSON.stringify({
-    university: transcript.university,
-    program: transcript.program,
-    credentialType: transcript.credentialType,
-    cgpa: transcript.cgpa,
-    semesters: transcript.semesters.map(({ term, year, courses }) => ({
-        term,
-        year,
-        courses: courses.map(({ code, title, grade, credits }) => ({
-            code,
-            title,
-            grade,
-            credits,
-            status: getCourseCompletionStatus({ grade }),
-        })),
-    })),
-});
+const transcriptTerms = (value: string): Set<string> => new Set(
+    value.toLowerCase().replace(/[^a-z0-9]+/g, ' ').split(/\s+/).filter(term => term.length >= 4)
+);
 
-const stringifyCourses = (transcript: Transcript): string => JSON.stringify(
+const stringifyTranscriptForCareer = (transcript: Transcript, reference = '', maxCourses = 40): string => {
+    const referenceTerms = transcriptTerms(reference);
+    const courses = transcript.semesters
+        .flatMap(semester => semester.courses.map(course => ({
+            ...course,
+            status: getCourseCompletionStatus({ grade: course.grade }),
+            score: [...transcriptTerms(`${course.code} ${course.title}`)].filter(term => referenceTerms.has(term)).length,
+        })))
+        .sort((a, b) => b.score - a.score)
+        .slice(0, maxCourses);
+
+    return JSON.stringify({
+        university: transcript.university,
+        program: transcript.program,
+        credentialType: transcript.credentialType,
+        cgpa: transcript.cgpa,
+        courses: courses.map(({ code, title, grade, credits, status }) => ({ code, title, grade, credits, status })),
+    });
+};
+
+const stringifyCourses = (transcript: Transcript, maxCourses = 60): string => JSON.stringify(
     transcript.semesters.flatMap(semester => semester.courses.map(({ code, title, grade, credits }) => ({
         code,
         title,
         grade,
         credits,
         status: getCourseCompletionStatus({ grade }),
-    })))
+    }))).slice(0, maxCourses)
 );
 
 export const analyzeMAEligibility = async (
     transcript: Transcript,
     targetProgram: string
 ): Promise<AdmissionEligibility> => {
-    const transcriptText = stringifyTranscriptForCareer(transcript);
+    const transcriptText = stringifyTranscriptForCareer(transcript, targetProgram);
     const prompt = EDUCATION_PROMPTS.GRAD_SCHOOL_ELIGIBILITY(transcriptText, targetProgram);
 
     return callWithRetry(async (metadata) => {
@@ -224,7 +230,7 @@ export const analyzeCurrentProgramRequirements = async (
     programName: string,
     university: string
 ): Promise<AdmissionEligibility> => {
-    const transcriptText = stringifyTranscriptForCareer(transcript);
+    const transcriptText = stringifyTranscriptForCareer(transcript, `${programName} ${university}`);
     const prompt = EDUCATION_PROMPTS.PROGRAM_REQUIREMENTS_ANALYSIS(transcriptText, programName, university);
 
     return callWithRetry(async (metadata) => {

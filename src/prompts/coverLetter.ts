@@ -80,7 +80,7 @@ export const COVER_LETTER_PROMPTS = {
     JOB DESCRIPTION DATA:
     ${anchorData('JOB_DESCRIPTION', jobDescription)}
  
-    MY EXPERIENCE DATA (Full Resume for Context):
+    RELEVANT EXPERIENCE DATA:
     ${anchorData('RESUME', resumeText)}
  
     ${trajectoryContext ? `MY CAREER CONTEXT (Goals & Patterns):

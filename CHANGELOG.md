@@ -5,6 +5,7 @@ All notable changes to this project will be documented in this file.
 See [CHANGELOG_ARCHIVE.md](CHANGELOG_ARCHIVE.md) for earlier history.
 
 ## [Unreleased]
+- **Focused AI context beyond interviews**: cover letters and education tools now send only relevant resume blocks and capped coursework, while AI logs record prompt-size metrics for cost review.
 - **Focused interview AI context**: each prompt now receives only the most relevant resume blocks, skills, and approved profile details needed for that task.
 - **Hardened interview inputs**: answer length is capped, oversized AI requests are rejected server-side, and repeated interview requests are throttled.
 - **Kept interview feedback professional**: profanity and insults in answers are not repeated verbatim in coaching.
