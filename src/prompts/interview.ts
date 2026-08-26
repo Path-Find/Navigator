@@ -138,7 +138,8 @@ export const INTERVIEW_PROMPTS = {
     1. Evaluate the response quality overall. Address the candidate DIRECTLY using "you" (do NOT use third-person like "the candidate").
     2. For EACH target skill listed, determine if the response demonstrates competence in that skill.
     3. Provide concise feedback.
-    4. Decide whether the interview should continue. Continue until there is enough evidence across the selected skills, but never exceed ${maxQuestions} questions. If it continues, write one new question that does not repeat the recent history and targets one or two selected skills.
+    4. Decide whether the interview should continue. Continue until there is enough evidence across the selected skills, but never exceed ${maxQuestions} questions. If it continues, write one new question that targets one or two selected skills.
+    5. Make each new question meaningfully different from the recent history: do not reuse the same setting, people, crisis, or financial-aid/transcript details. You may target a weakness from an earlier answer, but use a fresh scenario unless a direct clarification is genuinely necessary.
 
     Return ONLY JSON:
     {

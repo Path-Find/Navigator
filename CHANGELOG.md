@@ -7,6 +7,7 @@ See [CHANGELOG_ARCHIVE.md](CHANGELOG_ARCHIVE.md) for earlier history.
 ## [Unreleased]
 ### Changed
 
+- **Improved adaptive Skills scenarios**: follow-up questions now target earlier weaknesses without repeating the same setting or crisis.
 - **Reduced Skills interview page height**: removed the duplicate viewport reservation so the conversation and answer box fit more naturally on screen.
 - **Made Skills interviews adaptive**: questions now arrive one at a time, with the next question chosen from the answer and the interview ending when enough evidence is collected.
 - **Added conservative skill canonicalization**: obvious spelling, abbreviation, and product-name variants now share one canonical skill without merging merely similar skills.

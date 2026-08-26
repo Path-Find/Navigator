@@ -21,7 +21,7 @@ export const SkillInterviewSummary = ({ verifiedCount, skills, skillScores, veri
             </h4>
             <p className="text-lg text-neutral-500 dark:text-neutral-400 font-medium mb-10 max-w-lg">
                 {verifiedCount > 0
-                    ? `${verifiedCount} skill${verifiedCount !== 1 ? 's' : ''} now has interview evidence in your profile.`
+                    ? `${verifiedCount} skill${verifiedCount !== 1 ? 's' : ''} met the evidence threshold in this interview. Return to Skills to save the results to your profile.`
                     : `No skills met the evidence threshold this time. You can practice again when you’re ready.`
                 }
             </p>
