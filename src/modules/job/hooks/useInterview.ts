@@ -15,20 +15,18 @@ import type { ResumeProfile } from '../../resume/types';
 import type { CustomSkill } from '../../skills/types';
 import { Storage } from '../../../services/storageService';
 import { createCandidateEducationContext, formatCandidateProfileContext, formatVerifiedSkills } from '../../../services/candidateProfileContext';
+import { formatInterviewBlocks } from '../../../services/ai/interviewContext';
 
 const MAX_FOLLOW_UPS = 2;
 
 const INTERVIEW_BLOCK_TYPES = new Set(['work', 'volunteer', 'project', 'education']);
 
-const stringifyForInterview = (resumes: ResumeProfile[], skills: CustomSkill[] = []): string => {
+const stringifyForInterview = (resumes: ResumeProfile[], skills: CustomSkill[] = [], reference = ''): string => {
     if (!resumes.length) return '';
-    return resumes[0].blocks
-        .filter(b => b.isVisible && (b.type === 'work' || b.type === 'volunteer' || b.type === 'project' || b.type === 'education'))
-        .map(b => `${b.title} at ${b.organization} (${b.dateRange}):\n${b.bullets.map(bull => `- ${bull}`).join('\n')}${b.narrativeContext ? `\nStory context: ${b.narrativeContext}` : ''}`)
-        .join('\n\n')
+    return formatInterviewBlocks(resumes[0], reference)
         + [
-            formatCandidateProfileContext(resumes[0]) ? `APPROVED CANDIDATE CONTEXT:\n${formatCandidateProfileContext(resumes[0])}` : '',
-            formatVerifiedSkills(skills),
+            formatCandidateProfileContext(resumes[0], reference) ? `APPROVED CANDIDATE CONTEXT:\n${formatCandidateProfileContext(resumes[0], reference)}` : '',
+            formatVerifiedSkills(skills, reference),
         ].filter(Boolean).join('\n\n');
 };
 
@@ -127,7 +125,7 @@ export const useInterview = () => {
                 responseText,
                 job ? getInterviewJobContext(job) : undefined,
                 job?.id,
-                stringifyForInterview(job ? getInterviewResumes(job, resumes) : resumes, skills)
+                stringifyForInterview(job ? getInterviewResumes(job, resumes) : resumes, skills, `${question.question}\n${responseText}`)
             );
             const { followUp: followUpResult, ...analysis } = result;
 

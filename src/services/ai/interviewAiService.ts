@@ -1,24 +1,16 @@
 import { getModel, callWithRetry, cleanJsonOutput } from "./aiCore";
 import { INTERVIEW_PROMPTS } from "../../prompts/index";
 import { AI_MODELS } from "../../constants";
-import type { CandidateProfileSignal, CustomSkill, ExperienceBlock, InterviewQuestion, InterviewResponseAnalysis, ResumeProfile } from "../../types";
+import type { CandidateProfileSignal, CustomSkill, InterviewQuestion, InterviewResponseAnalysis, ResumeProfile } from "../../types";
 import { formatCandidateProfileContext, formatVerifiedSkills } from '../candidateProfileContext';
+import { formatInterviewBlocks } from './interviewContext';
 
 const stringifyProfile = (profile: ResumeProfile, jobContext = '', verifiedSkills: CustomSkill[] = []): string => {
-    const blocks = profile.blocks
-        .filter((block: ExperienceBlock) => block.isVisible && ['work', 'volunteer', 'project', 'education'].includes(block.type))
-        .map(({ type, title, organization, dateRange, bullets, narrativeContext }) => ({
-            type,
-            title,
-            organization,
-            dateRange,
-            bullets,
-            ...(narrativeContext ? { narrativeContext } : {}),
-        }));
+    const blocks = formatInterviewBlocks(profile, jobContext);
     const candidateContext = formatCandidateProfileContext(profile, jobContext);
     const skillsContext = formatVerifiedSkills(verifiedSkills, jobContext);
     return [
-        JSON.stringify(blocks),
+        blocks,
         candidateContext ? `APPROVED CANDIDATE CONTEXT:\n${candidateContext}` : '',
         skillsContext,
     ].filter(Boolean).join('\n\n');

@@ -9,6 +9,7 @@ import { createCandidateProfileInsight, createCandidateStory, deriveCandidatePro
 import { ROUTES } from '../../../constants';
 import { authClient } from '../../../lib/auth-client';
 import { checkInterviewLimit } from '../../../services/usageLimits';
+import { formatInterviewBlocks } from '../../../services/ai/interviewContext';
 import type { CandidateProfileInsightStatus, CandidateProfileSignal, CandidateProfileInsightSuggestion, ResumeProfile } from '../../resume/types';
 
 const PROFILE_QUESTIONS = [
@@ -23,14 +24,7 @@ const REVIEW_QUESTIONS: Record<CandidateProfileInsightSuggestion['key'], string>
     possible_first_role: 'Should Navigator treat you as early-career?',
 };
 
-const stringifyResume = (profile: ResumeProfile): string => profile.blocks
-    .filter(block => block.isVisible)
-    .map(block => [
-        `${block.type}: ${block.title} at ${block.organization} (${block.dateRange})`,
-        block.bullets.map(bullet => `- ${bullet}`).join('\n'),
-        block.narrativeContext ? `Story context: ${block.narrativeContext}` : '',
-    ].filter(Boolean).join('\n'))
-    .join('\n\n');
+const stringifyResume = (profile: ResumeProfile): string => formatInterviewBlocks(profile);
 
 interface CandidateProfileInterviewProps {
     onClose?: () => void;
