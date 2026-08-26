@@ -1,8 +1,20 @@
+export type EducationCredentialType =
+    | 'High school'
+    | 'Certificate'
+    | 'Diploma'
+    | 'Associate degree'
+    | "Bachelor's degree"
+    | "Master's degree"
+    | 'Doctorate'
+    | 'Professional degree'
+    | 'Other';
+
 export interface ExperienceBlock {
     id: string;
     type: 'summary' | 'work' | 'education' | 'project' | 'skill' | 'volunteer' | 'other';
     title: string;       // Job Title, Degree, or Project Name
     organization: string; // Company, School, or Organization
+    credentialType?: EducationCredentialType;
     dateRange: string;   // e.g. "Jan 2023 - Present"
     bullets: string[];   // The specific points
     isVisible: boolean;  // toggle to include/exclude in analysis

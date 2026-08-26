@@ -1,6 +1,12 @@
 import React from 'react';
 import { UserCircle, Briefcase, GraduationCap, Heart, Code, Layers } from 'lucide-react';
 import type { ExperienceBlock } from './types';
+import type { EducationCredentialType } from './types';
+
+export const EDUCATION_CREDENTIAL_TYPES: EducationCredentialType[] = [
+    'High school', 'Certificate', 'Diploma', 'Associate degree',
+    "Bachelor's degree", "Master's degree", 'Doctorate', 'Professional degree', 'Other',
+];
 
 export type SectionType = ExperienceBlock['type'];
 

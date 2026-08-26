@@ -2,7 +2,7 @@ import React from 'react';
 import { Plus, Trash2, Calendar, ArrowRightLeft, ChevronUp, ChevronDown, MessageCircle } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import type { ExperienceBlock } from '../types';
-import type { SectionType } from '../constants';
+import { EDUCATION_CREDENTIAL_TYPES, type SectionType } from '../constants';
 import { Card } from '../../../components/ui/Card';
 import { Button } from '../../../components/ui/Button';
 import { ResumeDateRangeFields } from './ResumeDateRangeFields';
@@ -85,6 +85,17 @@ export const ResumeSectionEditor: React.FC<ResumeSectionEditorProps> = ({
                                         target.style.height = target.scrollHeight + 'px';
                                     }}
                                 />
+                                {block.type === 'education' && (
+                                    <select
+                                        value={block.credentialType || ''}
+                                        onChange={event => onUpdateBlock(block.id, 'credentialType', event.target.value)}
+                                        aria-label={`Credential type for ${block.title || 'education entry'}`}
+                                        className="mt-3 rounded-lg border border-neutral-200 bg-white px-2 py-1.5 text-xs font-bold text-neutral-500 outline-none focus:border-neutral-400 dark:border-neutral-700 dark:bg-neutral-900 dark:text-neutral-300"
+                                    >
+                                        <option value="">Select credential type</option>
+                                        {EDUCATION_CREDENTIAL_TYPES.map(option => <option key={option} value={option}>{option}</option>)}
+                                    </select>
+                                )}
                             </div>
                         )}
 

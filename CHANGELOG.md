@@ -5,6 +5,7 @@ All notable changes to this project will be documented in this file.
 See [CHANGELOG_ARCHIVE.md](CHANGELOG_ARCHIVE.md) for earlier history.
 
 ## [Unreleased]
+- **Structured education credentials**: education entries now use a consistent credential-type selector while keeping the full degree or program name in the title.
 - **Refined resume date controls**: styled month/year selectors now replace the native picker, and existing entries use one current-state control.
 - **Replaced freeform resume dates**: entries now use month selectors and a Current checkbox so date ranges are consistent.
 - **Made resume-story interviews type-aware**: project and volunteer entries now receive questions tailored to their goals, contributions, and impact instead of generic work-interview wording.

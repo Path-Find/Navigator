@@ -59,7 +59,7 @@ export const formatResumeBlocks = (
     maxBlocks: number = AI_CONTEXT_BUDGETS.resumeBlocks,
     includeBlockIds = false,
 ): string => selectRelevantResumeBlocks(profile, reference, maxBlocks)
-    .map(block => `${includeBlockIds ? `BLOCK_ID: ${block.id}\n` : ''}ROLE: ${block.title}\nORG: ${block.organization}\nDATE: ${block.dateRange}\nDETAILS:\n${block.bullets.map(bullet => `- ${bullet}`).join('\n')}${block.narrativeContext ? `\nSTORY CONTEXT:\n${block.narrativeContext}` : ''}`)
+    .map(block => `${includeBlockIds ? `BLOCK_ID: ${block.id}\n` : ''}TYPE: ${block.type}\nROLE: ${block.title}\nORG: ${block.organization}\n${block.credentialType ? `CREDENTIAL TYPE: ${block.credentialType}\n` : ''}DATE: ${block.dateRange}\nDETAILS:\n${block.bullets.map(bullet => `- ${bullet}`).join('\n')}${block.narrativeContext ? `\nSTORY CONTEXT:\n${block.narrativeContext}` : ''}`)
     .join('\n---\n');
 
 export const serializeResumeBlocks = (
@@ -68,7 +68,7 @@ export const serializeResumeBlocks = (
     maxBlocks: number = AI_CONTEXT_BUDGETS.resumeBlocks,
 ): string => JSON.stringify(selectRelevantResumeBlocks(profile, reference, maxBlocks)
     .map(({ type, title, organization, dateRange, bullets, narrativeContext }) => ({
-        type, title, organization, dateRange, bullets,
+        type, title, organization, credentialType, dateRange, bullets,
         ...(narrativeContext ? { narrativeContext } : {}),
     })));
 
@@ -80,7 +80,7 @@ export const serializeResumeProfile = (
     name: profile.name,
     blocks: selectRelevantResumeBlocks(profile, reference, maxBlocks)
         .map(({ type, title, organization, dateRange, bullets, narrativeContext }) => ({
-            type, title, organization, dateRange, bullets,
+        type, title, organization, credentialType, dateRange, bullets,
             ...(narrativeContext ? { narrativeContext } : {}),
         })),
 });

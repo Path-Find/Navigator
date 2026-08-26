@@ -2,13 +2,14 @@ import React, { useState, useEffect, useRef } from 'react';
 import { X, Plus, Calendar } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { Button } from '../../../components/ui/Button';
-import type { SectionType } from '../constants';
+import { EDUCATION_CREDENTIAL_TYPES, type SectionType } from '../constants';
+import type { EducationCredentialType } from '../types';
 import { ResumeDateRangeFields } from './ResumeDateRangeFields';
 
 interface AddEntryModalProps {
     type: SectionType;
     sectionLabel: string;
-    onAdd: (title: string, organization: string, dateRange: string) => void;
+    onAdd: (title: string, organization: string, dateRange: string, credentialType?: EducationCredentialType) => void;
     onClose: () => void;
 }
 
@@ -16,6 +17,7 @@ export const AddEntryModal: React.FC<AddEntryModalProps> = ({ type, sectionLabel
     const [title, setTitle] = useState('');
     const [organization, setOrganization] = useState('');
     const [dateRange, setDateRange] = useState('');
+    const [credentialType, setCredentialType] = useState<EducationCredentialType | ''>('');
     const titleRef = useRef<HTMLInputElement>(null);
 
     useEffect(() => {
@@ -24,7 +26,7 @@ export const AddEntryModal: React.FC<AddEntryModalProps> = ({ type, sectionLabel
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        onAdd(title.trim(), organization.trim(), dateRange.trim());
+        onAdd(title.trim(), organization.trim(), dateRange.trim(), type === 'education' && credentialType ? credentialType : undefined);
         onClose();
     };
 
@@ -65,6 +67,20 @@ export const AddEntryModal: React.FC<AddEntryModalProps> = ({ type, sectionLabel
                                 placeholder={type === 'work' ? 'e.g. Product Manager' : type === 'education' ? 'e.g. B.Sc. Urban Planning' : 'e.g. Transit Dashboard'}
                                 className="w-full px-3 py-2.5 rounded-xl border border-neutral-200 dark:border-neutral-700 bg-neutral-50 dark:bg-neutral-800 text-neutral-900 dark:text-white placeholder:text-neutral-300 dark:placeholder:text-neutral-600 text-sm font-medium focus:outline-none focus:border-neutral-300 dark:focus:border-neutral-700 focus:ring-2 focus:ring-neutral-500/10 transition-all"
                             />
+                        </div>
+                    )}
+
+                    {type === 'education' && (
+                        <div className="space-y-1.5">
+                            <label className="text-xs font-bold text-neutral-500 uppercase tracking-wide">Credential type</label>
+                            <select
+                                value={credentialType}
+                                onChange={event => setCredentialType(event.target.value as EducationCredentialType | '')}
+                                className="w-full px-3 py-2.5 rounded-xl border border-neutral-200 dark:border-neutral-700 bg-neutral-50 dark:bg-neutral-800 text-neutral-900 dark:text-white text-sm font-medium focus:outline-none focus:border-neutral-300 dark:focus:border-neutral-700 focus:ring-2 focus:ring-neutral-500/10 transition-all"
+                            >
+                                <option value="">Select a credential type</option>
+                                {EDUCATION_CREDENTIAL_TYPES.map(option => <option key={option} value={option}>{option}</option>)}
+                            </select>
                         </div>
                     )}
 

@@ -417,8 +417,8 @@ export const ResumeEditor: React.FC = () => {
                     <AddEntryModal
                         type={addingSection}
                         sectionLabel={SECTIONS.find(s => s.type === addingSection)?.label ?? addingSection}
-                        onAdd={(title, organization, dateRange) => {
-                            addBlock(addingSection, { title, organization, dateRange });
+                        onAdd={(title, organization, dateRange, credentialType) => {
+                            addBlock(addingSection, { title, organization, dateRange, credentialType });
                             setAddingSection(null);
                         }}
                         onClose={() => setAddingSection(null)}

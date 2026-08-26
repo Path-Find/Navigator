@@ -46,13 +46,14 @@ export function useResumeEditor(
     // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [blocks, initialResume?.id]);
 
-    const addBlock = useCallback((type: SectionType, initial?: { title?: string; organization?: string; dateRange?: string }) => {
+    const addBlock = useCallback((type: SectionType, initial?: { title?: string; organization?: string; dateRange?: string; credentialType?: ExperienceBlock['credentialType'] }) => {
         if (type === 'summary' && blocks.some(b => b.type === 'summary')) return;
         const newBlock: ExperienceBlock = {
             id: crypto.randomUUID(),
             type,
             title: initial?.title ?? (type === 'summary' ? 'Professional Summary' : ''),
             organization: initial?.organization ?? '',
+            ...(type === 'education' && initial?.credentialType ? { credentialType: initial.credentialType } : {}),
             dateRange: initial?.dateRange ?? '',
             bullets: [''],
             isVisible: true
