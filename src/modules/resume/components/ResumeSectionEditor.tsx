@@ -24,6 +24,7 @@ interface ResumeSectionEditorProps {
 }
 
 const CURRENT_FLAG_TYPES: ExperienceBlock['type'][] = ['work', 'volunteer', 'education', 'project'];
+const INTERVIEWABLE_TYPES: ExperienceBlock['type'][] = ['work', 'volunteer', 'project'];
 
 export const ResumeSectionEditor: React.FC<ResumeSectionEditorProps> = ({
     block,
@@ -214,7 +215,7 @@ export const ResumeSectionEditor: React.FC<ResumeSectionEditorProps> = ({
                                         Add Line
                                     </Button>
 
-                                    {CURRENT_FLAG_TYPES.includes(block.type) && (
+                                    {INTERVIEWABLE_TYPES.includes(block.type) && (
                                         <Button
                                             onClick={() => onStartInterview(block)}
                                             variant="subtle"
