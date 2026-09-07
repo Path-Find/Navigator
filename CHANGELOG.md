@@ -127,6 +127,7 @@ See [CHANGELOG_ARCHIVE.md](CHANGELOG_ARCHIVE.md) for earlier history.
 
 ### Security
 - **Patched the high-severity nanoid denial-of-service vulnerability**: the development dependency now resolves to a fixed release.
+- **Patched the extension’s high-severity browserslist vulnerability**: the extension lockfile now resolves to a fixed release.
 
 ## [2.43.13] — 2026-08-11
 
