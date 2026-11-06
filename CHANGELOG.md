@@ -125,8 +125,9 @@ See [CHANGELOG_ARCHIVE.md](CHANGELOG_ARCHIVE.md) for earlier history.
 - **Resume editing no longer shows the unrequested “Tell Your Story” control**: the editor stays focused on resume content and actions users asked for.
 - **Cover letters no longer mechanically repeat resume metrics**: achievement facts remain grounded while numbers can be rounded, generalized, or omitted when natural wording is stronger.
 
+- **Patched the open Dependabot security alerts, including a critical flaw in the sign-in library**: Better Auth, Zod, undici, Vite, happy-dom and source-map-js now resolve to fixed releases.
 ### Security
-- **Patched the high-severity nanoid denial-of-service vulnerability**: the development dependency now resolves to a fixed release.
+- **Patched 46 Dependabot security alerts, including a critical sign-in library flaw**: Better Auth, Zod, undici, Vite, happy-dom and source-map-js now resolve to fixed releases.
 - **Patched the extension’s high-severity browserslist vulnerability**: the extension lockfile now resolves to a fixed release.
 - **Patched the root app’s high-severity browserslist vulnerability**: the root lockfile now resolves to a fixed release.
 
