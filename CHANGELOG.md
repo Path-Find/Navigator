@@ -126,6 +126,7 @@ See [CHANGELOG_ARCHIVE.md](CHANGELOG_ARCHIVE.md) for earlier history.
 - **Cover letters no longer mechanically repeat resume metrics**: achievement facts remain grounded while numbers can be rounded, generalized, or omitted when natural wording is stronger.
 
 ### Security
+- **Patched the open Dependabot security alerts, including a critical flaw in the sign-in library**: Better Auth, Zod, undici, Vite, happy-dom and source-map-js now resolve to fixed releases.
 - **Patched the high-severity nanoid denial-of-service vulnerability**: the development dependency now resolves to a fixed release.
 - **Patched the extension’s high-severity browserslist vulnerability**: the extension lockfile now resolves to a fixed release.
 - **Patched the root app’s high-severity browserslist vulnerability**: the root lockfile now resolves to a fixed release.
