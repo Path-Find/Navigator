@@ -16,6 +16,7 @@
     "test:e2e": "playwright test"
   },
   "dependencies": {
+    "@anthropic-ai/sdk": "^1.6.0",
     "@google/generative-ai": "^0.24.1",
     "@neondatabase/auth": "^0.6.0-beta",
     "@neondatabase/postgrest-js": "^0.2.0-beta",

@@ -1,6 +1,7 @@
 import { neon } from '@neondatabase/serverless';
 import { verifyUser, getCorsHeaders, AuthError } from './_lib/verifyAuth.js';
 import { extractText, type GeminiResponse } from './_lib/types.js';
+import { callClaude } from './_lib/claude.js';
 
 // Vercel Function port of supabase/functions/gemini-proxy/index.ts.
 // Same business logic (tier gating, quota, refunds); auth + data access moved to Neon Auth + Neon Postgres.
@@ -34,6 +35,24 @@ export const TIER_MODELS: Record<string, { extraction: string; analysis: string 
     admin: { extraction: 'gemini-flash-lite-latest', analysis: 'gemini-flash-latest' },
     tester: { extraction: 'gemini-flash-lite-latest', analysis: 'gemini-flash-latest' },
 };
+
+const ANALYSIS_SYSTEM_PROMPT = 'CRITICAL: First validate if the provided content is a job description or related job metadata. Ignore website navigation, headers, and boilerplate. As long as there is mention of a role, responsibilities, or requirements anywhere in the text, proceed with the requested analysis. If it is purely non-job related content (e.g. a recipe or a weather report), return: {"error": "not_a_job"}.';
+
+// Claude pilot. Off unless CLAUDE_MODELS is set in the environment, so nothing
+// changes until it is. A JSON map of task or feature -> Claude model, for example:
+//   {"extraction":"claude-haiku-5-5","analysis":"claude-sonnet-5-5","cover_letter_critique":"claude-opus-5-5"}
+// A feature entry wins over its task entry. Anything not listed stays on Gemini.
+function claudeModelFor(task: string, feature?: string): string | undefined {
+    const raw = process.env.CLAUDE_MODELS;
+    if (!raw) return undefined;
+    try {
+        const map = JSON.parse(raw) as Record<string, string>;
+        return (feature && map[feature]) || map[task];
+    } catch {
+        console.error('CLAUDE_MODELS is not valid JSON; ignoring it.');
+        return undefined;
+    }
+}
 
 async function handler(req: Request): Promise<Response> {
     if (req.method === 'OPTIONS') {
@@ -165,7 +184,7 @@ async function handler(req: Request): Promise<Response> {
         }
 
         // 2c. FEATURE-TIER ACCESS CHECK
-        const PLUS_ONLY_FEATURES = ['cover_letter', 'resume_tailor'];
+        const PLUS_ONLY_FEATURES = ['cover_letter', 'cover_letter_critique', 'resume_tailor'];
         const PRO_ONLY_FEATURES = ['gap_analysis', 'roadmap', 'role_model'];
 
         if (feature && PLUS_ONLY_FEATURES.includes(feature) && userTier === 'free') {
@@ -195,13 +214,17 @@ async function handler(req: Request): Promise<Response> {
             modelName = model || 'gemini-embedding-001';
         }
 
+        const claudeModel = safeTask === 'embedding' ? undefined : claudeModelFor(safeTask, feature);
+        if (claudeModel) modelName = claudeModel;
+
         console.log('User action:', { userId: sanitizeLog(userId), tier: sanitizeLog(userTier), task: sanitizeLog(safeTask), model: sanitizeLog(modelName) });
 
         // 3. RETRIEVE API KEY
-        const apiKey = process.env.GEMINI_API_KEY;
+        const apiKey = claudeModel ? process.env.ANTHROPIC_API_KEY : process.env.GEMINI_API_KEY;
         if (!apiKey) {
-            console.error('GEMINI_API_KEY missing');
-            throw new Error('GEMINI_API_KEY not set in Vercel project env vars.');
+            const missing = claudeModel ? 'ANTHROPIC_API_KEY' : 'GEMINI_API_KEY';
+            console.error(`${missing} missing`);
+            throw new Error(`${missing} not set in Vercel project env vars.`);
         }
 
         // 4. PESSIMISTIC QUOTA INCREMENT
@@ -220,32 +243,48 @@ async function handler(req: Request): Promise<Response> {
         const method = safeTask === 'embedding' ? 'embedContent' : 'generateContent';
         const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:${method}?key=${apiKey}`;
 
-        let response: Response;
+        let data: GeminiResponse;
         try {
-            response = await fetch(apiUrl, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                // `embedContent` accepts neither generationConfig nor systemInstruction —
-                // sending either returns 400 "Unknown name". Only generateContent gets them.
-                body: JSON.stringify(safeTask === 'embedding' ? payload : {
-                    ...payload,
-                    generationConfig: {
-                        ...generationConfig,
-                        // Gemini 3.x rejects `thinkingBudget: 0` outright (400 INVALID_ARGUMENT)
-                        // — thinking can be turned down but not off. `thinkingLevel: 'low'` is
-                        // the replacement and yields zero thought tokens on the flash models.
-                        thinkingConfig: { thinkingLevel: 'low' },
-                    },
-                    systemInstruction: safeTask === 'analysis' ? {
-                        role: 'system',
-                        parts: [{ text: 'CRITICAL: First validate if the provided content is a job description or related job metadata. Ignore website navigation, headers, and boilerplate. As long as there is mention of a role, responsibilities, or requirements anywhere in the text, proceed with the requested analysis. If it is purely non-job related content (e.g. a recipe or a weather report), return: {"error": "not_a_job"}.' }],
-                    } : undefined,
-                }),
-            });
+            if (claudeModel) {
+                const result = await callClaude({
+                    model: claudeModel,
+                    payload,
+                    generationConfig,
+                    system: safeTask === 'analysis' ? ANALYSIS_SYSTEM_PROMPT : undefined,
+                    task: safeTask,
+                });
+                // Reshape to Gemini's response so the code below is unchanged.
+                data = {
+                    candidates: [{ content: { parts: [{ text: result.text }] } }],
+                    usageMetadata: result.usage,
+                };
+            } else {
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    // `embedContent` accepts neither generationConfig nor systemInstruction —
+                    // sending either returns 400 "Unknown name". Only generateContent gets them.
+                    body: JSON.stringify(safeTask === 'embedding' ? payload : {
+                        ...payload,
+                        generationConfig: {
+                            ...generationConfig,
+                            // Gemini 3.x rejects `thinkingBudget: 0` outright (400 INVALID_ARGUMENT)
+                            // — thinking can be turned down but not off. `thinkingLevel: 'low'` is
+                            // the replacement and yields zero thought tokens on the flash models.
+                            thinkingConfig: { thinkingLevel: 'low' },
+                        },
+                        systemInstruction: safeTask === 'analysis' ? {
+                            role: 'system',
+                            parts: [{ text: ANALYSIS_SYSTEM_PROMPT }],
+                        } : undefined,
+                    }),
+                });
 
-            if (!response.ok) {
-                const errorText = await response.text();
-                throw new Error(`Gemini API Error (${response.status}): ${errorText}`);
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    throw new Error(`Gemini API Error (${response.status}): ${errorText}`);
+                }
+                data = await response.json() as GeminiResponse;
             }
         } catch (apiError) {
             console.error('API execution failure:', sanitizeLog((apiError as Error).message));
@@ -259,8 +298,6 @@ async function handler(req: Request): Promise<Response> {
             }
             throw apiError;
         }
-
-        const data = await response.json() as GeminiResponse;
 
         if (safeTask === 'embedding') {
             const embedding = data.embedding?.values ?? [];
