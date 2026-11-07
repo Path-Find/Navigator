@@ -3,6 +3,11 @@ import { getEmbeddingModel } from '../aiCore';
 
 export type EmbeddingSource = 'full_profile' | 'experience_block' | 'onboarding_goal' | 'job_role';
 
+// Paused while Navigator moves off Gemini. Embeddings were the last Gemini-only
+// call, and nothing user-facing reads the stored vectors yet. Set to true (and
+// point `embedding` calls at a provider) to resume collecting them.
+const EMBEDDINGS_ENABLED = false;
+
 /**
  * Service for the Professional Latent Space (Phase 2 R&D).
  * Manages vector embeddings for high-dimensional modeling.
@@ -12,6 +17,7 @@ export class RdEmbeddingService {
      * Vectorizes text and stores it in the isolated R&D table.
      */
     static async vectorizeAndStore(userId: string, text: string, sourceType: EmbeddingSource, sourceId?: string) {
+        if (!EMBEDDINGS_ENABLED) return { success: false, error: 'embeddings_paused' };
         try {
             const model = await getEmbeddingModel({
                 task: 'embedding',

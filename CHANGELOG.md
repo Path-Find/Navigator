@@ -7,6 +7,7 @@ See [CHANGELOG_ARCHIVE.md](CHANGELOG_ARCHIVE.md) for earlier history.
 ## [Unreleased]
 ### Changed
 
+- **Paused background resume embeddings**: tailoring no longer stores hidden vectors for the unreleased career-trajectory work, removing the last feature that required Gemini.
 - **Added an optional Claude backend for AI features**: off by default. When enabled, each task (or the cover letter writer and critic separately) can use a chosen Claude model instead of Gemini, so cost and quality can be compared before switching.
 - **Improved adaptive Skills scenarios**: follow-up questions now target earlier weaknesses without repeating the same setting or crisis.
 - **Reduced Skills interview page height**: removed the duplicate viewport reservation so the conversation and answer box fit more naturally on screen.
